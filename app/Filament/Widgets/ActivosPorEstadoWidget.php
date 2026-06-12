@@ -4,38 +4,38 @@ namespace App\Filament\Widgets;
 
 use App\Models\Inventario;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 class ActivosPorEstadoWidget extends ChartWidget
 {
     protected static ?string $heading = 'Activos por Estado';
-    
-    protected static ?int $sort = 5; // Para que aparezca debajo de las tarjetas
+    protected static ?int $sort = 5;
+    protected int | string | array $columnSpan = 'full';
 
     protected function getData(): array
     {
-        // Consulta para contar inventarios agrupados por su estado
-        $data = Inventario::query()
-            ->select('estado', DB::raw('count(*) as total'))
-            ->groupBy('estado')
-            ->pluck('total', 'estado');
+        $estados = ['Disponible', 'Asignado', 'En Mantenimiento', 'Dañado', 'Baja', 'Devuelto a Proveedor'];
+        $conteos = [];
+
+        foreach ($estados as $estado) {
+            $conteos[] = Inventario::where('estado', $estado)->count();
+        }
 
         return [
             'datasets' => [
                 [
-                    'label' => 'Cantidad de Equipos',
-                    'data' => $data->values()->toArray(),
+                    'label' => 'Cantidad de Activos',
+                    'data' => $conteos,
                     'backgroundColor' => [
-                        '#10B981', // Verde (Disponible)
-                        '#3B82F6', // Azul (Asignado)
-                        '#F59E0B', // Naranja (En Mantenimiento)
-                        '#EF4444', // Rojo (Dañado)
-                        '#6B7280', // Gris (Baja)
-                        '#8B5CF6', // Morado (Devuelto)
+                        '#10B981',
+                        '#3B82F6',
+                        '#F59E0B',
+                        '#EF4444',
+                        '#6B7280',
+                        '#8B5CF6',
                     ],
                 ],
             ],
-            'labels' => $data->keys()->toArray(),
+            'labels' => $estados,
         ];
     }
 

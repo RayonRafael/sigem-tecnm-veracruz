@@ -3,18 +3,22 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Mantenimiento;
-use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-class MantenimientosPendientesWidget extends BaseWidget
+class MantenimientosPendientesWidget extends StatsOverviewWidget
 {
+    protected static ?int $sort = 4;
+    protected int | string | array $columnSpan = 1;
+
     protected function getStats(): array
     {
-        $mantenimientosPendientes = Mantenimiento::whereIn('estado', ['Solicitado', 'En proceso', 'Pendiente Revision Admin'])->count();
+        $pendientes = Mantenimiento::whereIn('estado', ['Solicitado', 'En proceso', 'Pendiente Revision Admin'])->count();
 
         return [
-            Stat::make('Mantenimientos Pendientes', $mantenimientosPendientes)
-                ->description('Por atender')
+            Stat::make('Mantenimientos Pendientes', $pendientes)
+                ->description('Requieren atención')
+                ->descriptionIcon('heroicon-m-wrench')
                 ->color('danger'),
         ];
     }
