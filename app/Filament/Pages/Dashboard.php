@@ -2,11 +2,8 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\StatsOverview;
 use App\Filament\Widgets\ActivosPorEstadoWidget;
-use App\Filament\Widgets\DisponiblesWidget;
-use App\Filament\Widgets\MantenimientosPendientesWidget;
-use App\Filament\Widgets\RentasPorVencerWidget;
-use App\Filament\Widgets\TotalActivosWidget;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
@@ -19,7 +16,9 @@ class Dashboard extends BaseDashboard
     {
         return [
             'default' => 1,
+            'sm'      => 1,
             'md'      => 2,
+            'lg'      => 2,
             'xl'      => 2,
         ];
     }
@@ -27,10 +26,7 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            TotalActivosWidget::class,
-            DisponiblesWidget::class,
-            RentasPorVencerWidget::class,
-            MantenimientosPendientesWidget::class,
+            StatsOverview::class,
             ActivosPorEstadoWidget::class,
         ];
     }
