@@ -8,8 +8,8 @@ use Filament\Widgets\ChartWidget;
 class ActivosPorEstadoWidget extends ChartWidget
 {
     protected static ?string $heading = 'Activos por Estado';
-    protected static ?int $sort = 2;
-    protected int | string | array $columnSpan = 'full';
+    protected static ?int $sort = 3;
+    protected int | string | array $columnSpan = 8;
 
     protected function getData(): array
     {
@@ -34,20 +34,20 @@ class ActivosPorEstadoWidget extends ChartWidget
                     'label' => 'Cantidad de Activos',
                     'data' => $conteos,
                     'backgroundColor' => [
-                        '#10B981',
-                        '#3B82F6',
-                        '#F59E0B',
-                        '#EF4444',
-                        '#6B7280',
-                        '#8B5CF6',
+                        '#235B4E', // Verde (Disponible)
+                        '#1B396A', // Azul (Asignado)
+                        '#B38E5D', // Dorado (En Mantenimiento)
+                        '#9D2449', // Guinda (Dañado)
+                        '#807E82', // Gris (Baja)
+                        '#4B5563', // Gris Oscuro (Devuelto a Proveedor)
                     ],
                     'borderColor' => [
-                        '#059669',
-                        '#2563EB',
-                        '#D97706',
-                        '#DC2626',
-                        '#4B5563',
-                        '#7C3AED',
+                        '#194339',
+                        '#13284B',
+                        '#8F714A',
+                        '#7A1B39',
+                        '#5F5E60',
+                        '#374151',
                     ],
                     'borderWidth' => 2,
                     'borderRadius' => 8,

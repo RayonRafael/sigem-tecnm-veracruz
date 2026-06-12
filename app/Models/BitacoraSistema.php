@@ -11,7 +11,9 @@ class BitacoraSistema extends Model
 
     protected $table = 'bitacora_sistema';
     protected $primaryKey = 'id_bitacora';
-    public $timestamps = false;
+    public $timestamps = true;
+    const CREATED_AT = 'fecha_hora';
+    const UPDATED_AT = null;
     
     protected $fillable = [
         'id_usuario', 'accion', 'tabla_afectada', 'registro_id', 

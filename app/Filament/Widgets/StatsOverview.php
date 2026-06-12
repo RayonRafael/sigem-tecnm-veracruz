@@ -11,7 +11,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 class StatsOverview extends StatsOverviewWidget
 {
     protected static ?int $sort = 1;
-    protected int | string | array $columnSpan = 'full';
+    protected int | string | array $columnSpan = 12;
 
     /**
      * StatsOverviewWidget::getColumns() solo acepta int

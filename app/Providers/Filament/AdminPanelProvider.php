@@ -27,20 +27,26 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->brandName('SIGEM - TecNM Veracruz')
             ->colors([
-                'primary' => Color::hex('#006341'),
-                'success' => Color::hex('#008B5D'),
-                'warning' => Color::hex('#D4AF37'),
-                'danger'  => Color::hex('#DC2626'),
-                'info'    => Color::hex('#2563EB'),
-                'gray'    => Color::hex('#6B7280'),
+                'primary' => Color::hex('#1B396A'),      // Azul Institucional (Pantone 294 C)
+                'success' => Color::hex('#235B4E'),      // Verde (Pantone 626 C)
+                'warning' => Color::hex('#B38E5D'),      // Dorado (Pantone 465 C)
+                'danger'  => Color::hex('#9D2449'),      // Guinda (Pantone 7420 C)
+                'info'    => Color::hex('#1B396A'),      // Azul
+                'gray'    => Color::hex('#807E82'),      // Gris (Cool Gray 10 C)
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 \App\Filament\Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([])
+            ->widgets([
+                \App\Filament\Widgets\StatsOverview::class,
+                \App\Filament\Widgets\ActivosPorEstadoWidget::class,
+                \App\Filament\Widgets\AlertasWidget::class,
+                \App\Filament\Widgets\UltimasActividadesWidget::class,
+                \App\Filament\Widgets\RegistroRapidoWidget::class,
+                \App\Filament\Widgets\AccesosRapidosWidget::class,
+            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
