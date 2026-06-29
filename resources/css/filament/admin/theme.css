@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Syne:wght@400;500;600;700;800&display=swap');
+
+/* Font usage */
+body, .fi-body, .filament-body {
+  font-family: 'Outfit', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+
+.fi-section-header h2, .fi-section-header h3, .fi-wi-header h3, .fi-wi__heading, .fi-stats-card__value, .fi-stats-card__title {
+  font-family: 'Syne', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto;
+}
+
+/* Top bar / header */
+.fi-topbar {
+  background: linear-gradient(135deg, #235B4E 0%, #1B396A 50%, #235B4E 100%) !important;
+  border-bottom: 3px solid #B38E5D !important;
+}
+.fi-topbar .fi-topbar-nav a,
+.fi-topbar .fi-topbar-actions a,
+.fi-topbar .fi-topbar-nav button {
+  color: rgba(255,255,255,0.92) !important;
+  opacity: 0.95;
+}
+.fi-topbar .fi-topbar-nav a.active,
+.fi-topbar .fi-topbar-nav button.active {
+  background: rgba(255,255,255,0.12) !important;
+  color: #B38E5D !important;
+}
+
+/* Sidebar */
+.fi-sidebar {
+  background-color: #070d1a !important;
+}
+.fi-sidebar a, .fi-sidebar .fi-nav-link {
+  color: rgba(255,255,255,0.45) !important;
+}
+.fi-sidebar .fi-nav-link.active {
+  background: rgba(56,134,246,0.13) !important;
+  color: #5ba3f5 !important;
+}
+.fi-sidebar .fi-nav-link:hover {
+  background: rgba(255,255,255,0.065) !important;
+}
+
+/* Cards and sections */
+.fi-section, .fi-wi, .fi-card, .fi-stats-card {
+  border-radius: 16px !important;
+  border: 1px solid rgba(0,0,0,0.06) !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06) !important;
+  overflow: hidden;
+  transition: all 250ms ease;
+}
+.fi-section:hover, .fi-wi:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Primary buttons */
+.fi-btn-primary, .filament-button--primary, button.filament-button-primary {
+  background: #235B4E !important;
+  border-radius: 10px !important;
+  font-family: 'Syne', sans-serif !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  transition: all 200ms ease !important;
+}
+.fi-btn-primary:hover, .filament-button--primary:hover {
+  background: #1a453b !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(35,91,78,0.3) !important;
+}
+
+/* Stats overview */
+.fi-stats-card {
+  border-radius: 16px !important;
+}
+.fi-stats-card::before {
+  content: '';
+  display: block;
+}
+.fi-stats-card[data-color="primary"] { border-left: 4px solid #1B396A !important; }
+.fi-stats-card[data-color="success"] { border-left: 4px solid #235B4E !important; }
+.fi-stats-card[data-color="warning"] { border-left: 4px solid #B38E5D !important; }
+.fi-stats-card[data-color="danger"]  { border-left: 4px solid #9D2449 !important; }
+.fi-stats-card .fi-stats-card__value {
+  font-family: 'Syne', sans-serif !important;
+  font-weight: 800 !important;
+}
+
+/* Forms */
+.fi-input, .fi-select-input, input.filament-input, select.filament-select {
+  border-radius: 10px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  transition: border-color 200ms, box-shadow 200ms !important;
+}
+.fi-input:focus, .fi-select-input:focus, input.filament-input:focus, select.filament-select:focus {
+  border-color: #1B396A !important;
+  box-shadow: 0 0 0 3px rgba(27,57,106,0.1) !important;
+  outline: none !important;
+}
+
+/* Tables */
+.fi-ta-table, .filament-tables-table {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+.fi-ta-table thead {
+  background: #f8fafc !important;
+}
+.fi-ta-table tbody tr:hover {
+  background: #f1f5f9 !important;
+}
+
+/* Scrollbar */
+*::-webkit-scrollbar { width: 6px; height: 6px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 999px; }
+
+/* Subtle animations */
+.fi-section, .fi-wi {
+  transition: box-shadow 250ms ease, transform 250ms ease !important;
+}
+
+/* Utility small tweaks */
+.min-h-220 { min-height: 220px !important; }
+
+/* Ensure headings don't inherit weird weights */
+h1,h2,h3,h4,h5,h6 { font-family: 'Syne', 'Outfit', sans-serif; }

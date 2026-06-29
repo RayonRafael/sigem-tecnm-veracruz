@@ -12,12 +12,12 @@
         </div>
     </div>
 
-    <form wire:submit.prevent="crear" class="p-6 space-y-5 flex-1 flex flex-col">
-        <div class="space-y-3 flex-1">
-            {{ $this->form }}
-        </div>
+    <form wire:submit.prevent="crear" class="p-6 space-y-5 flex-1 flex flex-col h-full">
+            <div class="space-y-3 flex-1">
+                {{ $this->form }}
+            </div>
 
-        <button type="submit" class="w-full text-white px-4 py-3 rounded-lg hover:shadow-lg transition-all duration-200 flex items-center justify-center font-bold text-sm uppercase tracking-wide" style="background-color: #235B4E;">
+            <button type="submit" class="w-full text-white px-4 py-3 rounded-lg hover:shadow-lg transition-all duration-200 flex items-center justify-center font-bold text-sm uppercase tracking-wide" style="background-color: #235B4E;">
             <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path>
             </svg>

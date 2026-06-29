@@ -3,29 +3,35 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UnidadMedidaResource\Pages;
-use App\Filament\Resources\UnidadMedidaResource\RelationManagers;
 use App\Models\UnidadMedida;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UnidadMedidaResource extends Resource
 {
     protected static ?string $model = UnidadMedida::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-bars-3-bottom-left';
+    protected static ?string $navigationLabel = 'Unidades de medida';
+    protected static ?string $modelLabel = 'Unidad de medida';
+    protected static ?string $pluralModelLabel = 'Unidades de medida';
+    protected static ?string $navigationGroup = 'Catálogos';
+    protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nombre')
-                    ->required()
-                    ->maxLength(50),
+                Forms\Components\Section::make('Datos de la Unidad de Medida')
+                    ->schema([
+                        Forms\Components\TextInput::make('nombre')
+                            ->label('Nombre de la Unidad')
+                            ->required()
+                            ->maxLength(50),
+                    ]),
             ]);
     }
 
@@ -34,13 +40,11 @@ class UnidadMedidaResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')
-                    ->searchable(),
+                    ->label('Nombre')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -59,9 +63,7 @@ class UnidadMedidaResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

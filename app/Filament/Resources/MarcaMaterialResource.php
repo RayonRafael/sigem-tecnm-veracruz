@@ -3,29 +3,34 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\MarcaMaterialResource\Pages;
-use App\Filament\Resources\MarcaMaterialResource\RelationManagers;
 use App\Models\MarcaMaterial;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MarcaMaterialResource extends Resource
 {
     protected static ?string $model = MarcaMaterial::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-tag';
+    protected static ?string $navigationLabel = 'Marcas';
+    protected static ?string $modelLabel = 'Marca';
+    protected static ?string $pluralModelLabel = 'Marcas';
+    protected static ?string $navigationGroup = 'Catálogos';
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nombre')
-                    ->required()
-                    ->maxLength(100),
+                Forms\Components\Section::make('Datos de la Marca')
+                    ->schema([
+                        Forms\Components\TextInput::make('nombre')
+                            ->label('Nombre de la Marca')
+                            ->required()
+                            ->maxLength(100),
+                    ]),
             ]);
     }
 
@@ -34,13 +39,11 @@ class MarcaMaterialResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')
-                    ->searchable(),
+                    ->label('Nombre')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -59,9 +62,7 @@ class MarcaMaterialResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

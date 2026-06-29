@@ -3,29 +3,34 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TipoMaterialResource\Pages;
-use App\Filament\Resources\TipoMaterialResource\RelationManagers;
 use App\Models\TipoMaterial;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class TipoMaterialResource extends Resource
 {
     protected static ?string $model = TipoMaterial::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Tipos de material';
+    protected static ?string $modelLabel = 'Tipo de material';
+    protected static ?string $pluralModelLabel = 'Tipos de material';
+    protected static ?string $navigationGroup = 'Catálogos';
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nombre')
-                    ->required()
-                    ->maxLength(100),
+                Forms\Components\Section::make('Datos del Tipo de Material')
+                    ->schema([
+                        Forms\Components\TextInput::make('nombre')
+                            ->label('Nombre del Tipo')
+                            ->required()
+                            ->maxLength(100),
+                    ]),
             ]);
     }
 
@@ -34,13 +39,11 @@ class TipoMaterialResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')
-                    ->searchable(),
+                    ->label('Nombre')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -59,9 +62,7 @@ class TipoMaterialResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

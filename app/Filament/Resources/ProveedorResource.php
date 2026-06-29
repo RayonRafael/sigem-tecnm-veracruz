@@ -3,45 +3,60 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProveedorResource\Pages;
-use App\Filament\Resources\ProveedorResource\RelationManagers;
 use App\Models\Proveedor;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProveedorResource extends Resource
 {
     protected static ?string $model = Proveedor::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
+    protected static ?string $navigationLabel = 'Proveedores';
+    protected static ?string $modelLabel = 'Proveedor';
+    protected static ?string $pluralModelLabel = 'Proveedores';
+    protected static ?string $navigationGroup = 'Catálogos';
+    protected static ?int $navigationSort = 6;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nombre_empresa')
-                    ->required()
-                    ->maxLength(150),
-                Forms\Components\TextInput::make('rfc')
-                    ->maxLength(13)
-                    ->default(null),
-                Forms\Components\TextInput::make('contacto_nombre')
-                    ->maxLength(100)
-                    ->default(null),
-                Forms\Components\TextInput::make('contacto_telefono')
-                    ->tel()
-                    ->maxLength(20)
-                    ->default(null),
-                Forms\Components\TextInput::make('contacto_email')
-                    ->email()
-                    ->maxLength(100)
-                    ->default(null),
-                Forms\Components\Toggle::make('activo')
-                    ->required(),
+                Forms\Components\Section::make('Datos de la Empresa')
+                    ->schema([
+                        Forms\Components\TextInput::make('nombre_empresa')
+                            ->label('Nombre de la Empresa')
+                            ->required()
+                            ->maxLength(150),
+                        Forms\Components\TextInput::make('rfc')
+                            ->label('RFC')
+                            ->maxLength(13)
+                            ->default(null),
+                        Forms\Components\Toggle::make('activo')
+                            ->label('Proveedor Activo')
+                            ->default(true)
+                            ->required(),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Información de Contacto')
+                    ->schema([
+                        Forms\Components\TextInput::make('contacto_nombre')
+                            ->label('Nombre del Contacto')
+                            ->maxLength(100)
+                            ->default(null),
+                        Forms\Components\TextInput::make('contacto_telefono')
+                            ->label('Teléfono')
+                            ->tel()
+                            ->maxLength(20)
+                            ->default(null),
+                        Forms\Components\TextInput::make('contacto_email')
+                            ->label('Correo Electrónico')
+                            ->email()
+                            ->maxLength(100)
+                            ->default(null),
+                    ])->columns(3),
             ]);
     }
 
@@ -50,23 +65,27 @@ class ProveedorResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nombre_empresa')
-                    ->searchable(),
+                    ->label('Empresa')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('rfc')
+                    ->label('RFC')
+                    ->fontFamily('mono')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('contacto_nombre')
+                    ->label('Contacto')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('contacto_telefono')
+                    ->label('Teléfono')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('contacto_email')
+                    ->label('Email')
                     ->searchable(),
                 Tables\Columns\IconColumn::make('activo')
+                    ->label('Activo')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -85,9 +104,7 @@ class ProveedorResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

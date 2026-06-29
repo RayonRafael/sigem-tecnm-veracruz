@@ -15,7 +15,10 @@ class MantenimientoResource extends Resource
     protected static ?string $model = Mantenimiento::class;
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
     protected static ?string $navigationLabel = 'Mantenimiento';
-    protected static ?int $navigationSort = 7;
+    protected static ?string $modelLabel = 'Mantenimiento';
+    protected static ?string $pluralModelLabel = 'Mantenimientos';
+    protected static ?string $navigationGroup = 'Gestión de inventario';
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
@@ -25,7 +28,7 @@ class MantenimientoResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('id_inventario')
                             ->label('Equipo a Reparar')
-                            ->relationship('inventario', 'num_serie') // Muestra el número de serie
+                            ->relationship('inventario', 'num_serie')
                             ->required()
                             ->searchable()
                             ->preload(),
@@ -33,6 +36,12 @@ class MantenimientoResource extends Resource
                             ->label('Técnico / Alumno')
                             ->required()
                             ->maxLength(150),
+                        Forms\Components\TextInput::make('num_control_tecnico')
+                            ->label('Número de Control Técnico')
+                            ->maxLength(100),
+                        Forms\Components\TextInput::make('tipo_servicio')
+                            ->label('Tipo de Servicio')
+                            ->maxLength(100),
                         Forms\Components\Select::make('tipo_mantenimiento')
                             ->options([
                                 'Preventivo' => 'Preventivo',
@@ -53,12 +62,22 @@ class MantenimientoResource extends Resource
                         Forms\Components\DatePicker::make('fecha_solicitud')
                             ->default(now())
                             ->required(),
+                        Forms\Components\DatePicker::make('fecha_inicio')
+                            ->label('Fecha Inicio'),
+                        Forms\Components\DatePicker::make('fecha_fin')
+                            ->label('Fecha Fin'),
                         Forms\Components\Textarea::make('descripcion_falla')
                             ->label('Descripción de la Falla')
-                            ->rows(3),
+                            ->rows(3)
+                            ->columnSpanFull(),
                         Forms\Components\Textarea::make('descripcion_trabajo')
                             ->label('Trabajo Realizado')
-                            ->rows(3),
+                            ->rows(3)
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make('observaciones')
+                            ->label('Observaciones')
+                            ->rows(3)
+                            ->columnSpanFull(),
                     ])->columns(2),
             ]);
     }
@@ -67,16 +86,27 @@ class MantenimientoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id_mantenimiento')
-                    ->label('ID')
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('inventario.num_serie')
-                    ->label('No. Serie')
+                    ->label('No. Serie (Activo)')
+                    ->fontFamily('mono')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('inventario.material.nombre')
+                    ->label('Material')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('tipo_mantenimiento')
+                    ->label('Tipo Mantenimiento')
+                    ->badge()
+                    ->colors([
+                        'success' => 'Preventivo',
+                        'danger' => 'Correctivo',
+                        'primary' => 'Mejora',
+                    ])
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('tipo_servicio')
+                    ->label('Tipo Servicio')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nombre_tecnico')
                     ->label('Técnico')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('tipo_mantenimiento')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('estado')
                     ->badge()
@@ -99,6 +129,14 @@ class MantenimientoResource extends Resource
                         'En proceso' => 'En proceso',
                         'Pendiente Revision Admin' => 'Pendiente Revisión',
                         'Completado' => 'Completado',
+                        'Cancelado' => 'Cancelado',
+                    ]),
+                Tables\Filters\SelectFilter::make('tipo_mantenimiento')
+                    ->label('Tipo de Mantenimiento')
+                    ->options([
+                        'Preventivo' => 'Preventivo',
+                        'Correctivo' => 'Correctivo',
+                        'Mejora' => 'Mejora',
                     ]),
             ])
             ->actions([

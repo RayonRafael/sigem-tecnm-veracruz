@@ -13,9 +13,12 @@ use Filament\Tables\Table;
 class SolicitudResource extends Resource
 {
     protected static ?string $model = Solicitud::class;
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationLabel = 'Solicitudes';
-    protected static ?int $navigationSort = 6;
+    protected static ?string $modelLabel = 'Solicitud';
+    protected static ?string $pluralModelLabel = 'Solicitudes';
+    protected static ?string $navigationGroup = 'Gestión de inventario';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -34,7 +37,7 @@ class SolicitudResource extends Resource
                             ->preload(),
                         Forms\Components\Select::make('id_receptor')
                             ->label('Receptor (Área/Persona)')
-                            ->relationship('receptor', 'nombre') // Muestra el nombre del receptor
+                            ->relationship('receptor', 'nombre')
                             ->required()
                             ->searchable()
                             ->preload(),
@@ -58,7 +61,8 @@ class SolicitudResource extends Resource
                             ->required(),
                         Forms\Components\Textarea::make('observaciones')
                             ->label('Observaciones')
-                            ->rows(3),
+                            ->rows(3)
+                            ->columnSpanFull(),
                     ])->columns(2),
             ]);
     }
@@ -68,25 +72,31 @@ class SolicitudResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id_solicitud')
-                    ->label('ID')
+                    ->label('Folio')
+                    ->formatStateUsing(fn ($state) => 'FOLIO-' . str_pad($state, 5, '0', STR_PAD_LEFT))
+                    ->fontFamily('mono')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('fecha_solicitud')
-                    ->label('Fecha')
-                    ->date('d/m/Y')
-                    ->sortable(),
+                Tables\Columns\TextColumn::make('tipo_movimiento')
+                    ->label('Tipo de Movimiento')
+                    ->badge()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('usuario.name')
                     ->label('Solicitante')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('receptor.nombre')
                     ->label('Receptor')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('fecha_solicitud')
+                    ->label('Fecha')
+                    ->date('d/m/Y')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('estado')
                     ->badge()
                     ->colors([
                         'warning' => 'Pendiente',
-                        'success' => 'Autorizado',
+                        'primary' => 'Autorizado',
+                        'success' => 'Completado',
                         'danger' => 'Rechazado',
-                        'info' => 'Completado',
                         'gray' => 'Cancelado',
                     ]),
             ])
@@ -97,6 +107,14 @@ class SolicitudResource extends Resource
                         'Autorizado' => 'Autorizado',
                         'Rechazado' => 'Rechazado',
                         'Completado' => 'Completado',
+                        'Cancelado' => 'Cancelado',
+                    ]),
+                Tables\Filters\SelectFilter::make('tipo_movimiento')
+                    ->label('Tipo de Movimiento')
+                    ->options([
+                        'Asignacion Temporal' => 'Asignación Temporal',
+                        'Asignacion Permanente' => 'Asignación Permanente',
+                        'Renta Externa' => 'Renta Externa',
                     ]),
             ])
             ->actions([

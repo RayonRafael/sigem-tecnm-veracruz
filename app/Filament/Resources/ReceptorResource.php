@@ -3,46 +3,58 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReceptorResource\Pages;
-use App\Filament\Resources\ReceptorResource\RelationManagers;
 use App\Models\Receptor;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ReceptorResource extends Resource
 {
     protected static ?string $model = Receptor::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-users';
+    protected static ?string $navigationLabel = 'Receptores';
+    protected static ?string $modelLabel = 'Receptor';
+    protected static ?string $pluralModelLabel = 'Receptores';
+    protected static ?string $navigationGroup = 'Catálogos';
+    protected static ?int $navigationSort = 7;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nombre')
-                    ->required()
-                    ->maxLength(100),
-                Forms\Components\TextInput::make('apellido_paterno')
-                    ->required()
-                    ->maxLength(100),
-                Forms\Components\TextInput::make('apellido_materno')
-                    ->required()
-                    ->maxLength(100),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->maxLength(100)
-                    ->default(null),
-                Forms\Components\TextInput::make('telefono')
-                    ->tel()
-                    ->maxLength(20)
-                    ->default(null),
-                Forms\Components\TextInput::make('id_area')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Section::make('Datos del Receptor')
+                    ->schema([
+                        Forms\Components\TextInput::make('nombre')
+                            ->label('Nombre')
+                            ->required()
+                            ->maxLength(100),
+                        Forms\Components\TextInput::make('apellido_paterno')
+                            ->label('Apellido Paterno')
+                            ->required()
+                            ->maxLength(100),
+                        Forms\Components\TextInput::make('apellido_materno')
+                            ->label('Apellido Materno')
+                            ->required()
+                            ->maxLength(100),
+                        Forms\Components\TextInput::make('email')
+                            ->label('Correo Electrónico')
+                            ->email()
+                            ->maxLength(100)
+                            ->default(null),
+                        Forms\Components\TextInput::make('telefono')
+                            ->label('Teléfono')
+                            ->tel()
+                            ->maxLength(20)
+                            ->default(null),
+                        Forms\Components\Select::make('id_area')
+                            ->label('Área')
+                            ->relationship('area', 'nombre')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                    ])->columns(2),
             ]);
     }
 
@@ -51,28 +63,26 @@ class ReceptorResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')
+                    ->label('Nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('apellido_paterno')
+                    ->label('Apellido Paterno')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('apellido_materno')
+                    ->label('Apellido Materno')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
+                    ->label('Email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('telefono')
+                    ->label('Teléfono')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('id_area')
-                    ->numeric()
+                Tables\Columns\TextColumn::make('area.nombre')
+                    ->label('Área')
+                    ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -91,9 +101,7 @@ class ReceptorResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

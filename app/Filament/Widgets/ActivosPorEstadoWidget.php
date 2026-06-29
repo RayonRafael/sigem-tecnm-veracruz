@@ -34,24 +34,14 @@ class ActivosPorEstadoWidget extends ChartWidget
                     'label' => 'Cantidad de Activos',
                     'data' => $conteos,
                     'backgroundColor' => [
-                        '#235B4E', // Verde (Disponible)
-                        '#1B396A', // Azul (Asignado)
-                        '#B38E5D', // Dorado (En Mantenimiento)
-                        '#9D2449', // Guinda (Dañado)
-                        '#807E82', // Gris (Baja)
-                        '#4B5563', // Gris Oscuro (Devuelto a Proveedor)
-                    ],
-                    'borderColor' => [
-                        '#194339',
-                        '#13284B',
-                        '#8F714A',
-                        '#7A1B39',
-                        '#5F5E60',
-                        '#374151',
+                        '#0f9d58', // Verde (Disponible)
+                        '#1b65d4', // Azul TecNM (Asignado)
+                        '#f4a623', // Naranja (En Mantenimiento)
+                        '#d93025', // Rojo (Dañado)
+                        '#6b7280', // Gris (Baja)
+                        '#0b1d3a', // Azul Marino Oscuro (Devuelto a Proveedor)
                     ],
                     'borderWidth' => 2,
-                    'borderRadius' => 8,
-                    'borderSkipped' => false,
                 ],
             ],
             'labels' => $estados,
@@ -60,7 +50,7 @@ class ActivosPorEstadoWidget extends ChartWidget
 
     protected function getType(): string
     {
-        return 'bar';
+        return 'doughnut';
     }
 
     protected function getOptions(): array
@@ -68,43 +58,11 @@ class ActivosPorEstadoWidget extends ChartWidget
         return [
             'responsive' => true,
             'maintainAspectRatio' => false,
-            'scales' => [
-                'y' => [
-                    'beginAtZero' => true,
-                    'ticks' => [
-                        'stepSize' => 1,
-                        'precision' => 0,
-                    ],
-                    'grid' => [
-                        'color' => 'rgba(0, 0, 0, 0.05)',
-                    ],
-                ],
-                'x' => [
-                    'grid' => [
-                        'display' => false,
-                    ],
-                ],
-            ],
             'plugins' => [
                 'legend' => [
-                    'display' => false,
+                    'display' => true,
+                    'position' => 'right',
                 ],
-                'tooltip' => [
-                    'backgroundColor' => 'rgba(0, 0, 0, 0.8)',
-                    'padding' => 12,
-                    'cornerRadius' => 8,
-                    'titleFont' => [
-                        'size' => 14,
-                        'weight' => 'bold',
-                    ],
-                    'bodyFont' => [
-                        'size' => 13,
-                    ],
-                ],
-            ],
-            'animation' => [
-                'duration' => 1000,
-                'easing' => 'easeOutQuart',
             ],
         ];
     }

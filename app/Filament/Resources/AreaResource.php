@@ -3,32 +3,40 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\AreaResource\Pages;
-use App\Filament\Resources\AreaResource\RelationManagers;
 use App\Models\Area;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AreaResource extends Resource
 {
     protected static ?string $model = Area::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
+    protected static ?string $navigationLabel = 'Áreas';
+    protected static ?string $modelLabel = 'Área';
+    protected static ?string $pluralModelLabel = 'Áreas';
+    protected static ?string $navigationGroup = 'Catálogos';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nombre')
-                    ->required()
-                    ->maxLength(100),
-                Forms\Components\TextInput::make('id_departamento')
-                    ->required()
-                    ->numeric(),
+                Forms\Components\Section::make('Datos del Área')
+                    ->schema([
+                        Forms\Components\TextInput::make('nombre')
+                            ->label('Nombre del Área')
+                            ->required()
+                            ->maxLength(100),
+                        Forms\Components\Select::make('id_departamento')
+                            ->label('Departamento')
+                            ->relationship('departamento', 'nombre')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                    ])->columns(2),
             ]);
     }
 
@@ -37,20 +45,15 @@ class AreaResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('id_departamento')
-                    ->numeric()
+                    ->label('Nombre')
+                    ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('departamento.nombre')
+                    ->label('Departamento')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -69,9 +72,7 @@ class AreaResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

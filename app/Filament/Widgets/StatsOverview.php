@@ -4,7 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
-use Carbon\Carbon;
+use App\Models\Material;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -13,11 +13,6 @@ class StatsOverview extends StatsOverviewWidget
     protected static ?int $sort = 1;
     protected int | string | array $columnSpan = 12;
 
-    /**
-     * StatsOverviewWidget::getColumns() solo acepta int
-     * 4 = 4 columnas (1 fila con las 4 stats)
-     * 2 = 2 columnas (2x2 grid)
-     */
     protected function getColumns(): int
     {
         return 4;
@@ -28,37 +23,33 @@ class StatsOverview extends StatsOverviewWidget
         $totalActivos = Inventario::count();
         $disponibles = Inventario::where('estado', 'Disponible')->count();
         
-        $rentasPorVencer = Inventario::where('tipo_propiedad', 'Rentado')
-            ->where('estado', '!=', 'Devuelto a Proveedor')
-            ->where('fecha_fin_renta', '<=', Carbon::now()->addDays(30))
-            ->where('fecha_fin_renta', '>=', Carbon::now())
-            ->count();
-        
         $mantenimientosPendientes = Mantenimiento::whereIn('estado', [
             'Solicitado', 
             'En proceso', 
             'Pendiente Revision Admin'
         ])->count();
 
+        $stockBajo = Material::whereColumn('stock_actual', '<', 'stock_minimo')->count();
+
         return [
             Stat::make('Total de Activos', $totalActivos)
-                ->description('Equipos registrados')
-                ->descriptionIcon('heroicon-m-computer-desktop')
+                ->description('Equipos registrados en el sistema')
+                ->descriptionIcon('heroicon-m-cube')
                 ->color('primary'),
                 
-            Stat::make('Disponibles', $disponibles)
-                ->description('Listos para asignar')
+            Stat::make('Activos en Buen Estado', $disponibles)
+                ->description('Equipos disponibles y operativos')
                 ->descriptionIcon('heroicon-m-check-circle')
                 ->color('success'),
                 
-            Stat::make('Rentas por Vencer', $rentasPorVencer)
-                ->description('Próximos 30 días')
-                ->descriptionIcon('heroicon-m-calendar')
+            Stat::make('Mantenimientos Pendientes', $mantenimientosPendientes)
+                ->description('Solicitudes en espera o proceso')
+                ->descriptionIcon('heroicon-m-wrench-screwdriver')
                 ->color('warning'),
                 
-            Stat::make('Mantenimientos Pendientes', $mantenimientosPendientes)
-                ->description('Por atender')
-                ->descriptionIcon('heroicon-m-wrench')
+            Stat::make('Materiales con Stock Bajo', $stockBajo)
+                ->description('Requieren reabastecimiento')
+                ->descriptionIcon('heroicon-m-exclamation-triangle')
                 ->color('danger'),
         ];
     }
