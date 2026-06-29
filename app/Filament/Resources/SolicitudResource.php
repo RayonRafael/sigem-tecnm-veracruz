@@ -24,23 +24,11 @@ class SolicitudResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Detalles de la Solicitud')
+                Forms\Components\Section::make('Datos de la solicitud')
                     ->schema([
                         Forms\Components\DatePicker::make('fecha_solicitud')
                             ->default(now())
                             ->required(),
-                        Forms\Components\Select::make('id_usuario')
-                            ->label('Solicitante (Usuario)')
-                            ->relationship('usuario', 'name')
-                            ->required()
-                            ->searchable()
-                            ->preload(),
-                        Forms\Components\Select::make('id_receptor')
-                            ->label('Receptor (Área/Persona)')
-                            ->relationship('receptor', 'nombre')
-                            ->required()
-                            ->searchable()
-                            ->preload(),
                         Forms\Components\Select::make('tipo_movimiento')
                             ->options([
                                 'Asignacion Temporal' => 'Asignación Temporal',
@@ -59,11 +47,44 @@ class SolicitudResource extends Resource
                             ])
                             ->default('Pendiente')
                             ->required(),
+                    ])->columns(3),
+
+                Forms\Components\Section::make('Participantes')
+                    ->schema([
+                        Forms\Components\Select::make('id_usuario')
+                            ->label('Solicitante (Usuario)')
+                            ->relationship('usuario', 'name')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                        Forms\Components\Select::make('id_receptor')
+                            ->label('Receptor (Área/Persona)')
+                            ->relationship('receptor', 'nombre')
+                            ->required()
+                            ->searchable()
+                            ->preload(),
+                        Forms\Components\Select::make('autorizado_por')
+                            ->label('Autorizado por')
+                            ->relationship('autorizadoPor', 'name')
+                            ->searchable()
+                            ->preload(),
+                    ])->columns(3),
+
+                Forms\Components\Section::make('Devoluciones')
+                    ->schema([
+                        Forms\Components\DatePicker::make('fecha_devolucion_estimada')
+                            ->label('Fecha Estimada de Devolución'),
+                        Forms\Components\DatePicker::make('fecha_devolucion_real')
+                            ->label('Fecha Real de Devolución'),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Observaciones')
+                    ->schema([
                         Forms\Components\Textarea::make('observaciones')
                             ->label('Observaciones')
                             ->rows(3)
                             ->columnSpanFull(),
-                    ])->columns(2),
+                    ])->columns(1),
             ]);
     }
 
@@ -99,7 +120,18 @@ class SolicitudResource extends Resource
                         'danger' => 'Rechazado',
                         'gray' => 'Cancelado',
                     ]),
+                Tables\Columns\TextColumn::make('fecha_devolucion_estimada')
+                    ->label('Devolución Estimada')
+                    ->date('d/m/Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('autorizadoPor.name')
+                    ->label('Autorizado por')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('estado')
                     ->options([
@@ -118,7 +150,8 @@ class SolicitudResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

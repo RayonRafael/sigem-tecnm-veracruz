@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class MaterialResource extends Resource
 {
@@ -113,13 +114,16 @@ class MaterialResource extends Resource
                     ->colors([
                         'danger' => 'Stock bajo',
                         'success' => 'Normal',
-                    ]),
+                    ])
+                    ->sortable(query: fn (Builder $query, string $direction) => $query->orderByRaw('stock_actual - stock_minimo ' . $direction)),
             ])
+            ->defaultSort('nombre', 'asc')
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -24,7 +24,7 @@ class MantenimientoResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Información del Mantenimiento')
+                Forms\Components\Section::make('Equipo y técnico')
                     ->schema([
                         Forms\Components\Select::make('id_inventario')
                             ->label('Equipo a Reparar')
@@ -39,6 +39,10 @@ class MantenimientoResource extends Resource
                         Forms\Components\TextInput::make('num_control_tecnico')
                             ->label('Número de Control Técnico')
                             ->maxLength(100),
+                    ])->columns(3),
+
+                Forms\Components\Section::make('Tipo de servicio')
+                    ->schema([
                         Forms\Components\TextInput::make('tipo_servicio')
                             ->label('Tipo de Servicio')
                             ->maxLength(100),
@@ -59,6 +63,10 @@ class MantenimientoResource extends Resource
                             ])
                             ->default('Solicitado')
                             ->required(),
+                    ])->columns(3),
+
+                Forms\Components\Section::make('Fechas')
+                    ->schema([
                         Forms\Components\DatePicker::make('fecha_solicitud')
                             ->default(now())
                             ->required(),
@@ -66,6 +74,10 @@ class MantenimientoResource extends Resource
                             ->label('Fecha Inicio'),
                         Forms\Components\DatePicker::make('fecha_fin')
                             ->label('Fecha Fin'),
+                    ])->columns(3),
+
+                Forms\Components\Section::make('Detalles')
+                    ->schema([
                         Forms\Components\Textarea::make('descripcion_falla')
                             ->label('Descripción de la Falla')
                             ->rows(3)
@@ -78,7 +90,7 @@ class MantenimientoResource extends Resource
                             ->label('Observaciones')
                             ->rows(3)
                             ->columnSpanFull(),
-                    ])->columns(2),
+                    ])->columns(1),
             ]);
     }
 
@@ -121,7 +133,18 @@ class MantenimientoResource extends Resource
                     ->label('Fecha Sol.')
                     ->date('d/m/Y')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('fecha_inicio')
+                    ->label('Fecha Inicio')
+                    ->date('d/m/Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('fecha_fin')
+                    ->label('Fecha Fin')
+                    ->date('d/m/Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('estado')
                     ->options([
@@ -140,7 +163,8 @@ class MantenimientoResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

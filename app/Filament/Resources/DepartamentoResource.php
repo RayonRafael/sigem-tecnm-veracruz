@@ -37,9 +37,10 @@ class DepartamentoResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->label('Nombre')->searchable()->sortable(),
             ])
+            ->defaultSort('nombre', 'asc')
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

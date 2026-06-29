@@ -3,14 +3,15 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\InventarioResource\Pages;
-use App\Models\Departamento;
 use App\Models\Inventario;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 class InventarioResource extends Resource
 {
@@ -26,7 +27,7 @@ class InventarioResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Información del activo')
+                Forms\Components\Section::make('Identificación del activo')
                     ->schema([
                         Forms\Components\TextInput::make('num_serie')
                             ->label('Número de Serie')
@@ -50,7 +51,7 @@ class InventarioResource extends Resource
                             ->required(),
                     ])->columns(3),
 
-                Forms\Components\Section::make('Ubicación y propiedad')
+                Forms\Components\Section::make('Ubicación y asignación')
                     ->schema([
                         Forms\Components\TextInput::make('ubicacion_fisica')
                             ->label('Ubicación Física')
@@ -87,17 +88,9 @@ class InventarioResource extends Resource
                             ->label('Fecha de Registro')
                             ->default(now())
                             ->required(),
-                        Forms\Components\Select::make('estado_registro')
-                            ->options([
-                                'Pendiente' => 'Pendiente',
-                                'Aprobado' => 'Aprobado',
-                                'Rechazado' => 'Rechazado',
-                            ])
-                            ->default('Pendiente')
-                            ->required(),
-                    ])->columns(3),
+                    ])->columns(2),
 
-                Forms\Components\Section::make('Renta')
+                Forms\Components\Section::make('Información de renta')
                     ->schema([
                         Forms\Components\DatePicker::make('fecha_inicio_renta')->label('Inicio de Renta'),
                         Forms\Components\DatePicker::make('fecha_fin_renta')->label('Fin de Renta'),
@@ -121,11 +114,20 @@ class InventarioResource extends Resource
 
                 Forms\Components\Section::make('Observaciones')
                     ->schema([
+                        Forms\Components\Select::make('estado_registro')
+                            ->label('Estado de Registro')
+                            ->options([
+                                'Pendiente' => 'Pendiente',
+                                'Aprobado' => 'Aprobado',
+                                'Rechazado' => 'Rechazado',
+                            ])
+                            ->default('Pendiente')
+                            ->required(),
                         Forms\Components\Textarea::make('observaciones_generales')
                             ->label('Observaciones Generales')
                             ->rows(3)
                             ->columnSpanFull(),
-                    ]),
+                    ])->columns(1),
             ]);
     }
 
@@ -169,12 +171,29 @@ class InventarioResource extends Resource
                         'primary' => 'Propio',
                         'gray' => 'Rentado',
                     ]),
+                Tables\Columns\TextColumn::make('aprobado')
+                    ->label('Aprobado')
+                    ->formatStateUsing(fn ($state) => $state ? 'Aprobado' : 'Pendiente')
+                    ->badge()
+                    ->color(fn ($state) => $state ? 'success' : 'warning'),
+                Tables\Columns\TextColumn::make('aprobadoPor.name')
+                    ->label('Aprobado por')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('fecha_aprobacion')
+                    ->label('Fecha Aprobación')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
+                Tables\Filters\TernaryFilter::make('aprobado')
+                    ->label('Estado de Aprobación'),
                 Tables\Filters\SelectFilter::make('estado')
                     ->options([
                         'Disponible' => 'Disponible',
@@ -189,17 +208,47 @@ class InventarioResource extends Resource
                         'Propio' => 'Propio',
                         'Rentado' => 'Rentado',
                     ]),
-                Tables\Filters\SelectFilter::make('departamento')
-                    ->label('Departamento')
-                    ->options(fn () => Departamento::pluck('nombre', 'id_departamento')->toArray())
-                    ->query(fn (Builder $query, $data) => empty($data['value']) ? $query : $query->whereHas('detallesSolicitud.solicitud.receptor.area', fn ($q) => $q->where('id_departamento', $data['value']))),
             ])
             ->actions([
+                Tables\Actions\Action::make('aprobar')
+                    ->label('Aprobar')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn (Inventario $record): bool => !$record->aprobado && auth()->user()->can('aprobaciones.aprobar'))
+                    ->action(function (Inventario $record) {
+                        $record->update(['aprobado' => true, 'aprobado_por' => auth()->id(), 'fecha_aprobacion' => now()]);
+                        Notification::make()->title('Registro aprobado exitosamente')->success()->send();
+                    })
+                    ->requiresConfirmation(),
+                Tables\Actions\Action::make('rechazar')
+                    ->label('Rechazar')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn (Inventario $record): bool => !$record->aprobado && auth()->user()->can('aprobaciones.rechazar'))
+                    ->action(function (Inventario $record) {
+                        $record->delete();
+                        Notification::make()->title('Registro rechazado y eliminado')->success()->send();
+                    })
+                    ->requiresConfirmation(),
                 Tables\Actions\ViewAction::make()->iconButton(),
                 Tables\Actions\EditAction::make()->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\BulkAction::make('aprobarMasivo')
+                        ->label('Aprobar Seleccionados')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->visible(fn (): bool => auth()->user()->can('aprobaciones.aprobar'))
+                        ->action(function (Collection $records) {
+                            foreach ($records as $record) {
+                                if (!$record->aprobado) {
+                                    $record->update(['aprobado' => true, 'aprobado_por' => auth()->id(), 'fecha_aprobacion' => now()]);
+                                }
+                            }
+                            Notification::make()->title('Registros aprobados exitosamente')->success()->send();
+                        })
+                        ->requiresConfirmation(),
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);

@@ -205,6 +205,8 @@
             border-radius: var(--radius);
             overflow: hidden;
             box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
         }
 
         .sigem-dashboard .panel-header {
@@ -246,6 +248,9 @@
 
         .sigem-dashboard .panel-body {
             padding: 20px 22px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         /* ===== BAR CHART (CSS only) ===== */
@@ -255,6 +260,7 @@
             gap: 12px;
             height: 180px;
             padding-top: 10px;
+            width: 100%;
         }
 
         .sigem-dashboard .bar-group {
@@ -265,6 +271,7 @@
             gap: 8px;
             height: 100%;
             justify-content: flex-end;
+            min-width: 0;
         }
 
         .sigem-dashboard .bar {
@@ -297,6 +304,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 100%;
+            width: 100%;
         }
 
         .sigem-dashboard .bar-value {
@@ -313,6 +321,7 @@
             gap: 24px;
             justify-content: center;
             flex-wrap: wrap;
+            height: 100%;
         }
 
         .sigem-dashboard .donut {
@@ -457,6 +466,50 @@
             margin-top: 3px;
         }
 
+        /* ===== EMPTY STATE ===== */
+        .sigem-dashboard .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+            flex: 1;
+        }
+
+        .sigem-dashboard .empty-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            background: var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            color: var(--text-muted);
+        }
+
+        .sigem-dashboard .empty-icon svg {
+            width: 26px;
+            height: 26px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.5;
+        }
+
+        .sigem-dashboard .empty-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .sigem-dashboard .empty-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            max-width: 280px;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1200px) {
             .sigem-dashboard .stats-grid {
@@ -502,14 +555,11 @@
         @endif
 
         @php
-            $tActivos = $totalActivos ?? 247;
+            $tActivos = $totalActivos ?? 0;
             $activosBueno = ($activosPorEstado['Bueno'] ?? 0) + ($activosPorEstado['Operativo'] ?? 0);
-            if ($tActivos > 0 && $activosBueno == 0 && empty($activosPorEstado)) {
-                $activosBueno = 218;
-            }
             $porcentajeBueno = $tActivos > 0 ? round(($activosBueno / $tActivos) * 100) : 0;
-            $mPendientes = $mantenimientosPendientes ?? 5;
-            $mStockBajo = $materialesStockBajo ?? 8;
+            $mPendientes = $mantenimientosPendientes ?? 0;
+            $mStockBajo = $materialesStockBajo ?? 0;
         @endphp
 
         <!-- Stats Cards -->
@@ -520,10 +570,6 @@
                 </div>
                 <div class="stat-value">{{ $tActivos }}</div>
                 <div class="stat-label">Activos registrados</div>
-                <div class="stat-change up">
-                    <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
-                    +12 este mes
-                </div>
             </div>
             <div class="stat-card green">
                 <div class="stat-icon">
@@ -531,10 +577,12 @@
                 </div>
                 <div class="stat-value">{{ $activosBueno }}</div>
                 <div class="stat-label">En buen estado</div>
+                @if($tActivos > 0)
                 <div class="stat-change up">
                     <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg>
                     {{ $porcentajeBueno }}% del total
                 </div>
+                @endif
             </div>
             <div class="stat-card orange">
                 <div class="stat-icon">
@@ -542,10 +590,6 @@
                 </div>
                 <div class="stat-value">{{ $mPendientes }}</div>
                 <div class="stat-label">Mantenimientos pendientes</div>
-                <div class="stat-change down">
-                    <svg viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg>
-                    -2 vs semana anterior
-                </div>
             </div>
             <div class="stat-card red">
                 <div class="stat-icon">
@@ -553,10 +597,6 @@
                 </div>
                 <div class="stat-value">{{ $mStockBajo }}</div>
                 <div class="stat-label">Stock bajo mínimo</div>
-                <div class="stat-change down">
-                    <svg viewBox="0 0 24 24"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/></svg>
-                    Requiere atención
-                </div>
             </div>
         </div>
 
@@ -572,31 +612,34 @@
                 </div>
                 <div class="panel-body">
                     @php
-                        $ubicaciones = isset($inventarioPorUbicacion) && $inventarioPorUbicacion->count() > 0 ? $inventarioPorUbicacion : collect([
-                            (object)['ubicacion_fisica' => 'Sistemas', 'total' => 68],
-                            (object)['ubicacion_fisica' => 'Industrial', 'total' => 52],
-                            (object)['ubicacion_fisica' => 'Electrónica', 'total' => 41],
-                            (object)['ubicacion_fisica' => 'Mecánica', 'total' => 38],
-                            (object)['ubicacion_fisica' => 'Administración', 'total' => 28],
-                            (object)['ubicacion_fisica' => 'Química', 'total' => 20],
-                        ]);
+                        $ubicaciones = isset($inventarioPorUbicacion) && $inventarioPorUbicacion->count() > 0 ? $inventarioPorUbicacion : collect([]);
                         $maxUbicacion = $ubicaciones->max('total') ?: 1;
                         $coloresBarras = ['blue', 'green', 'orange', 'purple', 'blue', 'red'];
                     @endphp
-                    <div class="bar-chart">
-                        @foreach($ubicaciones as $index => $ubicacion)
-                            @php
-                                $colorBarra = $coloresBarras[$index % count($coloresBarras)];
-                                $altura = round(($ubicacion->total / $maxUbicacion) * 85);
-                                if ($altura < 15) $altura = 15; // Altura mínima visual
-                            @endphp
-                            <div class="bar-group">
-                                <div class="bar-value">{{ $ubicacion->total }}</div>
-                                <div class="bar {{ $colorBarra }}" style="height: {{ $altura }}%"></div>
-                                <div class="bar-label" title="{{ $ubicacion->ubicacion_fisica ?: 'General' }}">{{ $ubicacion->ubicacion_fisica ?: 'General' }}</div>
+                    @if($ubicaciones->count() > 0)
+                        <div class="bar-chart">
+                            @foreach($ubicaciones as $index => $ubicacion)
+                                @php
+                                    $colorBarra = $coloresBarras[$index % count($coloresBarras)];
+                                    $altura = round(($ubicacion->total / $maxUbicacion) * 85);
+                                    if ($altura < 15) $altura = 15; // Altura mínima visual
+                                @endphp
+                                <div class="bar-group">
+                                    <div class="bar-value">{{ $ubicacion->total }}</div>
+                                    <div class="bar {{ $colorBarra }}" style="height: {{ $altura }}%"></div>
+                                    <div class="bar-label" title="{{ $ubicacion->ubicacion_fisica ?: 'General' }}">{{ $ubicacion->ubicacion_fisica ?: 'General' }}</div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                             </div>
-                        @endforeach
-                    </div>
+                            <div class="empty-title">Sin inventario registrado</div>
+                            <div class="empty-desc">No hay activos asignados a departamentos o ubicaciones.</div>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -616,52 +659,71 @@
                         $cDaniado = ($activosPorEstadoArr['Dañado'] ?? 0) + ($activosPorEstadoArr['De Baja'] ?? 0);
                         $cMantenimiento = ($activosPorEstadoArr['En mantenimiento'] ?? 0);
                         
-                        if (empty($activosPorEstadoArr) || $totalEstado == 0) {
-                            $cBueno = 178;
-                            $cRegular = 40;
-                            $cDaniado = 15;
-                            $cMantenimiento = 14;
-                            $totalEstado = 247;
+                        if ($totalEstado > 0) {
+                            $pBueno = round(($cBueno / $totalEstado) * 100);
+                            $pRegular = $pBueno + round(($cRegular / $totalEstado) * 100);
+                            $pDaniado = $pRegular + round(($cDaniado / $totalEstado) * 100);
+                            if ($pRegular > 100) $pRegular = 100;
+                            if ($pDaniado > 100) $pDaniado = 100;
                         }
-
-                        $pBueno = round(($cBueno / $totalEstado) * 100);
-                        $pRegular = $pBueno + round(($cRegular / $totalEstado) * 100);
-                        $pDaniado = $pRegular + round(($cDaniado / $totalEstado) * 100);
-                        
-                        if ($pRegular > 100) $pRegular = 100;
-                        if ($pDaniado > 100) $pDaniado = 100;
                     @endphp
                     <div class="donut-container">
-                        <div class="donut" style="background: conic-gradient(var(--success) 0% {{ $pBueno }}%, var(--warning) {{ $pBueno }}% {{ $pRegular }}%, var(--danger) {{ $pRegular }}% {{ $pDaniado }}%, #94a3b8 {{ $pDaniado }}% 100%);">
-                            <div class="donut-center">
-                                <div class="donut-center-value">{{ $totalEstado }}</div>
-                                <div class="donut-center-label">Total</div>
+                        @if($totalEstado == 0)
+                            <div class="donut" style="background: #e2e8f0;">
+                                <div class="donut-center">
+                                    <div class="donut-center-value">0</div>
+                                    <div class="donut-center-label">Total</div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="donut-legend">
-                            <div class="legend-item">
-                                <div class="legend-dot" style="background: var(--success)"></div>
-                                <div class="legend-label">Bueno</div>
-                                <div class="legend-value">{{ $cBueno }}</div>
+                            <div class="donut-legend">
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background: var(--success)"></div>
+                                    <div class="legend-label">Bueno</div>
+                                    <div class="legend-value">0</div>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background: var(--warning)"></div>
+                                    <div class="legend-label">Regular</div>
+                                    <div class="legend-value">0</div>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background: var(--danger)"></div>
+                                    <div class="legend-label">Dañado</div>
+                                    <div class="legend-value">0</div>
+                                </div>
                             </div>
-                            <div class="legend-item">
-                                <div class="legend-dot" style="background: var(--warning)"></div>
-                                <div class="legend-label">Regular</div>
-                                <div class="legend-value">{{ $cRegular }}</div>
+                        @else
+                            <div class="donut" style="background: conic-gradient(var(--success) 0% {{ $pBueno }}%, var(--warning) {{ $pBueno }}% {{ $pRegular }}%, var(--danger) {{ $pRegular }}% {{ $pDaniado }}%, #94a3b8 {{ $pDaniado }}% 100%);">
+                                <div class="donut-center">
+                                    <div class="donut-center-value">{{ $totalEstado }}</div>
+                                    <div class="donut-center-label">Total</div>
+                                </div>
                             </div>
-                            <div class="legend-item">
-                                <div class="legend-dot" style="background: var(--danger)"></div>
-                                <div class="legend-label">Dañado</div>
-                                <div class="legend-value">{{ $cDaniado }}</div>
+                            <div class="donut-legend">
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background: var(--success)"></div>
+                                    <div class="legend-label">Bueno / Operativo</div>
+                                    <div class="legend-value">{{ $cBueno }}</div>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background: var(--warning)"></div>
+                                    <div class="legend-label">Regular / Mantenimiento</div>
+                                    <div class="legend-value">{{ $cRegular }}</div>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background: var(--danger)"></div>
+                                    <div class="legend-label">Dañado / De Baja</div>
+                                    <div class="legend-value">{{ $cDaniado }}</div>
+                                </div>
+                                @if($cMantenimiento > 0)
+                                <div class="legend-item">
+                                    <div class="legend-dot" style="background: #94a3b8"></div>
+                                    <div class="legend-label">En mantenimiento</div>
+                                    <div class="legend-value">{{ $cMantenimiento }}</div>
+                                </div>
+                                @endif
                             </div>
-                            @if($cMantenimiento > 0)
-                            <div class="legend-item">
-                                <div class="legend-dot" style="background: #94a3b8"></div>
-                                <div class="legend-label">En mantenimiento</div>
-                                <div class="legend-value">{{ $cMantenimiento }}</div>
-                            </div>
-                            @endif
-                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -680,8 +742,8 @@
                     @php
                         $actividadesColores = ['blue', 'orange', 'green', 'red'];
                     @endphp
-                    <div class="activity-list">
-                        @if(isset($actividadReciente) && $actividadReciente->count() > 0)
+                    @if(isset($actividadReciente) && $actividadReciente->count() > 0)
+                        <div class="activity-list">
                             @foreach($actividadReciente as $index => $actividad)
                                 @php
                                     $color = $actividadesColores[$index % count($actividadesColores)];
@@ -709,45 +771,16 @@
                                     </div>
                                 </div>
                             @endforeach
-                        @else
-                            <div class="activity-item">
-                                <div class="activity-dot blue">
-                                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-text"><strong>María López</strong> registró 3 laptops Dell en el inventario</div>
-                                    <div class="activity-time">Hace 2 horas</div>
-                                </div>
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                             </div>
-                            <div class="activity-item">
-                                <div class="activity-dot orange">
-                                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-text"><strong>Carlos Méndez</strong> solicitó mantenimiento para proyector Epson</div>
-                                    <div class="activity-time">Hace 5 horas</div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-dot green">
-                                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-text"><strong>Roberto Díaz</strong> completó mantenimiento correctivo en UPS #042</div>
-                                    <div class="activity-time">Ayer, 4:30 PM</div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-dot red">
-                                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-text"><strong>Sistema</strong> detectó stock bajo en cable UTP Cat6 (quedan 2 rollos)</div>
-                                    <div class="activity-time">Ayer, 9:00 AM</div>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
+                            <div class="empty-title">Sin actividad reciente</div>
+                            <div class="empty-desc">No se han registrado movimientos recientes en el sistema.</div>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -760,8 +793,8 @@
                     <a href="{{ url('/admin/solicituds') }}" class="panel-action">Ver todas</a>
                 </div>
                 <div class="panel-body">
-                    <div class="activity-list">
-                        @if(isset($solicitudesPendientes) && $solicitudesPendientes->count() > 0)
+                    @if(isset($solicitudesPendientes) && $solicitudesPendientes->count() > 0)
+                        <div class="activity-list">
                             @foreach($solicitudesPendientes as $solicitud)
                                 <div class="activity-item">
                                     <div class="activity-dot orange">
@@ -773,36 +806,16 @@
                                     </div>
                                 </div>
                             @endforeach
-                        @else
-                            <div class="activity-item">
-                                <div class="activity-dot orange">
-                                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-text"><strong>SOL-0023</strong> — Renta de 2 proyectores para evento</div>
-                                    <div class="activity-time">Pendiente de autorización · Ing. Torres</div>
-                                </div>
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                             </div>
-                            <div class="activity-item">
-                                <div class="activity-dot orange">
-                                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-text"><strong>SOL-0022</strong> — Préstamo de multímetro digital</div>
-                                    <div class="activity-time">Pendiente de autorización · Depto. Electrónica</div>
-                                </div>
-                            </div>
-                            <div class="activity-item">
-                                <div class="activity-dot blue">
-                                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                </div>
-                                <div class="activity-content">
-                                    <div class="activity-text"><strong>SOL-0021</strong> — Devolución de 5 sillas ergonómicas</div>
-                                    <div class="activity-time">Autorizada · Devolución pendiente</div>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
+                            <div class="empty-title">Sin solicitudes pendientes</div>
+                            <div class="empty-desc">No hay solicitudes pendientes de autorización en este momento.</div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

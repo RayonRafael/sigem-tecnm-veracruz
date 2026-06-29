@@ -17,7 +17,8 @@ class Inventario extends Model
         'num_serie', 'id_producto', 'id_usuario', 'id_proveedor', 'estado', 'estado_registro',
         'tipo_propiedad', 'ubicacion_fisica', 'fecha_registro', 'fecha_factura', 'num_factura',
         'fecha_baja', 'fecha_inicio_renta', 'fecha_fin_renta', 'observaciones_renta',
-        'observaciones_generales', 'garantia_fecha_fin', 'garantia_estado'
+        'observaciones_generales', 'garantia_fecha_fin', 'garantia_estado',
+        'aprobado', 'aprobado_por', 'fecha_aprobacion'
     ];
 
     // Convertir fechas automáticamente a objetos Carbon
@@ -28,6 +29,8 @@ class Inventario extends Model
         'fecha_inicio_renta' => 'date',
         'fecha_fin_renta' => 'date',
         'garantia_fecha_fin' => 'date',
+        'aprobado' => 'boolean',
+        'fecha_aprobacion' => 'datetime',
     ];
 
     public function material()
@@ -43,6 +46,11 @@ class Inventario extends Model
     public function proveedor()
     {
         return $this->belongsTo(Proveedor::class, 'id_proveedor', 'id_proveedor');
+    }
+
+    public function aprobadoPor()
+    {
+        return $this->belongsTo(User::class, 'aprobado_por', 'id');
     }
 
     public function detallesSolicitud()

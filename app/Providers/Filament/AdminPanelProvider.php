@@ -84,6 +84,9 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Catálogos')
                     ->collapsible(true),
+                NavigationGroup::make()
+                    ->label('Administración')
+                    ->collapsible(true),
             ])
             ->spa()
             ->sidebarCollapsibleOnDesktop()

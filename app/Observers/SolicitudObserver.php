@@ -3,16 +3,38 @@
 namespace App\Observers;
 
 use App\Models\Solicitud;
-use Illuminate\Support\Facades\Log;
+use App\Traits\RegistraBitacora;
 
 class SolicitudObserver
 {
+    use RegistraBitacora;
+
+    public function created(Solicitud $solicitud): void
+    {
+        $this->registrarBitacora(
+            'crear',
+            'solicitud',
+            $solicitud->id_solicitud,
+            null,
+            $solicitud->toArray(),
+            "Creó solicitud de {$solicitud->tipo_movimiento}"
+        );
+    }
+
     public function updated(Solicitud $solicitud): void
     {
-        // Si la solicitud cambia a "Autorizado"
-        if ($solicitud->isDirty('estado') && $solicitud->estado === 'Autorizado') {
-            // Registramos en la consola/logs que la magia funcionó
-            Log::info(' Observer activado: Solicitud autorizada ID: ' . $solicitud->id_solicitud);
+        if ($solicitud->isDirty('estado')) {
+            $estadoAnterior = $solicitud->getOriginal('estado');
+            $estadoNuevo = $solicitud->estado;
+
+            $this->registrarBitacora(
+                'editar',
+                'solicitud',
+                $solicitud->id_solicitud,
+                $solicitud->getOriginal(),
+                $solicitud->getChanges(),
+                "Cambió solicitud #{$solicitud->id_solicitud} de '{$estadoAnterior}' a '{$estadoNuevo}'"
+            );
         }
     }
 }
