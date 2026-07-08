@@ -404,7 +404,7 @@
             </div>
         </div>
         <div class="header-actions">
-            <a href="{{ url('/admin/login') }}" class="btn btn-primary">
+            <a href="{{ url('/login') }}" class="btn btn-primary">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
                 Iniciar Sesión
             </a>
@@ -417,7 +417,7 @@
         <h1 class="hero-title">Gestión de Equipos y Materiales</h1>
         <p class="hero-sub">Sistema integral para el control de inventario, gestión de préstamos, rentas y seguimiento de mantenimiento para el equipamiento del TecNM Campus Veracruz.</p>
         <div class="hero-actions">
-            <a href="{{ url('/admin/login') }}" class="btn btn-primary" style="padding: 16px 36px; font-size: 17px;">
+            <a href="{{ url('/login') }}" class="btn btn-primary" style="padding: 16px 36px; font-size: 17px;">
                 <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
                 Iniciar Sesión
             </a>

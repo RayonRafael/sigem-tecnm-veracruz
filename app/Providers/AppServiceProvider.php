@@ -18,7 +18,14 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        $this->app->bind(\Filament\Http\Responses\Auth\Contracts\LogoutResponse::class, function () {
+            return new class implements \Filament\Http\Responses\Auth\Contracts\LogoutResponse {
+                public function toResponse($request): \Illuminate\Http\RedirectResponse
+                {
+                    return redirect()->to('/login');
+                }
+            };
+        });
     }
 
     public function boot(): void
