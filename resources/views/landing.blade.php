@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIGEM — TecNM Veracruz | Gestión de Equipos y Materiales</title>
+    <link rel="icon" href="{{ asset('images/tecnm-logo.svg') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -40,12 +41,35 @@
 
         body {
             font-family: 'DM Sans', sans-serif;
-            background: var(--bg);
             color: var(--text-primary);
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             overflow-x: hidden;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-image: url('{{ asset("images/fondo.jpg") }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            z-index: -2;
+        }
+        
+        .bg-overlay::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 29, 58, 0.75);
+            z-index: -1;
         }
 
         /* ===== HEADER ===== */
@@ -184,17 +208,18 @@
         .hero-title {
             font-size: 48px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: #ffffff;
             letter-spacing: -1.5px;
             line-height: 1.15;
             margin-bottom: 22px;
             opacity: 0;
             animation: slideUp 0.6s ease 0.1s forwards;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
         .hero-sub {
             font-size: 19px;
-            color: var(--text-secondary);
+            color: rgba(255, 255, 255, 0.85);
             line-height: 1.6;
             margin-bottom: 40px;
             max-width: 700px;
@@ -363,6 +388,7 @@
     </style>
 </head>
 <body>
+    <div class="bg-overlay"></div>
 
     <!-- Header -->
     <header class="header">
@@ -372,15 +398,15 @@
                 <div class="brand-title">SIGEM</div>
                 <div class="brand-sub">TecNM Veracruz</div>
             </div>
+            <div class="header-logos" style="display: flex; gap: 12px; margin-left: 20px; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 20px;">
+                <img src="{{ asset('images/tecnm-logo.png') }}" alt="TecNM" style="height: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+                <img src="{{ asset('images/itv-logo.png') }}" alt="ITV" style="height: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+            </div>
         </div>
         <div class="header-actions">
-            <a href="{{ url('/servicio-social') }}" class="btn btn-primary">
-                <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                Acceso Alumnos
-            </a>
-            <a href="{{ url('/admin') }}" class="btn btn-secondary">
+            <a href="{{ url('/admin/login') }}" class="btn btn-primary">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                Admin
+                Iniciar Sesión
             </a>
         </div>
     </header>
@@ -391,13 +417,9 @@
         <h1 class="hero-title">Gestión de Equipos y Materiales</h1>
         <p class="hero-sub">Sistema integral para el control de inventario, gestión de préstamos, rentas y seguimiento de mantenimiento para el equipamiento del TecNM Campus Veracruz.</p>
         <div class="hero-actions">
-            <a href="{{ url('/servicio-social') }}" class="btn btn-primary" style="padding: 16px 36px; font-size: 17px;">
-                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                Acceso Alumnos (Servicio Social)
-            </a>
-            <a href="{{ url('/admin') }}" class="btn btn-secondary" style="padding: 16px 36px; font-size: 17px;">
+            <a href="{{ url('/admin/login') }}" class="btn btn-primary" style="padding: 16px 36px; font-size: 17px;">
                 <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                Acceso Administración
+                Iniciar Sesión
             </a>
         </div>
     </main>
@@ -445,6 +467,11 @@
 
     <!-- Footer -->
     <footer class="footer">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 20px;">
+            <span style="color: rgba(255,255,255,0.7); font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Instituciones:</span>
+            <img src="{{ asset('images/tecnm-logo.png') }}" alt="TecNM" style="height: 38px; opacity: 0.95; object-fit: contain;">
+            <img src="{{ asset('images/itv-logo.png') }}" alt="ITV" style="height: 38px; opacity: 0.95; object-fit: contain;">
+        </div>
         <p>&copy; {{ date('Y') }} SIGEM — Tecnológico Nacional de México Campus Veracruz. Todos los derechos reservados.</p>
     </footer>
 

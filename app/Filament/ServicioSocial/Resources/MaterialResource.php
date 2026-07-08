@@ -60,23 +60,12 @@ class MaterialResource extends Resource
                             ->preload(),
                     ])->columns(3),
 
-                Forms\Components\Section::make('Control de stock')
-                    ->schema([
-                        Forms\Components\TextInput::make('stock_actual')
-                            ->label('Stock Actual')
-                            ->numeric()
-                            ->default(0)
-                            ->required(),
-                        Forms\Components\TextInput::make('stock_minimo')
-                            ->label('Stock Mínimo')
-                            ->numeric()
-                            ->default(0)
-                            ->required(),
-                        Forms\Components\Toggle::make('requiere_control_individual')
-                            ->label('Requiere control individual')
-                            ->default(true)
-                            ->columnSpanFull(),
-                    ])->columns(2),
+                        Forms\Components\Hidden::make('stock_actual')
+                            ->default(0),
+                        Forms\Components\Hidden::make('stock_minimo')
+                            ->default(0),
+                        Forms\Components\Hidden::make('requiere_control_individual')
+                            ->default(true),
             ]);
     }
 

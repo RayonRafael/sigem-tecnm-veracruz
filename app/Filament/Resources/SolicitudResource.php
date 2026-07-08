@@ -62,7 +62,18 @@ class SolicitudResource extends Resource
                             ->relationship('receptor', 'nombre')
                             ->required()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->live(),
+                        Forms\Components\Placeholder::make('departamento')
+                            ->label('Departamento')
+                            ->content(function (callable $get) {
+                                $receptorId = $get('id_receptor');
+                                if ($receptorId) {
+                                    $receptor = \App\Models\Receptor::with('area.departamento')->find($receptorId);
+                                    return $receptor?->area?->departamento?->nombre ?? 'Sin departamento';
+                                }
+                                return 'Seleccione un receptor';
+                            }),
                         Forms\Components\Select::make('autorizado_por')
                             ->label('Autorizado por')
                             ->relationship('autorizadoPor', 'name')
@@ -107,6 +118,10 @@ class SolicitudResource extends Resource
                 Tables\Columns\TextColumn::make('receptor.nombre')
                     ->label('Receptor')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('receptor.area.departamento.nombre')
+                    ->label('Departamento')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('fecha_solicitud')
                     ->label('Fecha')
                     ->date('d/m/Y')
@@ -150,6 +165,38 @@ class SolicitudResource extends Resource
                     ]),
             ])
             ->actions([
+                Tables\Actions\Action::make('autorizar')
+                    ->label('Autorizar')
+                    ->icon('heroicon-m-check-circle')
+                    ->color('success')
+                    ->visible(fn (Solicitud $record): bool => $record->estado === 'Pendiente')
+                    ->action(fn (Solicitud $record) => $record->update([
+                        'estado' => 'Autorizado',
+                        'fecha_autorizacion' => now(),
+                        'autorizado_por' => auth()->id()
+                    ]))
+                    ->requiresConfirmation(),
+                Tables\Actions\Action::make('rechazar')
+                    ->label('Rechazar')
+                    ->icon('heroicon-m-x-circle')
+                    ->color('danger')
+                    ->visible(fn (Solicitud $record): bool => $record->estado === 'Pendiente')
+                    ->form([
+                        Forms\Components\Textarea::make('motivo_rechazo')
+                            ->label('Motivo de rechazo (opcional)')
+                            ->rows(3),
+                    ])
+                    ->action(function (Solicitud $record, array $data) {
+                        $observacion = $record->observaciones;
+                        if ($data['motivo_rechazo']) {
+                            $observacion = $observacion ? $observacion . "\n\nMotivo Rechazo: " . $data['motivo_rechazo'] : "Motivo Rechazo: " . $data['motivo_rechazo'];
+                        }
+                        $record->update([
+                            'estado' => 'Rechazado',
+                            'observaciones' => $observacion
+                        ]);
+                    })
+                    ->requiresConfirmation(),
                 Tables\Actions\ViewAction::make()->iconButton(),
                 Tables\Actions\EditAction::make()->iconButton(),
             ])
@@ -162,7 +209,9 @@ class SolicitudResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            SolicitudResource\RelationManagers\DetallesRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

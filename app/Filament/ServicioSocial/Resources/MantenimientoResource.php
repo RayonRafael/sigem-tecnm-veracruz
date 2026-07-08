@@ -39,13 +39,20 @@ class MantenimientoResource extends Resource
                         Forms\Components\TextInput::make('num_control_tecnico')
                             ->label('Número de Control Técnico')
                             ->maxLength(100),
+                        Forms\Components\Hidden::make('id_usuario_solicita')
+                            ->default(fn () => auth()->id()),
                     ])->columns(3),
 
                 Forms\Components\Section::make('Servicio y Detalles')
                     ->schema([
-                        Forms\Components\TextInput::make('tipo_servicio')
+                        Forms\Components\Select::make('tipo_servicio')
                             ->label('Tipo de Servicio')
-                            ->maxLength(100),
+                            ->options([
+                                'Servicio Social' => 'Servicio Social',
+                                'Prácticas Profesionales' => 'Prácticas Profesionales',
+                                'Personal Técnico' => 'Personal Técnico',
+                            ])
+                            ->required(),
                         Forms\Components\Select::make('tipo_mantenimiento')
                             ->options([
                                 'Preventivo' => 'Preventivo',
@@ -57,9 +64,9 @@ class MantenimientoResource extends Resource
                             ->options([
                                 'Solicitado' => 'Solicitado',
                                 'En proceso' => 'En proceso',
-                                'Pendiente Revision Admin' => 'Pendiente Revisión',
+                                'Pendiente Revision Admin' => 'En revisión',
                             ])
-                            ->default('Solicitado')
+                            ->default('Pendiente Revision Admin')
                             ->required(),
                         Forms\Components\DatePicker::make('fecha_solicitud')
                             ->default(now())
@@ -100,6 +107,7 @@ class MantenimientoResource extends Resource
                     ->label('Técnico')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('estado')
+                    ->formatStateUsing(fn ($state) => $state === 'Pendiente Revision Admin' ? 'En revisión' : $state)
                     ->badge()
                     ->colors([
                         'warning' => 'Solicitado',
@@ -119,7 +127,7 @@ class MantenimientoResource extends Resource
                     ->options([
                         'Solicitado' => 'Solicitado',
                         'En proceso' => 'En proceso',
-                        'Pendiente Revision Admin' => 'Pendiente Revisión',
+                        'Pendiente Revision Admin' => 'En revisión',
                     ]),
             ])
             ->actions([

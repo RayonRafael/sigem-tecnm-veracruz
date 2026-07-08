@@ -63,8 +63,8 @@ class UserResource extends Resource
                             ->label('Carrera / Área')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('RFC')
-                            ->label('RFC')
-                            ->maxLength(255),
+                            ->label('RFC (Opcional)')
+                            ->maxLength(13),
                     ])->columns(3),
 
                 Forms\Components\Section::make('Estado y Rol')

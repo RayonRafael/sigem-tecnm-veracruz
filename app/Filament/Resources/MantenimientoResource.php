@@ -39,13 +39,20 @@ class MantenimientoResource extends Resource
                         Forms\Components\TextInput::make('num_control_tecnico')
                             ->label('Número de Control Técnico')
                             ->maxLength(100),
+                        Forms\Components\Hidden::make('id_usuario_solicita')
+                            ->default(fn () => auth()->id()),
                     ])->columns(3),
 
                 Forms\Components\Section::make('Tipo de servicio')
                     ->schema([
-                        Forms\Components\TextInput::make('tipo_servicio')
+                        Forms\Components\Select::make('tipo_servicio')
                             ->label('Tipo de Servicio')
-                            ->maxLength(100),
+                            ->options([
+                                'Servicio Social' => 'Servicio Social',
+                                'Prácticas Profesionales' => 'Prácticas Profesionales',
+                                'Personal Técnico' => 'Personal Técnico',
+                            ])
+                            ->required(),
                         Forms\Components\Select::make('tipo_mantenimiento')
                             ->options([
                                 'Preventivo' => 'Preventivo',
@@ -57,11 +64,11 @@ class MantenimientoResource extends Resource
                             ->options([
                                 'Solicitado' => 'Solicitado',
                                 'En proceso' => 'En proceso',
-                                'Pendiente Revision Admin' => 'Pendiente Revisión',
+                                'Pendiente Revision Admin' => 'En revisión',
                                 'Completado' => 'Completado',
                                 'Cancelado' => 'Cancelado',
                             ])
-                            ->default('Solicitado')
+                            ->default('Pendiente Revision Admin')
                             ->required(),
                     ])->columns(3),
 
@@ -121,6 +128,7 @@ class MantenimientoResource extends Resource
                     ->label('Técnico')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('estado')
+                    ->formatStateUsing(fn ($state) => $state === 'Pendiente Revision Admin' ? 'En revisión' : $state)
                     ->badge()
                     ->colors([
                         'warning' => 'Solicitado',
@@ -150,7 +158,7 @@ class MantenimientoResource extends Resource
                     ->options([
                         'Solicitado' => 'Solicitado',
                         'En proceso' => 'En proceso',
-                        'Pendiente Revision Admin' => 'Pendiente Revisión',
+                        'Pendiente Revision Admin' => 'En revisión',
                         'Completado' => 'Completado',
                         'Cancelado' => 'Cancelado',
                     ]),
@@ -163,6 +171,20 @@ class MantenimientoResource extends Resource
                     ]),
             ])
             ->actions([
+                Tables\Actions\Action::make('autorizar')
+                    ->label('Autorizar')
+                    ->icon('heroicon-m-check-circle')
+                    ->color('success')
+                    ->visible(fn (Mantenimiento $record): bool => $record->estado === 'Pendiente Revision Admin' || $record->estado === 'Solicitado')
+                    ->action(fn (Mantenimiento $record) => $record->update(['estado' => 'En proceso']))
+                    ->requiresConfirmation(),
+                Tables\Actions\Action::make('completar')
+                    ->label('Completar')
+                    ->icon('heroicon-m-check-badge')
+                    ->color('info')
+                    ->visible(fn (Mantenimiento $record): bool => $record->estado === 'En proceso')
+                    ->action(fn (Mantenimiento $record) => $record->update(['estado' => 'Completado', 'fecha_fin' => now()]))
+                    ->requiresConfirmation(),
                 Tables\Actions\ViewAction::make()->iconButton(),
                 Tables\Actions\EditAction::make()->iconButton(),
             ])

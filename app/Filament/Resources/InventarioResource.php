@@ -33,7 +33,7 @@ class InventarioResource extends Resource
                             ->label('Número de Serie')
                             ->maxLength(100),
                         Forms\Components\Select::make('id_producto')
-                            ->label('Material / Producto')
+                            ->label('Material / Equipo')
                             ->relationship('material', 'nombre')
                             ->required()
                             ->searchable()
@@ -78,12 +78,15 @@ class InventarioResource extends Resource
                             ->label('Proveedor')
                             ->relationship('proveedor', 'nombre_empresa')
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
                         Forms\Components\TextInput::make('num_factura')
                             ->label('Número de Factura')
-                            ->maxLength(100),
+                            ->maxLength(100)
+                            ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
                         Forms\Components\DatePicker::make('fecha_factura')
-                            ->label('Fecha de Factura'),
+                            ->label('Fecha de Factura')
+                            ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
                         Forms\Components\DatePicker::make('fecha_registro')
                             ->label('Fecha de Registro')
                             ->default(now())

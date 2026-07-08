@@ -72,6 +72,29 @@ class AdminPanelProvider extends PanelProvider
                     .font-mono, .fi-ta-text-item-label code, .fi-ta-text-item-label[style*="monospace"] {
                         font-family: "JetBrains Mono", monospace !important;
                     }
+                    /* ===== LOGIN CUSTOMIZATION ===== */
+                    .fi-simple-layout {
+                        background-image: url("{{ asset("images/fondo.jpg") }}") !important;
+                        background-size: cover !important;
+                        background-position: center !important;
+                        background-attachment: fixed !important;
+                        position: relative;
+                        z-index: 1;
+                    }
+                    .fi-simple-layout::before {
+                        content: "";
+                        position: absolute;
+                        top: 0; left: 0; right: 0; bottom: 0;
+                        background: rgba(11, 29, 58, 0.75) !important;
+                        z-index: -1;
+                    }
+                    .fi-simple-main-ctn > div {
+                        background: rgba(255, 255, 255, 0.95) !important;
+                        backdrop-filter: blur(8px) !important;
+                        border-radius: 12px !important;
+                        box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+                        border: 1px solid rgba(255,255,255,0.2) !important;
+                    }
                 </style>')
             )
             ->navigationGroups([

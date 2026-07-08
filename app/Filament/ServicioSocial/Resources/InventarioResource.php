@@ -32,7 +32,7 @@ class InventarioResource extends Resource
                             ->required()
                             ->maxLength(100),
                         Forms\Components\Select::make('id_producto')
-                            ->label('Material / Producto')
+                            ->label('Material / Equipo')
                             ->relationship('material', 'nombre')
                             ->required()
                             ->searchable()
