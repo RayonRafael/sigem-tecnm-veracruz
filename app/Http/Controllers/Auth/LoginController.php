@@ -25,25 +25,44 @@ class LoginController extends Controller
      */
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
+            'tipo_acceso' => ['required', 'in:alumno,personal'],
         ]);
+
+        $credentials = $request->only('email', 'password');
 
         if (Auth::guard('web')->attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
             
             $user = Auth::guard('web')->user();
-            $tipo = $request->input('tipo', 'alumnos');
+            $tipo_acceso = $request->input('tipo_acceso');
             
-            // Redirección explícita basada en la pestaña elegida y permisos
-            if ($tipo === 'personal' && ($user->hasRole('Administrador') || $user->tipo_usuario === 'Administrador')) {
-                return redirect()->intended('/admin');
-            } elseif ($tipo === 'alumnos' && ($user->hasRole('Servicio Social') || $user->tipo_usuario === 'Servicio')) {
+            if ($tipo_acceso === 'alumno') {
+                if ($user->hasRole('Administrador') || $user->tipo_usuario === 'Administrador') {
+                    Auth::guard('web')->logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+                    return back()->withErrors([
+                        'email' => 'Esta cuenta es de administración. Usa la pestaña "Personal".',
+                    ])->onlyInput('email');
+                }
                 return redirect()->intended('/servicio-social');
             }
+
+            if ($tipo_acceso === 'personal') {
+                if ($user->hasRole('Servicio Social') || $user->tipo_usuario === 'Servicio') {
+                    Auth::guard('web')->logout();
+                    $request->session()->invalidate();
+                    $request->session()->regenerateToken();
+                    return back()->withErrors([
+                        'email' => 'Esta cuenta es de alumno. Usa la pestaña "Alumnos".',
+                    ])->onlyInput('email');
+                }
+                return redirect()->intended('/admin');
+            }
             
-            // Si elige una pestaña pero sus permisos apuntan a otra, redirigir al panel correcto (fallback)
             return $this->redirectBasedOnRole($user);
         }
 

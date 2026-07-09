@@ -1,59 +1,112 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SIGEM — Sistema de Gestión de Equipos y Materiales
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema integral para el control de inventario, gestión de préstamos, rentas y seguimiento de mantenimiento para el equipamiento del TecNM Campus Veracruz. El sistema centraliza la operación de activos y proporciona interfaces distintas para administradores y prestadores de servicio social.
 
-## About Laravel
+## Stack Tecnológico
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Framework:** Laravel 12
+- **Admin Panel:** Filament 3.3
+- **Roles & Permisos:** Spatie Laravel Permission
+- **Estilos:** Tailwind CSS 4
+- **Base de Datos:** MySQL 8
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Requisitos Previos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.2+
+- Composer
+- Node.js & npm
+- MySQL 8
 
-## Learning Laravel
+## Instalación
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+1. Clona el repositorio:
+   ```bash
+   git clone [repo]
+   ```
+2. Instala las dependencias de PHP:
+   ```bash
+   composer install
+   ```
+3. Copia el archivo de entorno y configura tu base de datos:
+   ```bash
+   cp .env.example .env
+   ```
+4. Genera la clave de la aplicación:
+   ```bash
+   php artisan key:generate
+   ```
+5. Ejecuta las migraciones:
+   ```bash
+   php artisan migrate
+   ```
+6. Siembra la base de datos (Roles, Permisos y Usuarios):
+   ```bash
+   php artisan db:seed
+   ```
+7. Instala y compila los assets del frontend:
+   ```bash
+   npm install
+   npm run build
+   ```
+8. Inicia el servidor de desarrollo:
+   ```bash
+   php artisan serve
+   ```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Usuarios de Prueba
 
-## Laravel Sponsors
+Para ingresar al sistema, dirígete a `http://localhost:8000/login` e inicia sesión con las siguientes credenciales:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **Administrador:** 
+  - Correo: `admin@tecnm.edu.mx` 
+  - Contraseña: `admin123` 
+  - Redirección: `/admin`
+- **Servicio Social:** 
+  - Correo: `servicio@tecnm.edu.mx` 
+  - Contraseña: `servicio123` 
+  - Redirección: `/servicio-social`
 
-### Premium Partners
+## Estructura del Proyecto
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+| Directorio | Descripción |
+|---|---|
+| `app/Models/` | Modelos Eloquent (15 modelos) |
+| `app/Filament/Resources/` | Resources del panel Admin (11 módulos) |
+| `app/Filament/ServicioSocial/Resources/` | Resources del panel Servicio Social (9 módulos) |
+| `app/Filament/Widgets/` | Widgets del dashboard (eliminados tras refactoring a favor de vistas HTML directas) |
+| `app/Observers/` | Observers para lógica de negocio y bitácora automatizada |
+| `app/Http/Controllers/Auth/` | `LoginController` para autenticación unificada con pestañas dinámicas |
+| `resources/views/` | Vistas Blade (landing, login unificado con pestañas, dashboards de Filament) |
+| `database/seeders/` | Seeders responsables de cargar roles, permisos iniciales y usuarios de prueba |
 
-## Contributing
+## Módulos del Sistema
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Panel Admin (Acceso Total)
+1. Inventario
+2. Solicitudes (Préstamos/Rentas)
+3. Mantenimiento
+4. Departamentos
+5. Áreas
+6. Materiales
+7. Marcas de Material
+8. Tipos de Material
+9. Unidades de Medida
+10. Proveedores
+11. Receptores
+12. Usuarios
+13. Bitácora de Sistema
 
-## Code of Conduct
+### Panel Servicio Social (Operaciones con Supervisión)
+1. Inventario
+2. Solicitudes
+3. Mantenimiento
+4. Materiales
+5. Receptores
+6. Marcas de Material
+7. Tipos de Material
+8. Unidades de Medida
+9. Áreas
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Roles y Permisos (Spatie)
+- **Administrador:** Cuenta con 24 permisos, acceso total a todos los catálogos, configuraciones y paneles administrativos. Autoriza solicitudes y edita históricos.
+- **Servicio Social:** Cuenta con 10 permisos, destinado a registro rápido, lectura de inventario y levantamiento de solicitudes. Su actividad queda sujeta a revisión administrativa.

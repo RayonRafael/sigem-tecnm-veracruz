@@ -294,7 +294,7 @@
             </div>
 
             <div class="tabs-container">
-                <div class="tab active" id="tab-alumnos" onclick="switchTab('alumnos')">
+                <div class="tab active" id="tab-alumno" onclick="switchTab('alumno')">
                     <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                     Alumnos
                 </div>
@@ -315,7 +315,7 @@
 
             <form action="{{ route('login.submit') }}" method="POST">
                 @csrf
-                <input type="hidden" name="tipo" id="tipo" value="alumnos">
+                <input type="hidden" name="tipo_acceso" id="tipo_acceso" value="alumno">
                 
                 <div class="form-group">
                     <label for="email" class="form-label">Correo electrónico</label>
@@ -346,13 +346,13 @@
 
     <script>
         function switchTab(tab) {
-            document.getElementById('tab-alumnos').classList.remove('active');
+            document.getElementById('tab-alumno').classList.remove('active');
             document.getElementById('tab-personal').classList.remove('active');
             
             document.getElementById('tab-' + tab).classList.add('active');
-            document.getElementById('tipo').value = tab;
+            document.getElementById('tipo_acceso').value = tab;
             
-            if (tab === 'alumnos') {
+            if (tab === 'alumno') {
                 document.getElementById('login-subtitle').innerText = 'Acceso para alumnos de servicio social';
             } else {
                 document.getElementById('login-subtitle').innerText = 'Acceso para personal administrativo';
