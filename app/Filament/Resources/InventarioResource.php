@@ -67,6 +67,7 @@ class InventarioResource extends Resource
                         Forms\Components\Select::make('id_usuario')
                             ->label('Registrado por (Usuario)')
                             ->relationship('usuario', 'name')
+                            ->default(auth()->id())
                             ->required()
                             ->searchable()
                             ->preload(),

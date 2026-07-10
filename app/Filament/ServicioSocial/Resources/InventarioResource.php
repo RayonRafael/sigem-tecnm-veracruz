@@ -59,13 +59,64 @@ class InventarioResource extends Resource
                                 'Rentado' => 'Rentado',
                             ])
                             ->default('Propio')
+                            ->live()
                             ->required(),
-                        Forms\Components\Hidden::make('id_usuario')
-                            ->default(auth()->id()),
+                        Forms\Components\Select::make('id_usuario')
+                            ->label('Registrado por (Usuario)')
+                            ->relationship('usuario', 'name')
+                            ->default(auth()->id())
+                            ->disabled()
+                            ->dehydrated()
+                            ->required()
+                            ->searchable()
+                            ->preload(),
                         Forms\Components\Hidden::make('aprobado')
                             ->default(false),
                         Forms\Components\Hidden::make('estado_registro')
                             ->default('Pendiente'),
+                    ])->columns(3),
+
+                Forms\Components\Section::make('Proveedor y factura')
+                    ->schema([
+                        Forms\Components\Select::make('id_proveedor')
+                            ->label('Proveedor')
+                            ->relationship('proveedor', 'nombre_empresa')
+                            ->searchable()
+                            ->preload()
+                            ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
+                        Forms\Components\TextInput::make('num_factura')
+                            ->label('Número de Factura')
+                            ->maxLength(100)
+                            ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
+                        Forms\Components\DatePicker::make('fecha_factura')
+                            ->label('Fecha de Factura')
+                            ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
+                        Forms\Components\DatePicker::make('fecha_registro')
+                            ->label('Fecha de Registro')
+                            ->default(now())
+                            ->required(),
+                    ])->columns(2),
+
+                Forms\Components\Section::make('Información de renta')
+                    ->schema([
+                        Forms\Components\DatePicker::make('fecha_inicio_renta')->label('Inicio de Renta'),
+                        Forms\Components\DatePicker::make('fecha_fin_renta')->label('Fin de Renta'),
+                        Forms\Components\Textarea::make('observaciones_renta')->label('Observaciones de Renta')->columnSpanFull(),
+                    ])
+                    ->columns(2)
+                    ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
+
+                Forms\Components\Section::make('Garantía')
+                    ->schema([
+                        Forms\Components\DatePicker::make('garantia_fecha_fin')->label('Fin de Garantía'),
+                        Forms\Components\Select::make('garantia_estado')
+                            ->label('Estado de Garantía')
+                            ->options([
+                                'vigente' => 'Vigente',
+                                'vencida' => 'Vencida',
+                                'sin_garantia' => 'Sin Garantía',
+                            ])
+                            ->default('sin_garantia'),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Observaciones')
