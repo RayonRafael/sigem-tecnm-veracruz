@@ -25,10 +25,12 @@ class TipoMaterialResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Datos del Tipo de Material')
+                    ->icon('heroicon-m-rectangle-stack')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
                             ->label('Nombre del Tipo')
                             ->required()
+                            ->prefixIcon('heroicon-m-rectangle-stack')
                             ->maxLength(100),
                     ]),
             ]);
@@ -52,13 +54,24 @@ class TipoMaterialResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton(),
+                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ]);
+    }
+
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Datos del Tipo de Material')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-rectangle-stack'),
+                    ]),
             ]);
     }
 

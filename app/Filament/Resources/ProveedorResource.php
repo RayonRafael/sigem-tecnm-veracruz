@@ -25,35 +25,44 @@ class ProveedorResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Datos de la Empresa')
+                    ->icon('heroicon-m-building-office-2')
                     ->schema([
                         Forms\Components\TextInput::make('nombre_empresa')
                             ->label('Nombre de la Empresa')
                             ->required()
+                            ->prefixIcon('heroicon-m-building-storefront')
                             ->maxLength(150),
                         Forms\Components\TextInput::make('rfc')
                             ->label('RFC')
+                            ->prefixIcon('heroicon-m-identification')
                             ->maxLength(13)
                             ->default(null),
-                        Forms\Components\Toggle::make('activo')
+                        Forms\Components\ToggleButtons::make('activo')
                             ->label('Proveedor Activo')
+                            ->boolean()
+                            ->inline()
                             ->default(true)
                             ->required(),
-                    ])->columns(2),
+                    ])->columns(3),
 
                 Forms\Components\Section::make('Información de Contacto')
+                    ->icon('heroicon-m-phone')
                     ->schema([
                         Forms\Components\TextInput::make('contacto_nombre')
                             ->label('Nombre del Contacto')
+                            ->prefixIcon('heroicon-m-user')
                             ->maxLength(100)
                             ->default(null),
                         Forms\Components\TextInput::make('contacto_telefono')
                             ->label('Teléfono')
                             ->tel()
+                            ->prefixIcon('heroicon-m-device-phone-mobile')
                             ->maxLength(20)
                             ->default(null),
                         Forms\Components\TextInput::make('contacto_email')
                             ->label('Correo Electrónico')
                             ->email()
+                            ->prefixIcon('heroicon-m-envelope')
                             ->maxLength(100)
                             ->default(null),
                     ])->columns(3),
@@ -81,9 +90,12 @@ class ProveedorResource extends Resource
                 Tables\Columns\TextColumn::make('contacto_email')
                     ->label('Email')
                     ->searchable(),
-                Tables\Columns\IconColumn::make('activo')
-                    ->label('Activo')
-                    ->boolean(),
+                Tables\Columns\TextColumn::make('activo')
+                    ->label('Estado')
+                    ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Inactivo')
+                    ->badge()
+                    ->color(fn ($state) => $state ? 'success' : 'danger')
+                    ->icon(fn ($state) => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime('d/m/Y')
                     ->sortable()
@@ -94,13 +106,37 @@ class ProveedorResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton(),
+                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ]);
+    }
+
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Datos de la Empresa')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('nombre_empresa')->label('Empresa')->icon('heroicon-m-building-storefront'),
+                        \Filament\Infolists\Components\TextEntry::make('rfc')->label('RFC')->fontFamily('mono')->icon('heroicon-m-identification'),
+                        \Filament\Infolists\Components\TextEntry::make('activo')
+                            ->label('Estado')
+                            ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Inactivo')
+                            ->badge()
+                            ->color(fn ($state) => $state ? 'success' : 'danger')
+                            ->icon(fn ($state) => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle'),
+                    ])->columns(3),
+                \Filament\Infolists\Components\Section::make('Contacto')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('contacto_nombre')->label('Contacto')->icon('heroicon-m-user'),
+                        \Filament\Infolists\Components\TextEntry::make('contacto_telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
+                        \Filament\Infolists\Components\TextEntry::make('contacto_email')->label('Email')->icon('heroicon-m-envelope'),
+                    ])->columns(3),
             ]);
     }
 

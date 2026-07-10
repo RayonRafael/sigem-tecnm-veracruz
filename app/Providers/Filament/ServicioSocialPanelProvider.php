@@ -28,9 +28,9 @@ class ServicioSocialPanelProvider extends PanelProvider
             ->path('servicio-social')
             ->login()
             ->brandName('SIGEM - Servicio Social')
-            ->brandLogo(fn () => view('filament.logo'))
+            ->brandLogo(asset('images/sigem-logo.svg'))
             ->brandLogoHeight('2.5rem')
-            ->favicon(asset('images/tecnm-logo.svg'))
+            ->favicon(asset('images/sigem-favicon.svg'))
             ->font('DM Sans', 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap')
             ->colors([
                 'primary' => Color::hex('#1b65d4'),

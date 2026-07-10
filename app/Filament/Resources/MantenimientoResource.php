@@ -24,80 +24,118 @@ class MantenimientoResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Equipo y técnico')
-                    ->schema([
-                        Forms\Components\Select::make('id_inventario')
-                            ->label('Equipo a Reparar')
-                            ->relationship('inventario', 'num_serie')
-                            ->required()
-                            ->searchable()
-                            ->preload(),
-                        Forms\Components\TextInput::make('nombre_tecnico')
-                            ->label('Técnico / Alumno')
-                            ->required()
-                            ->maxLength(150),
-                        Forms\Components\TextInput::make('num_control_tecnico')
-                            ->label('Número de Control Técnico')
-                            ->maxLength(100),
-                        Forms\Components\Hidden::make('id_usuario_solicita')
-                            ->default(fn () => auth()->id()),
-                    ])->columns(3),
+                Forms\Components\Wizard::make([
+                    Forms\Components\Wizard\Step::make('Equipo y técnico')
+                        ->icon('heroicon-m-wrench')
+                        ->schema([
+                            Forms\Components\Select::make('id_inventario')
+                                ->label('Equipo a Reparar')
+                                ->relationship('inventario', 'num_serie')
+                                ->required()
+                                ->searchable()
+                                ->preload()
+                                ->prefixIcon('heroicon-m-qr-code')
+                                ->columnSpanFull(),
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\TextInput::make('nombre_tecnico')
+                                        ->label('Técnico / Alumno')
+                                        ->required()
+                                        ->prefixIcon('heroicon-m-user')
+                                        ->maxLength(150),
+                                    Forms\Components\TextInput::make('num_control_tecnico')
+                                        ->label('Número de Control Técnico')
+                                        ->prefixIcon('heroicon-m-identification')
+                                        ->maxLength(100),
+                                ]),
+                            Forms\Components\Hidden::make('id_usuario_solicita')
+                                ->default(fn () => auth()->id()),
+                        ]),
 
-                Forms\Components\Section::make('Tipo de servicio')
-                    ->schema([
-                        Forms\Components\Select::make('tipo_servicio')
-                            ->label('Tipo de Servicio')
-                            ->options([
-                                'Servicio Social' => 'Servicio Social',
-                                'Prácticas Profesionales' => 'Prácticas Profesionales',
-                                'Personal Técnico' => 'Personal Técnico',
-                            ])
-                            ->required(),
-                        Forms\Components\Select::make('tipo_mantenimiento')
-                            ->options([
-                                'Preventivo' => 'Preventivo',
-                                'Correctivo' => 'Correctivo',
-                                'Mejora' => 'Mejora',
-                            ])
-                            ->required(),
-                        Forms\Components\Select::make('estado')
-                            ->options([
-                                'Solicitado' => 'Solicitado',
-                                'En proceso' => 'En proceso',
-                                'Pendiente Revision Admin' => 'En revisión',
-                                'Completado' => 'Completado',
-                                'Cancelado' => 'Cancelado',
-                            ])
-                            ->default('Pendiente Revision Admin')
-                            ->required(),
-                    ])->columns(3),
+                    Forms\Components\Wizard\Step::make('Tipo de servicio')
+                        ->icon('heroicon-m-cog')
+                        ->schema([
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\ToggleButtons::make('tipo_servicio')
+                                        ->label('Tipo de Servicio')
+                                        ->options([
+                                            'Servicio Social' => 'Servicio Social',
+                                            'Prácticas Profesionales' => 'Prácticas Profesionales',
+                                            'Personal Técnico' => 'Personal Técnico',
+                                        ])
+                                        ->colors([
+                                            'Servicio Social' => 'primary',
+                                            'Prácticas Profesionales' => 'info',
+                                            'Personal Técnico' => 'success',
+                                        ])
+                                        ->inline()
+                                        ->required(),
+                                    Forms\Components\ToggleButtons::make('tipo_mantenimiento')
+                                        ->options([
+                                            'Preventivo' => 'Preventivo',
+                                            'Correctivo' => 'Correctivo',
+                                            'Mejora' => 'Mejora',
+                                        ])
+                                        ->colors([
+                                            'Preventivo' => 'success',
+                                            'Correctivo' => 'danger',
+                                            'Mejora' => 'info',
+                                        ])
+                                        ->inline()
+                                        ->required(),
+                                ]),
+                            Forms\Components\ToggleButtons::make('estado')
+                                ->options([
+                                    'Solicitado' => 'Solicitado',
+                                    'En proceso' => 'En proceso',
+                                    'Pendiente Revision Admin' => 'En revisión',
+                                    'Completado' => 'Completado',
+                                    'Cancelado' => 'Cancelado',
+                                ])
+                                ->colors([
+                                    'Solicitado' => 'warning',
+                                    'En proceso' => 'primary',
+                                    'Pendiente Revision Admin' => 'warning',
+                                    'Completado' => 'success',
+                                    'Cancelado' => 'danger',
+                                ])
+                                ->inline()
+                                ->default('Pendiente Revision Admin')
+                                ->required()
+                                ->columnSpanFull(),
+                        ]),
 
-                Forms\Components\Section::make('Fechas')
-                    ->schema([
-                        Forms\Components\DatePicker::make('fecha_solicitud')
-                            ->default(now())
-                            ->required(),
-                        Forms\Components\DatePicker::make('fecha_inicio')
-                            ->label('Fecha Inicio'),
-                        Forms\Components\DatePicker::make('fecha_fin')
-                            ->label('Fecha Fin'),
-                    ])->columns(3),
-
-                Forms\Components\Section::make('Detalles')
-                    ->schema([
-                        Forms\Components\Textarea::make('descripcion_falla')
-                            ->label('Descripción de la Falla')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                        Forms\Components\Textarea::make('descripcion_trabajo')
-                            ->label('Trabajo Realizado')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                        Forms\Components\Textarea::make('observaciones')
-                            ->label('Observaciones')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                    ])->columns(1),
+                    Forms\Components\Wizard\Step::make('Fechas y detalles')
+                        ->icon('heroicon-m-calendar-days')
+                        ->schema([
+                            Forms\Components\Grid::make(3)
+                                ->schema([
+                                    Forms\Components\DatePicker::make('fecha_solicitud')
+                                        ->default(now())
+                                        ->prefixIcon('heroicon-m-calendar')
+                                        ->required(),
+                                    Forms\Components\DatePicker::make('fecha_inicio')
+                                        ->prefixIcon('heroicon-m-calendar')
+                                        ->label('Fecha Inicio'),
+                                    Forms\Components\DatePicker::make('fecha_fin')
+                                        ->prefixIcon('heroicon-m-calendar')
+                                        ->label('Fecha Fin'),
+                                ]),
+                            Forms\Components\Textarea::make('descripcion_falla')
+                                ->label('Descripción de la Falla')
+                                ->rows(2)
+                                ->columnSpanFull(),
+                            Forms\Components\Textarea::make('descripcion_trabajo')
+                                ->label('Trabajo Realizado')
+                                ->rows(2)
+                                ->columnSpanFull(),
+                            Forms\Components\Textarea::make('observaciones')
+                                ->label('Observaciones')
+                                ->rows(2)
+                                ->columnSpanFull(),
+                        ]),
+                ])->columnSpanFull(),
             ]);
     }
 
@@ -120,6 +158,11 @@ class MantenimientoResource extends Resource
                         'danger' => 'Correctivo',
                         'primary' => 'Mejora',
                     ])
+                    ->icons([
+                        'heroicon-m-shield-check' => 'Preventivo',
+                        'heroicon-m-exclamation-triangle' => 'Correctivo',
+                        'heroicon-m-arrow-trending-up' => 'Mejora',
+                    ])
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tipo_servicio')
                     ->label('Tipo Servicio')
@@ -136,6 +179,13 @@ class MantenimientoResource extends Resource
                         'info' => 'Pendiente Revision Admin',
                         'success' => 'Completado',
                         'danger' => 'Cancelado',
+                    ])
+                    ->icons([
+                        'heroicon-m-clock' => 'Solicitado',
+                        'heroicon-m-wrench-screwdriver' => 'En proceso',
+                        'heroicon-m-clock' => 'Pendiente Revision Admin',
+                        'heroicon-m-check-badge' => 'Completado',
+                        'heroicon-m-x-circle' => 'Cancelado',
                     ]),
                 Tables\Columns\TextColumn::make('fecha_solicitud')
                     ->label('Fecha Sol.')
@@ -185,13 +235,75 @@ class MantenimientoResource extends Resource
                     ->visible(fn (Mantenimiento $record): bool => $record->estado === 'En proceso')
                     ->action(fn (Mantenimiento $record) => $record->update(['estado' => 'Completado', 'fecha_fin' => now()]))
                     ->requiresConfirmation(),
-                Tables\Actions\ViewAction::make()->iconButton(),
+                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ]);
+    }
+
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Equipo y Técnico')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('inventario.num_serie')->label('No. Serie')
+                            ->fontFamily('mono')
+                            ->icon('heroicon-m-qr-code'),
+                        \Filament\Infolists\Components\TextEntry::make('inventario.material.nombre')->label('Material')->icon('heroicon-m-cube'),
+                        \Filament\Infolists\Components\TextEntry::make('nombre_tecnico')->label('Técnico')->icon('heroicon-m-user'),
+                        \Filament\Infolists\Components\TextEntry::make('num_control_tecnico')->label('No. Control')->icon('heroicon-m-identification'),
+                    ])->columns(4),
+                \Filament\Infolists\Components\Section::make('Detalles del Servicio')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('tipo_servicio')->label('Servicio')->badge(),
+                        \Filament\Infolists\Components\TextEntry::make('tipo_mantenimiento')->label('Tipo')
+                            ->badge()
+                            ->color(fn (string $state): string => match ($state) {
+                                'Preventivo' => 'success',
+                                'Correctivo' => 'danger',
+                                'Mejora' => 'info',
+                                default => 'gray',
+                            })
+                            ->icon(fn (string $state): string => match ($state) {
+                                'Preventivo' => 'heroicon-m-shield-check',
+                                'Correctivo' => 'heroicon-m-exclamation-triangle',
+                                'Mejora' => 'heroicon-m-arrow-trending-up',
+                                default => 'heroicon-m-minus',
+                            }),
+                        \Filament\Infolists\Components\TextEntry::make('estado')->label('Estado')
+                            ->formatStateUsing(fn ($state) => $state === 'Pendiente Revision Admin' ? 'En revisión' : $state)
+                            ->badge()
+                            ->color(fn (string $state): string => match ($state) {
+                                'Solicitado' => 'warning',
+                                'En proceso' => 'primary',
+                                'Pendiente Revision Admin' => 'info',
+                                'Completado' => 'success',
+                                'Cancelado' => 'danger',
+                                default => 'gray',
+                            })
+                            ->icon(fn (string $state): string => match ($state) {
+                                'Solicitado' => 'heroicon-m-clock',
+                                'En proceso' => 'heroicon-m-wrench-screwdriver',
+                                'Pendiente Revision Admin' => 'heroicon-m-clock',
+                                'Completado' => 'heroicon-m-check-badge',
+                                'Cancelado' => 'heroicon-m-x-circle',
+                                default => 'heroicon-m-minus',
+                            }),
+                    ])->columns(3),
+                \Filament\Infolists\Components\Section::make('Fechas y Reportes')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('fecha_solicitud')->label('Solicitud')->date('d/m/Y')->icon('heroicon-m-calendar'),
+                        \Filament\Infolists\Components\TextEntry::make('fecha_inicio')->label('Inicio')->date('d/m/Y')->icon('heroicon-m-calendar'),
+                        \Filament\Infolists\Components\TextEntry::make('fecha_fin')->label('Fin')->date('d/m/Y')->icon('heroicon-m-calendar'),
+                        \Filament\Infolists\Components\TextEntry::make('descripcion_falla')->label('Falla')->columnSpanFull(),
+                        \Filament\Infolists\Components\TextEntry::make('descripcion_trabajo')->label('Trabajo Realizado')->columnSpanFull(),
+                        \Filament\Infolists\Components\TextEntry::make('observaciones')->label('Observaciones')->columnSpanFull(),
+                    ])->columns(3),
             ]);
     }
 

@@ -42,9 +42,15 @@ class UnidadMedidaResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nombre')
-                    ->required()
-                    ->maxLength(50),
+                Forms\Components\Section::make('Datos de la Unidad de Medida')
+                    ->icon('heroicon-m-bars-3-bottom-left')
+                    ->schema([
+                        Forms\Components\TextInput::make('nombre')
+                            ->label('Nombre de la Unidad')
+                            ->required()
+                            ->prefixIcon('heroicon-m-bars-3-bottom-left')
+                            ->maxLength(50),
+                    ]),
             ]);
     }
 
@@ -53,30 +59,38 @@ class UnidadMedidaResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')
-                    ->searchable(),
+                    ->label('Nombre')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('nombre', 'asc')
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
             ])
             ->bulkActions([]);
     }
 
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Datos de la Unidad de Medida')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-bars-3-bottom-left'),
+                    ]),
+            ]);
+    }
+
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

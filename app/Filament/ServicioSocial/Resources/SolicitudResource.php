@@ -24,50 +24,84 @@ class SolicitudResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos de la solicitud')
-                    ->schema([
-                        Forms\Components\DatePicker::make('fecha_solicitud')
-                            ->default(now())
-                            ->required(),
-                        Forms\Components\Select::make('tipo_movimiento')
-                            ->options([
-                                'Asignacion Temporal' => 'Asignación Temporal',
-                                'Asignacion Permanente' => 'Asignación Permanente',
-                            ])
-                            ->default('Asignacion Temporal')
-                            ->required(),
-                        Forms\Components\Select::make('estado')
-                            ->options([
-                                'Pendiente' => 'Pendiente',
-                            ])
-                            ->default('Pendiente')
-                            ->required(),
-                    ])->columns(3),
-
-                Forms\Components\Section::make('Participantes')
-                    ->schema([
-                        Forms\Components\Select::make('id_usuario')
-                            ->label('Solicitante (Usuario)')
-                            ->relationship('usuario', 'name')
-                            ->default(auth()->id())
-                            ->required()
-                            ->searchable()
-                            ->preload(),
-                        Forms\Components\Select::make('id_receptor')
-                            ->label('Receptor (Área/Persona)')
-                            ->relationship('receptor', 'nombre')
-                            ->required()
-                            ->searchable()
-                            ->preload(),
-                    ])->columns(2),
-
-                Forms\Components\Section::make('Observaciones')
-                    ->schema([
-                        Forms\Components\Textarea::make('observaciones')
-                            ->label('Observaciones')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                    ])->columns(1),
+                Forms\Components\Wizard::make([
+                    Forms\Components\Wizard\Step::make('Datos de la solicitud')
+                        ->icon('heroicon-m-document-text')
+                        ->schema([
+                            Forms\Components\Grid::make(3)
+                                ->schema([
+                                    Forms\Components\DatePicker::make('fecha_solicitud')
+                                        ->default(now())
+                                        ->required()
+                                        ->prefixIcon('heroicon-m-calendar')
+                                        ->columnSpan(1),
+                                    Forms\Components\ToggleButtons::make('tipo_movimiento')
+                                        ->options([
+                                            'Asignacion Temporal' => 'Asignación Temporal',
+                                            'Asignacion Permanente' => 'Asignación Permanente',
+                                        ])
+                                        ->colors([
+                                            'Asignacion Temporal' => 'warning',
+                                            'Asignacion Permanente' => 'success',
+                                        ])
+                                        ->inline()
+                                        ->default('Asignacion Temporal')
+                                        ->required()
+                                        ->live()
+                                        ->columnSpan(2),
+                                ]),
+                            Forms\Components\ToggleButtons::make('estado')
+                                ->options([
+                                    'Pendiente' => 'Pendiente',
+                                ])
+                                ->colors([
+                                    'Pendiente' => 'warning',
+                                ])
+                                ->inline()
+                                ->default('Pendiente')
+                                ->required()
+                                ->columnSpanFull(),
+                        ]),
+                    
+                    Forms\Components\Wizard\Step::make('Participantes y detalles')
+                        ->icon('heroicon-m-users')
+                        ->schema([
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\Select::make('id_usuario')
+                                        ->label('Solicitante (Usuario)')
+                                        ->relationship('usuario', 'name')
+                                        ->default(auth()->id())
+                                        ->required()
+                                        ->searchable()
+                                        ->preload()
+                                        ->prefixIcon('heroicon-m-user'),
+                                    Forms\Components\Select::make('id_receptor')
+                                        ->label('Receptor (Área/Persona)')
+                                        ->relationship('receptor', 'nombre')
+                                        ->required()
+                                        ->searchable()
+                                        ->preload()
+                                        ->prefixIcon('heroicon-m-user-group')
+                                        ->live(),
+                                ]),
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\DatePicker::make('fecha_devolucion_estimada')
+                                        ->label('Devolución Estimada')
+                                        ->prefixIcon('heroicon-m-calendar-days')
+                                        ->visible(fn (Forms\Get $get) => $get('tipo_movimiento') === 'Asignacion Temporal'),
+                                    Forms\Components\DatePicker::make('fecha_devolucion_real')
+                                        ->label('Devolución Real')
+                                        ->prefixIcon('heroicon-m-calendar-days')
+                                        ->visible(fn (Forms\Get $get) => $get('tipo_movimiento') === 'Asignacion Temporal'),
+                                ]),
+                            Forms\Components\Textarea::make('observaciones')
+                                ->label('Observaciones')
+                                ->rows(3)
+                                ->columnSpanFull(),
+                        ]),
+                ])->columnSpanFull(),
             ]);
     }
 
@@ -99,6 +133,13 @@ class SolicitudResource extends Resource
                         'success' => 'Completado',
                         'danger' => 'Rechazado',
                         'gray' => 'Cancelado',
+                    ])
+                    ->icons([
+                        'heroicon-m-clock' => 'Pendiente',
+                        'heroicon-m-check-circle' => 'Autorizado',
+                        'heroicon-m-check-badge' => 'Completado',
+                        'heroicon-m-x-circle' => 'Rechazado',
+                        'heroicon-m-no-symbol' => 'Cancelado',
                     ]),
             ])
             ->defaultSort('created_at', 'desc')
@@ -113,10 +154,56 @@ class SolicitudResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton(),
+                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton(),
             ])
             ->bulkActions([]);
+    }
+
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Datos de la Solicitud')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('id_solicitud')->label('Folio')
+                            ->formatStateUsing(fn ($state) => 'FOLIO-' . str_pad($state, 5, '0', STR_PAD_LEFT))
+                            ->fontFamily('mono')
+                            ->icon('heroicon-m-hashtag'),
+                        \Filament\Infolists\Components\TextEntry::make('fecha_solicitud')->label('Fecha')->date('d/m/Y')->icon('heroicon-m-calendar'),
+                        \Filament\Infolists\Components\TextEntry::make('tipo_movimiento')->label('Tipo')->badge(),
+                        \Filament\Infolists\Components\TextEntry::make('estado')
+                            ->badge()
+                            ->color(fn (string $state): string => match ($state) {
+                                'Pendiente' => 'warning',
+                                'Autorizado' => 'primary',
+                                'Completado' => 'success',
+                                'Rechazado' => 'danger',
+                                'Cancelado' => 'gray',
+                                default => 'gray',
+                            })
+                            ->icon(fn (string $state): string => match ($state) {
+                                'Pendiente' => 'heroicon-m-clock',
+                                'Autorizado' => 'heroicon-m-check-circle',
+                                'Completado' => 'heroicon-m-check-badge',
+                                'Rechazado' => 'heroicon-m-x-circle',
+                                'Cancelado' => 'heroicon-m-no-symbol',
+                                default => 'heroicon-m-minus',
+                            }),
+                    ])->columns(4),
+                \Filament\Infolists\Components\Section::make('Participantes')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('usuario.name')->label('Solicitante')->icon('heroicon-m-user'),
+                        \Filament\Infolists\Components\TextEntry::make('receptor.nombre')->label('Receptor')->icon('heroicon-m-user-group'),
+                        \Filament\Infolists\Components\TextEntry::make('receptor.area.departamento.nombre')->label('Departamento')->icon('heroicon-m-building-office'),
+                    ])->columns(3),
+                \Filament\Infolists\Components\Section::make('Devoluciones y Observaciones')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('fecha_devolucion_estimada')->label('Devolución Estimada')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
+                        \Filament\Infolists\Components\TextEntry::make('fecha_devolucion_real')->label('Devolución Real')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
+                        \Filament\Infolists\Components\TextEntry::make('observaciones')->label('Observaciones')->columnSpanFull(),
+                    ])->columns(2),
+            ]);
     }
 
     public static function getRelations(): array

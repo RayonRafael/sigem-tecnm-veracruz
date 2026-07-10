@@ -25,10 +25,12 @@ class MarcaMaterialResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Datos de la Marca')
+                    ->icon('heroicon-m-tag')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
                             ->label('Nombre de la Marca')
                             ->required()
+                            ->prefixIcon('heroicon-m-tag')
                             ->maxLength(100),
                     ]),
             ]);
@@ -52,13 +54,24 @@ class MarcaMaterialResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton(),
+                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ]);
+    }
+
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Datos de la Marca')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-tag'),
+                    ]),
             ]);
     }
 

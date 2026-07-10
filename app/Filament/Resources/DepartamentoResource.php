@@ -25,8 +25,13 @@ class DepartamentoResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Datos del departamento')
+                    ->icon('heroicon-m-building-office-2')
                     ->schema([
-                        Forms\Components\TextInput::make('nombre')->label('Nombre')->required()->maxLength(100),
+                        Forms\Components\TextInput::make('nombre')
+                            ->label('Nombre')
+                            ->required()
+                            ->prefixIcon('heroicon-m-tag')
+                            ->maxLength(100),
                     ]),
             ]);
     }
@@ -39,7 +44,7 @@ class DepartamentoResource extends Resource
             ])
             ->defaultSort('nombre', 'asc')
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton(),
+                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton(),
             ])
             ->bulkActions([
@@ -48,6 +53,18 @@ class DepartamentoResource extends Resource
                 ]),
             ]);
     }
+
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Datos del Departamento')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-building-office-2'),
+                    ]),
+            ]);
+    }
+
 
     public static function getRelations(): array
     {

@@ -26,11 +26,14 @@ class MaterialResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Datos del material')
+                    ->icon('heroicon-m-cube')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
                             ->required()
+                            ->prefixIcon('heroicon-m-tag')
                             ->maxLength(150),
                         Forms\Components\TextInput::make('modelo')
+                            ->prefixIcon('heroicon-m-qr-code')
                             ->maxLength(100),
                         Forms\Components\Textarea::make('descripcion')
                             ->label('Descripción')
@@ -39,25 +42,29 @@ class MaterialResource extends Resource
                     ])->columns(2),
 
                 Forms\Components\Section::make('Clasificación')
+                    ->icon('heroicon-m-rectangle-stack')
                     ->schema([
                         Forms\Components\Select::make('id_marca')
                             ->label('Marca')
                             ->relationship('marca', 'nombre')
                             ->required()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->prefixIcon('heroicon-m-star'),
                         Forms\Components\Select::make('id_tipodematerial')
                             ->label('Tipo de Material')
                             ->relationship('tipo', 'nombre')
                             ->required()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->prefixIcon('heroicon-m-square-3-stack-3d'),
                         Forms\Components\Select::make('id_unidad')
                             ->label('Unidad de Medida')
                             ->relationship('unidad', 'nombre')
                             ->required()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->prefixIcon('heroicon-m-scale'),
                     ])->columns(3),
 
                         Forms\Components\Hidden::make('stock_actual')
@@ -103,15 +110,60 @@ class MaterialResource extends Resource
                     ->colors([
                         'danger' => 'Stock bajo',
                         'success' => 'Normal',
+                    ])
+                    ->icons([
+                        'heroicon-m-exclamation-triangle' => 'Stock bajo',
+                        'heroicon-m-check-circle' => 'Normal',
                     ]),
             ])
             ->defaultSort('nombre', 'asc')
             ->filters([])
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton(),
+                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton(),
             ])
             ->bulkActions([]);
+    }
+
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Datos del Material')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-tag'),
+                        \Filament\Infolists\Components\TextEntry::make('modelo')->label('Modelo')->icon('heroicon-m-qr-code'),
+                        \Filament\Infolists\Components\TextEntry::make('descripcion')->label('Descripción')->columnSpanFull(),
+                    ])->columns(2),
+                \Filament\Infolists\Components\Section::make('Clasificación')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('marca.nombre')->label('Marca')->icon('heroicon-m-star'),
+                        \Filament\Infolists\Components\TextEntry::make('tipo.nombre')->label('Tipo')->icon('heroicon-m-square-3-stack-3d'),
+                        \Filament\Infolists\Components\TextEntry::make('unidad.nombre')->label('Unidad de Medida')->icon('heroicon-m-scale'),
+                    ])->columns(3),
+                \Filament\Infolists\Components\Section::make('Control de Stock')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('stock_actual')->label('Stock Actual')->icon('heroicon-m-archive-box'),
+                        \Filament\Infolists\Components\TextEntry::make('stock_minimo')->label('Stock Mínimo')->icon('heroicon-m-bell-alert'),
+                        \Filament\Infolists\Components\TextEntry::make('estado_stock')
+                            ->label('Estado')
+                            ->getStateUsing(fn ($record) => $record->stock_actual < $record->stock_minimo ? 'Stock bajo' : 'Normal')
+                            ->badge()
+                            ->color(fn (string $state): string => match ($state) {
+                                'Stock bajo' => 'danger',
+                                'Normal' => 'success',
+                                default => 'gray',
+                            })
+                            ->icon(fn (string $state): string => match ($state) {
+                                'Stock bajo' => 'heroicon-m-exclamation-triangle',
+                                'Normal' => 'heroicon-m-check-circle',
+                                default => 'heroicon-m-minus',
+                            }),
+                        \Filament\Infolists\Components\IconEntry::make('requiere_control_individual')
+                            ->label('Control Individual')
+                            ->boolean(),
+                    ])->columns(4),
+            ]);
     }
 
     public static function getRelations(): array

@@ -31,27 +31,36 @@ class BitacoraSistemaResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Información del Registro')
+                    ->icon('heroicon-m-clock')
                     ->schema([
                         Forms\Components\TextInput::make('fecha_hora')
-                            ->label('Fecha y Hora'),
+                            ->label('Fecha y Hora')
+                            ->prefixIcon('heroicon-m-calendar'),
                         Forms\Components\TextInput::make('usuario.name')
-                            ->label('Usuario'),
+                            ->label('Usuario')
+                            ->prefixIcon('heroicon-m-user'),
                         Forms\Components\TextInput::make('accion')
-                            ->label('Acción'),
+                            ->label('Acción')
+                            ->prefixIcon('heroicon-m-bolt'),
                         Forms\Components\TextInput::make('tabla_afectada')
-                            ->label('Tabla Afectada'),
+                            ->label('Tabla Afectada')
+                            ->prefixIcon('heroicon-m-table-cells'),
                         Forms\Components\TextInput::make('registro_id')
-                            ->label('ID Registro'),
+                            ->label('ID Registro')
+                            ->prefixIcon('heroicon-m-hashtag'),
                         Forms\Components\TextInput::make('ip_address')
-                            ->label('Dirección IP'),
+                            ->label('Dirección IP')
+                            ->prefixIcon('heroicon-m-globe-alt'),
                         Forms\Components\TextInput::make('user_agent')
                             ->label('User Agent')
+                            ->prefixIcon('heroicon-m-computer-desktop')
                             ->columnSpanFull(),
                         Forms\Components\Textarea::make('detalles')
                             ->label('Detalles')
                             ->columnSpanFull(),
                     ])->columns(3),
                 Forms\Components\Section::make('Datos del Cambio')
+                    ->icon('heroicon-m-arrow-path')
                     ->schema([
                         Forms\Components\KeyValue::make('datos_anteriores')
                             ->label('Datos Anteriores'),
@@ -79,6 +88,11 @@ class BitacoraSistemaResource extends Resource
                         'success' => 'crear',
                         'warning' => 'editar',
                         'danger' => 'eliminar',
+                    ])
+                    ->icons([
+                        'heroicon-m-plus' => 'crear',
+                        'heroicon-m-pencil' => 'editar',
+                        'heroicon-m-trash' => 'eliminar',
                     ])
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tabla_afectada')
@@ -129,10 +143,47 @@ class BitacoraSistemaResource extends Resource
                     ),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton(),
+                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
             ])
             ->bulkActions([
                 // Sin bulk actions de delete
+            ]);
+    }
+
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Información del Registro')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('fecha_hora')->label('Fecha y Hora')->icon('heroicon-m-calendar'),
+                        \Filament\Infolists\Components\TextEntry::make('usuario.name')->label('Usuario')->icon('heroicon-m-user'),
+                        \Filament\Infolists\Components\TextEntry::make('accion')
+                            ->label('Acción')
+                            ->badge()
+                            ->color(fn (string $state): string => match($state) {
+                                'crear' => 'success',
+                                'editar' => 'warning',
+                                'eliminar' => 'danger',
+                                default => 'gray',
+                            })
+                            ->icon(fn (string $state): string => match($state) {
+                                'crear' => 'heroicon-m-plus',
+                                'editar' => 'heroicon-m-pencil',
+                                'eliminar' => 'heroicon-m-trash',
+                                default => 'heroicon-m-bolt',
+                            }),
+                        \Filament\Infolists\Components\TextEntry::make('tabla_afectada')->label('Tabla Afectada')->icon('heroicon-m-table-cells'),
+                        \Filament\Infolists\Components\TextEntry::make('registro_id')->label('ID Registro')->icon('heroicon-m-hashtag'),
+                        \Filament\Infolists\Components\TextEntry::make('ip_address')->label('Dirección IP')->icon('heroicon-m-globe-alt'),
+                        \Filament\Infolists\Components\TextEntry::make('user_agent')->label('User Agent')->icon('heroicon-m-computer-desktop')->columnSpanFull(),
+                        \Filament\Infolists\Components\TextEntry::make('detalles')->label('Detalles')->columnSpanFull(),
+                    ])->columns(3),
+                \Filament\Infolists\Components\Section::make('Datos del Cambio')
+                    ->schema([
+                        \Filament\Infolists\Components\KeyValueEntry::make('datos_anteriores')->label('Datos Anteriores'),
+                        \Filament\Infolists\Components\KeyValueEntry::make('datos_nuevos')->label('Datos Nuevos'),
+                    ])->columns(2),
             ]);
     }
 

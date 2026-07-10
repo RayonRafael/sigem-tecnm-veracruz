@@ -284,8 +284,7 @@
         <div class="login-card">
             
             <div class="brand-header">
-                <div class="brand-icon">S</div>
-                <div class="brand-title">SIGEM</div>
+                <img src="{{ asset('images/sigem-logo.svg') }}" alt="SIGEM" height="50">
             </div>
 
             <div class="logos-container">

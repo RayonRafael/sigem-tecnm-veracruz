@@ -25,27 +25,33 @@ class ReceptorResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make('Datos del Receptor')
+                    ->icon('heroicon-m-user-circle')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
                             ->label('Nombre')
                             ->required()
+                            ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
                         Forms\Components\TextInput::make('apellido_paterno')
                             ->label('Apellido Paterno')
                             ->required()
+                            ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
                         Forms\Components\TextInput::make('apellido_materno')
                             ->label('Apellido Materno')
                             ->required()
+                            ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
                         Forms\Components\TextInput::make('email')
                             ->label('Correo Electrónico')
                             ->email()
+                            ->prefixIcon('heroicon-m-envelope')
                             ->maxLength(100)
                             ->default(null),
                         Forms\Components\TextInput::make('telefono')
                             ->label('Teléfono')
                             ->tel()
+                            ->prefixIcon('heroicon-m-device-phone-mobile')
                             ->maxLength(20)
                             ->default(null),
                         Forms\Components\Select::make('id_area')
@@ -53,7 +59,8 @@ class ReceptorResource extends Resource
                             ->relationship('area', 'nombre')
                             ->required()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->prefixIcon('heroicon-m-building-office'),
                     ])->columns(2),
             ]);
     }
@@ -91,13 +98,29 @@ class ReceptorResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton(),
+                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ]);
+    }
+
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Datos del Receptor')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-user'),
+                        \Filament\Infolists\Components\TextEntry::make('apellido_paterno')->label('Apellido Paterno')->icon('heroicon-m-user'),
+                        \Filament\Infolists\Components\TextEntry::make('apellido_materno')->label('Apellido Materno')->icon('heroicon-m-user'),
+                        \Filament\Infolists\Components\TextEntry::make('email')->label('Email')->icon('heroicon-m-envelope'),
+                        \Filament\Infolists\Components\TextEntry::make('telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
+                        \Filament\Infolists\Components\TextEntry::make('area.nombre')->label('Área')->icon('heroicon-m-building-office'),
+                    ])->columns(3),
             ]);
     }
 

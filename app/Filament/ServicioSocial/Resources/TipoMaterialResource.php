@@ -42,9 +42,15 @@ class TipoMaterialResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('nombre')
-                    ->required()
-                    ->maxLength(100),
+                Forms\Components\Section::make('Datos del Tipo de Material')
+                    ->icon('heroicon-m-rectangle-stack')
+                    ->schema([
+                        Forms\Components\TextInput::make('nombre')
+                            ->label('Nombre del Tipo')
+                            ->required()
+                            ->prefixIcon('heroicon-m-rectangle-stack')
+                            ->maxLength(100),
+                    ]),
             ]);
     }
 
@@ -53,30 +59,38 @@ class TipoMaterialResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')
-                    ->searchable(),
+                    ->label('Nombre')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('nombre', 'asc')
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
             ])
             ->bulkActions([]);
     }
 
+    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    {
+        return $infolist
+            ->schema([
+                \Filament\Infolists\Components\Section::make('Datos del Tipo de Material')
+                    ->schema([
+                        \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-rectangle-stack'),
+                    ]),
+            ]);
+    }
+
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
