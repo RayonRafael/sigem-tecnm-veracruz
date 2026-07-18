@@ -101,6 +101,17 @@ class ServicioSocialPanelProvider extends PanelProvider
                     .fi-topbar { left: 0 !important; width: 100% !important; }
                 </style>')
             )
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn (): string => Blade::render('
+                    @if(!request()->routeIs(\'filament.servicio-social.pages.dashboard\'))
+                        <a href="{{ url(\'/servicio-social\') }}" style="position: fixed; bottom: 30px; left: 30px; z-index: 9999; background-color: #0b1d3a; color: white; padding: 12px 24px; border-radius: 999px; font-weight: 600; font-family: sans-serif; text-decoration: none; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.2); display: flex; align-items: center; gap: 10px; transition: all 0.2s ease-in-out;" onmouseover="this.style.backgroundColor=\'#16325c\'; this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.backgroundColor=\'#0b1d3a\'; this.style.transform=\'translateY(0)\'">
+                            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                            Volver al Dashboard
+                        </a>
+                    @endif
+                ')
+            )
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label('Panel')

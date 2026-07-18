@@ -9,4 +9,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateMarcaMaterial extends CreateRecord
 {
     protected static string $resource = MarcaMaterialResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return url('/servicio-social');
+    }
 }

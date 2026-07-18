@@ -17,4 +17,9 @@ class EditUser extends EditRecord
                 ->hidden(fn ($record) => $record->email === 'admin@tecnm.edu.mx'),
         ];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return url('/admin');
+    }
 }

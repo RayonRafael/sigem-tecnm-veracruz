@@ -16,4 +16,9 @@ class EditUnidadMedida extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return url('/servicio-social');
+    }
 }

@@ -8,4 +8,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateMantenimiento extends CreateRecord
 {
     protected static string $resource = MantenimientoResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return url('/servicio-social');
+    }
 }

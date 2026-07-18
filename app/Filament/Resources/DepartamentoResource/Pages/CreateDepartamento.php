@@ -9,4 +9,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateDepartamento extends CreateRecord
 {
     protected static string $resource = DepartamentoResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return url('/admin');
+    }
 }

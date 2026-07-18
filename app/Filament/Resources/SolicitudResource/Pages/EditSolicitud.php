@@ -16,4 +16,9 @@ class EditSolicitud extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return url('/admin');
+    }
 }

@@ -9,4 +9,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateInventario extends CreateRecord
 {
     protected static string $resource = InventarioResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return url('/admin');
+    }
 }

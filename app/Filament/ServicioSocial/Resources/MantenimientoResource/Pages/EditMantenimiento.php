@@ -14,4 +14,9 @@ class EditMantenimiento extends EditRecord
     {
         return [];
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return url('/servicio-social');
+    }
 }

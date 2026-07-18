@@ -18,4 +18,9 @@ class CreateInventario extends CreateRecord
             ->info()
             ->send();
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return url('/servicio-social');
+    }
 }

@@ -9,4 +9,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateTipoMaterial extends CreateRecord
 {
     protected static string $resource = TipoMaterialResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return url('/servicio-social');
+    }
 }
