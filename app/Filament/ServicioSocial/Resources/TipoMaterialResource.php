@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class TipoMaterialResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = TipoMaterial::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-bookmark';

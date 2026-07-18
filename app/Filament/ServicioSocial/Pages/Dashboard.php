@@ -11,6 +11,8 @@ use Illuminate\Support\Carbon;
 
 class Dashboard extends BaseDashboard
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationIcon = 'heroicon-o-home';
     protected static ?string $navigationLabel = 'Panel';
     protected static ?string $navigationGroup = 'Panel';
@@ -46,26 +48,36 @@ class Dashboard extends BaseDashboard
             ->whereIn('estado', ['Pendiente', 'Solicitado', 'En Proceso', 'En mantenimiento'])
             ->count();
 
-        // 2. Solicitudes (mini tabla 3 rows)
-        $solicitudesRecientes = Solicitud::with('usuario')
+        // Colecciones Completas para modales (solo lectura en SS)
+        $inventariosCompletos = Inventario::with(['material', 'material.marca', 'material.tipo'])
             ->where('id_usuario', $userId)
             ->latest('created_at')
-            ->limit(3)
             ->get();
+        $inventariosRecientes = $inventariosCompletos->take(3);
 
-        // 3. Mantenimiento (mini tabla 3 rows)
-        $mantenimientosRecientes = Mantenimiento::with(['inventario', 'inventario.material', 'usuarioSolicita'])
+        $solicitudesCompletas = Solicitud::with('usuario')
+            ->where('id_usuario', $userId)
+            ->latest('created_at')
+            ->get();
+        $solicitudesRecientes = $solicitudesCompletas->take(3);
+
+        $mantenimientosCompletos = Mantenimiento::with(['inventario', 'inventario.material', 'usuarioSolicita'])
             ->where('id_usuario_solicita', $userId)
             ->latest('created_at')
-            ->limit(3)
             ->get();
+        $mantenimientosRecientes = $mantenimientosCompletos->take(3);
 
         return [
             'misRegistrosHoy' => $misRegistrosHoy,
             'pendientesAprobacion' => $pendientesAprobacion,
             'reportesActivos' => $reportesActivos,
+            'inventariosRecientes' => $inventariosRecientes,
             'solicitudesRecientes' => $solicitudesRecientes,
             'mantenimientosRecientes' => $mantenimientosRecientes,
+            'inventariosCompletos' => $inventariosCompletos,
+            'solicitudesCompletas' => $solicitudesCompletas,
+            'mantenimientosCompletos' => $mantenimientosCompletos,
         ];
     }
 }
+

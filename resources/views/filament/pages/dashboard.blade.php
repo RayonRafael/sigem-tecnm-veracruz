@@ -1,6 +1,7 @@
 <x-filament-panels::page>
     <div x-data="{ activeModal: null }" class="sigem-dashboard">
         <style>
+            /* CSS from previous version */
             .sigem-dashboard {
                 --bg: #f0f4f8;
                 --card-bg: #ffffff;
@@ -23,342 +24,89 @@
                 --radius: 12px;
                 --radius-sm: 8px;
                 --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-                --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+                --shadow-lg: 0 10px 25px rgba(0,0,0,0.15);
 
                 font-family: 'DM Sans', sans-serif;
                 color: var(--text-primary);
             }
 
-            .sigem-dashboard * {
-                box-sizing: border-box;
-            }
+            .sigem-dashboard * { box-sizing: border-box; }
 
-            /* ===== BENTO GRID ===== */
-            .bento-grid {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px;
-            }
+            .bento-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .bento-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); transition: transform 0.2s ease, box-shadow 0.2s ease; display: flex; flex-direction: column; }
+            .bento-item:hover { transform: scale(1.01); box-shadow: var(--shadow-md); }
+            .span-2 { grid-column: span 2; }
+            .bento-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+            .bento-title { font-size: 16px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+            .bento-title svg { width: 20px; height: 20px; stroke: var(--accent); fill: none; stroke-width: 2; }
 
-            .bento-item {
-                background: var(--card-bg);
-                border: 1px solid var(--border);
-                border-radius: var(--radius);
-                padding: 24px;
-                box-shadow: var(--shadow);
-                transition: transform 0.2s ease, box-shadow 0.2s ease;
-                display: flex;
-                flex-direction: column;
-            }
+            .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: all 0.15s ease; text-decoration: none; }
+            .btn-primary { background: var(--accent); color: #fff; }
+            .btn-primary:hover { background: var(--accent-dark); }
+            .btn-secondary { background: var(--bg); color: var(--text-primary); border: 1px solid var(--border); }
+            .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+            .btn-danger { background: var(--danger-light); color: var(--danger); }
+            .btn-danger:hover { background: var(--danger); color: #fff; }
+            .btn-sm { padding: 4px 8px; font-size: 11px; }
+            .btn-icon { padding: 6px; }
 
-            .bento-item:hover {
-                transform: scale(1.01);
-                box-shadow: var(--shadow-md);
-            }
-
-            .span-2 {
-                grid-column: span 2;
-            }
-
-            /* ===== HEADERS ===== */
-            .bento-header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                margin-bottom: 16px;
-            }
-
-            .bento-title {
-                font-size: 16px;
-                font-weight: 700;
-                color: var(--text-primary);
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .bento-title svg {
-                width: 20px;
-                height: 20px;
-                stroke: var(--accent);
-                fill: none;
-                stroke-width: 2;
-            }
-
-            /* ===== BUTTONS ===== */
-            .btn {
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                padding: 8px 14px;
-                border-radius: var(--radius-sm);
-                font-family: inherit;
-                font-size: 13px;
-                font-weight: 600;
-                border: none;
-                cursor: pointer;
-                transition: all 0.15s ease;
-                text-decoration: none;
-            }
-
-            .btn-primary {
-                background: var(--accent);
-                color: #fff;
-            }
-
-            .btn-primary:hover {
-                background: var(--accent-dark);
-            }
-
-            .btn-secondary {
-                background: var(--bg);
-                color: var(--text-primary);
-                border: 1px solid var(--border);
-            }
-
-            .btn-secondary:hover {
-                border-color: var(--accent);
-                color: var(--accent);
-            }
-
-            /* ===== WELCOME CARD STATS ===== */
-            .welcome-stats {
-                display: flex;
-                gap: 20px;
-                margin: 20px 0;
-            }
-            .welcome-stat-item {
-                flex: 1;
-                background: var(--bg);
-                padding: 16px;
-                border-radius: var(--radius-sm);
-                border: 1px solid var(--border-light);
-            }
-            .welcome-stat-value {
-                font-family: 'JetBrains Mono', monospace;
-                font-size: 28px;
-                font-weight: 700;
-                color: var(--text-primary);
-                line-height: 1.2;
-            }
-            .welcome-stat-label {
-                font-size: 13px;
-                color: var(--text-secondary);
-                font-weight: 500;
-            }
+            .welcome-stats { display: flex; gap: 20px; margin: 20px 0; }
+            .welcome-stat-item { flex: 1; background: var(--bg); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); }
+            .welcome-stat-value { font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700; line-height: 1.2; }
+            .welcome-stat-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
             
-            /* ===== ALERTS ===== */
-            .alert-banner {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                padding: 12px 16px;
-                border-radius: var(--radius-sm);
-                margin-bottom: 20px;
-                font-size: 13px;
-                font-weight: 500;
-            }
-            .alert-banner.warning {
-                background: var(--warning-light);
-                border: 1px solid #fcd34d;
-                color: #92400e;
-            }
-            .alert-banner svg {
-                width: 18px;
-                height: 18px;
-                flex-shrink: 0;
-                stroke: currentColor;
-                fill: none;
-                stroke-width: 2;
-            }
+            .alert-banner { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 20px; font-size: 13px; font-weight: 500; }
+            .alert-banner.warning { background: var(--warning-light); border: 1px solid #fcd34d; color: #92400e; }
+            .alert-banner svg { width: 18px; height: 18px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 2; }
 
-            /* ===== MINI TABLES ===== */
-            .mini-table {
-                width: 100%;
-                border-collapse: collapse;
-                margin-top: 10px;
-            }
-            .mini-table th {
-                text-align: left;
-                padding: 8px;
-                font-size: 11px;
-                font-weight: 700;
-                color: var(--text-muted);
-                text-transform: uppercase;
-                border-bottom: 1px solid var(--border);
-            }
-            .mini-table td {
-                padding: 10px 8px;
-                font-size: 13px;
-                border-bottom: 1px solid var(--border-light);
-                color: var(--text-primary);
-            }
-            .mini-table tr:last-child td {
-                border-bottom: none;
-            }
-            .mono-text {
-                font-family: 'JetBrains Mono', monospace;
-                font-size: 12px;
-                font-weight: 600;
-            }
+            .mini-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            .mini-table th { text-align: left; padding: 8px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+            .mini-table td { padding: 10px 8px; font-size: 13px; border-bottom: 1px solid var(--border-light); color: var(--text-primary); }
+            .mini-table tr:last-child td { border-bottom: none; }
+            .mono-text { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; }
 
-            /* ===== BADGES ===== */
-            .badge-status {
-                display: inline-flex;
-                align-items: center;
-                gap: 5px;
-                padding: 3px 8px;
-                border-radius: 12px;
-                font-size: 11px;
-                font-weight: 600;
-            }
+            .badge-status { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; }
             .badge-status.active { background: var(--success-light); color: var(--success); }
             .badge-status.warning { background: var(--warning-light); color: #b45309; }
             .badge-status.danger { background: var(--danger-light); color: var(--danger); }
             .badge-status.info { background: var(--info-light); color: var(--info); }
-            .badge-status.muted { background: #f1f5f9; color: var(--text-muted); }
-            .badge-status::before {
-                content: '';
-                width: 5px;
-                height: 5px;
-                border-radius: 50%;
-                background: currentColor;
-            }
+            .badge-status::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
 
-            /* ===== CATALOG ICONS GRID ===== */
-            .catalog-grid {
-                display: grid;
-                grid-template-columns: repeat(9, 1fr);
-                gap: 12px;
-                margin-top: 10px;
-            }
-            .catalog-item {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 8px;
-                padding: 16px 8px;
-                border-radius: var(--radius-sm);
-                background: var(--bg);
-                border: 1px solid var(--border);
-                cursor: pointer;
-                transition: all 0.2s;
-                text-align: center;
-            }
-            .catalog-item:hover {
-                background: var(--accent-light);
-                border-color: var(--accent);
-                transform: translateY(-2px);
-            }
-            .catalog-icon {
-                width: 32px;
-                height: 32px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 8px;
-                background: var(--card-bg);
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                color: var(--accent);
-            }
-            .catalog-icon svg {
-                width: 18px;
-                height: 18px;
-                stroke: currentColor;
-                fill: none;
-                stroke-width: 1.8;
-            }
-            .catalog-label {
-                font-size: 11px;
-                font-weight: 600;
-                color: var(--text-primary);
-                line-height: 1.2;
-            }
+            .catalog-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 12px; margin-top: 10px; }
+            .catalog-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 16px 8px; border-radius: var(--radius-sm); background: var(--bg); border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; text-align: center; }
+            .catalog-item:hover { background: var(--accent-light); border-color: var(--accent); transform: translateY(-2px); }
+            .catalog-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: var(--card-bg); box-shadow: 0 2px 4px rgba(0,0,0,0.05); color: var(--accent); }
+            .catalog-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+            .catalog-label { font-size: 11px; font-weight: 600; color: var(--text-primary); line-height: 1.2; }
 
-            /* ===== ACTIVITY LIST ===== */
-            .activity-item {
-                display: flex;
-                align-items: flex-start;
-                gap: 12px;
-                padding: 12px 0;
-                border-bottom: 1px solid var(--border-light);
-            }
+            .activity-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border-light); }
             .activity-item:last-child { border-bottom: none; }
-            .activity-dot {
-                width: 32px;
-                height: 32px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                flex-shrink: 0;
-                background: var(--accent-light);
-                color: var(--accent);
-            }
+            .activity-dot { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: var(--accent-light); color: var(--accent); }
             .activity-dot svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; }
             .activity-text { font-size: 13px; color: var(--text-primary); line-height: 1.4; }
             .activity-time { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
-            /* ===== MODALS (ALPINE) ===== */
-            .modal-backdrop {
-                position: fixed;
-                inset: 0;
-                background: rgba(11, 29, 58, 0.4);
-                backdrop-filter: blur(4px);
-                z-index: 1000;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                padding: 20px;
-            }
-            .modal-window {
-                background: var(--card-bg);
-                border-radius: var(--radius);
-                width: 100%;
-                max-width: 500px;
-                box-shadow: var(--shadow-lg);
-                overflow: hidden;
-            }
-            .modal-header {
-                padding: 20px 24px;
-                border-bottom: 1px solid var(--border);
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
-            .modal-title {
-                font-size: 18px;
-                font-weight: 700;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-            .modal-title svg {
-                width: 22px;
-                height: 22px;
-                stroke: var(--accent);
-                fill: none;
-            }
-            .modal-close {
-                background: none;
-                border: none;
-                cursor: pointer;
-                color: var(--text-muted);
-                padding: 4px;
-            }
+            /* MODALS */
+            .modal-backdrop { position: fixed; inset: 0; background: rgba(11, 29, 58, 0.4); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+            .modal-window { background: var(--card-bg); border-radius: var(--radius); width: 100%; max-width: 900px; box-shadow: var(--shadow-lg); overflow: hidden; display: flex; flex-direction: column; max-height: 90vh; }
+            .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+            .modal-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+            .modal-title svg { width: 22px; height: 22px; stroke: var(--accent); fill: none; }
+            .modal-close { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 4px; }
             .modal-close:hover { color: var(--danger); }
             .modal-close svg { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2; }
-            .modal-body {
-                padding: 24px;
-            }
-            .modal-footer {
-                padding: 16px 24px;
-                background: var(--bg);
-                border-top: 1px solid var(--border);
-                display: flex;
-                justify-content: flex-end;
-            }
+            .modal-body { padding: 0; overflow-y: auto; background: var(--bg); }
+            
+            /* CRUD Table in Modal */
+            .crud-table-wrap { width: 100%; overflow-x: auto; }
+            .crud-table { width: 100%; border-collapse: collapse; background: var(--card-bg); }
+            .crud-table th { text-align: left; padding: 12px 16px; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--bg); position: sticky; top: 0; z-index: 10; }
+            .crud-table td { padding: 12px 16px; font-size: 13px; border-bottom: 1px solid var(--border-light); color: var(--text-primary); vertical-align: middle; }
+            .crud-table tr:hover td { background: var(--accent-light); }
+            .crud-actions { display: flex; gap: 6px; }
+
+            .empty-state { padding: 40px 20px; text-align: center; color: var(--text-muted); }
+            .empty-state svg { width: 48px; height: 48px; stroke: var(--border); margin-bottom: 12px; }
 
             @media (max-width: 1024px) {
                 .bento-grid { grid-template-columns: 1fr; }
@@ -443,30 +191,16 @@
                         <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
                         Últimos Registros
                     </div>
-                    <a href="{{ url('/admin/inventarios/create') }}" class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;">Nuevo</a>
+                    <button class="btn btn-secondary btn-sm" @click="activeModal = 'modulo-inventario'">Ver todos</button>
                 </div>
                 <table class="mini-table">
-                    <thead>
-                        <tr>
-                            <th>N/S</th>
-                            <th>Material</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>N/S</th><th>Material</th><th>Estado</th></tr></thead>
                     <tbody>
                         @forelse($inventariosRecientes ?? [] as $inv)
                         <tr>
                             <td class="mono-text">{{ $inv->num_serie }}</td>
                             <td>{{ Str::limit($inv->material?->nombre ?? 'N/A', 25) }}</td>
-                            <td>
-                                @if(in_array($inv->estado, ['Bueno', 'Operativo']))
-                                    <span class="badge-status active">{{ $inv->estado }}</span>
-                                @elseif(in_array($inv->estado, ['Regular', 'En mantenimiento']))
-                                    <span class="badge-status warning">{{ $inv->estado }}</span>
-                                @else
-                                    <span class="badge-status danger">{{ $inv->estado }}</span>
-                                @endif
-                            </td>
+                            <td><span class="badge-status {{ in_array($inv->estado, ['Bueno','Operativo']) ? 'active' : 'warning' }}">{{ $inv->estado }}</span></td>
                         </tr>
                         @empty
                         <tr><td colspan="3" style="text-align: center; color: var(--text-muted);">No hay registros.</td></tr>
@@ -482,16 +216,10 @@
                         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                         Solicitudes Pendientes
                     </div>
-                    <a href="{{ url('/admin/solicituds') }}" class="btn btn-primary" style="padding: 4px 10px; font-size: 11px;">Autorizar</a>
+                    <button class="btn btn-secondary btn-sm" @click="activeModal = 'modulo-solicitudes'">Ver todas</button>
                 </div>
                 <table class="mini-table">
-                    <thead>
-                        <tr>
-                            <th>Folio</th>
-                            <th>Usuario</th>
-                            <th>Fecha</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Folio</th><th>Usuario</th><th>Fecha</th></tr></thead>
                     <tbody>
                         @forelse($solicitudesRecientes ?? [] as $sol)
                         <tr>
@@ -513,16 +241,10 @@
                         <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
                         Mantenimientos
                     </div>
-                    <a href="{{ url('/admin/mantenimientos/create') }}" class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;">Nuevo</a>
+                    <button class="btn btn-secondary btn-sm" @click="activeModal = 'modulo-mantenimiento'">Ver todos</button>
                 </div>
                 <table class="mini-table">
-                    <thead>
-                        <tr>
-                            <th>Activo</th>
-                            <th>Técnico</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Activo</th><th>Técnico</th><th>Estado</th></tr></thead>
                     <tbody>
                         @forelse($mantenimientosRecientes ?? [] as $mant)
                         <tr>
@@ -548,21 +270,21 @@
                 
                 @php
                     $catalogos = [
-                        ['nombre' => 'Materiales', 'icon' => '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>', 'url' => url('/admin/materials')],
-                        ['nombre' => 'Usuarios', 'icon' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>', 'url' => url('/admin/users')],
-                        ['nombre' => 'Deptos', 'icon' => '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>', 'url' => url('/admin/departamentos')],
-                        ['nombre' => 'Áreas', 'icon' => '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/>', 'url' => url('/admin/areas')],
-                        ['nombre' => 'Marcas', 'icon' => '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>', 'url' => url('/admin/marca-materials')],
-                        ['nombre' => 'Tipos', 'icon' => '<path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/>', 'url' => url('/admin/tipo-materials')],
-                        ['nombre' => 'Unidades', 'icon' => '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>', 'url' => url('/admin/unidad-medidas')],
-                        ['nombre' => 'Proveedores', 'icon' => '<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>', 'url' => url('/admin/proveedors')],
-                        ['nombre' => 'Receptores', 'icon' => '<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>', 'url' => url('/admin/receptors')],
+                        ['id' => 'departamentos', 'nombre' => 'Departamentos', 'icon' => '<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'],
+                        ['id' => 'materiales', 'nombre' => 'Materiales', 'icon' => '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>'],
+                        ['id' => 'areas', 'nombre' => 'Áreas', 'icon' => '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/>'],
+                        ['id' => 'marcas', 'nombre' => 'Marcas', 'icon' => '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>'],
+                        ['id' => 'tipos', 'nombre' => 'Tipos', 'icon' => '<path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/>'],
+                        ['id' => 'unidades', 'nombre' => 'Unidades', 'icon' => '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>'],
+                        ['id' => 'proveedores', 'nombre' => 'Proveedores', 'icon' => '<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>'],
+                        ['id' => 'receptores', 'nombre' => 'Receptores', 'icon' => '<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>'],
+                        ['id' => 'usuarios', 'nombre' => 'Usuarios', 'icon' => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'],
                     ];
                 @endphp
 
                 <div class="catalog-grid">
                     @foreach($catalogos as $cat)
-                    <div class="catalog-item" @click="activeModal = '{{ Str::slug($cat['nombre']) }}'">
+                    <div class="catalog-item" @click="activeModal = 'cat-{{ $cat['id'] }}'">
                         <div class="catalog-icon">
                             <svg viewBox="0 0 24 24">{!! $cat['icon'] !!}</svg>
                         </div>
@@ -574,16 +296,109 @@
         </div>
 
         <!-- MODALS (ALPINE.JS) -->
-        @foreach($catalogos as $cat)
+        
+        <!-- Componente reusable de modal macro -->
+        @php
+            $modalMacros = [
+                // 9 Catalogs
+                [
+                    'id' => 'cat-departamentos', 'title' => 'Departamentos', 'create' => url('/admin/departamentos/create'),
+                    'cols' => ['Nombre', 'Descripción'],
+                    'data' => $departamentosList ?? [],
+                    'editPrefix' => '/admin/departamentos/',
+                    'row' => fn($i) => ["<td>{$i->nombre}</td>", "<td>{$i->descripcion}</td>"]
+                ],
+                [
+                    'id' => 'cat-materiales', 'title' => 'Materiales', 'create' => url('/admin/materials/create'),
+                    'cols' => ['Nombre', 'Tipo', 'Unidad', 'Stock Mín.'],
+                    'data' => $materialesList ?? [],
+                    'editPrefix' => '/admin/materials/',
+                    'row' => fn($i) => ["<td>{$i->nombre}</td>", "<td>".($i->tipo?->nombre ?? '')."</td>", "<td>".($i->unidad?->abreviatura ?? '')."</td>", "<td>{$i->stock_minimo}</td>"]
+                ],
+                [
+                    'id' => 'cat-areas', 'title' => 'Áreas', 'create' => url('/admin/areas/create'),
+                    'cols' => ['Nombre', 'Departamento'],
+                    'data' => $areasList ?? [],
+                    'editPrefix' => '/admin/areas/',
+                    'row' => fn($i) => ["<td>{$i->nombre}</td>", "<td>".($i->departamento?->nombre ?? '')."</td>"]
+                ],
+                [
+                    'id' => 'cat-marcas', 'title' => 'Marcas', 'create' => url('/admin/marca-materials/create'),
+                    'cols' => ['Nombre', 'Cant. Materiales'],
+                    'data' => $marcasList ?? [],
+                    'editPrefix' => '/admin/marca-materials/',
+                    'row' => fn($i) => ["<td>{$i->nombre}</td>", "<td>{$i->materiales_count}</td>"]
+                ],
+                [
+                    'id' => 'cat-tipos', 'title' => 'Tipos de Material', 'create' => url('/admin/tipo-materials/create'),
+                    'cols' => ['Nombre'],
+                    'data' => $tiposList ?? [],
+                    'editPrefix' => '/admin/tipo-materials/',
+                    'row' => fn($i) => ["<td>{$i->nombre}</td>"]
+                ],
+                [
+                    'id' => 'cat-unidades', 'title' => 'Unidades de Medida', 'create' => url('/admin/unidad-medidas/create'),
+                    'cols' => ['Nombre', 'Abreviatura'],
+                    'data' => $unidadesList ?? [],
+                    'editPrefix' => '/admin/unidad-medidas/',
+                    'row' => fn($i) => ["<td>{$i->nombre}</td>", "<td>{$i->abreviatura}</td>"]
+                ],
+                [
+                    'id' => 'cat-proveedores', 'title' => 'Proveedores', 'create' => url('/admin/proveedors/create'),
+                    'cols' => ['Empresa', 'Contacto', 'RFC'],
+                    'data' => $proveedoresList ?? [],
+                    'editPrefix' => '/admin/proveedors/',
+                    'row' => fn($i) => ["<td>{$i->nombre_empresa}</td>", "<td>{$i->nombre_contacto}</td>", "<td>{$i->rfc}</td>"]
+                ],
+                [
+                    'id' => 'cat-receptores', 'title' => 'Receptores', 'create' => url('/admin/receptors/create'),
+                    'cols' => ['Nombre', 'Departamento'],
+                    'data' => $receptoresList ?? [],
+                    'editPrefix' => '/admin/receptors/',
+                    'row' => fn($i) => ["<td>{$i->nombre} {$i->apellido_paterno}</td>", "<td>".($i->area?->departamento?->nombre ?? 'N/A')."</td>"]
+                ],
+                [
+                    'id' => 'cat-usuarios', 'title' => 'Usuarios', 'create' => url('/admin/users/create'),
+                    'cols' => ['Nombre', 'Email'],
+                    'data' => $usuariosList ?? [],
+                    'editPrefix' => '/admin/users/',
+                    'row' => fn($i) => ["<td>{$i->name}</td>", "<td>{$i->email}</td>"]
+                ],
+                // 3 Modules
+                [
+                    'id' => 'modulo-inventario', 'title' => 'Inventario General', 'create' => url('/admin/inventarios/create'),
+                    'cols' => ['N/S', 'Material', 'Marca', 'Estado', 'Ubicación'],
+                    'data' => $inventariosCompletos ?? [],
+                    'editPrefix' => '/admin/inventarios/',
+                    'row' => fn($i) => ["<td class='mono-text'>{$i->num_serie}</td>", "<td>".($i->material?->nombre ?? '')."</td>", "<td>".($i->material?->marca?->nombre ?? '')."</td>", "<td><span class='badge-status ".(in_array($i->estado, ['Bueno','Operativo']) ? 'active' : 'warning')."'>{$i->estado}</span></td>", "<td>{$i->ubicacion_fisica}</td>"]
+                ],
+                [
+                    'id' => 'modulo-solicitudes', 'title' => 'Solicitudes', 'create' => url('/admin/solicituds/create'),
+                    'cols' => ['Folio', 'Usuario', 'Fecha', 'Estado'],
+                    'data' => $solicitudesCompletas ?? [],
+                    'editPrefix' => '/admin/solicituds/',
+                    'row' => fn($i) => ["<td class='mono-text'>SOL-".str_pad($i->id_solicitud, 4, '0', STR_PAD_LEFT)."</td>", "<td>".($i->usuario?->name ?? '')."</td>", "<td>".($i->fecha_solicitud ? $i->fecha_solicitud->format('d/m/Y') : '')."</td>", "<td><span class='badge-status warning'>{$i->estado}</span></td>"]
+                ],
+                [
+                    'id' => 'modulo-mantenimiento', 'title' => 'Mantenimientos', 'create' => url('/admin/mantenimientos/create'),
+                    'cols' => ['Activo', 'Técnico', 'Fecha', 'Estado'],
+                    'data' => $mantenimientosCompletos ?? [],
+                    'editPrefix' => '/admin/mantenimientos/',
+                    'row' => fn($i) => ["<td class='mono-text'>".($i->inventario?->num_serie ?? '')."</td>", "<td>{$i->nombre_tecnico}</td>", "<td>".($i->fecha_solicitud ? $i->fecha_solicitud->format('d/m/Y') : '')."</td>", "<td><span class='badge-status warning'>{$i->estado}</span></td>"]
+                ],
+            ];
+        @endphp
+
+        @foreach($modalMacros as $m)
         <div class="modal-backdrop" 
-             x-show="activeModal === '{{ Str::slug($cat['nombre']) }}'" 
+             x-show="activeModal === '{{ $m['id'] }}'" 
              x-transition.opacity
              @click.self="activeModal = null"
              @keydown.escape.window="activeModal = null"
              style="display: none;">
             
             <div class="modal-window"
-                 x-show="activeModal === '{{ Str::slug($cat['nombre']) }}'"
+                 x-show="activeModal === '{{ $m['id'] }}'"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 transform scale-95"
                  x-transition:enter-end="opacity-100 transform scale-100"
@@ -593,30 +408,54 @@
                 
                 <div class="modal-header">
                     <div class="modal-title">
-                        <svg viewBox="0 0 24 24">{!! $cat['icon'] !!}</svg>
-                        Catálogo de {{ $cat['nombre'] }}
+                        {{ $m['title'] }}
                     </div>
-                    <button class="modal-close" @click="activeModal = null">
-                        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                    </button>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <a href="{{ $m['create'] }}" class="btn btn-primary">Nuevo Registro</a>
+                        <button class="modal-close" @click="activeModal = null">
+                            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="modal-body">
-                    <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px;">
-                        Estás a punto de ingresar a la gestión completa del catálogo de <strong>{{ $cat['nombre'] }}</strong>. Desde aquí podrás crear, editar y eliminar registros relacionados.
-                    </p>
-                    <div style="background: var(--bg); padding: 16px; border-radius: var(--radius-sm); border: 1px dashed var(--border);">
-                        <div style="font-size: 13px; font-weight: 600; margin-bottom: 4px;">Atajo rápido</div>
-                        <div style="font-size: 12px; color: var(--text-muted);">Redirigiendo al panel administrativo...</div>
-                    </div>
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" style="margin-right: 12px;" @click="activeModal = null">Cancelar</button>
-                    <a href="{{ $cat['url'] }}" class="btn btn-primary">
-                        Ir al módulo
-                        <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; margin-left: 4px;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                    </a>
+                    @if(count($m['data']) > 0)
+                        <div class="crud-table-wrap">
+                            <table class="crud-table">
+                                <thead>
+                                    <tr>
+                                        @foreach($m['cols'] as $col)
+                                            <th>{{ $col }}</th>
+                                        @endforeach
+                                        <th style="width: 100px;">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($m['data'] as $item)
+                                        @php
+                                            $key = $item->getKey();
+                                        @endphp
+                                        <tr>
+                                            {!! implode('', $m['row']($item)) !!}
+                                            <td>
+                                                <div class="crud-actions">
+                                                    <a href="{{ url($m['editPrefix'] . $key . '/edit') }}" class="btn btn-secondary btn-icon" title="Editar">
+                                                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                                    </a>
+                                                    <!-- Para eliminar se requeriría un formulario, usar la vista de Filament si desean eliminar o dejar solo edición -->
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+                            <p>No hay registros en este módulo.</p>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

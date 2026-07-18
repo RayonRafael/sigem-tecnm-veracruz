@@ -108,7 +108,6 @@ class ServicioSocialPanelProvider extends PanelProvider
                     ->collapsible(true),
             ])
             ->spa()
-            ->sidebarCollapsibleOnDesktop()
             ->sidebarWidth('20rem')
             ->discoverResources(in: app_path('Filament/ServicioSocial/Resources'), for: 'App\\Filament\\ServicioSocial\\Resources')
             ->discoverPages(in: app_path('Filament/ServicioSocial/Pages'), for: 'App\\Filament\\ServicioSocial\\Pages')

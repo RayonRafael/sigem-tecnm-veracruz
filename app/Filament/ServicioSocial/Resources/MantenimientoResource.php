@@ -12,6 +12,8 @@ use Filament\Tables\Table;
 
 class MantenimientoResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = Mantenimiento::class;
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
     protected static ?string $navigationLabel = 'Mantenimiento';

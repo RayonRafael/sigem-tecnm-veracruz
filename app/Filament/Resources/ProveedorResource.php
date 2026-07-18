@@ -12,6 +12,8 @@ use Filament\Tables\Table;
 
 class ProveedorResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = Proveedor::class;
     protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
     protected static ?string $navigationLabel = 'Proveedores';

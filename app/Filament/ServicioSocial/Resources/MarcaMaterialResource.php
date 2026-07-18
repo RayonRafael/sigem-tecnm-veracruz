@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class MarcaMaterialResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = MarcaMaterial::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';

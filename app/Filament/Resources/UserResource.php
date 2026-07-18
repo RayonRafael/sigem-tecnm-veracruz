@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Collection;
 
 class UserResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = User::class;
     protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'Usuarios';
