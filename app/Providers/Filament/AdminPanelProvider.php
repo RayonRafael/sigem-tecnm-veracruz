@@ -95,6 +95,11 @@ class AdminPanelProvider extends PanelProvider
                         box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
                         border: 1px solid rgba(255,255,255,0.2) !important;
                     }
+                    /* Eliminar espacio del sidebar */
+                    .fi-sidebar-layout { padding-left: 0 !important; }
+                    .fi-sidebar { display: none !important; width: 0 !important; min-width: 0 !important; }
+                    .fi-main { width: 100% !important; max-width: 100% !important; margin-left: 0 !important; padding-left: 24px !important; padding-right: 24px !important; }
+                    .fi-topbar { left: 0 !important; width: 100% !important; }
                 </style>')
             )
             ->navigationGroups([
