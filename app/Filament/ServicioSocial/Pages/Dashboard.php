@@ -5,6 +5,7 @@ namespace App\Filament\ServicioSocial\Pages;
 use App\Models\BitacoraSistema;
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
+use App\Models\Solicitud;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Support\Carbon;
 
@@ -32,42 +33,39 @@ class Dashboard extends BaseDashboard
     {
         $userId = auth()->id();
 
-        // 1. Mis registros hoy
+        // 1. Welcome Card Stats
         $misRegistrosHoy = Inventario::where('id_usuario', $userId)
             ->whereDate('created_at', Carbon::today())
             ->count();
 
-        // 2. Pendientes de aprobación
         $pendientesAprobacion = Inventario::where('id_usuario', $userId)
             ->where('aprobado', false)
             ->count();
 
-        // 3. Reportes activos
         $reportesActivos = Mantenimiento::where('id_usuario_solicita', $userId)
             ->whereIn('estado', ['Pendiente', 'Solicitado', 'En Proceso', 'En mantenimiento'])
             ->count();
 
-        // Panel de Mis tareas pendientes
-        $tareasPendientes = Inventario::with('material')
+        // 2. Solicitudes (mini tabla 3 rows)
+        $solicitudesRecientes = Solicitud::with('usuario')
             ->where('id_usuario', $userId)
-            ->where('aprobado', false)
-            ->latest()
-            ->limit(5)
+            ->latest('created_at')
+            ->limit(3)
             ->get();
 
-        // Panel de Actividad reciente
-        $actividadReciente = BitacoraSistema::with('usuario')
-            ->where('id_usuario', $userId)
-            ->latest('fecha_hora')
-            ->limit(5)
+        // 3. Mantenimiento (mini tabla 3 rows)
+        $mantenimientosRecientes = Mantenimiento::with(['inventario', 'inventario.material', 'usuarioSolicita'])
+            ->where('id_usuario_solicita', $userId)
+            ->latest('created_at')
+            ->limit(3)
             ->get();
 
         return [
             'misRegistrosHoy' => $misRegistrosHoy,
             'pendientesAprobacion' => $pendientesAprobacion,
             'reportesActivos' => $reportesActivos,
-            'tareasPendientes' => $tareasPendientes,
-            'actividadReciente' => $actividadReciente,
+            'solicitudesRecientes' => $solicitudesRecientes,
+            'mantenimientosRecientes' => $mantenimientosRecientes,
         ];
     }
 }

@@ -32,52 +32,44 @@ class Dashboard extends BaseDashboard
 
     public function getViewData(): array
     {
-        // Total de activos
+        // 1. Welcome Card Stats
         $totalActivos = Inventario::count();
-
-        // Activos por estado
-        $activosPorEstado = Inventario::selectRaw('estado, COUNT(*) as total')
-            ->groupBy('estado')
-            ->pluck('total', 'estado')
-            ->toArray();
-
-        // Mantenimientos pendientes (buscando 'Pendiente' o 'Solicitado')
+        $activosBueno = Inventario::whereIn('estado', ['Bueno', 'Operativo'])->count();
         $mantenimientosPendientes = Mantenimiento::whereIn('estado', ['Pendiente', 'Solicitado'])->count();
+        $materialesStockBajoCount = Material::whereColumn('stock_actual', '<', 'stock_minimo')->count();
 
-        // Materiales con stock bajo
-        $materialesStockBajo = Material::whereColumn('stock_actual', '<', 'stock_minimo')->count();
+        // 2. Actividad Reciente (5 items)
+        $actividadReciente = BitacoraSistema::with('usuario')->latest('fecha_hora')->limit(5)->get();
 
-        // Inventario por ubicación/departamento
-        $inventarioPorUbicacion = Inventario::selectRaw('ubicacion_fisica, COUNT(*) as total')
-            ->groupBy('ubicacion_fisica')
-            ->orderByDesc('total')
-            ->limit(6)
+        // 3. Inventario (mini tabla 3 rows)
+        $inventariosRecientes = Inventario::with(['material', 'material.marca', 'material.tipo'])
+            ->latest('created_at')
+            ->limit(3)
             ->get();
 
-        // Actividad reciente: Primero intentar BitacoraSistema, si no hay datos usar Solicitud
-        $actividadReciente = BitacoraSistema::with('usuario')->latest('fecha_hora')->limit(5)->get();
-        $tipoActividad = 'bitacora';
-        if ($actividadReciente->isEmpty()) {
-            $actividadReciente = Solicitud::with('usuario')->latest()->limit(5)->get();
-            $tipoActividad = 'solicitud';
-        }
-
-        // Solicitudes pendientes
-        $solicitudesPendientes = Solicitud::with(['usuario', 'receptor'])
+        // 4. Solicitudes (mini tabla 3 rows)
+        $solicitudesRecientes = Solicitud::with('usuario')
             ->where('estado', 'Pendiente')
-            ->latest()
-            ->limit(5)
+            ->latest('created_at')
+            ->limit(3)
+            ->get();
+
+        // 5. Mantenimiento (mini tabla 3 rows)
+        $mantenimientosRecientes = Mantenimiento::with(['inventario', 'inventario.material', 'usuarioSolicita'])
+            ->whereIn('estado', ['Pendiente', 'Solicitado'])
+            ->latest('created_at')
+            ->limit(3)
             ->get();
 
         return [
             'totalActivos' => $totalActivos,
-            'activosPorEstado' => $activosPorEstado,
+            'activosBueno' => $activosBueno,
             'mantenimientosPendientes' => $mantenimientosPendientes,
-            'materialesStockBajo' => $materialesStockBajo,
-            'inventarioPorUbicacion' => $inventarioPorUbicacion,
+            'materialesStockBajoCount' => $materialesStockBajoCount,
             'actividadReciente' => $actividadReciente,
-            'tipoActividad' => $tipoActividad,
-            'solicitudesPendientes' => $solicitudesPendientes,
+            'inventariosRecientes' => $inventariosRecientes,
+            'solicitudesRecientes' => $solicitudesRecientes,
+            'mantenimientosRecientes' => $mantenimientosRecientes,
         ];
     }
 }
