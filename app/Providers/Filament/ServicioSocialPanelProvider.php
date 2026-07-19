@@ -47,6 +47,11 @@ class ServicioSocialPanelProvider extends PanelProvider
    SIGEM - FILAMENT GLOBAL THEME OVERRIDES
    ========================================= */
 
+/* ===== 0. OCULTAR TOPBAR COMPLETAMENTE ===== */
+.fi-topbar, .fi-header { display: none !important; height: 0 !important; overflow: hidden !important; position: absolute !important; }
+body { padding-top: 0 !important; }
+.fi-main { padding-top: 0 !important; margin-top: 0 !important; }
+
 /* ===== 1. FONDO GENERAL Y APP ===== */
 main.fi-main, body {
     background: radial-gradient(circle at top left, rgba(11, 29, 58, 0.03) 0%, transparent 40%),
