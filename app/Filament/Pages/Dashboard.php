@@ -100,7 +100,6 @@ class Dashboard extends BaseDashboard
         $receptoresList = Receptor::with('area.departamento')->get();
         $usuariosList = User::with('roles')->get();
         
-        $catalogosCount = 9;
         $totalRegistrosCatalogos = $departamentosList->count() + $materialesList->count() + $areasList->count() + 
                                    $marcasList->count() + $tiposList->count() + $unidadesList->count() + 
                                    $proveedoresList->count() + $receptoresList->count() + $usuariosList->count();
@@ -148,7 +147,6 @@ class Dashboard extends BaseDashboard
             'receptoresList' => $receptoresList,
             'usuariosList' => $usuariosList,
             
-            'catalogosCount' => $catalogosCount,
             'totalRegistrosCatalogos' => $totalRegistrosCatalogos,
         ];
     }
