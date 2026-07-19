@@ -156,6 +156,97 @@ h1, .fi-header-heading {
     box-shadow: 0 0 0 3px rgba(59,130,246,0.2) !important;
 }
 
+/* ===== 5.1 RADIO, CHECKBOX, TOGGLES (CORREGIDO) ===== */
+
+/* 1. Toggle Buttons (Usados en Estados de Inventario) */
+.fi-fo-toggle-buttons label.fi-btn {
+    border: 1px solid #e2e8f0 !important;
+    background-color: #ffffff !important;
+    color: #334155 !important;
+    opacity: 1 !important;
+}
+.fi-fo-toggle-buttons label.fi-btn * { color: #334155 !important; }
+
+.fi-fo-toggle-buttons input[type="radio"]:checked + label.fi-btn,
+.fi-fo-toggle-buttons input[type="checkbox"]:checked + label.fi-btn {
+    border: 2px solid #2563eb !important;
+    background-color: #eff6ff !important;
+    color: #1e40af !important;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15) !important;
+}
+.fi-fo-toggle-buttons input[type="radio"]:checked + label.fi-btn *,
+.fi-fo-toggle-buttons input[type="checkbox"]:checked + label.fi-btn * {
+    color: #1e40af !important;
+}
+
+/* 2. Radio Buttons clásicos */
+.fi-fo-radio label {
+    border: 1px solid #e2e8f0 !important;
+    background-color: #ffffff !important;
+    padding: 12px 16px !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    cursor: pointer !important;
+}
+.fi-fo-radio label:has(input[type="radio"]:checked) {
+    border: 2px solid #2563eb !important;
+    background-color: #eff6ff !important;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.15) !important;
+}
+.fi-fo-radio label:has(input[type="radio"]:checked) * {
+    color: #1e40af !important;
+}
+.fi-fo-radio input[type="radio"]:checked {
+    background-color: #2563eb !important;
+    border-color: #2563eb !important;
+}
+
+/* 3. Checkboxes nativos */
+.fi-checkbox-input:checked {
+    background-color: #2563eb !important;
+    border-color: #2563eb !important;
+    background-image: url("data:image/svg+xml,%3csvg viewBox=\'0 0 16 16\' fill=\'white\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z\'/%3e%3c/svg%3e") !important;
+}
+
+/* 4. Toggle switches */
+button[role="switch"][aria-checked="true"] {
+    background-color: #2563eb !important;
+}
+
+/* ===== MODO OSCURO ===== */
+.dark .fi-fo-toggle-buttons label.fi-btn,
+.dark .fi-fo-radio label {
+    border-color: #30363d !important;
+    background-color: #161b22 !important;
+    color: #e2e8f0 !important;
+}
+.dark .fi-fo-toggle-buttons label.fi-btn *,
+.dark .fi-fo-radio label * {
+    color: #e2e8f0 !important;
+}
+
+.dark .fi-fo-toggle-buttons input[type="radio"]:checked + label.fi-btn,
+.dark .fi-fo-toggle-buttons input[type="checkbox"]:checked + label.fi-btn,
+.dark .fi-fo-radio label:has(input[type="radio"]:checked) {
+    border-color: #3b82f6 !important;
+    background-color: #1e3a5f !important;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.2) !important;
+}
+.dark .fi-fo-toggle-buttons input[type="radio"]:checked + label.fi-btn *,
+.dark .fi-fo-toggle-buttons input[type="checkbox"]:checked + label.fi-btn *,
+.dark .fi-fo-radio label:has(input[type="radio"]:checked) * {
+    color: #93c5fd !important;
+}
+
+.dark .fi-fo-radio input[type="radio"]:checked, 
+.dark .fi-checkbox-input:checked, 
+.dark button[role="switch"][aria-checked="true"] {
+    background-color: #3b82f6 !important;
+    border-color: #3b82f6 !important;
+}
+
 /* ===== 6. LABELS DE CAMPOS ===== */
 .fi-fo-field-wrp-label, .fi-fo-field-wrp-label * {
     color: #334155 !important;
