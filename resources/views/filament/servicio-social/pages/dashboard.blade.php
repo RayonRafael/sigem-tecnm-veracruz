@@ -745,7 +745,8 @@
                             </div>
                             
                             <!-- Footer -->
-                            <div class="slide-footer">
+                            <div class="slide-footer" style="justify-content: space-between;">
+                                <div><a :href="getExternalListUrl()" class="link-blue">Vista avanzada (Filament) →</a></div>
                                 <div style="font-size: 13px; color: var(--slate-600);">por página: <strong style="color:var(--slate-900);">10</strong> <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline-block;vertical-align:middle;"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
                             </div>
                         </div>
@@ -809,6 +810,16 @@
                             'modulo-inventario': 'Inventario General', 'modulo-solicitudes': 'Mis Solicitudes', 'modulo-mantenimiento': 'Mis Mantenimientos'
                         };
                         return titles[this.activeCatalog] || 'Catálogo';
+                    },
+
+                    getExternalListUrl() {
+                        const map = {
+                            departamentos: '#', areas: '/servicio-social/areas', usuarios: '#',
+                            materiales: '/servicio-social/materials', marcas: '/servicio-social/marca-materials', tipos: '/servicio-social/tipo-materials',
+                            unidades: '/servicio-social/unidad-medidas', proveedores: '#', receptores: '/servicio-social/receptors',
+                            'modulo-inventario': '/servicio-social/inventarios', 'modulo-solicitudes': '/servicio-social/solicituds', 'modulo-mantenimiento': '/servicio-social/mantenimientos'
+                        };
+                        return map[this.activeCatalog] || '#';
                     },
 
                     getTableHeaders() {
