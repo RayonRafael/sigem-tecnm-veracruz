@@ -2,6 +2,9 @@
 <x-filament-panels::page>
     <div x-data="sigemDashboard()" class="sigem-professional" x-cloak>
         <style>
+            /* Ocultar header nativo de Filament solo en esta pagina */
+            .fi-header { display: none !important; }
+            
             .sigem-professional {
                 /* Color Palette */
                 --brand-50: #eff6ff; --brand-100: #dbeafe; --brand-500: #3b82f6; --brand-600: #2563eb; --brand-700: #1d4ed8;
@@ -268,13 +271,7 @@
                 </div>
             </div>
             <div class="header-user">
-                <button class="bell-btn">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                    @if($solicitudesPendientes > 0 || $mantenimientosPendientes > 0)
-                    <div class="bell-dot"></div>
-                    @endif
-                </button>
-                <div class="header-divider"></div>
+
                 <div class="user-info" x-data="{ open: false }" style="position:relative;">
                     <div class="user-text">
                         <div class="user-name">{{ $user->name ?? 'Usuario' }}</div>
@@ -331,13 +328,7 @@
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
                     +{{ $creadosEsteMes ?? 0 }} este mes
                 </div>
-                <div class="sparkline">
-                    <svg viewBox="0 0 100 40" preserveAspectRatio="none" style="width:100%; height:100%;">
-                        <defs><linearGradient id="g-brand" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--brand-500)" stop-opacity="0.3"/><stop offset="100%" stop-color="var(--brand-500)" stop-opacity="0"/></linearGradient></defs>
-                        <polygon points="0,40 0,25 20,30 40,15 60,20 80,5 100,10 100,40" fill="url(#g-brand)"/>
-                        <polyline points="0,25 20,30 40,15 60,20 80,5 100,10" fill="none" stroke="var(--brand-500)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
-                    </svg>
-                </div>
+
             </div>
             
             <!-- Stat 2 -->
@@ -361,13 +352,7 @@
                 </div>
                 <h2 class="stat-val mono-text">{{ $mantenimientosTotales ?? 0 }}</h2>
                 <div class="stat-sub text-amber">{{ $mantenimientosPendientes ?? 0 }} pendientes/revisión</div>
-                <div class="sparkline">
-                    <svg viewBox="0 0 100 40" preserveAspectRatio="none" style="width:100%; height:100%;">
-                        <defs><linearGradient id="g-amber" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="var(--amber-500)" stop-opacity="0.3"/><stop offset="100%" stop-color="var(--amber-500)" stop-opacity="0"/></linearGradient></defs>
-                        <polygon points="0,40 0,10 20,25 40,15 60,30 80,20 100,5 100,40" fill="url(#g-amber)"/>
-                        <polyline points="0,10 20,25 40,15 60,30 80,20 100,5" fill="none" stroke="var(--amber-500)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
-                    </svg>
-                </div>
+
             </div>
 
             <!-- Stat 4 -->
@@ -406,7 +391,6 @@
                         <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         <input type="text" class="search-input" x-model="searchQuery" id="catSearchInput" placeholder="Buscar catálogos...">
                     </div>
-                    <button class="btn-icon" style="background: var(--slate-100);"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg></button>
                 </div>
             </div>
 
@@ -415,7 +399,6 @@
                 <button class="recent-chip" @click="openCatalog('departamentos')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-brand-500"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg> Departamentos</button>
                 <button class="recent-chip" @click="openCatalog('materiales')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-emerald-500"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg> Materiales</button>
                 <button class="recent-chip" @click="openCatalog('usuarios')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-indigo-500"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg> Usuarios</button>
-                <button class="btn-text" style="padding: 4px 8px; font-size: 12px; margin-left: auto;">Limpiar</button>
             </div>
 
             <!-- G1: ORG -->
@@ -444,7 +427,6 @@
                                 <div class="cat-number">{{ count($departamentosList ?? []) }}</div>
                                 <div class="cat-num-label">registros</div>
                             </div>
-                            <div class="text-emerald" style="font-size: 12px; font-weight: 600;">+ activo</div>
                         </div>
                         <div class="hover-preview">
                             @php $lastDep = collect($departamentosList ?? [])->last(); @endphp
@@ -464,7 +446,6 @@
                                 <div class="cat-number">{{ count($areasList ?? []) }}</div>
                                 <div class="cat-num-label">registros</div>
                             </div>
-                            <svg width="40" height="20" viewBox="0 0 40 20" fill="none" stroke="var(--cyan-500)" stroke-width="2"><polyline points="0,15 10,10 20,18 30,5 40,8"></polyline></svg>
                         </div>
                         <div class="hover-preview">
                             @php $lastArea = collect($areasList ?? [])->last(); @endphp
@@ -484,7 +465,6 @@
                                 <div class="cat-number">{{ count($usuariosList ?? []) }}</div>
                                 <div class="cat-num-label">registros</div>
                             </div>
-                            <div class="text-emerald" style="font-size: 12px; font-weight: 600;">+ activo</div>
                         </div>
                         <div class="hover-preview" style="display:flex; justify-content:space-between; align-items:center;">
                             <div class="avatar-stack">
@@ -587,7 +567,6 @@
                                 <div class="cat-number">{{ count($proveedoresList ?? []) }}</div>
                                 <div class="cat-num-label">registros</div>
                             </div>
-                            <div class="text-emerald" style="font-size: 12px; font-weight: 600;">+ activo</div>
                         </div>
                         <div class="hover-preview">
                             @php $lastProv = collect($proveedoresList ?? [])->last(); @endphp

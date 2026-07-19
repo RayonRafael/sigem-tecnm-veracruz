@@ -2,6 +2,9 @@
 <x-filament-panels::page>
     <div x-data="sigemDashboardSS()" class="sigem-professional" x-cloak>
         <style>
+            /* Ocultar header nativo de Filament solo en esta pagina */
+            .fi-header { display: none !important; }
+
             .sigem-professional {
                 /* Color Palette */
                 --brand-50: #eff6ff; --brand-100: #dbeafe; --brand-500: #3b82f6; --brand-600: #2563eb; --brand-700: #1d4ed8;
@@ -235,13 +238,7 @@
                 </div>
             </div>
             <div class="header-user">
-                <button class="bell-btn">
-                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
-                    @if($misSolicitudesPendientes > 0)
-                    <div class="bell-dot"></div>
-                    @endif
-                </button>
-                <div class="header-divider"></div>
+
                 <div class="user-info" x-data="{ open: false }" style="position:relative;">
                     <div class="user-text">
                         <div class="user-name">{{ $user->name ?? 'Usuario' }}</div>
@@ -477,7 +474,6 @@
                 <div class="recent-label"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> BÚSQUEDA RÁPIDA</div>
                 <button class="recent-chip" @click="openCatalog('departamentos')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-brand-500"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg> Departamentos</button>
                 <button class="recent-chip" @click="openCatalog('materiales')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-emerald-500"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg> Materiales</button>
-                <button class="btn-text" style="padding: 4px 8px; font-size: 12px; margin-left: auto;">Limpiar</button>
             </div>
 
             <!-- G1: ORG -->
