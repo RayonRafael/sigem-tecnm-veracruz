@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class DepartamentoResource extends Resource
 {
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Departamento::class;

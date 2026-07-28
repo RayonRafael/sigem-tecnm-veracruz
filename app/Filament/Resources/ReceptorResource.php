@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class ReceptorResource extends Resource
 {
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Receptor::class;

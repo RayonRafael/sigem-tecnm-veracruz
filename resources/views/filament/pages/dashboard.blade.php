@@ -829,7 +829,7 @@
                                         <div class="catalog-search" style="width: 300px;">
                                             <div class="search-input-wrap" style="width: 100%;">
                                                 <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                                                <input type="text" class="search-input" style="width: 100%; padding: 8px 12px 8px 36px;" x-model="tableSearch" placeholder="Buscar registros...">
+                                                <input type="text" class="search-input" style="width: 100%; padding: 8px 12px 8px 36px;" x-model="tableSearch" @input="page = 1" placeholder="Buscar registros...">
                                             </div>
                                         </div>
                                         <div class="table-results"><span x-text="getFilteredData().length"></span> resultados</div>
@@ -845,6 +845,12 @@
                                         <div x-show="!getTableRows()" style="padding: 40px; text-align: center; color: var(--slate-500);">
                                             Sin registros encontrados.
                                         </div>
+                                    </div>
+                                    <!-- Pagination -->
+                                    <div class="table-pagination" x-show="totalPages() > 1" style="padding: 12px 24px; border-top: 1px solid var(--slate-200); display: flex; justify-content: space-between; align-items: center; background: white;">
+                                        <button type="button" class="btn-text" @click="if(page > 1) page--" :disabled="page === 1" :style="page === 1 ? 'opacity: 0.5; cursor: not-allowed;' : ''">Anterior</button>
+                                        <span style="font-size: 13px; color: var(--slate-600);">Página <strong x-text="page" style="color:var(--slate-900);"></strong> de <strong x-text="totalPages()" style="color:var(--slate-900);"></strong></span>
+                                        <button type="button" class="btn-text" @click="if(page < totalPages()) page++" :disabled="page === totalPages()" :style="page === totalPages() ? 'opacity: 0.5; cursor: not-allowed;' : ''">Siguiente</button>
                                     </div>
                                 </div>
 
@@ -897,6 +903,8 @@
                     activeCatalog: null,
                     mode: 'list', // 'list' or 'form'
                     tableSearch: '',
+                    page: 1,
+                    pageSize: 10,
                     isSubmitting: false,
                     form: {},
                     toast: { show: false, message: '' },
@@ -941,6 +949,7 @@
                         this.activeCatalog = id;
                         this.mode = 'list';
                         this.tableSearch = '';
+                        this.page = 1;
                         this.form = {};
                     },
 
@@ -1012,7 +1021,7 @@
                     },
 
                     getTableRows() {
-                        const items = this.getFilteredData();
+                        const items = this.paginatedData();
                         if (items.length === 0) return '';
                         
                         return items.map(item => {

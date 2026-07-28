@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 
 class AreaResource extends Resource
 {
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Area::class;

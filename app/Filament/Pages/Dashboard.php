@@ -59,18 +59,18 @@ class Dashboard extends BaseDashboard
         $actividadReciente = BitacoraSistema::with('usuario')->latest('fecha_hora')->limit(5)->get();
 
         // 3. Inventario (completos y limitados)
-        $inventariosCompletos = Inventario::with(['material', 'material.marca', 'material.tipo', 'proveedor', 'usuario'])->latest('created_at')->get();
+        $inventariosCompletos = Inventario::with(['material', 'material.marca', 'material.tipo', 'proveedor', 'usuario'])->latest('created_at')->take(50)->get();
         $inventariosRecientes = $inventariosCompletos->take(3);
 
         // 4. Solicitudes (completas y limitadas)
-        $solicitudesCompletas = Solicitud::with('usuario')->latest('created_at')->get();
+        $solicitudesCompletas = Solicitud::with('usuario')->latest('created_at')->take(50)->get();
         $solicitudesRecientes = $solicitudesCompletas->where('estado', 'Pendiente')->take(3);
         if ($solicitudesRecientes->isEmpty()) {
             $solicitudesRecientes = $solicitudesCompletas->take(3);
         }
 
         // 5. Mantenimiento (completos y limitados)
-        $mantenimientosCompletos = Mantenimiento::with(['inventario', 'inventario.material', 'usuarioSolicita'])->latest('created_at')->get();
+        $mantenimientosCompletos = Mantenimiento::with(['inventario', 'inventario.material', 'usuarioSolicita'])->latest('created_at')->take(50)->get();
         $mantenimientosRecientes = $mantenimientosCompletos->whereIn('estado', ['Pendiente', 'Solicitado', 'Pendiente Revision Admin', 'En proceso'])->take(3);
         if ($mantenimientosRecientes->isEmpty()) {
             $mantenimientosRecientes = $mantenimientosCompletos->take(3);
@@ -90,15 +90,15 @@ class Dashboard extends BaseDashboard
         $solicitudesRechazadas = Solicitud::where('estado', 'Rechazado')->count();
 
         // 6. Catálogos Completos para los Modales
-        $departamentosList = Departamento::all();
-        $materialesList = Material::with(['tipo', 'unidad', 'marca'])->get();
-        $areasList = Area::with('departamento')->get();
-        $marcasList = MarcaMaterial::withCount('materiales')->get();
-        $tiposList = TipoMaterial::all();
-        $unidadesList = UnidadMedida::all();
-        $proveedoresList = Proveedor::all();
-        $receptoresList = Receptor::with('area.departamento')->get();
-        $usuariosList = User::with('roles')->get();
+        $departamentosList = Departamento::latest()->take(50)->get();
+        $materialesList = Material::with(['tipo', 'unidad', 'marca'])->latest()->take(50)->get();
+        $areasList = Area::with('departamento')->latest()->take(50)->get();
+        $marcasList = MarcaMaterial::withCount('materiales')->latest()->take(50)->get();
+        $tiposList = TipoMaterial::latest()->take(50)->get();
+        $unidadesList = UnidadMedida::latest()->take(50)->get();
+        $proveedoresList = Proveedor::latest()->take(50)->get();
+        $receptoresList = Receptor::with('area.departamento')->latest()->take(50)->get();
+        $usuariosList = User::with('roles')->latest()->take(50)->get();
         
         $totalRegistrosCatalogos = $departamentosList->count() + $materialesList->count() + $areasList->count() + 
                                    $marcasList->count() + $tiposList->count() + $unidadesList->count() + 

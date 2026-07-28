@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Collection;
 
 class InventarioResource extends Resource
 {
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Inventario::class;

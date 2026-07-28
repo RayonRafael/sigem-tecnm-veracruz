@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class InventarioResource extends Resource
 {
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Inventario::class;
