@@ -17,4 +17,9 @@ class CreateSolicitud extends CreateRecord
     {
         return url('/admin');
     }
+
+    protected function getCreatedNotificationTitle(): ?string
+    {
+        return 'Registro creado exitosamente';
+    }
 }

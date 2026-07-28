@@ -24,4 +24,14 @@ class EditMantenimiento extends EditRecord
     {
         return url('/admin');
     }
+
+    protected function getSavedNotificationTitle(): ?string
+    {
+        return 'Registro actualizado exitosamente';
+    }
+
+    protected function getDeletedNotificationTitle(): ?string
+    {
+        return 'Registro eliminado exitosamente';
+    }
 }

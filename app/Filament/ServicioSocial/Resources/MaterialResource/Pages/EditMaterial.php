@@ -22,4 +22,14 @@ class EditMaterial extends EditRecord
     {
         return url('/servicio-social');
     }
+
+    protected function getSavedNotificationTitle(): ?string
+    {
+        return 'Registro actualizado exitosamente';
+    }
+
+    protected function getDeletedNotificationTitle(): ?string
+    {
+        return 'Registro eliminado exitosamente';
+    }
 }

@@ -17,4 +17,9 @@ class CreateTipoMaterial extends CreateRecord
     {
         return url('/servicio-social');
     }
+
+    protected function getCreatedNotificationTitle(): ?string
+    {
+        return 'Registro creado exitosamente';
+    }
 }
