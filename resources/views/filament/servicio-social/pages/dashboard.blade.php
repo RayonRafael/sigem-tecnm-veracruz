@@ -50,13 +50,13 @@
             .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--slate-700), var(--slate-900)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; }
 
             /* Section 2: Banner */
-            .welcome-banner { background: linear-gradient(to left, var(--brand-700), var(--brand-600)); border-radius: 20px; padding: 32px 40px; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2); display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; color: white; }
-            .banner-greeting { font-size: 28px; font-weight: 600; margin: 0 0 8px 0; }
-            .banner-sub { color: var(--brand-100); font-size: 15px; margin: 0; }
-            .banner-sub strong { color: white; font-weight: 600; }
+            .welcome-banner { background: linear-gradient(to left, var(--brand-700), var(--brand-600)); border-radius: 20px; padding: 32px 40px; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2); display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; color: white !important; }
+            .banner-greeting { font-size: 28px; font-weight: 600; margin: 0 0 8px 0; color: white !important; }
+            .banner-sub { color: white !important; font-size: 15px; margin: 0; }
+            .banner-sub strong { color: white !important; font-weight: 700; }
             .banner-actions { display: flex; gap: 12px; }
             .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; padding: 10px 20px; border-radius: 10px; transition: all 0.18s; border: none; cursor: pointer; text-decoration: none; }
-            .btn-glass { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); color: white; }
+            .btn-glass { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); color: white !important; }
             .btn-glass:hover { background: rgba(255, 255, 255, 0.25); }
             .btn-white { background: white; color: var(--brand-600); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
             .btn-white:hover { background: var(--slate-50); transform: translateY(-2px); }

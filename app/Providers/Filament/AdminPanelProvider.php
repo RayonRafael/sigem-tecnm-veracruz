@@ -31,7 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('SIGEM - TecNM Veracruz')
             ->brandLogo(asset('images/sigem-logo.svg'))
             ->brandLogoHeight('2.5rem')
-            ->favicon(asset('images/sigem-logo.svg'))
+            ->favicon(asset('images/sigem-favicon.svg?v=2'))
             ->font('DM Sans', 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap')
             ->colors([
                 'primary' => Color::hex('#1b65d4'),
