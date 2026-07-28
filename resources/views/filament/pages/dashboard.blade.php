@@ -376,235 +376,6 @@
             </div>
         </div>
 
-        <!-- 4. CATALOGS -->
-        <div class="section-block">
-            <div class="block-header">
-                <div class="block-title-wrap">
-                    <div class="block-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
-                    <div>
-                        <h2 class="block-title">Catálogos del Sistema</h2>
-                        <p class="block-subtitle">9 catálogos · {{ $totalRegistrosCatalogos ?? 0 }} registros en total</p>
-                    </div>
-                </div>
-                <div class="catalog-search">
-                    <div class="search-input-wrap">
-                        <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        <input type="text" class="search-input" x-model="searchQuery" id="catSearchInput" placeholder="Buscar catálogos...">
-                    </div>
-                </div>
-            </div>
-
-            <div class="recent-row">
-                <div class="recent-label"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> RECIENTES</div>
-                <button class="recent-chip" @click="openCatalog('departamentos')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-brand-500"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg> Departamentos</button>
-                <button class="recent-chip" @click="openCatalog('materiales')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-emerald-500"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg> Materiales</button>
-                <button class="recent-chip" @click="openCatalog('usuarios')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-indigo-500"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg> Usuarios</button>
-            </div>
-
-            <!-- G1: ORG -->
-            <div class="catalog-group" x-show="matchesSearch('departamentos', 'áreas', 'usuarios')">
-                <div class="group-header">
-                    <div class="group-title-wrap">
-                        <div class="stat-icon bg-brand" style="width: 32px; height: 32px; border-radius: 8px;"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18"></path><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path></svg></div>
-                        <div>
-                            <span class="group-title-text">Organización</span>
-                            <span class="group-title-sub">· estructura institucional</span>
-                        </div>
-                    </div>
-                    <div class="group-count">3 catálogos</div>
-                </div>
-                
-                <div class="grid-3">
-                    <div class="cat-card" x-show="matchesSearch('departamentos')" @click="openCatalog('departamentos')">
-                        <div class="cat-card-header">
-                            <div class="cat-icon" style="background: linear-gradient(135deg, var(--brand-500), var(--brand-600));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></div>
-                            <button class="cat-add-btn" @click.stop="openCreateForm('departamentos')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
-                        </div>
-                        <h3 class="cat-title">Departamentos</h3>
-                        <p class="cat-desc">Áreas académicas y administrativas</p>
-                        <div class="cat-footer">
-                            <div>
-                                <div class="cat-number">{{ count($departamentosList ?? []) }}</div>
-                                <div class="cat-num-label">registros</div>
-                            </div>
-                        </div>
-                        <div class="hover-preview">
-                            @php $lastDep = collect($departamentosList ?? [])->last(); @endphp
-                            Último: {{ $lastDep ? Str::limit($lastDep->nombre, 25) : 'Ninguno' }}
-                        </div>
-                    </div>
-                    
-                    <div class="cat-card" x-show="matchesSearch('áreas')" @click="openCatalog('areas')">
-                        <div class="cat-card-header">
-                            <div class="cat-icon" style="background: linear-gradient(135deg, #22d3ee, var(--cyan-500));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></div>
-                            <button class="cat-add-btn" @click.stop="openCreateForm('areas')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
-                        </div>
-                        <h3 class="cat-title">Áreas</h3>
-                        <p class="cat-desc">Espacios físicos y oficinas</p>
-                        <div class="cat-footer">
-                            <div>
-                                <div class="cat-number">{{ count($areasList ?? []) }}</div>
-                                <div class="cat-num-label">registros</div>
-                            </div>
-                        </div>
-                        <div class="hover-preview">
-                            @php $lastArea = collect($areasList ?? [])->last(); @endphp
-                            Último: {{ $lastArea ? Str::limit($lastArea->nombre, 25) : 'Ninguno' }}
-                        </div>
-                    </div>
-                    
-                    <div class="cat-card" x-show="matchesSearch('usuarios')" @click="openCatalog('usuarios')">
-                        <div class="cat-card-header">
-                            <div class="cat-icon" style="background: linear-gradient(135deg, #818cf8, var(--indigo-500));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
-                            <!-- External link to Filament native for users -->
-                        </div>
-                        <h3 class="cat-title">Usuarios</h3>
-                        <p class="cat-desc">Personal y cuentas del sistema</p>
-                        <div class="cat-footer">
-                            <div>
-                                <div class="cat-number">{{ count($usuariosList ?? []) }}</div>
-                                <div class="cat-num-label">registros</div>
-                            </div>
-                        </div>
-                        <div class="hover-preview" style="display:flex; justify-content:space-between; align-items:center;">
-                            <div class="avatar-stack">
-                                @foreach(collect($usuariosList ?? [])->take(3) as $u)
-                                <div class="avatar-sm" style="background: var(--brand-500);">{{ substr($u->name, 0, 1) }}</div>
-                                @endforeach
-                            </div>
-                            <span>3 recientes</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- G2: INVENTARIO -->
-            <div class="catalog-group" x-show="matchesSearch('materiales', 'marcas', 'tipos', 'unidades')">
-                <div class="group-header">
-                    <div class="group-title-wrap">
-                        <div class="stat-icon bg-emerald" style="width: 32px; height: 32px; border-radius: 8px;"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
-                        <div>
-                            <span class="group-title-text">Inventario</span>
-                            <span class="group-title-sub">· configuración de activos</span>
-                        </div>
-                    </div>
-                    <div class="group-count">4 catálogos</div>
-                </div>
-                
-                <div class="grid-4">
-                    <div class="cat-card" x-show="matchesSearch('materiales')" @click="openCatalog('materiales')">
-                        <div class="cat-card-header" style="margin-bottom: 8px;">
-                            <div class="cat-icon cat-icon-sm" style="background: linear-gradient(135deg, #34d399, var(--emerald-500));"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></div>
-                        </div>
-                        <h3 class="cat-title">Materiales</h3>
-                        <div class="cat-footer">
-                            <span class="cat-number" style="font-size: 20px;">{{ count($materialesList ?? []) }}</span>
-                            <span class="cat-num-label">registros</span>
-                        </div>
-                    </div>
-
-                    <div class="cat-card" x-show="matchesSearch('marcas')" @click="openCatalog('marcas')">
-                        <div class="cat-card-header" style="margin-bottom: 8px;">
-                            <div class="cat-icon cat-icon-sm" style="background: linear-gradient(135deg, #2dd4bf, var(--teal-500));"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 8l4 4-4 4M8 12h8"></path></svg></div>
-                            <button class="cat-add-btn" @click.stop="openCreateForm('marcas')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
-                        </div>
-                        <h3 class="cat-title">Marcas</h3>
-                        <div class="cat-footer">
-                            <span class="cat-number" style="font-size: 20px;">{{ count($marcasList ?? []) }}</span>
-                            <span class="cat-num-label">registros</span>
-                        </div>
-                    </div>
-
-                    <div class="cat-card" x-show="matchesSearch('tipos')" @click="openCatalog('tipos')">
-                        <div class="cat-card-header" style="margin-bottom: 8px;">
-                            <div class="cat-icon cat-icon-sm" style="background: linear-gradient(135deg, #a78bfa, var(--violet-500));"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
-                            <button class="cat-add-btn" @click.stop="openCreateForm('tipos')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
-                        </div>
-                        <h3 class="cat-title">Tipos de Mat.</h3>
-                        <div class="cat-footer">
-                            <span class="cat-number" style="font-size: 20px;">{{ count($tiposList ?? []) }}</span>
-                            <span class="cat-num-label">registros</span>
-                        </div>
-                    </div>
-
-                    <div class="cat-card" x-show="matchesSearch('unidades')" @click="openCatalog('unidades')">
-                        <div class="cat-card-header" style="margin-bottom: 8px;">
-                            <div class="cat-icon cat-icon-sm" style="background: linear-gradient(135deg, #fb7185, var(--rose-500));"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
-                            <button class="cat-add-btn" @click.stop="openCreateForm('unidades')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
-                        </div>
-                        <h3 class="cat-title">Unidades</h3>
-                        <div class="cat-footer">
-                            <span class="cat-number" style="font-size: 20px;">{{ count($unidadesList ?? []) }}</span>
-                            <span class="cat-num-label">registros</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- G3: CONTACTOS -->
-            <div class="catalog-group" x-show="matchesSearch('proveedores', 'receptores')" style="border-bottom: none;">
-                <div class="group-header">
-                    <div class="group-title-wrap">
-                        <div class="stat-icon" style="background: var(--purple-500); opacity: 0.1; width: 32px; height: 32px; border-radius: 8px; position:absolute;"></div>
-                        <div class="stat-icon" style="color: var(--purple-500); width: 32px; height: 32px; border-radius: 8px; z-index:1;"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
-                        <div>
-                            <span class="group-title-text">Contactos</span>
-                            <span class="group-title-sub">· personas y proveedores</span>
-                        </div>
-                    </div>
-                    <div class="group-count">2 catálogos</div>
-                </div>
-                
-                <div class="grid-4" style="grid-template-columns: repeat(2, 1fr);">
-                    <div class="cat-card" x-show="matchesSearch('proveedores')" @click="openCatalog('proveedores')">
-                        <div class="cat-card-header">
-                            <div class="cat-icon" style="background: linear-gradient(135deg, #c084fc, var(--purple-500));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></div>
-                        </div>
-                        <h3 class="cat-title">Proveedores</h3>
-                        <p class="cat-desc">Empresas y distribuidores</p>
-                        <div class="cat-footer">
-                            <div>
-                                <div class="cat-number">{{ count($proveedoresList ?? []) }}</div>
-                                <div class="cat-num-label">registros</div>
-                            </div>
-                        </div>
-                        <div class="hover-preview">
-                            @php $lastProv = collect($proveedoresList ?? [])->last(); @endphp
-                            Último: {{ $lastProv ? Str::limit($lastProv->nombre_empresa, 25) : 'Ninguno' }}
-                        </div>
-                    </div>
-                    
-                    <div class="cat-card" x-show="matchesSearch('receptores')" @click="openCatalog('receptores')">
-                        <div class="cat-card-header">
-                            <div class="cat-icon" style="background: linear-gradient(135deg, #e879f9, var(--fuchsia-500));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
-                        </div>
-                        <h3 class="cat-title">Receptores</h3>
-                        <p class="cat-desc">Personas que reciben asignaciones</p>
-                        <div class="cat-footer">
-                            <div>
-                                <div class="cat-number">{{ count($receptoresList ?? []) }}</div>
-                                <div class="cat-num-label">registros</div>
-                            </div>
-                            <svg width="40" height="20" viewBox="0 0 40 20" fill="none" stroke="var(--fuchsia-500)" stroke-width="2"><polyline points="0,15 10,18 20,10 30,12 40,5"></polyline></svg>
-                        </div>
-                        <div class="hover-preview" style="display:flex; justify-content:space-between; align-items:center;">
-                            <div class="avatar-stack">
-                                @foreach(collect($receptoresList ?? [])->take(3) as $u)
-                                <div class="avatar-sm" style="background: var(--fuchsia-500);">{{ substr($u->nombre, 0, 1) }}</div>
-                                @endforeach
-                            </div>
-                            <span>activos este mes</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="block-footer">
-                <div>Tip: presiona <span class="kbd">/</span> para buscar catálogos</div>
-                <a href="{{ url('/admin') }}" class="link-blue">Ir a Configuración →</a>
-            </div>
-        </div>
-
         <!-- 5. MODULES -->
         <div class="grid-3">
             <!-- Inventario -->
@@ -732,6 +503,239 @@
                     <button class="link-blue" style="background:transparent;border:none;padding:0;cursor:pointer;" @click="openCatalog('modulo-mantenimiento')">Ver todos →</button>
                     <a href="{{ url('/admin/mantenimientos/create') }}" class="btn-blue">Nuevo</a>
                 </div>
+            </div>
+        </div>
+
+
+        <!-- 4. CATALOGS -->
+        <div class="section-block">
+            <div class="block-header">
+                <div class="block-title-wrap">
+                    <div class="block-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
+                    <div>
+                        <h2 class="block-title">Catálogos del Sistema</h2>
+                        <p class="block-subtitle">9 catálogos · {{ $totalRegistrosCatalogos ?? 0 }} registros en total</p>
+                    </div>
+                </div>
+                <div class="catalog-search">
+                    <div class="search-input-wrap">
+                        <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" class="search-input" x-model="searchQuery" id="catSearchInput" placeholder="Buscar catálogos...">
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-row">
+                <div class="recent-label"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> RECIENTES</div>
+                <button class="recent-chip" @click="openCatalog('departamentos')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-brand-500"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg> Departamentos</button>
+                <button class="recent-chip" @click="openCatalog('materiales')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-emerald-500"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg> Materiales</button>
+                <button class="recent-chip" @click="openCatalog('usuarios')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-indigo-500"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg> Usuarios</button>
+            </div>
+
+            <!-- G1: ORG -->
+            <div class="catalog-group" x-show="matchesSearch('departamentos', 'áreas', 'usuarios')">
+                <div class="group-header">
+                    <div class="group-title-wrap">
+                        <div class="stat-icon bg-brand" style="width: 32px; height: 32px; border-radius: 8px;"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18"></path><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path></svg></div>
+                        <div>
+                            <span class="group-title-text">Organización</span>
+                            <span class="group-title-sub">· estructura institucional</span>
+                        </div>
+                    </div>
+                    <div class="group-count">3 catálogos</div>
+                </div>
+                
+                <div class="grid-3">
+                    <div class="cat-card" x-show="matchesSearch('departamentos')" @click="openCatalog('departamentos')">
+                        <div class="cat-card-header">
+                            <div class="cat-icon" style="background: linear-gradient(135deg, var(--brand-500), var(--brand-600));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></div>
+                            <button class="cat-add-btn" @click.stop="openCreateForm('departamentos')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                        </div>
+                        <h3 class="cat-title">Departamentos</h3>
+                        <p class="cat-desc">Áreas académicas y administrativas</p>
+                        <div class="cat-footer">
+                            <div>
+                                <div class="cat-number">{{ count($departamentosList ?? []) }}</div>
+                                <div class="cat-num-label">registros</div>
+                            </div>
+                        </div>
+                        <div class="hover-preview">
+                            @php $lastDep = collect($departamentosList ?? [])->last(); @endphp
+                            Último: {{ $lastDep ? Str::limit($lastDep->nombre, 25) : 'Ninguno' }}
+                        </div>
+                    </div>
+                    
+                    <div class="cat-card" x-show="matchesSearch('áreas')" @click="openCatalog('areas')">
+                        <div class="cat-card-header">
+                            <div class="cat-icon" style="background: linear-gradient(135deg, #22d3ee, var(--cyan-500));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></div>
+                            <button class="cat-add-btn" @click.stop="openCreateForm('areas')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                        </div>
+                        <h3 class="cat-title">Áreas</h3>
+                        <p class="cat-desc">Espacios físicos y oficinas</p>
+                        <div class="cat-footer">
+                            <div>
+                                <div class="cat-number">{{ count($areasList ?? []) }}</div>
+                                <div class="cat-num-label">registros</div>
+                            </div>
+                        </div>
+                        <div class="hover-preview">
+                            @php $lastArea = collect($areasList ?? [])->last(); @endphp
+                            Último: {{ $lastArea ? Str::limit($lastArea->nombre, 25) : 'Ninguno' }}
+                        </div>
+                    </div>
+                    
+                    <div class="cat-card" x-show="matchesSearch('usuarios')" @click="openCatalog('usuarios')">
+                        <div class="cat-card-header">
+                            <div class="cat-icon" style="background: linear-gradient(135deg, #818cf8, var(--indigo-500));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+                            <button class="cat-add-btn" @click.stop="openCreateForm('usuarios')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                        </div>
+                        <h3 class="cat-title">Usuarios</h3>
+                        <p class="cat-desc">Personal y cuentas del sistema</p>
+                        <div class="cat-footer">
+                            <div>
+                                <div class="cat-number">{{ count($usuariosList ?? []) }}</div>
+                                <div class="cat-num-label">registros</div>
+                            </div>
+                        </div>
+                        <div class="hover-preview" style="display:flex; justify-content:space-between; align-items:center;">
+                            <div class="avatar-stack">
+                                @foreach(collect($usuariosList ?? [])->take(3) as $u)
+                                <div class="avatar-sm" style="background: var(--brand-500);">{{ substr($u->name, 0, 1) }}</div>
+                                @endforeach
+                            </div>
+                            <span>3 recientes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- G2: INVENTARIO -->
+            <div class="catalog-group" x-show="matchesSearch('materiales', 'marcas', 'tipos', 'unidades')">
+                <div class="group-header">
+                    <div class="group-title-wrap">
+                        <div class="stat-icon bg-emerald" style="width: 32px; height: 32px; border-radius: 8px;"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
+                        <div>
+                            <span class="group-title-text">Inventario</span>
+                            <span class="group-title-sub">· configuración de activos</span>
+                        </div>
+                    </div>
+                    <div class="group-count">4 catálogos</div>
+                </div>
+                
+                <div class="grid-4">
+                    <div class="cat-card" x-show="matchesSearch('materiales')" @click="openCatalog('materiales')">
+                        <div class="cat-card-header" style="margin-bottom: 8px;">
+                            <div class="cat-icon cat-icon-sm" style="background: linear-gradient(135deg, #34d399, var(--emerald-500));"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></div>
+                            <button class="cat-add-btn" @click.stop="openCreateForm('materiales')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                        </div>
+                        <h3 class="cat-title">Materiales</h3>
+                        <div class="cat-footer">
+                            <span class="cat-number" style="font-size: 20px;">{{ count($materialesList ?? []) }}</span>
+                            <span class="cat-num-label">registros</span>
+                        </div>
+                    </div>
+
+                    <div class="cat-card" x-show="matchesSearch('marcas')" @click="openCatalog('marcas')">
+                        <div class="cat-card-header" style="margin-bottom: 8px;">
+                            <div class="cat-icon cat-icon-sm" style="background: linear-gradient(135deg, #2dd4bf, var(--teal-500));"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 8l4 4-4 4M8 12h8"></path></svg></div>
+                            <button class="cat-add-btn" @click.stop="openCreateForm('marcas')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                        </div>
+                        <h3 class="cat-title">Marcas</h3>
+                        <div class="cat-footer">
+                            <span class="cat-number" style="font-size: 20px;">{{ count($marcasList ?? []) }}</span>
+                            <span class="cat-num-label">registros</span>
+                        </div>
+                    </div>
+
+                    <div class="cat-card" x-show="matchesSearch('tipos')" @click="openCatalog('tipos')">
+                        <div class="cat-card-header" style="margin-bottom: 8px;">
+                            <div class="cat-icon cat-icon-sm" style="background: linear-gradient(135deg, #a78bfa, var(--violet-500));"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
+                            <button class="cat-add-btn" @click.stop="openCreateForm('tipos')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                        </div>
+                        <h3 class="cat-title">Tipos de Mat.</h3>
+                        <div class="cat-footer">
+                            <span class="cat-number" style="font-size: 20px;">{{ count($tiposList ?? []) }}</span>
+                            <span class="cat-num-label">registros</span>
+                        </div>
+                    </div>
+
+                    <div class="cat-card" x-show="matchesSearch('unidades')" @click="openCatalog('unidades')">
+                        <div class="cat-card-header" style="margin-bottom: 8px;">
+                            <div class="cat-icon cat-icon-sm" style="background: linear-gradient(135deg, #fb7185, var(--rose-500));"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
+                            <button class="cat-add-btn" @click.stop="openCreateForm('unidades')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                        </div>
+                        <h3 class="cat-title">Unidades</h3>
+                        <div class="cat-footer">
+                            <span class="cat-number" style="font-size: 20px;">{{ count($unidadesList ?? []) }}</span>
+                            <span class="cat-num-label">registros</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- G3: CONTACTOS -->
+            <div class="catalog-group" x-show="matchesSearch('proveedores', 'receptores')" style="border-bottom: none;">
+                <div class="group-header">
+                    <div class="group-title-wrap">
+                        <div class="stat-icon" style="background: var(--purple-500); opacity: 0.1; width: 32px; height: 32px; border-radius: 8px; position:absolute;"></div>
+                        <div class="stat-icon" style="color: var(--purple-500); width: 32px; height: 32px; border-radius: 8px; z-index:1;"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+                        <div>
+                            <span class="group-title-text">Contactos</span>
+                            <span class="group-title-sub">· personas y proveedores</span>
+                        </div>
+                    </div>
+                    <div class="group-count">2 catálogos</div>
+                </div>
+                
+                <div class="grid-4" style="grid-template-columns: repeat(2, 1fr);">
+                    <div class="cat-card" x-show="matchesSearch('proveedores')" @click="openCatalog('proveedores')">
+                        <div class="cat-card-header">
+                            <div class="cat-icon" style="background: linear-gradient(135deg, #c084fc, var(--purple-500));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></div>
+                            <button class="cat-add-btn" @click.stop="openCreateForm('proveedores')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                        </div>
+                        <h3 class="cat-title">Proveedores</h3>
+                        <p class="cat-desc">Empresas y distribuidores</p>
+                        <div class="cat-footer">
+                            <div>
+                                <div class="cat-number">{{ count($proveedoresList ?? []) }}</div>
+                                <div class="cat-num-label">registros</div>
+                            </div>
+                        </div>
+                        <div class="hover-preview">
+                            @php $lastProv = collect($proveedoresList ?? [])->last(); @endphp
+                            Último: {{ $lastProv ? Str::limit($lastProv->nombre_empresa, 25) : 'Ninguno' }}
+                        </div>
+                    </div>
+                    
+                    <div class="cat-card" x-show="matchesSearch('receptores')" @click="openCatalog('receptores')">
+                        <div class="cat-card-header">
+                            <div class="cat-icon" style="background: linear-gradient(135deg, #e879f9, var(--fuchsia-500));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+                            <button class="cat-add-btn" @click.stop="openCreateForm('receptores')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                        </div>
+                        <h3 class="cat-title">Receptores</h3>
+                        <p class="cat-desc">Personas que reciben asignaciones</p>
+                        <div class="cat-footer">
+                            <div>
+                                <div class="cat-number">{{ count($receptoresList ?? []) }}</div>
+                                <div class="cat-num-label">registros</div>
+                            </div>
+                            <svg width="40" height="20" viewBox="0 0 40 20" fill="none" stroke="var(--fuchsia-500)" stroke-width="2"><polyline points="0,15 10,18 20,10 30,12 40,5"></polyline></svg>
+                        </div>
+                        <div class="hover-preview" style="display:flex; justify-content:space-between; align-items:center;">
+                            <div class="avatar-stack">
+                                @foreach(collect($receptoresList ?? [])->take(3) as $u)
+                                <div class="avatar-sm" style="background: var(--fuchsia-500);">{{ substr($u->nombre, 0, 1) }}</div>
+                                @endforeach
+                            </div>
+                            <span>activos este mes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="block-footer">
+                <div>Tip: presiona <span class="kbd">/</span> para buscar catálogos</div>
+                <a href="{{ url('/admin') }}" class="link-blue">Ir a Configuración →</a>
             </div>
         </div>
 

@@ -560,13 +560,15 @@ input[type="radio"]:checked + span, input[type="radio"]:checked ~ label, label:h
 </style>')
             )
             ->renderHook(
-                PanelsRenderHook::BODY_END,
+                PanelsRenderHook::CONTENT_START,
                 fn (): string => Blade::render('
                     @if(!request()->routeIs(\'filament.servicio-social.pages.dashboard\'))
-                        <a href="{{ url(\'/servicio-social\') }}" style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; background-color: #ffffff; color: #475569; padding: 8px 16px; border-radius: 8px; font-weight: 500; font-size: 14px; font-family: sans-serif; text-decoration: none; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.backgroundColor=\'#f8fafc\'; this.style.color=\'#0f172a\'" onmouseout="this.style.backgroundColor=\'#ffffff\'; this.style.color=\'#475569\'">
-                            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                            Volver al Dashboard
-                        </a>
+                        <div style="margin-bottom: 24px;">
+                            <a href="{{ url(\'/servicio-social\') }}" style="display: inline-flex; align-items: center; gap: 6px; background-color: #ffffff; color: #475569; padding: 8px 16px; border-radius: 8px; font-weight: 500; font-size: 14px; font-family: sans-serif; text-decoration: none; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;" onmouseover="this.style.backgroundColor=\'#f8fafc\'; this.style.color=\'#0f172a\'" onmouseout="this.style.backgroundColor=\'#ffffff\'; this.style.color=\'#475569\'">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                                Volver al Dashboard
+                            </a>
+                        </div>
                     @endif
                 ')
             )

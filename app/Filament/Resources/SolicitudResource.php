@@ -73,6 +73,12 @@ class SolicitudResource extends Resource
                                 ->default('Pendiente')
                                 ->required()
                                 ->columnSpanFull(),
+                            Forms\Components\Textarea::make('observaciones')
+                                ->label('Detalle / Motivo de la Solicitud')
+                                ->placeholder('Explica qué necesitas y para qué...')
+                                ->rows(3)
+                                ->required()
+                                ->columnSpanFull(),
                         ]),
                     
                     Forms\Components\Wizard\Step::make('Participantes y detalles')
@@ -123,10 +129,6 @@ class SolicitudResource extends Resource
                                         ->prefixIcon('heroicon-m-calendar-days')
                                         ->visible(fn (Forms\Get $get) => $get('tipo_movimiento') === 'Asignacion Temporal'),
                                 ]),
-                            Forms\Components\Textarea::make('observaciones')
-                                ->label('Observaciones')
-                                ->rows(3)
-                                ->columnSpanFull(),
                         ]),
                 ])->columnSpanFull(),
             ]);

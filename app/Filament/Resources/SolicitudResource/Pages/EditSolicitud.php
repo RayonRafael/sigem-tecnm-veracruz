@@ -8,6 +8,7 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditSolicitud extends EditRecord
 {
+    use EditRecord\Concerns\HasWizard;
     protected static string $resource = SolicitudResource::class;
 
     protected function getHeaderActions(): array

@@ -8,6 +8,7 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateSolicitud extends CreateRecord
 {
+    use CreateRecord\Concerns\HasWizard;
     protected static string $resource = SolicitudResource::class;
 
     protected function getRedirectUrl(): string

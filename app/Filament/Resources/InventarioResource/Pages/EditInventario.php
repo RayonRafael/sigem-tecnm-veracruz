@@ -8,6 +8,7 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditInventario extends EditRecord
 {
+    use EditRecord\Concerns\HasWizard;
     protected static string $resource = InventarioResource::class;
 
     protected function getHeaderActions(): array

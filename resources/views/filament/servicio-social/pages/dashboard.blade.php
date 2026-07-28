@@ -325,48 +325,6 @@
 
         <!-- 4. MODULES (SS Scope) -->
         <div class="grid-3">
-            <!-- Inventario -->
-            <div class="module-card">
-                <div class="mod-header">
-                    <div class="stat-icon bg-emerald" style="width: 36px; height: 36px; border-radius: 8px;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
-                    <div class="mod-title">Inventario General</div>
-                    <div class="mod-badge">Consultas</div>
-                </div>
-                <div class="mod-stats">
-                    <div class="mod-stat"><div class="mod-stat-val">{{ $inventarioDisponibles ?? 0 }}</div><div class="mod-stat-label">Disponibles</div></div>
-                    <div class="mod-stat"><div class="mod-stat-val">{{ $inventarioEnMantenimiento ?? 0 }}</div><div class="mod-stat-label">Mantenimiento</div></div>
-                    <div class="mod-stat"><div class="mod-stat-val">{{ $inventarioDanados ?? 0 }}</div><div class="mod-stat-label">Dañados</div></div>
-                </div>
-                <div class="mini-table-wrap">
-                    <table class="mod-table">
-                        <thead><tr><th>Código</th><th>Equipo</th><th>Estado</th></tr></thead>
-                        <tbody>
-                            @forelse($inventariosRecientes ?? [] as $inv)
-                            <tr>
-                                <td class="mono-text">{{ $inv->num_serie }}</td>
-                                <td>{{ Str::limit($inv->material?->nombre ?? 'N/A', 15) }}</td>
-                                <td>
-                                    @php
-                                        $cls = 'badge-slate';
-                                        if($inv->estado === 'Disponible') $cls = 'badge-green';
-                                        elseif($inv->estado === 'Asignado') $cls = 'badge-blue';
-                                        elseif($inv->estado === 'En Mantenimiento') $cls = 'badge-amber';
-                                        elseif(in_array($inv->estado, ['Dañado', 'Baja'])) $cls = 'badge-red';
-                                    @endphp
-                                    <span class="badge {{ $cls }}">{{ $inv->estado }}</span>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr><td colspan="3" style="text-align: center; color: var(--slate-500); padding: 24px;">Sin registros.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mod-footer">
-                    <button class="link-blue" style="background:transparent;border:none;padding:0;cursor:pointer;" @click="openCatalog('modulo-inventario')">Ver todo →</button>
-                </div>
-            </div>
-
             <!-- Solicitudes -->
             <div class="module-card">
                 <div class="mod-header">
@@ -403,9 +361,12 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="mod-footer">
+                <div class="mod-footer" style="display:flex; justify-content:space-between; align-items:center;">
                     <button class="link-blue" style="background:transparent;border:none;padding:0;cursor:pointer;" @click="openCatalog('modulo-solicitudes')">Ver todas →</button>
-                    <a href="{{ url('/servicio-social/solicituds/create') }}" class="btn-blue">Nueva</a>
+                    <a href="{{ url('/servicio-social/solicituds/create') }}" class="btn-blue" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Nueva Solicitud
+                    </a>
                 </div>
             </div>
 
@@ -445,12 +406,61 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="mod-footer">
+                <div class="mod-footer" style="display:flex; justify-content:space-between; align-items:center;">
                     <button class="link-blue" style="background:transparent;border:none;padding:0;cursor:pointer;" @click="openCatalog('modulo-mantenimiento')">Ver todos →</button>
-                    <a href="{{ url('/servicio-social/mantenimientos/create') }}" class="btn-blue">Nuevo</a>
+                    <a href="{{ url('/servicio-social/mantenimientos/create') }}" class="btn-blue" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                        Reportar Falla
+                    </a>
                 </div>
             </div>
         </div>
+            <!-- Inventario -->
+            <div class="module-card">
+                <div class="mod-header">
+                    <div class="stat-icon bg-emerald" style="width: 36px; height: 36px; border-radius: 8px;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
+                    <div class="mod-title">Inventario General</div>
+                    <div class="mod-badge">Consultas</div>
+                </div>
+                <div class="mod-stats">
+                    <div class="mod-stat"><div class="mod-stat-val">{{ $inventarioDisponibles ?? 0 }}</div><div class="mod-stat-label">Disponibles</div></div>
+                    <div class="mod-stat"><div class="mod-stat-val">{{ $inventarioEnMantenimiento ?? 0 }}</div><div class="mod-stat-label">Mantenimiento</div></div>
+                    <div class="mod-stat"><div class="mod-stat-val">{{ $inventarioDanados ?? 0 }}</div><div class="mod-stat-label">Dañados</div></div>
+                </div>
+                <div class="mini-table-wrap">
+                    <table class="mod-table">
+                        <thead><tr><th>Código</th><th>Equipo</th><th>Estado</th></tr></thead>
+                        <tbody>
+                            @forelse($inventariosRecientes ?? [] as $inv)
+                            <tr>
+                                <td class="mono-text">{{ $inv->num_serie }}</td>
+                                <td>{{ Str::limit($inv->material?->nombre ?? 'N/A', 15) }}</td>
+                                <td>
+                                    @php
+                                        $cls = 'badge-slate';
+                                        if($inv->estado === 'Disponible') $cls = 'badge-green';
+                                        elseif($inv->estado === 'Asignado') $cls = 'badge-blue';
+                                        elseif($inv->estado === 'En Mantenimiento') $cls = 'badge-amber';
+                                        elseif(in_array($inv->estado, ['Dañado', 'Baja'])) $cls = 'badge-red';
+                                    @endphp
+                                    <span class="badge {{ $cls }}">{{ $inv->estado }}</span>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr><td colspan="3" style="text-align: center; color: var(--slate-500); padding: 24px;">Sin registros.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mod-footer" style="display:flex; justify-content:space-between; align-items:center;">
+                    <button class="link-blue" style="background:transparent;border:none;padding:0;cursor:pointer;" @click="openCatalog('modulo-inventario')">Ver todo →</button>
+                    <a href="{{ url('/servicio-social/inventarios/create') }}" class="btn-blue" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Agregar activo
+                    </a>
+                </div>
+            </div>
+
 
         <!-- 5. CATALOGS (READ ONLY) -->
         <div class="section-block">
