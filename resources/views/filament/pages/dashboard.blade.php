@@ -267,13 +267,6 @@
         </style>
 
         @php
-            $hour = now()->hour;
-            $greeting = 'Buenos días';
-            if ($hour >= 12 && $hour < 18) {
-                $greeting = 'Buenas tardes';
-            } elseif ($hour >= 18 || $hour < 6) {
-                $greeting = 'Buenas noches';
-            }
             $user = auth()->user();
             $initial = substr($user->name ?? 'U', 0, 1);
             $role = $user->roles?->first()?->name ?? 'Usuario';
@@ -321,7 +314,7 @@
         <!-- 2. BANNER -->
         <div class="welcome-banner">
             <div>
-                <h1 class="banner-greeting">{{ $greeting }}, {{ explode(' ', $user->name)[0] ?? 'Usuario' }}</h1>
+                <h1 class="banner-greeting"><span x-text="getGreeting()"></span>, {{ explode(' ', $user->name)[0] ?? 'Usuario' }}</h1>
                 <p class="banner-sub">Tienes <strong>{{ $solicitudesPendientes ?? 0 }} solicitudes</strong> por autorizar y <strong>{{ $mantenimientosPendientes ?? 0 }} mantenimientos</strong> programados.</p>
             </div>
             <div class="banner-actions">
@@ -917,6 +910,12 @@
         <script>
             document.addEventListener('alpine:init', () => {
                 Alpine.data('sigemDashboard', () => ({
+                    getGreeting() {
+                        const hour = new Date().getHours();
+                        if (hour >= 6 && hour < 12) return 'Buenos días';
+                        if (hour >= 12 && hour < 18) return 'Buenas tardes';
+                        return 'Buenas noches';
+                    },
                     searchQuery: '',
                     activeCatalog: null,
                     mode: 'list', // 'list' or 'form'
