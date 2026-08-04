@@ -78,6 +78,8 @@ class MaterialResource extends Resource
                             ->numeric()
                             ->default(0)
                             ->prefixIcon('heroicon-m-archive-box')
+                            ->disabled()
+                            ->dehydrated()
                             ->required(),
                         Forms\Components\TextInput::make('stock_minimo')
                             ->label('Stock Mínimo')

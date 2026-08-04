@@ -70,8 +70,14 @@ class MaterialResource extends Resource
                             ->prefixIcon('heroicon-m-scale'),
                     ])->columns(3),
 
-                        Forms\Components\Hidden::make('stock_actual')
-                            ->default(0),
+                        Forms\Components\TextInput::make('stock_actual')
+                            ->label('Stock Actual')
+                            ->numeric()
+                            ->default(0)
+                            ->prefixIcon('heroicon-m-archive-box')
+                            ->disabled()
+                            ->dehydrated()
+                            ->required(),
                         Forms\Components\Hidden::make('stock_minimo')
                             ->default(0),
                         Forms\Components\Hidden::make('requiere_control_individual')

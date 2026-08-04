@@ -35,8 +35,11 @@ class MantenimientoObserver
 
             // Si el estado cambió y ahora es "Completado"
             if ($estadoNuevo === 'Completado') {
-                // Devuelve el inventario a "Disponible"
-                $mantenimiento->inventario()->update(['estado' => 'Disponible']);
+                $inventario = $mantenimiento->inventario;
+                if ($inventario) {
+                    $nuevoEstado = $inventario->id_usuario ? 'Asignado' : 'Disponible';
+                    $inventario->update(['estado' => $nuevoEstado]);
+                }
             }
 
             $this->registrarBitacora(

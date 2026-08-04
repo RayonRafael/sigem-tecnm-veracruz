@@ -281,7 +281,7 @@ class InventarioResource extends Resource
                     ->color('success')
                     ->visible(fn (Inventario $record): bool => !$record->aprobado && auth()->user()->can('aprobaciones.aprobar'))
                     ->action(function (Inventario $record) {
-                        $record->update(['aprobado' => true, 'aprobado_por' => auth()->id(), 'fecha_aprobacion' => now()]);
+                        $record->update(['aprobado' => true, 'estado_registro' => 'Aprobado', 'aprobado_por' => auth()->id(), 'fecha_aprobacion' => now()]);
                         Notification::make()->title('Registro aprobado exitosamente')->success()->send();
                     })
                     ->requiresConfirmation(),
@@ -308,7 +308,7 @@ class InventarioResource extends Resource
                         ->action(function (Collection $records) {
                             foreach ($records as $record) {
                                 if (!$record->aprobado) {
-                                    $record->update(['aprobado' => true, 'aprobado_por' => auth()->id(), 'fecha_aprobacion' => now()]);
+                                    $record->update(['aprobado' => true, 'estado_registro' => 'Aprobado', 'aprobado_por' => auth()->id(), 'fecha_aprobacion' => now()]);
                                 }
                             }
                             Notification::make()->title('Registros aprobados exitosamente')->success()->send();

@@ -17,4 +17,6 @@ class MaterialPolicy
     public function create(User $user): bool { return $this->isAdmin($user); }
     public function update(User $user, Material $modelInstance): bool { return $this->isAdmin($user); }
     public function delete(User $user, Material $modelInstance): bool { return $this->isAdmin($user); }
+    public function restore(User $user, Material $modelInstance): bool { return $this->isAdmin($user); }
+    public function forceDelete(User $user, Material $modelInstance): bool { return $this->isAdmin($user); }
 }

@@ -56,6 +56,11 @@ class InventarioObserver
                 "Actualizó activo: {$inventario->num_serie}"
             );
         }
+
+        if ($inventario->isDirty('estado') && $inventario->estado === 'Baja' && empty($inventario->fecha_baja)) {
+            $inventario->fecha_baja = now();
+            $inventario->saveQuietly();
+        }
     }
 
     public function deleted(Inventario $inventario): void
