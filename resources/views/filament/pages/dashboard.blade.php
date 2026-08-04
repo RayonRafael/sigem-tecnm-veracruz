@@ -1013,8 +1013,18 @@
                         return cols.map(c => `<th>${c}</th>`).join('');
                     },
 
+                    totalPages() {
+                        return Math.ceil(this.getFilteredData().length / this.pageSize) || 1;
+                    },
+
+                    paginatedData() {
+                        const start = (this.page - 1) * this.pageSize;
+                        return this.getFilteredData().slice(start, start + this.pageSize);
+                    },
+
                     getFilteredData() {
-                        const items = this.data[this.activeCatalog] || [];
+                        let rawItems = this.data[this.activeCatalog] || [];
+                        const items = Array.isArray(rawItems) ? rawItems : Object.values(rawItems);
                         if (!this.tableSearch) return items;
                         const q = this.tableSearch.toLowerCase();
                         return items.filter(item => JSON.stringify(item).toLowerCase().includes(q));

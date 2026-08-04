@@ -870,7 +870,8 @@
                     },
 
                     getFilteredData() {
-                        const items = this.data[this.activeCatalog] || [];
+                        let rawItems = this.data[this.activeCatalog] || [];
+                        const items = Array.isArray(rawItems) ? rawItems : Object.values(rawItems);
                         if (!this.tableSearch) return items;
                         const q = this.tableSearch.toLowerCase();
                         return items.filter(item => JSON.stringify(item).toLowerCase().includes(q));
