@@ -80,6 +80,28 @@ class SolicitudResource extends Resource
                                 ->rows(3)
                                 ->required()
                                 ->columnSpanFull(),
+                            Forms\Components\Repeater::make('detalles')
+                                ->label('Materiales Solicitados')
+                                ->relationship('detalles')
+                                ->schema([
+                                    Forms\Components\Select::make('id_producto')
+                                        ->label('Material')
+                                        ->relationship('material', 'nombre')
+                                        ->searchable()
+                                        ->preload()
+                                        ->required()
+                                        ->columnSpan(2),
+                                    Forms\Components\TextInput::make('cantidad')
+                                        ->label('Cantidad')
+                                        ->numeric()
+                                        ->default(1)
+                                        ->required()
+                                        ->columnSpan(1),
+                                ])
+                                ->columns(3)
+                                ->columnSpanFull()
+                                ->defaultItems(1)
+                                ->addActionLabel('Añadir material'),
                         ]),
                     
                     Forms\Components\Wizard\Step::make('Participantes y detalles')

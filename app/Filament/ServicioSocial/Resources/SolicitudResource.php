@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class SolicitudResource extends Resource
 {
@@ -70,6 +71,28 @@ class SolicitudResource extends Resource
                                 ->rows(3)
                                 ->required()
                                 ->columnSpanFull(),
+                            Forms\Components\Repeater::make('detalles')
+                                ->label('Materiales Solicitados')
+                                ->relationship('detalles')
+                                ->schema([
+                                    Forms\Components\Select::make('id_producto')
+                                        ->label('Material')
+                                        ->relationship('material', 'nombre')
+                                        ->searchable()
+                                        ->preload()
+                                        ->required()
+                                        ->columnSpan(2),
+                                    Forms\Components\TextInput::make('cantidad')
+                                        ->label('Cantidad')
+                                        ->numeric()
+                                        ->default(1)
+                                        ->required()
+                                        ->columnSpan(1),
+                                ])
+                                ->columns(3)
+                                ->columnSpanFull()
+                                ->defaultItems(1)
+                                ->addActionLabel('Añadir material'),
                         ]),
                     
                     Forms\Components\Wizard\Step::make('Participantes y detalles')
@@ -223,5 +246,10 @@ class SolicitudResource extends Resource
             'create' => Pages\CreateSolicitud::route('/create'),
             'edit' => Pages\EditSolicitud::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->where('id_usuario', auth()->id());
     }
 }

@@ -211,7 +211,25 @@
             }
             @media (max-width: 640px) {
                 .grid-4 { grid-template-columns: 1fr; }
-                .slide-panel { width: 100%; }
+                .slide-panel { width: 100%; height: 100%; }
+                
+                /* Horizontal scroll for table */
+                .slide-body { padding: 16px; overflow-x: hidden; overflow-y: auto; height: 100%; }
+                .slide-table-card { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
+                
+                /* Sticky header and pagination */
+                .slide-header { position: sticky; top: 0; z-index: 110; padding: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+                .table-pagination { position: sticky; bottom: 0; z-index: 110; border-top: 1px solid var(--slate-200); }
+                
+                /* Table adjustments */
+                .st-wrap th, .st-wrap td { white-space: nowrap; padding: 12px 16px; }
+                
+                /* Compact Action Buttons */
+                .slide-actions .btn-blue { font-size: 0; gap: 0 !important; padding: 8px !important; }
+                .slide-actions .btn-blue svg { width: 20px; height: 20px; margin: 0; }
+                
+                .btn-icon { padding: 8px; }
+                .btn-icon svg { width: 18px; height: 18px; }
             }
         </style>
 

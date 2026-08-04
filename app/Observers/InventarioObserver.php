@@ -11,6 +11,9 @@ class InventarioObserver
 
     public function created(Inventario $inventario): void
     {
+        if ($inventario->id_producto && $inventario->material) {
+            $inventario->material->increment('stock_actual');
+        }
         $this->registrarBitacora(
             'crear',
             'inventario',
@@ -23,6 +26,16 @@ class InventarioObserver
 
     public function updated(Inventario $inventario): void
     {
+        if ($inventario->isDirty('id_producto')) {
+            $oldMaterial = \App\Models\Material::find($inventario->getOriginal('id_producto'));
+            if ($oldMaterial) {
+                $oldMaterial->decrement('stock_actual');
+            }
+            if ($inventario->material) {
+                $inventario->material->increment('stock_actual');
+            }
+        }
+
         $camposRelevantes = ['estado', 'ubicacion_fisica', 'tipo_propiedad', 'id_usuario'];
         $cambiosRelevantes = false;
 
@@ -47,6 +60,9 @@ class InventarioObserver
 
     public function deleted(Inventario $inventario): void
     {
+        if ($inventario->id_producto && $inventario->material) {
+            $inventario->material->decrement('stock_actual');
+        }
         $this->registrarBitacora(
             'eliminar',
             'inventario',

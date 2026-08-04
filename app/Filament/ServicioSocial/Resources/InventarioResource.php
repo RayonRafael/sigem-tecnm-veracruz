@@ -296,4 +296,9 @@ class InventarioResource extends Resource
             'edit' => Pages\EditInventario::route('/{record}/edit'),
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->where('id_usuario', auth()->id());
+    }
 }

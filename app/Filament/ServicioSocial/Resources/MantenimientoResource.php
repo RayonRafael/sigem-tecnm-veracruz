@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class MantenimientoResource extends Resource
 {
@@ -257,5 +258,10 @@ class MantenimientoResource extends Resource
             'create' => Pages\CreateMantenimiento::route('/create'),
             'edit' => Pages\EditMantenimiento::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->where('id_usuario_solicita', auth()->id());
     }
 }
