@@ -269,9 +269,39 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 640px) {
+            .bg-overlay {
+                background-image: none !important;
+                background: linear-gradient(135deg, var(--sidebar-bg), var(--accent-dark)) !important;
+            }
+            .bg-overlay::after {
+                display: none !important;
+            }
             .login-card {
                 padding: 30px 20px;
+            }
+            .logos-container {
+                flex-wrap: wrap;
+            }
+            .tabs-container {
+                flex-direction: column;
+                gap: 12px;
+                border-bottom: none;
+            }
+            .tab {
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                border-bottom: 1px solid var(--border);
+            }
+            .tab.active {
+                border-color: var(--accent);
+                background: var(--accent-light);
+            }
+            .btn-submit {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
         }
     </style>

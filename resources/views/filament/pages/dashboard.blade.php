@@ -350,7 +350,7 @@
                 </div>
                 <h2 class="stat-val mono-text">{{ $activosBueno ?? 0 }}</h2>
                 <div class="stat-sub text-emerald">{{ $porcentajeBuenEstado ?? 0 }}% del inventario</div>
-                <div class="progress-bar-wrap">
+                <div class="progress-bar-wrap hidden-mobile">
                     <div class="progress-bar-fill" style="width: {{ $porcentajeBuenEstado ?? 0 }}%;"></div>
                 </div>
             </div>
@@ -376,7 +376,7 @@
                 <div class="stat-sub {{ ($materialesStockBajoCount ?? 0) > 0 ? 'text-red' : 'text-emerald' }}">
                     {{ ($materialesStockBajoCount ?? 0) > 0 ? 'requiere atención' : 'todo en orden' }}
                 </div>
-                <div class="severity-bars">
+                <div class="severity-bars hidden-mobile">
                     @php $sev = min(5, max(0, $materialesStockBajoCount ?? 0)); @endphp
                     <div class="severity-bar {{ $sev > 0 ? 'active' : '' }}"></div>
                     <div class="severity-bar {{ $sev > 1 ? 'active' : '' }}"></div>
@@ -387,8 +387,38 @@
             </div>
         </div>
 
+        <!-- ACCESOS RÁPIDOS MÓVIL (Cambio 1) -->
+        <div class="mobile-only" style="margin-bottom: 24px;">
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <a href="{{ url('/admin/inventarios') }}" class="btn" style="background: var(--brand-500); color: white; min-height: 56px; justify-content: flex-start; padding: 0 20px; font-size: 16px;">
+                    <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 8px; margin-right: 12px;">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                    </div>
+                    Inventario
+                    <span style="margin-left: auto; background: white; color: var(--brand-600); padding: 4px 8px; border-radius: 99px; font-size: 12px;">{{ $totalActivos ?? 0 }}</span>
+                </a>
+                <a href="{{ url('/admin/solicituds') }}" class="btn" style="background: var(--amber-500); color: white; min-height: 56px; justify-content: flex-start; padding: 0 20px; font-size: 16px;">
+                    <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 8px; margin-right: 12px;">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    Solicitudes
+                    <span style="margin-left: auto; background: white; color: var(--amber-600); padding: 4px 8px; border-radius: 99px; font-size: 12px;">{{ $solicitudesPendientes ?? 0 }}</span>
+                </a>
+                <a href="{{ url('/admin/mantenimientos') }}" class="btn" style="background: var(--red-500); color: white; min-height: 56px; justify-content: flex-start; padding: 0 20px; font-size: 16px;">
+                    <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 8px; margin-right: 12px;">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                    </div>
+                    Mantenimiento
+                    <span style="margin-left: auto; background: white; color: var(--red-600); padding: 4px 8px; border-radius: 99px; font-size: 12px;">{{ $mantenimientosPendientes ?? 0 }}</span>
+                </a>
+                <a href="{{ url('/admin') }}" class="btn btn-white" style="min-height: 56px; margin-top: 8px; font-size: 16px;">
+                    Ver Catálogos Completos
+                </a>
+            </div>
+        </div>
+
         <!-- 5. MODULES -->
-        <div class="grid-3">
+        <div class="grid-3 hidden-mobile">
             <!-- Inventario -->
             <div class="module-card">
                 <div class="mod-header">
@@ -519,7 +549,7 @@
 
 
         <!-- 4. CATALOGS -->
-        <div class="section-block">
+        <div class="section-block hidden-mobile">
             <div class="block-header">
                 <div class="block-title-wrap">
                     <div class="block-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>

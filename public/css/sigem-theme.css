@@ -512,3 +512,79 @@ input[type="radio"]:checked + span, input[type="radio"]:checked ~ label, label:h
 .fi-sidebar-layout { padding-left: 0 !important; }
 .fi-sidebar { display: none !important; width: 0 !important; min-width: 0 !important; }
 .fi-main { width: 100% !important; max-width: 100% !important; margin-left: 0 !important; padding-left: 24px !important; padding-right: 24px !important; }
+
+/* ===== RESPONSIVIDAD (MOBILE & TABLET) ===== */
+.mobile-only { display: none !important; }
+
+@media (max-width: 1024px) {
+    /* Tablet adjustments for Dashboard */
+    .sigem-professional .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+    .sigem-professional .grid-3 { grid-template-columns: 1fr !important; }
+    .fi-main { padding-left: 1rem !important; padding-right: 1rem !important; }
+
+    /* Adaptabilidad de columnas */
+    .col-desktop { display: none !important; }
+}
+
+@media (max-width: 640px) {
+    /* Clases de adaptabilidad */
+    .hidden-mobile { display: none !important; }
+    .mobile-only { display: block !important; }
+    .mobile-only-flex { display: flex !important; }
+    .col-tablet { display: none !important; }
+
+    /* Base typography */
+    body { font-size: 14px !important; }
+    
+    /* Layout & padding */
+    .fi-main { padding-left: 0.5rem !important; padding-right: 0.5rem !important; }
+    .fi-section-content { padding: 1rem !important; }
+    .sigem-professional .timeline { padding: 16px !important; }
+
+    /* Grids */
+    .sigem-professional .grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+    .sigem-professional .grid-3 { grid-template-columns: 1fr !important; }
+
+    /* Header */
+    .sigem-professional .top-header { flex-direction: column !important; align-items: flex-start !important; padding: 16px !important; height: auto !important; margin: -16px -16px 24px -16px !important; gap: 16px !important; }
+    .sigem-professional .header-brand { width: 100% !important; justify-content: space-between !important; }
+    .sigem-professional .brand-subtitle { display: none !important; }
+    .sigem-professional .header-user { width: 100% !important; justify-content: space-between !important; }
+    
+    /* Banner */
+    .sigem-professional .welcome-banner { flex-direction: column !important; text-align: center !important; padding: 20px !important; gap: 16px !important; }
+    .sigem-professional .banner-greeting { font-size: 20px !important; }
+    .sigem-professional .banner-actions { flex-wrap: wrap !important; justify-content: center !important; width: 100% !important; }
+    .sigem-professional .banner-actions .btn { width: 100% !important; }
+
+    /* Slide-overs - Transición a página completa */
+    .sigem-professional .slide-panel { position: fixed !important; inset: 0 !important; width: 100% !important; border-radius: 0 !important; box-shadow: none !important; }
+    .sigem-professional .slide-overlay { background: rgba(15, 23, 42, 0.95) !important; }
+    .sigem-professional .slide-header { flex-direction: row !important; align-items: center !important; gap: 12px !important; padding: 16px !important; border-bottom: 1px solid var(--slate-200) !important; }
+    .sigem-professional .slide-title-area { width: auto !important; flex: 1; }
+    .sigem-professional .slide-actions { width: auto !important; justify-content: flex-end !important; }
+    .sigem-professional .slide-form-card { padding: 16px !important; }
+    .sigem-professional .form-actions { flex-direction: column !important; }
+    .sigem-professional .form-actions button, .sigem-professional .form-actions a { width: 100% !important; margin-bottom: 8px !important; text-align: center !important; justify-content: center !important; }
+
+    /* Touch areas for buttons */
+    .sigem-professional .btn-close, .sigem-professional .btn-back, .sigem-professional .cat-add-btn, .sigem-professional .btn-icon, .sigem-professional .btn, .sigem-professional .btn-blue, .sigem-professional .btn-green, .sigem-professional .recent-chip { min-height: 44px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; }
+
+    /* Botón cerrar/volver más visible en móvil */
+    .sigem-professional .btn-close { font-size: 14px !important; background: var(--slate-100) !important; color: var(--slate-900) !important; border-radius: 8px !important; padding: 0 16px !important; width: auto !important; }
+
+    /* Tables */
+    .sigem-professional .mini-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding: 0 10px !important; margin-bottom: 10px !important; }
+    .sigem-professional .mod-table { min-width: 450px !important; }
+    .sigem-professional .st-wrap { min-width: 600px !important; }
+    .sigem-professional .mod-stats { flex-wrap: wrap !important; gap: 12px !important; }
+    .sigem-professional .mod-stat { min-width: 45% !important; }
+    
+    /* Catalogs Section */
+    .sigem-professional .block-header { flex-direction: column !important; align-items: flex-start !important; padding: 16px !important; gap: 16px !important; }
+    .sigem-professional .catalog-search { width: 100% !important; }
+    .sigem-professional .search-input { width: 100% !important; }
+    .sigem-professional .catalog-group { padding: 16px !important; }
+    .sigem-professional .group-header { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
+    .sigem-professional .slide-footer { flex-direction: column !important; gap: 12px !important; justify-content: center !important; }
+}

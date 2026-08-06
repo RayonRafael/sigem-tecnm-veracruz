@@ -371,18 +371,76 @@
             }
             .header {
                 padding: 16px 20px;
+                flex-direction: column;
+                gap: 20px;
+            }
+            .header-brand {
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+            }
+            .header-logos {
+                margin-left: 0 !important;
+                border-left: none !important;
+                padding-left: 0 !important;
+                margin-top: 10px;
+                border-top: 1px solid rgba(255,255,255,0.2);
+                padding-top: 16px;
+                justify-content: center;
+                width: 100%;
+            }
+            .header-actions {
+                width: 100%;
+            }
+            .header-actions .btn {
+                width: 100%;
+                justify-content: center;
+                min-height: 44px;
             }
             .hero {
-                padding: 60px 20px 50px;
+                padding: 40px 20px 40px;
+                max-height: 70vh;
+                min-height: 70vh;
+                justify-content: center;
             }
             .hero-title {
                 font-size: 32px;
+                margin-bottom: 16px;
             }
             .hero-sub {
                 font-size: 16px;
+                margin-bottom: 24px;
+            }
+            .hero-actions {
+                display: none; /* Oculto en móvil a favor del sticky */
+            }
+            .mobile-login-bar {
+                display: block !important;
+                position: sticky;
+                bottom: 0;
+                background: rgba(11, 29, 58, 0.95);
+                backdrop-filter: blur(10px);
+                padding: 16px 20px;
+                z-index: 100;
+                border-top: 1px solid rgba(255,255,255,0.1);
+            }
+            .mobile-login-bar .btn {
+                width: 100%;
+                justify-content: center;
+                min-height: 48px;
             }
             .modules-section {
                 padding: 0 20px 60px;
+            }
+            .footer {
+                padding: 30px 20px;
+            }
+            .footer > div {
+                flex-direction: column;
+                gap: 12px !important;
+            }
+            .footer img {
+                height: 32px !important;
             }
         }
     </style>
@@ -475,6 +533,14 @@
         </div>
         <p>&copy; {{ date('Y') }} SIGEM — Tecnológico Nacional de México Campus Veracruz. Todos los derechos reservados.</p>
     </footer>
+
+    <!-- Mobile Sticky Login Bar -->
+    <div class="mobile-login-bar" style="display: none;">
+        <a href="{{ url('/login') }}" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            Iniciar Sesión
+        </a>
+    </div>
 
 </body>
 </html>

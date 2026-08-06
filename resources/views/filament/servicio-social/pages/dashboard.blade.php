@@ -334,8 +334,32 @@
             </div>
         </div>
 
+        <!-- ACCESOS RÁPIDOS MÓVIL SS -->
+        <div class="mobile-only" style="margin-bottom: 24px;">
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <a href="{{ url('/servicio-social/solicituds/create') }}" class="btn" style="background: var(--amber-500); color: white; min-height: 56px; justify-content: flex-start; padding: 0 20px; font-size: 16px;">
+                    <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 8px; margin-right: 12px;">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    </div>
+                    Nueva Solicitud
+                </a>
+                <a href="{{ url('/servicio-social/mantenimientos/create') }}" class="btn" style="background: var(--red-500); color: white; min-height: 56px; justify-content: flex-start; padding: 0 20px; font-size: 16px;">
+                    <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 8px; margin-right: 12px;">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                    </div>
+                    Reportar Falla
+                </a>
+                <a href="{{ url('/servicio-social/inventarios') }}" class="btn" style="background: var(--brand-500); color: white; min-height: 56px; justify-content: flex-start; padding: 0 20px; font-size: 16px;">
+                    <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 8px; margin-right: 12px;">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                    </div>
+                    Ver Inventario
+                </a>
+            </div>
+        </div>
+
         <!-- 4. MODULES (SS Scope) -->
-        <div class="grid-3">
+        <div class="grid-3 hidden-mobile">
             <!-- Solicitudes -->
             <div class="module-card">
                 <div class="mod-header">

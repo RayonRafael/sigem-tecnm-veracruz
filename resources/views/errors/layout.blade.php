@@ -138,11 +138,12 @@
             box-shadow: 0 8px 15px -3px rgba(27,101,212,0.3), 0 4px 6px -2px rgba(27,101,212,0.2);
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 640px) {
             .error-container { padding: 2.5rem 1.5rem; }
             .error-code { font-size: 5rem; }
             .error-title { font-size: 1.5rem; }
             .error-message { font-size: 1rem; margin-bottom: 2rem; }
+            .btn { width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: center; }
         }
     </style>
 </head>
