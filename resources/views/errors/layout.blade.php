@@ -7,6 +7,20 @@
     <link rel="icon" href="{{ asset('images/sigem-favicon.svg?v=2') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            try {
+                var theme = localStorage.getItem('theme');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else if (theme === 'system' || !theme) {
+                    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        document.documentElement.classList.add('dark');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
     <style>
         :root {
             --bg: #f0f4f8;
@@ -18,16 +32,22 @@
             --border: #e2e8f0;
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #0d1117;
-                --text-primary: #e2e8f0;
-                --text-secondary: #8b949e;
-                --card-bg: rgba(22, 27, 34, 0.85);
-                --border: #30363d;
-                --accent: #3b82f6;
-                --accent-dark: #60a5fa;
-            }
+        /* Modo Oscuro */
+        .dark {
+            --bg: #0d1117;
+            --text-primary: #e2e8f0;
+            --text-secondary: #8b949e;
+            --card-bg: rgba(22, 27, 34, 0.85);
+            --border: #30363d;
+            --accent: #3b82f6;
+            --accent-dark: #60a5fa;
+        }
+
+        .dark .logo {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 4px 8px;
+            border-radius: 6px;
+            backdrop-filter: blur(4px);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -58,10 +78,8 @@
             background: linear-gradient(135deg, rgba(27,101,212,0.85) 0%, rgba(11,29,58,0.95) 100%);
             z-index: 2;
         }
-        @media (prefers-color-scheme: dark) {
-            .bg-gradient {
-                background: linear-gradient(135deg, rgba(13,17,23,0.9) 0%, rgba(22,27,34,0.98) 100%);
-            }
+        .dark .bg-gradient {
+            background: linear-gradient(135deg, rgba(13,17,23,0.9) 0%, rgba(22,27,34,0.98) 100%);
         }
 
         .error-container {

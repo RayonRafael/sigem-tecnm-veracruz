@@ -39,6 +39,8 @@
             .brand-title { font-weight: 600; font-size: 16px; color: var(--slate-900); }
             .brand-subtitle { font-size: 12px; color: var(--slate-600); }
             .header-user { display: flex; align-items: center; gap: 16px; }
+            .btn-theme { position: relative; color: var(--slate-600); background: transparent; border: none; cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.18s; display: flex; align-items: center; justify-content: center; }
+            .btn-theme:hover { background: var(--slate-100); color: var(--slate-900); }
             .bell-btn { position: relative; color: var(--slate-600); background: transparent; border: none; cursor: pointer; padding: 4px; transition: 0.18s; }
             .bell-btn:hover { color: var(--brand-600); }
             .bell-dot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: var(--red-500); border-radius: 50%; border: 2px solid white; }
@@ -204,6 +206,102 @@
 
             .slide-footer { background: white; border-top: 1px solid var(--slate-200); padding: 16px 32px; display: flex; justify-content: flex-end; align-items: center; }
 
+            /* ===== OVERRIDES MODO OSCURO ===== */
+            .dark .sigem-professional ::-webkit-scrollbar-thumb { background: var(--dark-border-strong); }
+            .dark .sigem-professional ::-webkit-scrollbar-thumb:hover { background: var(--dark-text-muted); }
+            
+            .dark .top-header { background: var(--dark-bg-header); border-bottom-color: var(--dark-border-color); }
+            .dark .brand-title, .dark .user-name { color: var(--dark-text-primary); }
+            .dark .brand-subtitle, .dark .user-role { color: var(--dark-text-secondary); }
+            .dark .header-divider { background: var(--dark-border-color); }
+            .dark .btn-theme, .dark .bell-btn { color: var(--dark-text-secondary); }
+            .dark .btn-theme:hover { background: var(--dark-bg-surface); color: var(--dark-text-primary); }
+            .dark .bell-dot { border-color: var(--dark-bg-header); }
+            .dark .user-avatar { background: linear-gradient(135deg, var(--brand-700), var(--brand-900)); }
+            
+            .dark .text-primary-util { color: var(--dark-text-primary) !important; }
+            .dark .text-secondary-util, .dark .text-muted-util { color: var(--dark-text-secondary) !important; }
+
+            .dark .welcome-banner { background: linear-gradient(to left, #0e2a5e, #113370); box-shadow: var(--dark-shadow-lg); }
+            
+            .dark .stat-card { background: var(--dark-bg-card); border-color: var(--dark-border-color); }
+            .dark .stat-card:hover { box-shadow: var(--dark-shadow-lg); }
+            .dark .stat-title, .dark .stat-sub { color: var(--dark-text-secondary); }
+            .dark .stat-val { color: var(--dark-text-primary); }
+            
+            .dark .bg-emerald { background: var(--dark-accent-green-bg); color: var(--dark-accent-green-text); }
+            .dark .bg-amber { background: var(--dark-accent-amber-bg); color: var(--dark-accent-amber-text); }
+            .dark .bg-red { background: var(--dark-accent-red-bg); color: var(--dark-accent-red-text); }
+            .dark .bg-brand { background: var(--dark-accent-blue-bg); color: var(--dark-accent-blue-text); }
+            .dark .text-emerald { color: var(--dark-accent-green-text); }
+            .dark .text-amber { color: var(--dark-accent-amber-text); }
+            .dark .text-red { color: var(--dark-accent-red-text); }
+            
+            .dark .progress-bar-wrap, .dark .severity-bar { background: var(--dark-bg-surface); }
+            
+            .dark .section-block, .dark .module-card, .dark .cat-card { background: var(--dark-bg-card); border-color: var(--dark-border-color); }
+            .dark .section-block:hover, .dark .module-card:hover, .dark .cat-card:hover { box-shadow: var(--dark-shadow-lg); }
+            .dark .block-header, .dark .mod-header, .dark .mod-footer, .dark .group-header { border-color: var(--dark-border-color); }
+            .dark .block-title, .dark .group-title-text, .dark .cat-title, .dark .mod-title, .dark .cat-number { color: var(--dark-text-primary); }
+            .dark .block-subtitle, .dark .group-title-sub, .dark .cat-desc, .dark .cat-num-label, .dark .group-count { color: var(--dark-text-secondary); }
+            
+            .dark .search-input { background: var(--dark-bg-card); color: var(--dark-text-primary); border-color: var(--dark-border-color); }
+            .dark .search-icon { color: var(--dark-text-secondary); }
+            .dark .search-input:focus { border-color: var(--brand-500); box-shadow: 0 0 0 3px var(--dark-accent-blue-bg); }
+            
+            .dark .recent-row, .dark .block-footer, .dark .mod-stats { background: var(--dark-bg-surface); border-color: var(--dark-border-color); }
+            .dark .recent-label, .dark .block-footer { color: var(--dark-text-secondary); }
+            .dark .recent-chip, .dark .kbd { background: var(--dark-bg-card); border-color: var(--dark-border-color); color: var(--dark-text-primary); }
+            
+            .dark .block-icon { background: var(--dark-accent-blue-bg); color: var(--dark-accent-blue-text); }
+            .dark .cat-icon { box-shadow: var(--dark-shadow-sm); }
+            .dark .cat-add-btn { background: var(--dark-accent-blue-bg); color: var(--brand-600); }
+            .dark .cat-add-btn:hover { background: var(--dark-accent-blue-hover); }
+            .dark .hover-preview { background: var(--dark-bg-card); border-color: var(--dark-border-color); color: var(--dark-text-secondary); }
+            .dark .avatar-sm { border-color: var(--dark-bg-card); }
+            
+            .dark .mod-badge { background: var(--dark-bg-surface); color: var(--dark-text-primary); }
+            .dark .mod-stat-val { color: var(--dark-text-primary); }
+            .dark .mod-stat-label { color: var(--dark-text-secondary); }
+            
+            .dark .mod-table th { color: var(--dark-text-secondary); border-color: var(--dark-border-color); }
+            .dark .mod-table td { color: var(--dark-text-primary); border-color: var(--dark-bg-surface); }
+            
+            .dark .badge-green { background: var(--dark-accent-green-bg); color: var(--dark-accent-green-text); }
+            .dark .badge-blue { background: var(--dark-accent-blue-bg); color: var(--dark-accent-blue-text); }
+            .dark .badge-amber { background: var(--dark-accent-amber-bg); color: var(--dark-accent-amber-text); }
+            .dark .badge-red { background: var(--dark-accent-red-bg); color: var(--dark-accent-red-text); }
+            
+            .dark .timeline-item::before { background: var(--dark-border-color); }
+            .dark .dot { border-color: var(--dark-bg-card); }
+            .dark .tl-text { color: var(--dark-text-primary); }
+            .dark .tl-time { color: var(--dark-text-secondary); }
+            
+            .dark .slide-panel { background: var(--dark-bg-surface); }
+            .dark .slide-header { background: var(--dark-bg-card); border-color: var(--dark-border-color); }
+            .dark .btn-back, .dark .btn-close { color: var(--dark-text-secondary); }
+            .dark .btn-back:hover { background: var(--dark-bg-surface); color: var(--dark-text-primary); }
+            .dark .slide-title { color: var(--dark-text-primary); }
+            .dark .slide-subtitle { color: var(--dark-text-secondary); }
+            
+            .dark .slide-table-card, .dark .slide-form-card { background: var(--dark-bg-card); border-color: var(--dark-border-color); }
+            .dark .table-toolbar { border-color: var(--dark-border-color); }
+            .dark .table-results { color: var(--dark-text-secondary); }
+            .dark .st-wrap th { background: var(--dark-bg-surface); color: var(--dark-text-secondary); border-color: var(--dark-border-color); }
+            .dark .st-wrap td { color: var(--dark-text-primary); border-color: var(--dark-bg-surface); }
+            .dark .st-wrap tr:hover td { background: var(--dark-bg-surface-hover); }
+            .dark .btn-icon { color: var(--dark-text-secondary); }
+            
+            .dark .form-title { color: var(--dark-text-primary); border-color: var(--dark-border-color); }
+            .dark .form-label { color: var(--dark-text-primary); }
+            .dark .form-input { background: var(--dark-bg-card); border-color: var(--dark-border-color); color: var(--dark-text-primary); }
+            .dark .form-input:focus { border-color: var(--brand-500); box-shadow: 0 0 0 3px var(--dark-accent-blue-bg); }
+            .dark .form-actions { border-color: var(--dark-border-color); }
+            .dark .btn-text { color: var(--dark-text-secondary); }
+            .dark .btn-text:hover { background: var(--dark-bg-surface); color: var(--dark-text-primary); }
+            
+            .dark .slide-footer { background: var(--dark-bg-card); border-color: var(--dark-border-color); }
+
             @media (max-width: 1024px) {
                 .grid-4 { grid-template-columns: repeat(2, 1fr); }
                 .grid-3 { grid-template-columns: 1fr; }
@@ -249,11 +347,27 @@
                 </div>
             </div>
             <div class="header-user">
-
+                <button type="button" class="btn-theme" title="Alternar tema"
+                    x-data="{ 
+                        theme: localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+                        toggle() {
+                            this.theme = this.theme === 'dark' ? 'light' : 'dark';
+                            localStorage.setItem('theme', this.theme);
+                            if (this.theme === 'dark') {
+                                document.documentElement.classList.add('dark');
+                            } else {
+                                document.documentElement.classList.remove('dark');
+                            }
+                        }
+                    }" 
+                    @click="toggle()">
+                    <svg x-show="theme === 'dark'" style="display:none;" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg x-show="theme !== 'dark'" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
                 <div class="user-info" x-data="{ open: false }" style="position:relative;">
                     <div class="user-text">
-                        <div class="user-name">{{ $user->name ?? 'Usuario' }}</div>
-                        <div class="user-role">{{ $role }}</div>
+                        <div class="user-name text-primary-util">{{ $user->name ?? 'Usuario' }}</div>
+                        <div class="user-role text-secondary-util">{{ $role }}</div>
                     </div>
                     <button type="button" class="user-avatar" @click="open = !open" style="border:none; cursor:pointer; outline:none;">
                         {{ strtoupper($initial) }}
@@ -261,8 +375,8 @@
                     
                     <div x-show="open" @click.away="open = false" x-transition.opacity.duration.200ms class="user-dropdown" style="display:none; position:absolute; top:48px; right:0; background:white; border:1px solid var(--slate-200); border-radius:12px; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1); width:200px; z-index:50; overflow:hidden;">
                         <div style="padding:12px 16px; border-bottom:1px solid var(--slate-100);">
-                            <div style="font-weight:600; font-size:14px; color:var(--slate-900); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $user->name ?? 'Usuario' }}</div>
-                            <div style="font-size:12px; color:var(--slate-600); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $user->email ?? '' }}</div>
+                            <div class="text-primary-util" style="font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $user->name ?? 'Usuario' }}</div>
+                            <div class="text-secondary-util" style="font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $user->email ?? '' }}</div>
                         </div>
                         <div style="padding:8px;">
                             <form method="POST" action="{{ route('filament.servicio-social.auth.logout') }}">
@@ -378,7 +492,7 @@
                         <tbody>
                             @forelse($solicitudesRecientes ?? [] as $sol)
                             <tr>
-                                <td class="mono-text">S-{{ str_pad($sol->id_solicitud, 4, '0', STR_PAD_LEFT) }}</td>
+                                <td class="mono-text">{{ str_pad($sol->id_solicitud, 4, '0', STR_PAD_LEFT) }}</td>
                                 <td>{{ explode(' ', $sol->usuario?->name)[0] ?? 'Usuario' }}</td>
                                 <td>
                                     @php
@@ -391,7 +505,7 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="3" style="text-align: center; color: var(--slate-500); padding: 24px;">No tienes solicitudes recientes.</td></tr>
+                            <tr><td colspan="3" class="text-muted-util" style="text-align: center; padding: 24px;">No tienes solicitudes recientes.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -423,7 +537,7 @@
                         <tbody>
                             @forelse($mantenimientosRecientes ?? [] as $mant)
                             <tr>
-                                <td class="mono-text">M-{{ str_pad($mant->id_mantenimiento, 4, '0', STR_PAD_LEFT) }}</td>
+                                <td class="mono-text">{{ str_pad($mant->id_mantenimiento, 4, '0', STR_PAD_LEFT) }}</td>
                                 <td>{{ $mant->inventario?->num_serie ?? 'N/A' }}</td>
                                 <td>
                                     @php
@@ -436,7 +550,7 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="3" style="text-align: center; color: var(--slate-500); padding: 24px;">No tienes mantenimientos recientes.</td></tr>
+                            <tr><td colspan="3" class="text-muted-util" style="text-align: center; padding: 24px;">No tienes mantenimientos recientes.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -482,7 +596,7 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="3" style="text-align: center; color: var(--slate-500); padding: 24px;">Sin registros.</td></tr>
+                            <tr><td colspan="3" class="text-muted-util" style="text-align: center; padding: 24px;">Sin registros.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -714,7 +828,9 @@
                     </div>
                 </div>
                 @empty
-                <p style="color: var(--slate-500); text-align: center;">Sin actividad reciente.</p>
+                <div class="block-footer" style="background: white; border-top: 1px solid var(--slate-100); justify-content: center;">
+                    <p class="text-muted-util" style="text-align: center;">Sin actividad reciente.</p>
+                </div>
                 @endforelse
             </div>
         </div>
@@ -776,21 +892,24 @@
                                     </div>
 
                                     <div style="overflow-x: auto;">
+                                        <div class="table-results" style="padding: 16px 24px; border-bottom: 1px solid var(--slate-200);">Mostrando registros del catálogo</div>
                                         <table class="st-wrap">
                                             <thead>
                                                 <tr x-html="getTableHeaders()"></tr>
                                             </thead>
                                             <tbody x-html="getTableRows()"></tbody>
                                         </table>
-                                        <div x-show="!getTableRows()" style="padding: 40px; text-align: center; color: var(--slate-500);">
-                                            Sin registros encontrados.
+                                        <div x-show="!getTableRows()" class="text-muted-util" style="padding: 40px; text-align: center;">
+                                            No hay resultados
                                         </div>
                                     </div>
                                     <!-- Pagination -->
                                     <div class="table-pagination" x-show="totalPages() > 1" style="padding: 12px 24px; border-top: 1px solid var(--slate-200); display: flex; justify-content: space-between; align-items: center; background: white;">
-                                        <button type="button" class="btn-text" @click="if(page > 1) page--" :disabled="page === 1" :style="page === 1 ? 'opacity: 0.5; cursor: not-allowed;' : ''">Anterior</button>
-                                        <span style="font-size: 13px; color: var(--slate-600);">Página <strong x-text="page" style="color:var(--slate-900);"></strong> de <strong x-text="totalPages()" style="color:var(--slate-900);"></strong></span>
-                                        <button type="button" class="btn-text" @click="if(page < totalPages()) page++" :disabled="page === totalPages()" :style="page === totalPages() ? 'opacity: 0.5; cursor: not-allowed;' : ''">Siguiente</button>
+                                        <span class="text-secondary-util" style="font-size: 13px;">Página <strong class="text-primary-util" x-text="page"></strong> de <strong class="text-primary-util" x-text="totalPages()"></strong></span>
+                                        <div style="display: flex; gap: 8px;">
+                                            <button @click="if(page > 1) page--" :disabled="page === 1" class="btn-icon" style="background: var(--slate-100); padding: 4px 12px; border-radius: 6px;">Ant.</button>
+                                            <button @click="if(page < totalPages()) page++" :disabled="page === totalPages()" class="btn-icon" style="background: var(--slate-100); padding: 4px 12px; border-radius: 6px;">Sig.</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -798,7 +917,9 @@
                             <!-- Footer -->
                             <div class="slide-footer" style="justify-content: space-between;">
                                 <div><a :href="getExternalListUrl()" class="link-blue">Vista avanzada (Filament) →</a></div>
-                                <div style="font-size: 13px; color: var(--slate-600);">por página: <strong style="color:var(--slate-900);">10</strong> <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline-block;vertical-align:middle;"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px;">
+                                    <div class="text-secondary-util" style="font-size: 13px;">por página: <strong class="text-primary-util">10</strong> <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline-block;vertical-align:middle;"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+                                </div>
                             </div>
                         </div>
                     </div>

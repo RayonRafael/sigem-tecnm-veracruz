@@ -7,6 +7,20 @@
     <link rel="icon" href="{{ asset('images/sigem-favicon.svg?v=2') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            try {
+                var theme = localStorage.getItem('theme');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else if (theme === 'system' || !theme) {
+                    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                        document.documentElement.classList.add('dark');
+                    }
+                }
+            } catch (e) {}
+        })();
+    </script>
     <style>
         :root {
             --bg: #f0f4f8;
@@ -28,6 +42,71 @@
             --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
             --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
             --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        /* Modo Oscuro */
+        .dark {
+            --bg: #0f172a;
+            --sidebar-bg: #f8fafc;
+            --card-bg: #1e293b;
+            --accent-light: rgba(59, 130, 246, 0.2);
+            --danger-light: rgba(239, 68, 68, 0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #334155;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .dark body { background: #0f172a; }
+        
+        .dark .bg-overlay::after {
+            background: rgba(13, 17, 23, 0.85);
+        }
+
+        .dark .login-card {
+            background: rgba(30, 41, 59, 0.95);
+            border-color: #334155;
+        }
+
+        .dark .form-control {
+            background: #0f172a;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+
+        .dark .form-control:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .dark .tab {
+            color: #94a3b8;
+        }
+
+        .dark .tab:hover {
+            color: #f8fafc;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .dark .tab.active {
+            color: #60a5fa;
+            border-bottom-color: #60a5fa;
+        }
+
+        .dark .error-message {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .dark .logos-container img {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 4px 8px;
+            border-radius: 6px;
+            backdrop-filter: blur(4px);
         }
 
         * {
@@ -274,6 +353,9 @@
                 background-image: none !important;
                 background: linear-gradient(135deg, var(--sidebar-bg), var(--accent-dark)) !important;
             }
+            .dark .bg-overlay {
+                background: linear-gradient(135deg, #0f172a, #1e293b) !important;
+            }
             .bg-overlay::after {
                 display: none !important;
             }
@@ -296,6 +378,10 @@
             .tab.active {
                 border-color: var(--accent);
                 background: var(--accent-light);
+            }
+            .dark .tab.active {
+                border-color: #60a5fa;
+                background: rgba(59, 130, 246, 0.15);
             }
             .btn-submit {
                 min-height: 44px;

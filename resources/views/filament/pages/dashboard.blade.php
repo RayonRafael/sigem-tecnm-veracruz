@@ -39,6 +39,8 @@
             .brand-title { font-weight: 600; font-size: 16px; color: var(--slate-900); }
             .brand-subtitle { font-size: 12px; color: var(--slate-600); }
             .header-user { display: flex; align-items: center; gap: 16px; }
+            .btn-theme { position: relative; color: var(--slate-600); background: transparent; border: none; cursor: pointer; padding: 8px; border-radius: 50%; transition: 0.18s; display: flex; align-items: center; justify-content: center; }
+            .btn-theme:hover { background: var(--slate-100); color: var(--slate-900); }
             .bell-btn { position: relative; color: var(--slate-600); background: transparent; border: none; cursor: pointer; padding: 4px; transition: 0.18s; }
             .bell-btn:hover { color: var(--brand-600); }
             .bell-dot { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; background: var(--red-500); border-radius: 50%; border: 2px solid white; }
@@ -236,34 +238,112 @@
             /* Toast */
             .toast { position: fixed; bottom: 24px; right: 24px; background: var(--slate-900); color: white; padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2); z-index: 1000; }
             .toast-icon { color: var(--emerald-500); }
+            
+            /* Utility classes for inline styles */
+            .text-primary-util { color: var(--slate-900); }
+            .text-secondary-util { color: var(--slate-600); }
+            .text-muted-util { color: var(--slate-500); }
+            .text-amber-util { color: var(--amber-600); }
+            .bg-amber-util { background: var(--amber-50); }
 
-            @media (max-width: 1024px) {
-                .grid-4 { grid-template-columns: repeat(2, 1fr); }
-                .grid-3 { grid-template-columns: 1fr; }
-                .slide-panel { width: 90%; }
-            }
-            @media (max-width: 640px) {
-                .grid-4 { grid-template-columns: 1fr; }
-                .slide-panel { width: 100%; height: 100%; }
-                
-                /* Horizontal scroll for table */
-                .slide-body { padding: 16px; overflow-x: hidden; overflow-y: auto; height: 100%; }
-                .slide-table-card { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
-                
-                /* Sticky header and pagination */
-                .slide-header { position: sticky; top: 0; z-index: 110; padding: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-                .table-pagination { position: sticky; bottom: 0; z-index: 110; border-top: 1px solid var(--slate-200); }
-                
-                /* Table adjustments */
-                .st-wrap th, .st-wrap td { white-space: nowrap; padding: 12px 16px; }
-                
-                /* Compact Action Buttons */
-                .slide-actions .btn-blue { font-size: 0; gap: 0 !important; padding: 8px !important; }
-                .slide-actions .btn-blue svg { width: 20px; height: 20px; margin: 0; }
-                
-                .btn-icon { padding: 8px; }
-                .btn-icon svg { width: 18px; height: 18px; }
-            }
+            /* ===== OVERRIDES MODO OSCURO ===== */
+            .dark .sigem-professional ::-webkit-scrollbar-thumb { background: var(--dark-border-strong); }
+            .dark .sigem-professional ::-webkit-scrollbar-thumb:hover { background: var(--dark-text-muted); }
+            
+            .dark .top-header { background: var(--dark-bg-header); border-bottom-color: var(--dark-border-color); }
+            .dark .brand-title, .dark .user-name { color: var(--dark-text-primary); }
+            .dark .brand-subtitle, .dark .user-role { color: var(--dark-text-secondary); }
+            .dark .header-divider { background: var(--dark-border-color); }
+            .dark .btn-theme, .dark .bell-btn { color: var(--dark-text-secondary); }
+            .dark .btn-theme:hover { background: var(--dark-bg-surface); color: var(--dark-text-primary); }
+            .dark .bell-dot { border-color: var(--dark-bg-header); }
+            .dark .user-avatar { background: linear-gradient(135deg, var(--brand-700), var(--brand-900)); }
+            
+            .dark .welcome-banner { background: linear-gradient(to left, #0e2a5e, #113370); box-shadow: var(--dark-shadow-lg); }
+            
+            .dark .stat-card { background: var(--dark-bg-card); border-color: var(--dark-border-color); }
+            .dark .stat-card:hover { box-shadow: var(--dark-shadow-lg); }
+            .dark .stat-title, .dark .stat-sub { color: var(--dark-text-secondary); }
+            .dark .stat-val { color: var(--dark-text-primary); }
+            
+            .dark .bg-emerald { background: var(--dark-accent-green-bg); color: var(--dark-accent-green-text); }
+            .dark .bg-amber { background: var(--dark-accent-amber-bg); color: var(--dark-accent-amber-text); }
+            .dark .bg-red { background: var(--dark-accent-red-bg); color: var(--dark-accent-red-text); }
+            .dark .bg-brand { background: var(--dark-accent-blue-bg); color: var(--dark-accent-blue-text); }
+            .dark .text-emerald { color: var(--dark-accent-green-text); }
+            .dark .text-amber { color: var(--dark-accent-amber-text); }
+            .dark .text-red { color: var(--dark-accent-red-text); }
+            
+            .dark .progress-bar-wrap, .dark .severity-bar { background: var(--dark-bg-surface); }
+            
+            .dark .section-block, .dark .module-card, .dark .cat-card { background: var(--dark-bg-card); border-color: var(--dark-border-color); }
+            .dark .section-block:hover, .dark .module-card:hover, .dark .cat-card:hover { box-shadow: var(--dark-shadow-lg); }
+            .dark .block-header, .dark .mod-header, .dark .mod-footer, .dark .group-header { border-color: var(--dark-border-color); }
+            .dark .block-title, .dark .group-title-text, .dark .cat-title, .dark .mod-title, .dark .cat-number { color: var(--dark-text-primary); }
+            .dark .block-subtitle, .dark .group-title-sub, .dark .cat-desc, .dark .cat-num-label, .dark .group-count { color: var(--dark-text-secondary); }
+            
+            .dark .search-input { background: var(--dark-bg-card); color: var(--dark-text-primary); border-color: var(--dark-border-color); }
+            .dark .search-icon { color: var(--dark-text-secondary); }
+            .dark .search-input:focus { border-color: var(--brand-500); box-shadow: 0 0 0 3px var(--dark-accent-blue-bg); }
+            
+            .dark .recent-row, .dark .block-footer, .dark .mod-stats { background: var(--dark-bg-surface); border-color: var(--dark-border-color); }
+            .dark .recent-label, .dark .block-footer { color: var(--dark-text-secondary); }
+            .dark .recent-chip, .dark .kbd { background: var(--dark-bg-card); border-color: var(--dark-border-color); color: var(--dark-text-primary); }
+            
+            .dark .block-icon { background: var(--dark-accent-blue-bg); color: var(--dark-accent-blue-text); }
+            .dark .cat-icon { box-shadow: var(--dark-shadow-sm); }
+            .dark .cat-add-btn { background: var(--dark-accent-blue-bg); color: var(--brand-600); }
+            .dark .cat-add-btn:hover { background: var(--dark-accent-blue-hover); }
+            .dark .hover-preview { background: var(--dark-bg-card); border-color: var(--dark-border-color); color: var(--dark-text-secondary); }
+            .dark .avatar-sm { border-color: var(--dark-bg-card); }
+            
+            .dark .mod-badge { background: var(--dark-bg-surface); color: var(--dark-text-primary); }
+            .dark .mod-stat-val { color: var(--dark-text-primary); }
+            .dark .mod-stat-label { color: var(--dark-text-secondary); }
+            
+            .dark .mod-table th { color: var(--dark-text-secondary); border-color: var(--dark-border-color); }
+            .dark .mod-table td { color: var(--dark-text-primary); border-color: var(--dark-bg-surface); }
+            
+            .dark .badge-green { background: var(--dark-accent-green-bg); color: var(--dark-accent-green-text); }
+            .dark .badge-blue { background: var(--dark-accent-blue-bg); color: var(--dark-accent-blue-text); }
+            .dark .badge-amber { background: var(--dark-accent-amber-bg); color: var(--dark-accent-amber-text); }
+            .dark .badge-red { background: var(--dark-accent-red-bg); color: var(--dark-accent-red-text); }
+            
+            .dark .timeline-item::before { background: var(--dark-border-color); }
+            .dark .dot { border-color: var(--dark-bg-card); }
+            .dark .tl-text { color: var(--dark-text-primary); }
+            .dark .tl-time { color: var(--dark-text-secondary); }
+            
+            .dark .slide-panel { background: var(--dark-bg-surface); }
+            .dark .slide-header { background: var(--dark-bg-card); border-color: var(--dark-border-color); }
+            .dark .btn-back, .dark .btn-close { color: var(--dark-text-secondary); }
+            .dark .btn-back:hover { background: var(--dark-bg-surface); color: var(--dark-text-primary); }
+            .dark .slide-title { color: var(--dark-text-primary); }
+            .dark .slide-subtitle { color: var(--dark-text-secondary); }
+            
+            .dark .slide-table-card, .dark .slide-form-card { background: var(--dark-bg-card); border-color: var(--dark-border-color); }
+            .dark .table-toolbar { border-color: var(--dark-border-color); }
+            .dark .table-results { color: var(--dark-text-secondary); }
+            .dark .st-wrap th { background: var(--dark-bg-surface); color: var(--dark-text-secondary); border-color: var(--dark-border-color); }
+            .dark .st-wrap td { color: var(--dark-text-primary); border-color: var(--dark-bg-surface); }
+            .dark .st-wrap tr:hover td { background: var(--dark-bg-surface-hover); }
+            .dark .btn-icon { color: var(--dark-text-secondary); }
+            
+            .dark .form-title { color: var(--dark-text-primary); border-color: var(--dark-border-color); }
+            .dark .form-label { color: var(--dark-text-primary); }
+            .dark .form-input { background: var(--dark-bg-card); border-color: var(--dark-border-color); color: var(--dark-text-primary); }
+            .dark .form-input:focus { border-color: var(--brand-500); box-shadow: 0 0 0 3px var(--dark-accent-blue-bg); }
+            .dark .form-actions { border-color: var(--dark-border-color); }
+            .dark .btn-text { color: var(--dark-text-secondary); }
+            .dark .btn-text:hover { background: var(--dark-bg-surface); color: var(--dark-text-primary); }
+            
+            .dark .slide-footer { background: var(--dark-bg-card); border-color: var(--dark-border-color); }
+            .dark .toast { background: var(--dark-text-primary); color: var(--dark-bg-card); box-shadow: var(--dark-shadow-lg); }
+
+            .dark .text-primary-util { color: var(--dark-text-primary) !important; }
+            .dark .text-secondary-util, .dark .text-muted-util { color: var(--dark-text-secondary) !important; }
+            .dark .text-amber-util { color: var(--dark-accent-amber-text) !important; }
+            .dark .bg-amber-util { background: var(--dark-accent-amber-bg) !important; }
         </style>
 
         @php
@@ -277,16 +357,32 @@
             <div class="header-brand">
                 <div class="brand-logo">S</div>
                 <div class="brand-text-container">
-                    <span class="brand-title">SIGEM – TecNM Veracruz</span>
-                    <span class="brand-subtitle">Sistema de Gestión de Inventario</span>
+                    <span class="brand-title text-primary-util">SIGEM – TecNM Veracruz</span>
+                    <span class="brand-subtitle text-secondary-util">Sistema de Gestión de Inventario</span>
                 </div>
             </div>
             <div class="header-user">
-
+                <button type="button" class="btn-theme" title="Alternar tema"
+                    x-data="{ 
+                        theme: localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
+                        toggle() {
+                            this.theme = this.theme === 'dark' ? 'light' : 'dark';
+                            localStorage.setItem('theme', this.theme);
+                            if (this.theme === 'dark') {
+                                document.documentElement.classList.add('dark');
+                            } else {
+                                document.documentElement.classList.remove('dark');
+                            }
+                        }
+                    }" 
+                    @click="toggle()">
+                    <svg x-show="theme === 'dark'" style="display:none;" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg x-show="theme !== 'dark'" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
                 <div class="user-info" x-data="{ open: false }" style="position:relative;">
                     <div class="user-text">
-                        <div class="user-name">{{ $user->name ?? 'Usuario' }}</div>
-                        <div class="user-role">{{ $role }}</div>
+                        <div class="user-name text-primary-util">{{ $user->name ?? 'Usuario' }}</div>
+                        <div class="user-role text-secondary-util">{{ $role }}</div>
                     </div>
                     <button type="button" class="user-avatar" @click="open = !open" style="border:none; cursor:pointer; outline:none;">
                         {{ strtoupper($initial) }}
@@ -294,8 +390,8 @@
                     
                     <div x-show="open" @click.away="open = false" x-transition.opacity.duration.200ms class="user-dropdown" style="display:none; position:absolute; top:48px; right:0; background:white; border:1px solid var(--slate-200); border-radius:12px; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1); width:200px; z-index:50; overflow:hidden;">
                         <div style="padding:12px 16px; border-bottom:1px solid var(--slate-100);">
-                            <div style="font-weight:600; font-size:14px; color:var(--slate-900); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $user->name ?? 'Usuario' }}</div>
-                            <div style="font-size:12px; color:var(--slate-600); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $user->email ?? '' }}</div>
+                            <div class="text-primary-util" style="font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $user->name ?? 'Usuario' }}</div>
+                            <div class="text-secondary-util" style="font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $user->email ?? '' }}</div>
                         </div>
                         <div style="padding:8px;">
                             <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
@@ -314,8 +410,8 @@
         <!-- 2. BANNER -->
         <div class="welcome-banner">
             <div>
-                <h1 class="banner-greeting"><span x-text="getGreeting()"></span>, {{ explode(' ', $user->name)[0] ?? 'Usuario' }}</h1>
-                <p class="banner-sub">Tienes <strong>{{ $solicitudesPendientes ?? 0 }} solicitudes</strong> por autorizar y <strong>{{ $mantenimientosPendientes ?? 0 }} mantenimientos</strong> programados.</p>
+                <h1 class="banner-greeting text-primary-util"><span x-text="getGreeting()"></span>, {{ explode(' ', $user->name)[0] ?? 'Usuario' }}</h1>
+                <p class="banner-sub text-secondary-util">Tienes <strong>{{ $solicitudesPendientes ?? 0 }} solicitudes</strong> por autorizar y <strong>{{ $mantenimientosPendientes ?? 0 }} mantenimientos</strong> programados.</p>
             </div>
             <div class="banner-actions">
                 <button class="btn btn-glass" @click="openCatalog('modulo-solicitudes')">Ver pendientes</button>
@@ -331,10 +427,10 @@
             <!-- Stat 1 -->
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="stat-title">TOTAL ACTIVOS</span>
+                    <span class="stat-title text-secondary-util">TOTAL ACTIVOS</span>
                     <div class="stat-icon bg-brand"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>
                 </div>
-                <h2 class="stat-val mono-text">{{ $totalActivos ?? 0 }}</h2>
+                <h2 class="stat-val mono-text text-primary-util">{{ $totalActivos ?? 0 }}</h2>
                 <div class="stat-sub text-emerald">
                     <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
                     +{{ $creadosEsteMes ?? 0 }} este mes
@@ -345,11 +441,11 @@
             <!-- Stat 2 -->
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="stat-title">EN BUEN ESTADO</span>
+                    <span class="stat-title text-secondary-util">EN BUEN ESTADO</span>
                     <div class="stat-icon bg-emerald"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
                 </div>
-                <h2 class="stat-val mono-text">{{ $activosBueno ?? 0 }}</h2>
-                <div class="stat-sub text-emerald">{{ $porcentajeBuenEstado ?? 0 }}% del inventario</div>
+                <h2 class="stat-val mono-text text-primary-util">{{ $activosBueno ?? 0 }}</h2>
+                <div class="stat-sub text-secondary-util">{{ $porcentajeBuenEstado ?? 0 }}% del inventario</div>
                 <div class="progress-bar-wrap hidden-mobile">
                     <div class="progress-bar-fill" style="width: {{ $porcentajeBuenEstado ?? 0 }}%;"></div>
                 </div>
@@ -358,21 +454,21 @@
             <!-- Stat 3 -->
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="stat-title">MANTENIMIENTOS</span>
+                    <span class="stat-title text-secondary-util">MANTENIMIENTOS</span>
                     <div class="stat-icon bg-amber"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg></div>
                 </div>
-                <h2 class="stat-val mono-text">{{ $mantenimientosTotales ?? 0 }}</h2>
-                <div class="stat-sub text-amber">{{ $mantenimientosPendientes ?? 0 }} pendientes/revisión</div>
+                <h2 class="stat-val mono-text text-primary-util">{{ $mantenimientosTotales ?? 0 }}</h2>
+                <div class="stat-sub text-amber-util">{{ $mantenimientosPendientes ?? 0 }} pendientes/revisión</div>
 
             </div>
 
             <!-- Stat 4 -->
             <div class="stat-card">
                 <div class="stat-header">
-                    <span class="stat-title">ALERTAS STOCK</span>
+                    <span class="stat-title text-secondary-util">ALERTAS STOCK</span>
                     <div class="stat-icon bg-red"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
                 </div>
-                <h2 class="stat-val mono-text">{{ $materialesStockBajoCount ?? 0 }}</h2>
+                <h2 class="stat-val mono-text text-primary-util">{{ $materialesStockBajoCount ?? 0 }}</h2>
                 <div class="stat-sub {{ ($materialesStockBajoCount ?? 0) > 0 ? 'text-red' : 'text-emerald' }}">
                     {{ ($materialesStockBajoCount ?? 0) > 0 ? 'requiere atención' : 'todo en orden' }}
                 </div>
@@ -423,22 +519,22 @@
             <div class="module-card">
                 <div class="mod-header">
                     <div class="stat-icon bg-emerald" style="width: 36px; height: 36px; border-radius: 8px;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
-                    <div class="mod-title">Inventario</div>
+                    <div class="mod-title text-primary-util">Inventario</div>
                     <div class="mod-badge">{{ $totalActivos ?? 0 }} Total</div>
                 </div>
                 <div class="mod-stats">
-                    <div class="mod-stat"><div class="mod-stat-val">{{ $inventarioDisponibles ?? 0 }}</div><div class="mod-stat-label">Disponibles</div></div>
-                    <div class="mod-stat"><div class="mod-stat-val">{{ $inventarioEnMantenimiento ?? 0 }}</div><div class="mod-stat-label">Mantenimiento</div></div>
-                    <div class="mod-stat"><div class="mod-stat-val">{{ $inventarioDanados ?? 0 }}</div><div class="mod-stat-label">Dañados</div></div>
+                    <div class="mod-stat"><div class="mod-stat-val text-primary-util">{{ $inventarioDisponibles ?? 0 }}</div><div class="mod-stat-label text-secondary-util">Disponibles</div></div>
+                    <div class="mod-stat"><div class="mod-stat-val text-primary-util">{{ $inventarioEnMantenimiento ?? 0 }}</div><div class="mod-stat-label text-secondary-util">Mantenimiento</div></div>
+                    <div class="mod-stat"><div class="mod-stat-val text-primary-util">{{ $inventarioDanados ?? 0 }}</div><div class="mod-stat-label text-secondary-util">Dañados</div></div>
                 </div>
                 <div class="mini-table-wrap">
                     <table class="mod-table">
-                        <thead><tr><th>Código</th><th>Equipo</th><th>Estado</th></tr></thead>
+                        <thead><tr><th class="text-secondary-util">Código</th><th class="text-secondary-util">Equipo</th><th class="text-secondary-util">Estado</th></tr></thead>
                         <tbody>
                             @forelse($inventariosRecientes ?? [] as $inv)
                             <tr>
-                                <td class="mono-text">{{ $inv->num_serie }}</td>
-                                <td>{{ Str::limit($inv->material?->nombre ?? 'N/A', 15) }}</td>
+                                <td class="mono-text text-primary-util">{{ $inv->num_serie }}</td>
+                                <td class="text-primary-util">{{ Str::limit($inv->material?->nombre ?? 'N/A', 15) }}</td>
                                 <td>
                                     @php
                                         $cls = 'badge-slate';
@@ -451,7 +547,7 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="3" style="text-align: center; color: var(--slate-500); padding: 24px;">Sin registros.</td></tr>
+                            <tr><td colspan="3" class="text-muted-util" style="text-align: center; padding: 24px;">Sin registros.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -466,22 +562,22 @@
             <div class="module-card">
                 <div class="mod-header">
                     <div class="stat-icon bg-brand" style="width: 36px; height: 36px; border-radius: 8px;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg></div>
-                    <div class="mod-title">Solicitudes</div>
-                    <div class="mod-badge" style="background:var(--amber-50); color:var(--amber-600);">{{ $solicitudesPendientes ?? 0 }} Pendientes</div>
+                    <div class="mod-title text-primary-util">Solicitudes</div>
+                    <div class="mod-badge bg-amber-util text-amber-util">{{ $solicitudesPendientes ?? 0 }} Pendientes</div>
                 </div>
                 <div class="mod-stats">
-                    <div class="mod-stat"><div class="mod-stat-val">{{ $solicitudesPendientes ?? 0 }}</div><div class="mod-stat-label">Pendientes</div></div>
-                    <div class="mod-stat"><div class="mod-stat-val">{{ $solicitudesAutorizadas ?? 0 }}</div><div class="mod-stat-label">Autorizadas</div></div>
-                    <div class="mod-stat"><div class="mod-stat-val">{{ $solicitudesRechazadas ?? 0 }}</div><div class="mod-stat-label">Rechazadas</div></div>
+                    <div class="mod-stat"><div class="mod-stat-val text-primary-util">{{ $solicitudesPendientes ?? 0 }}</div><div class="mod-stat-label text-secondary-util">Pendientes</div></div>
+                    <div class="mod-stat"><div class="mod-stat-val text-primary-util">{{ $solicitudesAutorizadas ?? 0 }}</div><div class="mod-stat-label text-secondary-util">Autorizadas</div></div>
+                    <div class="mod-stat"><div class="mod-stat-val text-primary-util">{{ $solicitudesRechazadas ?? 0 }}</div><div class="mod-stat-label text-secondary-util">Rechazadas</div></div>
                 </div>
                 <div class="mini-table-wrap">
                     <table class="mod-table">
-                        <thead><tr><th>#</th><th>Solicitante</th><th>Estado</th></tr></thead>
+                        <thead><tr><th class="text-secondary-util">#</th><th class="text-secondary-util">Solicitante</th><th class="text-secondary-util">Estado</th></tr></thead>
                         <tbody>
                             @forelse($solicitudesRecientes ?? [] as $sol)
                             <tr>
-                                <td class="mono-text">S-{{ str_pad($sol->id_solicitud, 4, '0', STR_PAD_LEFT) }}</td>
-                                <td>{{ explode(' ', $sol->usuario?->name)[0] ?? 'Usuario' }}</td>
+                                <td class="mono-text text-primary-util">S-{{ str_pad($sol->id_solicitud, 4, '0', STR_PAD_LEFT) }}</td>
+                                <td class="text-primary-util">{{ explode(' ', $sol->usuario?->name)[0] ?? 'Usuario' }}</td>
                                 <td>
                                     @php
                                         $cls = 'badge-slate';
@@ -493,7 +589,7 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="3" style="text-align: center; color: var(--slate-500); padding: 24px;">Sin registros.</td></tr>
+                            <tr><td colspan="3" class="text-muted-util" style="text-align: center; padding: 24px;">Sin registros.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -508,22 +604,22 @@
             <div class="module-card">
                 <div class="mod-header">
                     <div class="stat-icon bg-amber" style="width: 36px; height: 36px; border-radius: 8px;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg></div>
-                    <div class="mod-title">Mantenimiento</div>
+                    <div class="mod-title text-primary-util">Mantenimiento</div>
                     <div class="mod-badge">{{ $mantenimientosTotales ?? 0 }} Total</div>
                 </div>
                 <div class="mod-stats">
-                    <div class="mod-stat"><div class="mod-stat-val">{{ $mantenimientoEnRevision ?? 0 }}</div><div class="mod-stat-label">En revisión</div></div>
-                    <div class="mod-stat"><div class="mod-stat-val">{{ $mantenimientoEnProceso ?? 0 }}</div><div class="mod-stat-label">En proceso</div></div>
-                    <div class="mod-stat"><div class="mod-stat-val">{{ $mantenimientoCompletados ?? 0 }}</div><div class="mod-stat-label">Completados</div></div>
+                    <div class="mod-stat"><div class="mod-stat-val text-primary-util">{{ $mantenimientoEnRevision ?? 0 }}</div><div class="mod-stat-label text-secondary-util">En revisión</div></div>
+                    <div class="mod-stat"><div class="mod-stat-val text-primary-util">{{ $mantenimientoEnProceso ?? 0 }}</div><div class="mod-stat-label text-secondary-util">En proceso</div></div>
+                    <div class="mod-stat"><div class="mod-stat-val text-primary-util">{{ $mantenimientoCompletados ?? 0 }}</div><div class="mod-stat-label text-secondary-util">Completados</div></div>
                 </div>
                 <div class="mini-table-wrap">
                     <table class="mod-table">
-                        <thead><tr><th>#</th><th>Equipo</th><th>Estado</th></tr></thead>
+                        <thead><tr><th class="text-secondary-util">#</th><th class="text-secondary-util">Equipo</th><th class="text-secondary-util">Estado</th></tr></thead>
                         <tbody>
                             @forelse($mantenimientosRecientes ?? [] as $mant)
                             <tr>
-                                <td class="mono-text">M-{{ str_pad($mant->id_mantenimiento, 4, '0', STR_PAD_LEFT) }}</td>
-                                <td>{{ $mant->inventario?->num_serie ?? 'N/A' }}</td>
+                                <td class="mono-text text-primary-util">M-{{ str_pad($mant->id_mantenimiento, 4, '0', STR_PAD_LEFT) }}</td>
+                                <td class="text-primary-util">{{ $mant->inventario?->num_serie ?? 'N/A' }}</td>
                                 <td>
                                     @php
                                         $cls = 'badge-slate';
@@ -535,7 +631,7 @@
                                 </td>
                             </tr>
                             @empty
-                            <tr><td colspan="3" style="text-align: center; color: var(--slate-500); padding: 24px;">Sin registros.</td></tr>
+                            <tr><td colspan="3" class="text-muted-util" style="text-align: center; padding: 24px;">Sin registros.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -554,8 +650,8 @@
                 <div class="block-title-wrap">
                     <div class="block-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
                     <div>
-                        <h2 class="block-title">Catálogos del Sistema</h2>
-                        <p class="block-subtitle">9 catálogos · {{ $totalRegistrosCatalogos ?? 0 }} registros en total</p>
+                        <h2 class="block-title text-primary-util">Catálogos del Sistema</h2>
+                        <p class="block-subtitle text-secondary-util">9 catálogos · {{ $totalRegistrosCatalogos ?? 0 }} registros en total</p>
                     </div>
                 </div>
                 <div class="catalog-search">
@@ -567,7 +663,7 @@
             </div>
 
             <div class="recent-row">
-                <div class="recent-label"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> RECIENTES</div>
+                <div class="recent-label text-secondary-util"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg> RECIENTES</div>
                 <button class="recent-chip" @click="openCatalog('departamentos')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-brand-500"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg> Departamentos</button>
                 <button class="recent-chip" @click="openCatalog('materiales')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-emerald-500"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg> Materiales</button>
                 <button class="recent-chip" @click="openCatalog('usuarios')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" class="text-indigo-500"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg> Usuarios</button>
@@ -579,11 +675,11 @@
                     <div class="group-title-wrap">
                         <div class="stat-icon bg-brand" style="width: 32px; height: 32px; border-radius: 8px;"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18"></path><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"></path><path d="M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path></svg></div>
                         <div>
-                            <span class="group-title-text">Organización</span>
-                            <span class="group-title-sub">· estructura institucional</span>
+                            <span class="group-title-text text-primary-util">Organización</span>
+                            <span class="group-title-sub text-secondary-util">· estructura institucional</span>
                         </div>
                     </div>
-                    <div class="group-count">3 catálogos</div>
+                    <div class="group-count text-secondary-util">3 catálogos</div>
                 </div>
                 
                 <div class="grid-3">
@@ -592,15 +688,15 @@
                             <div class="cat-icon" style="background: linear-gradient(135deg, var(--brand-500), var(--brand-600));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></div>
                             <button class="cat-add-btn" @click.stop="openCreateForm('departamentos')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
                         </div>
-                        <h3 class="cat-title">Departamentos</h3>
-                        <p class="cat-desc">Áreas académicas y administrativas</p>
+                        <h3 class="cat-title text-primary-util">Departamentos</h3>
+                        <p class="cat-desc text-secondary-util">Áreas académicas y administrativas</p>
                         <div class="cat-footer">
                             <div>
-                                <div class="cat-number">{{ count($departamentosList ?? []) }}</div>
-                                <div class="cat-num-label">registros</div>
+                                <div class="cat-number text-primary-util">{{ count($departamentosList ?? []) }}</div>
+                                <div class="cat-num-label text-secondary-util">registros</div>
                             </div>
                         </div>
-                        <div class="hover-preview">
+                        <div class="hover-preview text-secondary-util">
                             @php $lastDep = collect($departamentosList ?? [])->last(); @endphp
                             Último: {{ $lastDep ? Str::limit($lastDep->nombre, 25) : 'Ninguno' }}
                         </div>
@@ -611,15 +707,15 @@
                             <div class="cat-icon" style="background: linear-gradient(135deg, #22d3ee, var(--cyan-500));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></div>
                             <button class="cat-add-btn" @click.stop="openCreateForm('areas')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
                         </div>
-                        <h3 class="cat-title">Áreas</h3>
-                        <p class="cat-desc">Espacios físicos y oficinas</p>
+                        <h3 class="cat-title text-primary-util">Áreas</h3>
+                        <p class="cat-desc text-secondary-util">Espacios físicos y oficinas</p>
                         <div class="cat-footer">
                             <div>
-                                <div class="cat-number">{{ count($areasList ?? []) }}</div>
-                                <div class="cat-num-label">registros</div>
+                                <div class="cat-number text-primary-util">{{ count($areasList ?? []) }}</div>
+                                <div class="cat-num-label text-secondary-util">registros</div>
                             </div>
                         </div>
-                        <div class="hover-preview">
+                        <div class="hover-preview text-secondary-util">
                             @php $lastArea = collect($areasList ?? [])->last(); @endphp
                             Último: {{ $lastArea ? Str::limit($lastArea->nombre, 25) : 'Ninguno' }}
                         </div>
@@ -630,15 +726,15 @@
                             <div class="cat-icon" style="background: linear-gradient(135deg, #818cf8, var(--indigo-500));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
                             <button class="cat-add-btn" @click.stop="openCreateForm('usuarios')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
                         </div>
-                        <h3 class="cat-title">Usuarios</h3>
-                        <p class="cat-desc">Personal y cuentas del sistema</p>
+                        <h3 class="cat-title text-primary-util">Usuarios</h3>
+                        <p class="cat-desc text-secondary-util">Personal y cuentas del sistema</p>
                         <div class="cat-footer">
                             <div>
-                                <div class="cat-number">{{ count($usuariosList ?? []) }}</div>
-                                <div class="cat-num-label">registros</div>
+                                <div class="cat-number text-primary-util">{{ count($usuariosList ?? []) }}</div>
+                                <div class="cat-num-label text-secondary-util">registros</div>
                             </div>
                         </div>
-                        <div class="hover-preview" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="hover-preview text-secondary-util" style="display:flex; justify-content:space-between; align-items:center;">
                             <div class="avatar-stack">
                                 @foreach(collect($usuariosList ?? [])->take(3) as $u)
                                 <div class="avatar-sm" style="background: var(--brand-500);">{{ substr($u->name, 0, 1) }}</div>
@@ -656,11 +752,11 @@
                     <div class="group-title-wrap">
                         <div class="stat-icon bg-emerald" style="width: 32px; height: 32px; border-radius: 8px;"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
                         <div>
-                            <span class="group-title-text">Inventario</span>
-                            <span class="group-title-sub">· configuración de activos</span>
+                            <span class="group-title-text text-primary-util">Inventario</span>
+                            <span class="group-title-sub text-secondary-util">· configuración de activos</span>
                         </div>
                     </div>
-                    <div class="group-count">4 catálogos</div>
+                    <div class="group-count text-secondary-util">4 catálogos</div>
                 </div>
                 
                 <div class="grid-4">
@@ -669,10 +765,10 @@
                             <div class="cat-icon cat-icon-sm" style="background: linear-gradient(135deg, #34d399, var(--emerald-500));"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></div>
                             <button class="cat-add-btn" @click.stop="openCreateForm('materiales')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
                         </div>
-                        <h3 class="cat-title">Materiales</h3>
+                        <h3 class="cat-title text-primary-util">Materiales</h3>
                         <div class="cat-footer">
-                            <span class="cat-number" style="font-size: 20px;">{{ count($materialesList ?? []) }}</span>
-                            <span class="cat-num-label">registros</span>
+                            <span class="cat-number text-primary-util" style="font-size: 20px;">{{ count($materialesList ?? []) }}</span>
+                            <span class="cat-num-label text-secondary-util">registros</span>
                         </div>
                     </div>
 
@@ -681,10 +777,10 @@
                             <div class="cat-icon cat-icon-sm" style="background: linear-gradient(135deg, #2dd4bf, var(--teal-500));"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 8l4 4-4 4M8 12h8"></path></svg></div>
                             <button class="cat-add-btn" @click.stop="openCreateForm('marcas')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
                         </div>
-                        <h3 class="cat-title">Marcas</h3>
+                        <h3 class="cat-title text-primary-util">Marcas</h3>
                         <div class="cat-footer">
-                            <span class="cat-number" style="font-size: 20px;">{{ count($marcasList ?? []) }}</span>
-                            <span class="cat-num-label">registros</span>
+                            <span class="cat-number text-primary-util" style="font-size: 20px;">{{ count($marcasList ?? []) }}</span>
+                            <span class="cat-num-label text-secondary-util">registros</span>
                         </div>
                     </div>
 
@@ -693,10 +789,10 @@
                             <div class="cat-icon cat-icon-sm" style="background: linear-gradient(135deg, #a78bfa, var(--violet-500));"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
                             <button class="cat-add-btn" @click.stop="openCreateForm('tipos')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
                         </div>
-                        <h3 class="cat-title">Tipos de Mat.</h3>
+                        <h3 class="cat-title text-primary-util">Tipos de Mat.</h3>
                         <div class="cat-footer">
-                            <span class="cat-number" style="font-size: 20px;">{{ count($tiposList ?? []) }}</span>
-                            <span class="cat-num-label">registros</span>
+                            <span class="cat-number text-primary-util" style="font-size: 20px;">{{ count($tiposList ?? []) }}</span>
+                            <span class="cat-num-label text-secondary-util">registros</span>
                         </div>
                     </div>
 
@@ -705,10 +801,10 @@
                             <div class="cat-icon cat-icon-sm" style="background: linear-gradient(135deg, #fb7185, var(--rose-500));"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
                             <button class="cat-add-btn" @click.stop="openCreateForm('unidades')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
                         </div>
-                        <h3 class="cat-title">Unidades</h3>
+                        <h3 class="cat-title text-primary-util">Unidades</h3>
                         <div class="cat-footer">
-                            <span class="cat-number" style="font-size: 20px;">{{ count($unidadesList ?? []) }}</span>
-                            <span class="cat-num-label">registros</span>
+                            <span class="cat-number text-primary-util" style="font-size: 20px;">{{ count($unidadesList ?? []) }}</span>
+                            <span class="cat-num-label text-secondary-util">registros</span>
                         </div>
                     </div>
                 </div>
@@ -721,11 +817,11 @@
                         <div class="stat-icon" style="background: var(--purple-500); opacity: 0.1; width: 32px; height: 32px; border-radius: 8px; position:absolute;"></div>
                         <div class="stat-icon" style="color: var(--purple-500); width: 32px; height: 32px; border-radius: 8px; z-index:1;"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
                         <div>
-                            <span class="group-title-text">Contactos</span>
-                            <span class="group-title-sub">· personas y proveedores</span>
+                            <span class="group-title-text text-primary-util">Contactos</span>
+                            <span class="group-title-sub text-secondary-util">· personas y proveedores</span>
                         </div>
                     </div>
-                    <div class="group-count">2 catálogos</div>
+                    <div class="group-count text-secondary-util">2 catálogos</div>
                 </div>
                 
                 <div class="grid-4" style="grid-template-columns: repeat(2, 1fr);">
@@ -734,15 +830,15 @@
                             <div class="cat-icon" style="background: linear-gradient(135deg, #c084fc, var(--purple-500));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></div>
                             <button class="cat-add-btn" @click.stop="openCreateForm('proveedores')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
                         </div>
-                        <h3 class="cat-title">Proveedores</h3>
-                        <p class="cat-desc">Empresas y distribuidores</p>
+                        <h3 class="cat-title text-primary-util">Proveedores</h3>
+                        <p class="cat-desc text-secondary-util">Empresas y distribuidores</p>
                         <div class="cat-footer">
                             <div>
-                                <div class="cat-number">{{ count($proveedoresList ?? []) }}</div>
-                                <div class="cat-num-label">registros</div>
+                                <div class="cat-number text-primary-util">{{ count($proveedoresList ?? []) }}</div>
+                                <div class="cat-num-label text-secondary-util">registros</div>
                             </div>
                         </div>
-                        <div class="hover-preview">
+                        <div class="hover-preview text-secondary-util">
                             @php $lastProv = collect($proveedoresList ?? [])->last(); @endphp
                             Último: {{ $lastProv ? Str::limit($lastProv->nombre_empresa, 25) : 'Ninguno' }}
                         </div>
@@ -753,16 +849,16 @@
                             <div class="cat-icon" style="background: linear-gradient(135deg, #e879f9, var(--fuchsia-500));"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
                             <button class="cat-add-btn" @click.stop="openCreateForm('receptores')"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
                         </div>
-                        <h3 class="cat-title">Receptores</h3>
-                        <p class="cat-desc">Personas que reciben asignaciones</p>
+                        <h3 class="cat-title text-primary-util">Receptores</h3>
+                        <p class="cat-desc text-secondary-util">Personas que reciben asignaciones</p>
                         <div class="cat-footer">
                             <div>
-                                <div class="cat-number">{{ count($receptoresList ?? []) }}</div>
-                                <div class="cat-num-label">registros</div>
+                                <div class="cat-number text-primary-util">{{ count($receptoresList ?? []) }}</div>
+                                <div class="cat-num-label text-secondary-util">registros</div>
                             </div>
                             <svg width="40" height="20" viewBox="0 0 40 20" fill="none" stroke="var(--fuchsia-500)" stroke-width="2"><polyline points="0,15 10,18 20,10 30,12 40,5"></polyline></svg>
                         </div>
-                        <div class="hover-preview" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="hover-preview text-secondary-util" style="display:flex; justify-content:space-between; align-items:center;">
                             <div class="avatar-stack">
                                 @foreach(collect($receptoresList ?? [])->take(3) as $u)
                                 <div class="avatar-sm" style="background: var(--fuchsia-500);">{{ substr($u->nombre, 0, 1) }}</div>
@@ -775,7 +871,7 @@
             </div>
 
             <div class="block-footer">
-                <div>Tip: presiona <span class="kbd">/</span> para buscar catálogos</div>
+                <div class="text-secondary-util">Tip: presiona <span class="kbd">/</span> para buscar catálogos</div>
                 <a href="{{ url('/admin') }}" class="link-blue">Ir a Configuración →</a>
             </div>
         </div>
@@ -783,7 +879,7 @@
         <!-- 6. ACTIVITY -->
         <div class="section-block">
             <div class="block-header" style="border-bottom: none; padding-bottom: 0;">
-                <h2 class="block-title" style="font-size: 16px;">Actividad Reciente</h2>
+                <h2 class="block-title text-primary-util" style="font-size: 16px;">Actividad Reciente</h2>
             </div>
             <div class="timeline">
                 @forelse($actividadReciente ?? [] as $act)
@@ -798,12 +894,12 @@
                 <div class="timeline-item">
                     <div class="dot {{ $dot }}"></div>
                     <div class="tl-content">
-                        <p class="tl-text"><strong>{{ $act->usuario?->name ?? 'Usuario' }}</strong> {{ strtolower($act->accion) }} en <em>{{ $act->tabla_afectada }}</em></p>
-                        <div class="tl-time">hace {{ \Carbon\Carbon::parse($act->fecha_hora)->diffInMinutes() }} min</div>
+                        <p class="tl-text text-primary-util"><strong>{{ $act->usuario?->name ?? 'Usuario' }}</strong> {{ strtolower($act->accion) }} en <em>{{ $act->tabla_afectada }}</em></p>
+                        <div class="tl-time text-muted-util">hace {{ \Carbon\Carbon::parse($act->fecha_hora)->diffInMinutes() }} min</div>
                     </div>
                 </div>
                 @empty
-                <p style="color: var(--slate-500); text-align: center;">Sin actividad reciente.</p>
+                <p class="text-muted-util" style="text-align: center;">Sin actividad reciente.</p>
                 @endforelse
             </div>
             <div class="block-footer" style="background: white; border-top: 1px solid var(--slate-100); justify-content: center;">
@@ -844,8 +940,8 @@
                                         <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
                                     </button>
                                     <div>
-                                        <h2 id="slide-over-title" class="slide-title" x-text="mode === 'form' ? (form.id ? 'Editar Registro' : 'Nuevo Registro') : getCatalogTitle()">Catálogo</h2>
-                                        <p class="slide-subtitle" x-text="mode === 'form' ? 'Completa los datos' : 'Gestión completa del catálogo'"></p>
+                                        <h2 id="slide-over-title" class="slide-title text-primary-util" x-text="mode === 'form' ? (form.id ? 'Editar Registro' : 'Nuevo Registro') : getCatalogTitle()">Catálogo</h2>
+                                        <p class="slide-subtitle text-secondary-util" x-text="mode === 'form' ? 'Completa los datos' : 'Gestión completa del catálogo'"></p>
                                     </div>
                                 </div>
                                 <div class="slide-actions">
@@ -873,7 +969,7 @@
                                                 <input type="text" class="search-input" style="width: 100%; padding: 8px 12px 8px 36px;" x-model="tableSearch" @input="page = 1" placeholder="Buscar registros...">
                                             </div>
                                         </div>
-                                        <div class="table-results"><span x-text="getFilteredData().length"></span> resultados</div>
+                                        <div class="table-results text-secondary-util"><span x-text="getFilteredData().length"></span> resultados</div>
                                     </div>
 
                                     <div style="overflow-x: auto;">
@@ -883,14 +979,14 @@
                                             </thead>
                                             <tbody x-html="getTableRows()"></tbody>
                                         </table>
-                                        <div x-show="!getTableRows()" style="padding: 40px; text-align: center; color: var(--slate-500);">
+                                        <div x-show="!getTableRows()" class="text-muted-util" style="padding: 40px; text-align: center;">
                                             Sin registros encontrados.
                                         </div>
                                     </div>
                                     <!-- Pagination -->
                                     <div class="table-pagination" x-show="totalPages() > 1" style="padding: 12px 24px; border-top: 1px solid var(--slate-200); display: flex; justify-content: space-between; align-items: center; background: white;">
                                         <button type="button" class="btn-text" @click="if(page > 1) page--" :disabled="page === 1" :style="page === 1 ? 'opacity: 0.5; cursor: not-allowed;' : ''">Anterior</button>
-                                        <span style="font-size: 13px; color: var(--slate-600);">Página <strong x-text="page" style="color:var(--slate-900);"></strong> de <strong x-text="totalPages()" style="color:var(--slate-900);"></strong></span>
+                                        <span class="text-secondary-util" style="font-size: 13px;">Página <strong class="text-primary-util" x-text="page"></strong> de <strong class="text-primary-util" x-text="totalPages()"></strong></span>
                                         <button type="button" class="btn-text" @click="if(page < totalPages()) page++" :disabled="page === totalPages()" :style="page === totalPages() ? 'opacity: 0.5; cursor: not-allowed;' : ''">Siguiente</button>
                                     </div>
                                 </div>
@@ -898,15 +994,15 @@
                                 <!-- FORM VIEW -->
                                 <div x-show="mode === 'form'" style="display: none;">
                                     <div class="slide-form-card">
-                                        <h3 class="form-title">Datos del registro</h3>
+                                        <h3 class="form-title text-primary-util">Datos del registro</h3>
                                         
                                         <!-- Dynamic Fields -->
                                         <div id="dynamic-form-fields" x-html="getFormFields()"></div>
                                         
                                         <div class="form-group" style="margin-top: 24px;">
-                                            <label class="form-check">
+                                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                                                 <input type="checkbox" checked style="accent-color: var(--brand-600); width: 16px; height: 16px;">
-                                                <span style="font-size: 14px; color: var(--slate-700);">Registro activo</span>
+                                                <span class="text-primary-util" style="font-size: 14px;">Registro activo</span>
                                             </label>
                                         </div>
 
@@ -922,7 +1018,7 @@
                             <!-- Footer -->
                             <div class="slide-footer">
                                 <div><a :href="getExternalListUrl()" class="link-blue">Vista avanzada (Filament) →</a></div>
-                                <div style="font-size: 13px; color: var(--slate-600);">por página: <strong style="color:var(--slate-900);">10</strong> <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline-block;vertical-align:middle;"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
+                                <div class="text-secondary-util" style="font-size: 13px;">por página: <strong class="text-primary-util">10</strong> <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline-block;vertical-align:middle;"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
                             </div>
                         </div>
                     </div>
