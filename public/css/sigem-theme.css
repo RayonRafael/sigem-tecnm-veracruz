@@ -1,4 +1,4 @@
-/* =========================================
+﻿/* =========================================
    SIGEM - FILAMENT GLOBAL THEME OVERRIDES
    ========================================= */
 
@@ -10,8 +10,8 @@ body:has(.sigem-professional) .fi-main-ctn { max-width: 100% !important; padding
 body:has(.sigem-professional) .fi-header { margin-bottom: 2rem !important; padding-top: 1.5rem !important; }
 
 /* ===== 1. FONDO GENERAL Y APP ===== */
-main.fi-main, body {
-    background-color: #f8fafc !important;
+    main.fi-main, body {
+        background-color: #f0f7ff !important;
     background-image: none !important;
 }
 .dark main.fi-main, .dark body {
@@ -37,7 +37,7 @@ main.fi-main, body {
     padding: 1.5rem !important;
 }
 
-/* ===== 3. TÍTULOS DE PÁGINA ===== */
+/* ===== 3. TÃTULOS DE PÃGINA ===== */
 h1, .fi-header-heading {
     color: #0f172a !important;
     font-weight: 700 !important;
@@ -106,7 +106,7 @@ h1, .fi-header-heading {
     color: #f1f5f9 !important;
 }
 .dark .fi-input:focus, .dark .fi-select-input:focus, .dark textarea:focus, .dark select:focus {
-    border-color: #3b82f6 !important;
+    border-color: #f8fafc !important;
     box-shadow: 0 0 0 3px rgba(59,130,246,0.2) !important;
 }
 
@@ -133,7 +133,7 @@ h1, .fi-header-heading {
     color: #1e40af !important;
 }
 
-/* 2. Radio Buttons clásicos */
+/* 2. Radio Buttons clÃ¡sicos */
 .fi-fo-radio label {
     border: 1px solid #e2e8f0 !important;
     background-color: #ffffff !important;
@@ -184,21 +184,21 @@ button[role="switch"][aria-checked="true"] {
 .dark .fi-fo-toggle-buttons input[type="radio"]:checked + label.fi-btn,
 .dark .fi-fo-toggle-buttons input[type="checkbox"]:checked + label.fi-btn,
 .dark .fi-fo-radio label:has(input[type="radio"]:checked) {
-    border-color: #3b82f6 !important;
+    border-color: #f8fafc !important;
     background-color: #1e3a5f !important;
     box-shadow: 0 0 0 3px rgba(59,130,246,0.2) !important;
 }
 .dark .fi-fo-toggle-buttons input[type="radio"]:checked + label.fi-btn *,
 .dark .fi-fo-toggle-buttons input[type="checkbox"]:checked + label.fi-btn *,
 .dark .fi-fo-radio label:has(input[type="radio"]:checked) * {
-    color: #93c5fd !important;
+    color: #bfdbfe !important;
 }
 
 .dark .fi-fo-radio input[type="radio"]:checked, 
 .dark .fi-checkbox-input:checked, 
 .dark button[role="switch"][aria-checked="true"] {
-    background-color: #3b82f6 !important;
-    border-color: #3b82f6 !important;
+    background-color: #f8fafc !important;
+    border-color: #f8fafc !important;
 }
 
 /* ===== 6. LABELS DE CAMPOS ===== */
@@ -226,7 +226,7 @@ button[role="switch"][aria-checked="true"] {
 .fi-btn-color-primary *, .btn-primary * { color: #ffffff !important; }
 .fi-btn-color-primary:hover, .btn-primary:hover { background-color: #1d4ed8 !important; }
 
-/* Éxito */
+/* Ã‰xito */
 .fi-btn-color-success, .btn-success {
     background-color: #10b981 !important;
     color: #ffffff !important;
@@ -255,7 +255,7 @@ button[role="switch"][aria-checked="true"] {
 
 /* Info */
 .fi-btn-color-info, .btn-info {
-    background-color: #3b82f6 !important;
+    background-color: #f8fafc !important;
     color: #ffffff !important;
     border: none !important;
 }
@@ -289,13 +289,13 @@ button[role="switch"][aria-checked="true"] {
 .fi-badge-color-success { background-color: #d1fae5 !important; color: #059669 !important; }
 .fi-badge-color-warning { background-color: #fef3c7 !important; color: #d97706 !important; }
 .fi-badge-color-danger { background-color: #fee2e2 !important; color: #dc2626 !important; }
-.fi-badge-color-info { background-color: #dbeafe !important; color: #2563eb !important; }
+.fi-badge-color-info { background-color: #e8f2fe !important; color: #2563eb !important; }
 .fi-badge-color-gray { background-color: #f1f5f9 !important; color: #475569 !important; }
 
 .dark .fi-badge-color-success { background-color: rgba(16,185,129,0.2) !important; color: #34d399 !important; }
 .dark .fi-badge-color-warning { background-color: rgba(245,158,11,0.2) !important; color: #fbbf24 !important; }
 .dark .fi-badge-color-danger { background-color: rgba(239,68,68,0.2) !important; color: #f87171 !important; }
-.dark .fi-badge-color-info { background-color: rgba(59,130,246,0.2) !important; color: #60a5fa !important; }
+.dark .fi-badge-color-info { background-color: rgba(59,130,246,0.2) !important; color: #bfdbfe !important; }
 .dark .fi-badge-color-gray { background-color: rgba(148,163,184,0.2) !important; color: #94a3b8 !important; }
 
 /* ===== 9. BREADCRUMBS ===== */
@@ -307,17 +307,17 @@ button[role="switch"][aria-checked="true"] {
 .dark .fi-breadcrumbs-item:last-child .fi-breadcrumbs-item-label { color: #e2e8f0 !important; }
 .dark .fi-breadcrumbs-separator { color: #334155 !important; }
 
-/* ===== 10. PAGINACIÓN ===== */
+/* ===== 10. PAGINACIÃ“N ===== */
 .fi-pagination-item { border-radius: 8px !important; margin: 0 2px !important; }
 .fi-pagination-item-active, .fi-pagination-item-active button { background-color: #2563eb !important; color: #ffffff !important; }
 .fi-pagination-item-active * { color: #ffffff !important; }
 .fi-pagination-item:not(.fi-pagination-item-active), .fi-pagination-item:not(.fi-pagination-item-active) button { background-color: #ffffff !important; color: #475569 !important; }
 .fi-pagination-item:not(.fi-pagination-item-active):hover { background-color: #f8fafc !important; }
-.dark .fi-pagination-item-active, .dark .fi-pagination-item-active button { background-color: #3b82f6 !important; }
+.dark .fi-pagination-item-active, .dark .fi-pagination-item-active button { background-color: #f8fafc !important; }
 .dark .fi-pagination-item:not(.fi-pagination-item-active), .dark .fi-pagination-item:not(.fi-pagination-item-active) button { background-color: #1e293b !important; color: #94a3b8 !important; }
 .dark .fi-pagination-item:not(.fi-pagination-item-active):hover { background-color: #334155 !important; }
 
-/* ===== 11. FILTROS Y BÚSQUEDA ===== */
+/* ===== 11. FILTROS Y BÃšSQUEDA ===== */
 .fi-ta-filters, .fi-ta-search, .fi-global-search {
     background-color: #ffffff !important;
     border: 1px solid #e2e8f0 !important;
@@ -336,7 +336,7 @@ button[role="switch"][aria-checked="true"] {
 }
 .fi-no-notification-status-success { border-left: 4px solid #10b981 !important; }
 .fi-no-notification-status-danger { border-left: 4px solid #ef4444 !important; }
-.fi-no-notification-status-info { border-left: 4px solid #3b82f6 !important; }
+.fi-no-notification-status-info { border-left: 4px solid #f8fafc !important; }
 .dark .fi-no-notification {
     background-color: #1e293b !important;
     box-shadow: 0 10px 25px rgba(0,0,0,0.3) !important;
@@ -361,7 +361,7 @@ button[role="switch"][aria-checked="true"] {
     border-bottom-color: #334155 !important;
 }
 
-/* ===== 14. BOTONES DE ACCIÓN EN TABLAS ===== */
+/* ===== 14. BOTONES DE ACCIÃ“N EN TABLAS ===== */
 .fi-ta-actions .fi-icon-btn {
     border-radius: 8px !important;
     transition: background-color 0.2s !important;
@@ -384,7 +384,7 @@ button[role="switch"][aria-checked="true"] {
 }
 .dark .fi-wizard-step-pending .fi-wizard-step-icon { background-color: #334155 !important; color: #94a3b8 !important; }
 
-/* ===== 16. SELECTS CON BÚSQUEDA ===== */
+/* ===== 16. SELECTS CON BÃšSQUEDA ===== */
 .fi-select-input-dropdown, .choices__list--dropdown {
     background-color: #ffffff !important;
     border-radius: 8px !important;
@@ -392,16 +392,16 @@ button[role="switch"][aria-checked="true"] {
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05) !important;
 }
 .fi-select-input-option:hover, .choices__item--choice:hover { background-color: #f8fafc !important; }
-.fi-select-input-option-selected, .choices__item--selectable.is-highlighted { background-color: #dbeafe !important; color: #2563eb !important; }
+.fi-select-input-option-selected, .choices__item--selectable.is-highlighted { background-color: #e8f2fe !important; color: #2563eb !important; }
 .dark .fi-select-input-dropdown, .dark .choices__list--dropdown {
     background-color: #1e293b !important;
     border-color: #334155 !important;
 }
 .dark .fi-select-input-option:hover, .dark .choices__item--choice:hover { background-color: #334155 !important; }
-.dark .fi-select-input-option-selected, .dark .choices__item--selectable.is-highlighted { background-color: rgba(37,99,235,0.2) !important; color: #60a5fa !important; }
+.dark .fi-select-input-option-selected, .dark .choices__item--selectable.is-highlighted { background-color: rgba(37,99,235,0.2) !important; color: #bfdbfe !important; }
 
 
-/* ===== 18. TABLAS VACÍAS ===== */
+/* ===== 18. TABLAS VACÃAS ===== */
 .fi-ta-empty-state-heading { color: #475569 !important; font-weight: 600 !important; }
 .fi-ta-empty-state-icon { color: #cbd5e1 !important; }
 .dark .fi-ta-empty-state-heading { color: #f1f5f9 !important; }
@@ -443,8 +443,8 @@ body:has(.sigem-professional) .fi-topbar .fi-user-menu button:hover { background
 /* ===== LINKS INTERACTIVOS (TEXTO) ===== */
 .fi-main a:not([class*="btn"]), .fi-ta-text-item-label a { color: #1b65d4 !important; transition: color 0.2s; }
 .fi-main a:not([class*="btn"]):hover, .fi-ta-text-item-label a:hover { color: #0d47a1 !important; }
-.dark .fi-main a:not([class*="btn"]), .dark .fi-ta-text-item-label a { color: #3b82f6 !important; }
-.dark .fi-main a:not([class*="btn"]):hover, .dark .fi-ta-text-item-label a:hover { color: #60a5fa !important; }
+.dark .fi-main a:not([class*="btn"]), .dark .fi-ta-text-item-label a { color: #f8fafc !important; }
+.dark .fi-main a:not([class*="btn"]):hover, .dark .fi-ta-text-item-label a:hover { color: #bfdbfe !important; }
 
 /* JetBrains Mono */
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap");
@@ -522,7 +522,7 @@ body:has(.sigem-professional) .fi-topbar .fi-user-menu button:hover { background
     .sigem-professional .banner-actions { flex-wrap: wrap !important; justify-content: center !important; width: 100% !important; }
     .sigem-professional .banner-actions .btn { width: 100% !important; }
 
-    /* Slide-overs - Transición a página completa */
+    /* Slide-overs - TransiciÃ³n a pÃ¡gina completa */
     .sigem-professional .slide-panel { position: fixed !important; inset: 0 !important; width: 100% !important; border-radius: 0 !important; box-shadow: none !important; }
     .sigem-professional .slide-overlay { background: rgba(15, 23, 42, 0.95) !important; }
     .sigem-professional .slide-header { flex-direction: row !important; align-items: center !important; gap: 12px !important; padding: 16px !important; border-bottom: 1px solid var(--slate-200) !important; }
@@ -535,7 +535,7 @@ body:has(.sigem-professional) .fi-topbar .fi-user-menu button:hover { background
     /* Touch areas for buttons */
     .sigem-professional .btn-close, .sigem-professional .btn-back, .sigem-professional .cat-add-btn, .sigem-professional .btn-icon, .sigem-professional .btn, .sigem-professional .btn-blue, .sigem-professional .btn-green, .sigem-professional .recent-chip { min-height: 44px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; }
 
-    /* Botón cerrar/volver más visible en móvil */
+    /* BotÃ³n cerrar/volver mÃ¡s visible en mÃ³vil */
     .sigem-professional .btn-close { font-size: 14px !important; background: var(--slate-100) !important; color: var(--slate-900) !important; border-radius: 8px !important; padding: 0 16px !important; width: auto !important; }
 
     /* Tables */
@@ -554,7 +554,7 @@ body:has(.sigem-professional) .fi-topbar .fi-user-menu button:hover { background
     .sigem-professional .slide-footer { flex-direction: column !important; gap: 12px !important; justify-content: center !important; }
 }
 
-/* ===== VARIABLES SEMÁNTICAS EXCLUSIVAS PARA MODO OSCURO ===== */
+/* ===== VARIABLES SEMÃNTICAS EXCLUSIVAS PARA MODO OSCURO ===== */
 .dark {
     /* Fondos */
     --dark-bg-app: #0f172a;
@@ -577,7 +577,7 @@ body:has(.sigem-professional) .fi-topbar .fi-user-menu button:hover { background
     
     /* Acentos Semi-transparentes (para badges y botones) */
     --dark-accent-blue-bg: rgba(59, 130, 246, 0.15);
-    --dark-accent-blue-text: #60a5fa;
+    --dark-accent-blue-text: #bfdbfe;
     --dark-accent-blue-hover: rgba(59, 130, 246, 0.25);
     
     --dark-accent-green-bg: rgba(16, 185, 129, 0.15);
@@ -597,7 +597,7 @@ body:has(.sigem-professional) .fi-topbar .fi-user-menu button:hover { background
             
             .sigem-professional {
                 /* Color Palette */
-                --brand-50: #eff6ff; --brand-100: #dbeafe; --brand-500: #3b82f6; --brand-600: #2563eb; --brand-700: #1d4ed8;
+                --brand-50: #eff6ff; --brand-100: #e8f2fe; --brand-500: #f8fafc; --brand-600: #2563eb; --brand-700: #1d4ed8;
                 --slate-50: #f8fafc; --slate-100: #f1f5f9; --slate-200: #e2e8f0; --slate-600: #475569; --slate-700: #334155; --slate-900: #0f172a;
                 --emerald-50: #ecfdf5; --emerald-500: #10b981; --emerald-600: #059669;
                 --amber-50: #fffbeb; --amber-500: #f59e0b; --amber-600: #d97706;
@@ -717,7 +717,7 @@ body:has(.sigem-professional) .fi-topbar .fi-user-menu button:hover { background
             .btn-green { background: var(--emerald-600); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.18s; }
             .btn-green:hover { background: var(--emerald-500); }
 
-/* ===== DASHBOARD: Catálogos ===== */
+/* ===== DASHBOARD: CatÃ¡logos ===== */
 /* Section 4: Catalogs */
             .section-block { background: white; border: 1px solid var(--slate-200); border-radius: 20px; overflow: hidden; margin-bottom: 24px; }
             .block-header { padding: 24px; border-bottom: 1px solid var(--slate-200); display: flex; justify-content: space-between; align-items: center; }
@@ -838,7 +838,7 @@ body:has(.sigem-professional) .fi-topbar .fi-user-menu button:hover { background
             .tl-text { font-size: 14px; color: var(--slate-700); margin: 0 0 4px 0; }
             .tl-time { font-size: 12px; color: var(--slate-500); }
 
-/* ===== DASHBOARD: Accesos rápidos móvil ===== */
+/* ===== DASHBOARD: Accesos rÃ¡pidos mÃ³vil ===== */
 /* (Clases como .mobile-only y .hidden-mobile ya existen arriba en Responsividad) */
 
 /* ===== DASHBOARD: Modo oscuro ===== */
@@ -971,3 +971,8 @@ body:has(.sigem-professional) .fi-topbar .fi-user-menu button:hover { background
 
 /* Ocultar el brand del topbar nativo cuando estamos en el dashboard */
 body:has(.sigem-professional) .sigem-topbar-brand { display: none !important; }
+
+
+
+
+
