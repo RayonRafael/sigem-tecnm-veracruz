@@ -600,7 +600,7 @@
 
         <!-- Inject data to JS -->
         <script>
-            document.addEventListener('alpine:init', () => {
+            const registerSigemDashboardSS = () => {
                 Alpine.data('sigemDashboardSS', () => ({
                     getGreeting() {
                         const hour = new Date().getHours();
@@ -750,7 +750,13 @@
                         }).join('');
                     }
                 }));
-            });
+            };
+
+            if (window.Alpine) {
+                registerSigemDashboardSS();
+            } else {
+                document.addEventListener('alpine:init', registerSigemDashboardSS);
+            }
         </script>
     </div>
 </x-filament-panels::page>
