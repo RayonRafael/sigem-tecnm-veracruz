@@ -33,9 +33,14 @@ class MantenimientoResource extends Resource
                         ->schema([
                             Forms\Components\Select::make('id_inventario')
                                 ->label('Equipo a Reparar')
-                                ->relationship('inventario', 'num_serie')
+                                ->relationship(
+                                    name: 'inventario',
+                                    titleAttribute: 'num_serie',
+                                    modifyQueryUsing: fn ($query) => $query->with('material')
+                                )
+                                ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->material?->nombre} - N/S: {$record->num_serie}")
                                 ->required()
-                                ->searchable()
+                                ->searchable(['num_serie', 'material.nombre'])
                                 ->preload()
                                 ->prefixIcon('heroicon-m-qr-code')
                                 ->columnSpanFull(),
@@ -44,10 +49,12 @@ class MantenimientoResource extends Resource
                                     Forms\Components\TextInput::make('nombre_tecnico')
                                         ->label('Técnico / Alumno')
                                         ->required()
+                                        ->default(fn () => auth()->user() ? trim(auth()->user()->name . ' ' . auth()->user()->apellido_paterno . ' ' . auth()->user()->apellido_materno) : null)
                                         ->prefixIcon('heroicon-m-user')
                                         ->maxLength(150),
                                     Forms\Components\TextInput::make('num_control_tecnico')
                                         ->label('Número de Control Técnico')
+                                        ->default(fn () => auth()->user()?->num_control)
                                         ->prefixIcon('heroicon-m-identification')
                                         ->maxLength(100),
                                 ]),

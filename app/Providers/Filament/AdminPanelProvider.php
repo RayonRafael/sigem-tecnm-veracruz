@@ -50,15 +50,6 @@ class AdminPanelProvider extends PanelProvider
 <link rel="stylesheet" href="{{ asset(\'css/sigem-theme.css\') }}">
 ')
             )
-            ->renderHook(
-                PanelsRenderHook::TOPBAR_START,
-                fn (): string => Blade::render('
-<div class="sigem-topbar-brand flex items-center gap-x-3 pr-4">
-    <img src="{{ asset(\'images/sigem-logo.svg\') }}" alt="Logo" class="h-8 w-8 rounded-lg shadow-sm" style="background: linear-gradient(135deg, var(--brand-600, #2563eb), var(--brand-700, #1d4ed8)); padding: 2px;">
-    <span class="font-bold text-lg text-gray-900 dark:text-white hidden sm:block tracking-tight">SIGEM - TecNM Veracruz</span>
-</div>
-')
-            )
 
             ->navigationGroups([
                 NavigationGroup::make()

@@ -690,7 +690,7 @@
 
         <!-- Inject data to JS -->
         <script>
-            const registerSigemDashboard = () => {
+            document.addEventListener('alpine:init', () => {
                 Alpine.data('sigemDashboard', () => ({
                     getGreeting() {
                         const hour = new Date().getHours();
@@ -887,6 +887,10 @@
 
                     openCreateForm(catId = null) {
                         if (catId) this.activeCatalog = catId;
+                        if (this.canCreateExternal()) {
+                            window.location.href = this.getExternalCreateUrl();
+                            return;
+                        }
                         this.form = {};
                         this.mode = 'form';
                     },
@@ -967,13 +971,7 @@
                         }
                     }
                 }));
-            };
-
-            if (window.Alpine) {
-                registerSigemDashboard();
-            } else {
-                document.addEventListener('alpine:init', registerSigemDashboard);
-            }
+            });
         </script>
     </div>
 </x-filament-panels::page>

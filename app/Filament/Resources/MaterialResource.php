@@ -76,14 +76,15 @@ class MaterialResource extends Resource
                         Forms\Components\TextInput::make('stock_actual')
                             ->label('Stock Actual')
                             ->numeric()
+                            ->minValue(0)
                             ->default(0)
                             ->prefixIcon('heroicon-m-archive-box')
-                            ->disabled()
                             ->dehydrated()
                             ->required(),
                         Forms\Components\TextInput::make('stock_minimo')
                             ->label('Stock Mínimo')
                             ->numeric()
+                            ->minValue(0)
                             ->default(0)
                             ->prefixIcon('heroicon-m-bell-alert')
                             ->required(),
