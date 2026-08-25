@@ -363,11 +363,17 @@
                 padding: 30px 20px;
             }
             .logos-container {
-                flex-wrap: wrap;
+                flex-wrap: nowrap;
+                gap: 12px;
+                margin-bottom: 20px;
+                padding-bottom: 16px;
+            }
+            .logos-container img {
+                height: 38px;
             }
             .tabs-container {
-                flex-direction: column;
-                gap: 12px;
+                flex-direction: row;
+                gap: 8px;
                 border-bottom: none;
             }
             .tab {

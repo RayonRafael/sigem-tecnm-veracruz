@@ -144,7 +144,7 @@
         </div>
 
         <!-- 4. MODULES (SS Scope) -->
-        <div class="grid-3 hidden-mobile">
+        <div class="grid-2 hidden-mobile">
             <!-- Solicitudes -->
             <div class="module-card">
                 <div class="mod-header">

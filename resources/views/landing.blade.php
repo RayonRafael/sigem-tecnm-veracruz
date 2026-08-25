@@ -449,12 +449,11 @@
             }
             .hero {
                 padding: 40px 20px 40px;
-                max-height: 70vh;
-                min-height: 70vh;
                 justify-content: center;
             }
             .hero-title {
                 font-size: 32px;
+                line-height: 1.2;
                 margin-bottom: 16px;
             }
             .hero-sub {
