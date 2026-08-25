@@ -45,7 +45,7 @@ class LoginController extends Controller
                     $request->session()->invalidate();
                     $request->session()->regenerateToken();
                     return back()->withErrors([
-                        'email' => 'Esta cuenta es de administración. Usa la pestaña "Personal".',
+                        'email' => 'Uso de credenciales incorrectas.',
                     ])->onlyInput('email');
                 }
                 return redirect()->intended('/servicio-social');
@@ -57,7 +57,7 @@ class LoginController extends Controller
                     $request->session()->invalidate();
                     $request->session()->regenerateToken();
                     return back()->withErrors([
-                        'email' => 'Esta cuenta es de alumno. Usa la pestaña "Alumnos".',
+                        'email' => 'Uso de credenciales incorrectas.',
                     ])->onlyInput('email');
                 }
                 return redirect()->intended('/admin');

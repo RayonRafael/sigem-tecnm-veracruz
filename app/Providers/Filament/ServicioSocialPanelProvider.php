@@ -49,6 +49,15 @@ class ServicioSocialPanelProvider extends PanelProvider
 <link rel="stylesheet" href="{{ asset(\'css/sigem-theme.css\') }}">
 ')
             )
+            ->renderHook(
+                PanelsRenderHook::TOPBAR_START,
+                fn (): string => Blade::render('
+<div class="sigem-topbar-brand flex items-center gap-x-3">
+    <img src="{{ asset(\'images/sigem-logo.svg\') }}" alt="SIGEM" class="h-8">
+    <span class="font-bold text-lg hidden sm:block">SIGEM - Servicio Social</span>
+</div>
+')
+            )
 
             ->navigationGroups([
                 NavigationGroup::make()

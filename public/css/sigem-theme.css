@@ -3,11 +3,11 @@
    ========================================= */
 
 /* ===== 0. OCULTAR TOPBAR COMPLETAMENTE ===== */
-.fi-topbar { display: none !important; height: 0 !important; overflow: hidden !important; position: absolute !important; }
-body { padding-top: 0 !important; }
-.fi-main { padding-top: 0 !important; margin-top: 0 !important; height: 100% !important; min-height: 100vh !important; }
-.fi-main-ctn { max-width: 100% !important; padding-left: 2rem !important; padding-right: 2rem !important; }
-.fi-header { margin-bottom: 2rem !important; padding-top: 1.5rem !important; }
+body:has(.sigem-professional) .fi-topbar { display: none !important; height: 0 !important; overflow: hidden !important; position: absolute !important; }
+body:has(.sigem-professional) { padding-top: 0 !important; }
+body:has(.sigem-professional) .fi-main { padding-top: 0 !important; margin-top: 0 !important; height: 100% !important; min-height: 100vh !important; }
+body:has(.sigem-professional) .fi-main-ctn { max-width: 100% !important; padding-left: 2rem !important; padding-right: 2rem !important; }
+body:has(.sigem-professional) .fi-header { margin-bottom: 2rem !important; padding-top: 1.5rem !important; }
 
 /* ===== 1. FONDO GENERAL Y APP ===== */
 main.fi-main, body {
@@ -408,7 +408,7 @@ button[role="switch"][aria-checked="true"] {
 .dark .fi-ta-empty-state-icon { color: #475569 !important; }
 
 /* ===== TOPBAR ====== */
-.fi-topbar {
+body:has(.sigem-professional) .fi-topbar {
     background-color: #0b1d3a !important;
     border-bottom: none !important;
     box-shadow: none !important;
@@ -419,18 +419,18 @@ button[role="switch"][aria-checked="true"] {
     position: relative !important;
     z-index: 20 !important;
 }
-.fi-topbar nav {
+body:has(.sigem-professional) .fi-topbar nav {
     height: 52px !important;
     min-height: 52px !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
 }
-.dark .fi-topbar {
+body:has(.sigem-professional).dark .fi-topbar {
     background-color: #050e1d !important;
 }
-.fi-topbar, .fi-topbar * { color: #ffffff !important; }
-.fi-topbar .fi-user-menu button { background: transparent !important; border: none !important; }
-.fi-topbar .fi-user-menu button:hover { background-color: rgba(255,255,255,0.1) !important; }
+body:has(.sigem-professional) .fi-topbar, body:has(.sigem-professional) .fi-topbar * { color: #ffffff !important; }
+body:has(.sigem-professional) .fi-topbar .fi-user-menu button { background: transparent !important; border: none !important; }
+body:has(.sigem-professional) .fi-topbar .fi-user-menu button:hover { background-color: rgba(255,255,255,0.1) !important; }
 
 /* ===== DROPDOWN / MENU DE USUARIO ===== */
 .fi-dropdown-panel, .fi-dropdown-list, .fi-dropdown-list-item, .fi-user-menu { background-color: #ffffff !important; }
@@ -593,7 +593,8 @@ button[role="switch"][aria-checked="true"] {
 
 /* ===== DASHBOARD: Componentes base ===== */
 /* Ocultar header nativo de Filament solo en esta pagina */
-            .fi-header { display: none !important; }
+            body:has(.sigem-professional) .fi-header { display: none !important; }
+            body:has(.sigem-professional) .sigem-topbar-brand { display: none !important; }
             
             .sigem-professional {
                 /* Color Palette */
