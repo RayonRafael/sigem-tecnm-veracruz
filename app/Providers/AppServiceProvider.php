@@ -12,6 +12,7 @@ use App\Observers\MaterialObserver;
 use App\Observers\MantenimientoObserver;
 use App\Observers\SolicitudObserver;
 use App\Observers\ProveedorObserver;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -30,6 +31,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
+
         \Illuminate\Support\Facades\Gate::policy(\App\Models\User::class, \App\Policies\UserPolicy::class);
         \Illuminate\Support\Facades\Gate::policy(\App\Models\Inventario::class, \App\Policies\InventarioPolicy::class);
         \Illuminate\Support\Facades\Gate::policy(\App\Models\Solicitud::class, \App\Policies\SolicitudPolicy::class);
