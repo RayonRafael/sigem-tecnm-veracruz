@@ -29,10 +29,5 @@ class DatabaseSeeder extends Seeder
         $this->call(MantenimientoTableSeeder::class);
         $this->call(HistorialEstadosTableSeeder::class);
         $this->call(BitacoraSistemaTableSeeder::class);
-        $this->call(PermissionsTableSeeder::class);
-        $this->call(RolesTableSeeder::class);
-        $this->call(ModelHasPermissionsTableSeeder::class);
-        $this->call(ModelHasRolesTableSeeder::class);
-        $this->call(RoleHasPermissionsTableSeeder::class);
     }
 }
