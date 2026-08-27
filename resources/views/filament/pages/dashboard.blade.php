@@ -287,12 +287,12 @@
                                 </td>
                                 <td>
                                     @if(in_array($mant->estado, ['Solicitado', 'Pendiente Revision Admin']))
-                                        <form action="{{ route('mantenimientos.autorizar', $mant->id_mantenimiento) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Autorizar este mantenimiento?')">
+                                        <form action="{{ route('mantenimientos.autorizar', $mant->id_mantenimiento) }}" method="POST" style="display:inline;" @submit.prevent="let f = $el; openConfirm('Autorizar mantenimiento', '¿Estás seguro de autorizar este mantenimiento?', 'blue', () => f.submit())">
                                             @csrf
                                             <button type="submit" class="btn-blue" style="padding:4px 10px;font-size:11px;">Autorizar</button>
                                         </form>
                                     @elseif($mant->estado === 'En proceso')
-                                        <form action="{{ route('mantenimientos.completar', $mant->id_mantenimiento) }}" method="POST" style="display:inline;" onsubmit="return confirm('¿Marcar como completado?')">
+                                        <form action="{{ route('mantenimientos.completar', $mant->id_mantenimiento) }}" method="POST" style="display:inline;" @submit.prevent="let f = $el; openConfirm('Completar mantenimiento', '¿Estás seguro de marcar este mantenimiento como completado?', 'green', () => f.submit())">
                                             @csrf
                                             <button type="submit" class="btn-blue" style="padding:4px 10px;font-size:11px;background:#059669;">Completar</button>
                                         </form>
@@ -703,6 +703,41 @@
             <span x-text="toast.message"></span>
         </div>
 
+        <!-- Confirm Modal -->
+        <template x-teleport="body">
+            <div x-show="confirmModal.show" style="display: none;" class="sigem-confirm-overlay" x-transition.opacity.duration.300ms>
+                <div @click.away="closeConfirm()" class="sigem-confirm-modal" x-show="confirmModal.show" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 scale-95" x-transition:enter-end="opacity-100 translate-y-0 scale-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 scale-100" x-transition:leave-end="opacity-0 translate-y-4 scale-95">
+                     <div style="display: flex; justify-content: center; margin-bottom: 1rem;">
+                         <div :style="'display: flex; align-items: center; justify-content: center; width: 3.5rem; height: 3.5rem; border-radius: 9999px; background-color: ' + getConfirmColor(0.1) + '; color: ' + getConfirmColor(1) + ';'">
+                            <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                         </div>
+                     </div>
+                     <h3 class="text-primary-util" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;" x-text="confirmModal.title"></h3>
+                     <p class="text-secondary-util" style="font-size: 0.875rem; margin-bottom: 1.5rem;" x-text="confirmModal.message"></p>
+                     <div style="display: flex; justify-content: center; gap: 0.75rem;">
+                         <button type="button" @click="closeConfirm()" class="sigem-confirm-cancel">
+                             Cancelar
+                         </button>
+                         <button type="button" @click="executeConfirm()" :style="'padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; color: white; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; background-color: ' + getConfirmColor(1) + '; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);'" onmouseover="this.style.filter='brightness(0.9)'" onmouseout="this.style.filter='none'">
+                             Confirmar
+                         </button>
+                     </div>
+                </div>
+            </div>
+        </template>
+        
+        <style>
+            .sigem-confirm-overlay { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+            .sigem-confirm-modal { background: white; border-radius: 0.75rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-width: 24rem; width: 100%; margin: 1rem; padding: 1.5rem; text-align: center; border: 1px solid var(--slate-200); }
+            .dark .sigem-confirm-modal { background: #18181b; border-color: #27272a; }
+            .sigem-confirm-cancel { padding: 0.5rem 1rem; border: 1px solid var(--slate-300); border-radius: 0.5rem; background: white; color: var(--slate-700); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+            .sigem-confirm-cancel:hover { background: var(--slate-50); }
+            .dark .sigem-confirm-cancel { background: #27272a; border-color: #3f3f46; color: #e4e4e7; }
+            .dark .sigem-confirm-cancel:hover { background: #3f3f46; }
+        </style>
+
         <!-- Inject data to JS -->
         <script>
             const registerSigemDashboard = () => {
@@ -722,6 +757,28 @@
                     isSubmitting: false,
                     form: {},
                     toast: { show: false, message: '' },
+
+                    confirmModal: { show: false, title: '', message: '', color: 'blue', onConfirm: null },
+                    
+                    openConfirm(title, message, color, callback) {
+                        this.confirmModal.title = title;
+                        this.confirmModal.message = message;
+                        this.confirmModal.color = color;
+                        this.confirmModal.onConfirm = callback;
+                        this.confirmModal.show = true;
+                    },
+                    closeConfirm() {
+                        this.confirmModal.show = false;
+                        setTimeout(() => { this.confirmModal.onConfirm = null; }, 300);
+                    },
+                    executeConfirm() {
+                        if (this.confirmModal.onConfirm) this.confirmModal.onConfirm();
+                        this.closeConfirm();
+                    },
+                    getConfirmColor(alpha) {
+                        const colors = { blue: `rgba(59, 130, 246, ${alpha})`, green: `rgba(16, 185, 129, ${alpha})`, red: `rgba(239, 68, 68, ${alpha})` };
+                        return colors[this.confirmModal.color] || colors.blue;
+                    },
                     
                     data: {
                         departamentos: @json($departamentosList ?? []),
@@ -968,22 +1025,22 @@
                         }
                     },
 
-                    async deleteInline(id) {
-                        if (!confirm('¿Estás seguro de eliminar este registro de forma permanente?')) return;
-                        
-                        try {
-                            if (this.activeCatalog === 'departamentos') await @this.deleteDepartamento(id);
-                            else if (this.activeCatalog === 'areas') await @this.deleteArea(id);
-                            else if (this.activeCatalog === 'marcas') await @this.deleteMarca(id);
-                            else if (this.activeCatalog === 'tipos') await @this.deleteTipo(id);
-                            else if (this.activeCatalog === 'unidades') await @this.deleteUnidad(id);
-                            
-                            this.showToast('Registro eliminado');
-                            setTimeout(() => { window.location.reload(); }, 1000);
-                        } catch (e) {
-                            alert('Error al eliminar');
-                            console.error(e);
-                        }
+                    deleteInline(id) {
+                        this.openConfirm('Eliminar registro', '¿Estás seguro de eliminar este registro de forma permanente?', 'red', async () => {
+                            try {
+                                if (this.activeCatalog === 'departamentos') await @this.deleteDepartamento(id);
+                                else if (this.activeCatalog === 'areas') await @this.deleteArea(id);
+                                else if (this.activeCatalog === 'marcas') await @this.deleteMarca(id);
+                                else if (this.activeCatalog === 'tipos') await @this.deleteTipo(id);
+                                else if (this.activeCatalog === 'unidades') await @this.deleteUnidad(id);
+                                
+                                this.showToast('Registro eliminado');
+                                setTimeout(() => { window.location.reload(); }, 1000);
+                            } catch (e) {
+                                alert('Error al eliminar');
+                                console.error(e);
+                            }
+                        });
                     }
                 }));
             };
