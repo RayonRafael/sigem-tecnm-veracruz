@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockup SIGEM - Antes y Después</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --green: #059669;
+            --yellow: #d97706;
+            --red: #dc2626;
+            --blue: #2563eb;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 2rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .tab-btn:hover {
+            background: #e5e7eb;
+            color: var(--text-primary);
+        }
+        .tab-btn.active {
+            background: var(--blue);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Dashboard Elements */
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            padding: 1.5rem;
+            position: relative;
+            border: 1px solid var(--border);
+        }
+
+        /* Markers */
+        .eliminated {
+            border: 2px dashed var(--red);
+            background-color: #fef2f2;
+        }
+        .eliminated::before {
+            content: 'SE ELIMINA';
+            position: absolute;
+            top: -12px;
+            right: 12px;
+            background: var(--red);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+        }
+
+        .kept, .redirect {
+            border: 2px dashed var(--blue);
+            background-color: #eff6ff;
+        }
+        .kept::before {
+            content: 'SE MANTIENE';
+            position: absolute;
+            top: -12px;
+            right: 12px;
+            background: var(--blue);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+        }
+        .redirect::before {
+            content: 'REDIRIGE A RESOURCE';
+        }
+
+        /* Banner */
+        .banner {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .banner h2 { margin: 0 0 0.5rem 0; font-size: 1.5rem; }
+        .banner p { margin: 0; color: #bfdbfe; font-size: 1rem; }
+
+        /* Stats */
+        .stat-value { font-size: 2rem; font-weight: 700; margin: 0.5rem 0; }
+        .stat-label { color: var(--text-secondary); font-size: 0.875rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* Tables & Previews */
+        .skeleton-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .skeleton-table th, .skeleton-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .skeleton-table th { color: var(--text-secondary); font-size: 0.875rem; font-weight: 500; }
+        
+        .skeleton-line { height: 12px; background: #e5e7eb; border-radius: 4px; }
+        .w-full { width: 100%; }
+        .w-3-4 { width: 75%; }
+        .w-1-2 { width: 50%; }
+
+        /* Table Comparativa */
+        .comparison-table {
+            width: 100%;
+            background: white;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            border-collapse: collapse;
+        }
+        .comparison-table th, .comparison-table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        .comparison-table th {
+            background: #f8fafc;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-block;
+            color: white;
+        }
+        .badge-green { background: var(--green); }
+        .badge-yellow { background: var(--yellow); }
+        .badge-red { background: var(--red); }
+        .badge-blue { background: var(--blue); }
+
+        .big-stats {
+            display: flex;
+            gap: 2rem;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: white;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+        }
+        .big-stat { flex: 1; text-align: center; }
+        .big-stat h3 { font-size: 3rem; margin: 0; color: var(--text-primary); }
+        .big-stat p { margin: 0.5rem 0 0 0; color: var(--text-secondary); font-weight: 500; }
+        .text-red { color: var(--red) !important; }
+        .text-green { color: var(--green) !important; }
+
+        .filament-resource-preview {
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background: white;
+        }
+        .filament-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+        }
+        .filament-actions {
+            display: flex; gap: 0.5rem;
+        }
+        .btn-primary {
+            background: var(--yellow);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Refactorización del Dashboard SIGEM</h1>
+        <p style="color: var(--text-secondary);">Análisis visual de reducción de código y adopción de recursos nativos</p>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('tab-antes')">PESTAÑA 1: ANTES</button>
+        <button class="tab-btn" onclick="showTab('tab-despues')">PESTAÑA 2: DESPUÉS</button>
+        <button class="tab-btn" onclick="showTab('tab-comparar')">PESTAÑA 3: COMPARAR</button>
+    </div>
+
+    <!-- PESTAÑA 1: ANTES -->
+    <div id="tab-antes" class="tab-content active">
+        <div class="banner kept">
+            <div>
+                <h2>Buenos días, Administrador</h2>
+                <p>Tienes 5 solicitudes pendientes por autorizar.</p>
+            </div>
+            <div>
+                <button style="padding: 0.75rem 1.5rem; background: rgba(255,255,255,0.2); border: none; border-radius: 0.5rem; color: white; font-weight: 700;">Ver Pendientes</button>
+            </div>
+        </div>
+
+        <div class="grid-4">
+            <div class="card kept">
+                <div class="stat-label">Total Activos</div>
+                <div class="stat-value">1,245</div>
+            </div>
+            <div class="card kept">
+                <div class="stat-label">En Buen Estado</div>
+                <div class="stat-value">850</div>
+            </div>
+            <div class="card kept">
+                <div class="stat-label">Mantenimientos</div>
+                <div class="stat-value">34</div>
+            </div>
+            <div class="card kept">
+                <div class="stat-label">Alertas Stock</div>
+                <div class="stat-value" style="color: var(--red);">12</div>
+            </div>
+        </div>
+
+        <div class="grid-3" style="margin-bottom: 2rem;">
+            <div class="card kept">
+                <h3>Acceso: Inventario</h3>
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">1200 registros</p>
+            </div>
+            <div class="card kept">
+                <h3>Acceso: Solicitudes</h3>
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">5 pendientes</p>
+            </div>
+            <div class="card kept">
+                <h3>Acceso: Mantenimiento</h3>
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">12 en proceso</p>
+            </div>
+        </div>
+
+        <h3 style="margin: 2rem 0 1rem 0;">Módulos Interactivos (Mini Tablas)</h3>
+        <div class="grid-3">
+            <div class="card eliminated">
+                <h4 style="margin-top:0;">Módulo Inventario</h4>
+                <table class="skeleton-table">
+                    <tr><th>N/S</th><th>Material</th><th>Estado</th></tr>
+                    <tr><td>INV-001</td><td><div class="skeleton-line w-full"></div></td><td><span class="badge badge-green">Disp</span></td></tr>
+                    <tr><td>INV-002</td><td><div class="skeleton-line w-3-4"></div></td><td><span class="badge badge-red">Dañado</span></td></tr>
+                </table>
+            </div>
+            <div class="card eliminated">
+                <h4 style="margin-top:0;">Módulo Solicitudes</h4>
+                <table class="skeleton-table">
+                    <tr><th>Folio</th><th>Usuario</th><th>Estado</th></tr>
+                    <tr><td>SOL-01</td><td><div class="skeleton-line w-full"></div></td><td><span class="badge badge-yellow">Pend</span></td></tr>
+                    <tr><td>SOL-02</td><td><div class="skeleton-line w-3-4"></div></td><td><span class="badge badge-green">Aut</span></td></tr>
+                </table>
+            </div>
+            <div class="card eliminated">
+                <h4 style="margin-top:0;">Módulo Mantenimiento</h4>
+                <table class="skeleton-table">
+                    <tr><th>Equipo</th><th>Técnico</th><th>Acción</th></tr>
+                    <tr><td>INV-01</td><td><div class="skeleton-line w-full"></div></td><td><button style="background:var(--blue);color:white;border:none;padding:2px 8px;border-radius:4px;">Autorizar</button></td></tr>
+                </table>
+            </div>
+        </div>
+
+        <h3 style="margin: 2rem 0 1rem 0;">Catálogos del Sistema (Slide-overs HTML/Alpine)</h3>
+        
+        <h4 style="color: var(--text-secondary); margin-bottom: 0.5rem;">G1: Organización</h4>
+        <div class="grid-3">
+            <div class="card eliminated"><h4 style="margin:0;">Departamentos</h4><p style="font-size:0.875rem; color:var(--text-secondary); margin-top:4px;">Gestión de áreas y oficinas</p></div>
+            <div class="card eliminated"><h4 style="margin:0;">Áreas</h4><p style="font-size:0.875rem; color:var(--text-secondary); margin-top:4px;">Espacios físicos</p></div>
+            <div class="card eliminated"><h4 style="margin:0;">Usuarios</h4><p style="font-size:0.875rem; color:var(--text-secondary); margin-top:4px;">Cuentas del sistema</p></div>
+        </div>
+
+        <h4 style="color: var(--text-secondary); margin-bottom: 0.5rem;">G2: Inventario</h4>
+        <div class="grid-4">
+            <div class="card eliminated"><h4 style="margin:0;">Materiales</h4></div>
+            <div class="card eliminated"><h4 style="margin:0;">Marcas</h4></div>
+            <div class="card eliminated"><h4 style="margin:0;">Tipos</h4></div>
+            <div class="card eliminated"><h4 style="margin:0;">Unidades</h4></div>
+        </div>
+
+        <h4 style="color: var(--text-secondary); margin-bottom: 0.5rem;">G3: Contactos</h4>
+        <div class="grid-4" style="grid-template-columns: repeat(2, 1fr);">
+            <div class="card eliminated"><h4 style="margin:0;">Proveedores</h4></div>
+            <div class="card eliminated"><h4 style="margin:0;">Receptores</h4></div>
+        </div>
+    </div>
+
+
+    <!-- PESTAÑA 2: DESPUÉS -->
+    <div id="tab-despues" class="tab-content">
+        <div class="banner kept">
+            <div>
+                <h2>Buenos días, Administrador</h2>
+                <p>Tienes 5 solicitudes pendientes por autorizar.</p>
+            </div>
+            <div>
+                <button style="padding: 0.75rem 1.5rem; background: rgba(255,255,255,0.2); border: none; border-radius: 0.5rem; color: white; font-weight: 700;">Ver Pendientes</button>
+            </div>
+        </div>
+
+        <div class="grid-4">
+            <div class="card kept">
+                <div class="stat-label">Total Activos</div>
+                <div class="stat-value">1,245</div>
+            </div>
+            <div class="card kept">
+                <div class="stat-label">En Buen Estado</div>
+                <div class="stat-value">850</div>
+            </div>
+            <div class="card kept">
+                <div class="stat-label">Mantenimientos</div>
+                <div class="stat-value">34</div>
+            </div>
+            <div class="card kept">
+                <div class="stat-label">Alertas Stock</div>
+                <div class="stat-value" style="color: var(--red);">12</div>
+            </div>
+        </div>
+
+        <h3 style="margin: 2rem 0 1rem 0;">Enlaces a Resources Nativos</h3>
+        <div class="grid-3" style="margin-bottom: 2rem;">
+            <div class="card redirect" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h3 style="margin:0;">Inventario General</h3>
+                    <p style="color: var(--blue); margin: 4px 0 0 0; font-size: 0.875rem;">/admin/inventarios ➔</p>
+                </div>
+            </div>
+            <div class="card redirect" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h3 style="margin:0;">Solicitudes</h3>
+                    <p style="color: var(--blue); margin: 4px 0 0 0; font-size: 0.875rem;">/admin/solicituds ➔</p>
+                </div>
+            </div>
+            <div class="card redirect" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h3 style="margin:0;">Mantenimiento</h3>
+                    <p style="color: var(--blue); margin: 4px 0 0 0; font-size: 0.875rem;">/admin/mantenimientos ➔</p>
+                </div>
+            </div>
+        </div>
+
+        <h3 style="margin: 2rem 0 1rem 0;">Catálogos (Redirección Directa a Resources)</h3>
+        <div class="grid-4">
+            <div class="card redirect">
+                <h4 style="margin:0;">Departamentos</h4>
+                <p style="color: var(--blue); margin: 4px 0 0 0; font-size: 0.75rem;">/admin/departamentos ➔</p>
+            </div>
+            <div class="card redirect">
+                <h4 style="margin:0;">Áreas</h4>
+                <p style="color: var(--blue); margin: 4px 0 0 0; font-size: 0.75rem;">/admin/areas ➔</p>
+            </div>
+            <div class="card redirect">
+                <h4 style="margin:0;">Materiales</h4>
+                <p style="color: var(--blue); margin: 4px 0 0 0; font-size: 0.75rem;">/admin/materials ➔</p>
+            </div>
+            <div class="card redirect">
+                <h4 style="margin:0;">Proveedores</h4>
+                <p style="color: var(--blue); margin: 4px 0 0 0; font-size: 0.75rem;">/admin/proveedors ➔</p>
+            </div>
+        </div>
+
+        <h3 style="margin: 3rem 0 1rem 0;">Vista Previa de un Resource Nativo (ej. MantenimientoResource)</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">En lugar de recargar el dashboard con mini-tablas, el usuario navega a la vista nativa de Filament, donde tiene acceso a todas las funcionalidades completas (filtros avanzados, paginación real, validación de formularios backend, y acciones seguras).</p>
+        
+        <div class="filament-resource-preview">
+            <div class="filament-header">
+                <h2 style="margin:0; font-size: 1.25rem;">Mantenimientos</h2>
+                <div class="filament-actions">
+                    <button class="btn-primary" style="background: white; border: 1px solid var(--border); color: var(--text-primary);">Filtros</button>
+                    <button class="btn-primary" style="background: white; border: 1px solid var(--border); color: var(--text-primary);">Columnas</button>
+                    <button class="btn-primary" style="background: var(--yellow);">+ Nuevo Mantenimiento</button>
+                </div>
+            </div>
+            <div style="padding: 0 1.5rem 1.5rem 1.5rem;">
+                <div style="padding: 1rem 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between;">
+                    <input type="text" placeholder="Buscar..." style="padding: 0.5rem; border: 1px solid var(--border); border-radius: 0.5rem; width: 300px;">
+                </div>
+                <table class="skeleton-table" style="margin-top: 0;">
+                    <tr>
+                        <th>NO. SERIE</th>
+                        <th>MATERIAL</th>
+                        <th>TIPO SERVICIO</th>
+                        <th>ESTADO</th>
+                        <th>FECHA SOL.</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                    <tr>
+                        <td style="font-family: monospace;">INV-001</td>
+                        <td>Laptop Dell Latitude</td>
+                        <td>Preventivo</td>
+                        <td><span class="badge badge-yellow">En revisión</span></td>
+                        <td>12/10/2023</td>
+                        <td>
+                            <button style="background:var(--green);color:white;border:none;padding:4px 10px;border-radius:4px;font-size:0.75rem;font-weight:700;">Autorizar</button>
+                            <button style="background:transparent;border:none;color:var(--text-secondary);padding:4px;">👁️</button>
+                            <button style="background:transparent;border:none;color:var(--text-secondary);padding:4px;">✏️</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="font-family: monospace;">INV-045</td>
+                        <td>Proyector Epson</td>
+                        <td>Correctivo</td>
+                        <td><span class="badge badge-blue">En proceso</span></td>
+                        <td>14/10/2023</td>
+                        <td>
+                            <button style="background:var(--blue);color:white;border:none;padding:4px 10px;border-radius:4px;font-size:0.75rem;font-weight:700;">Completar</button>
+                            <button style="background:transparent;border:none;color:var(--text-secondary);padding:4px;">👁️</button>
+                            <button style="background:transparent;border:none;color:var(--text-secondary);padding:4px;">✏️</button>
+                        </td>
+                    </tr>
+                </table>
+                <div style="padding: 1rem 0 0 0; display: flex; justify-content: space-between; color: var(--text-secondary); font-size: 0.875rem;">
+                    <span>Mostrando 1 a 2 de 34 resultados</span>
+                    <div>
+                        <button style="border:1px solid var(--border);background:white;padding:4px 8px;border-radius:4px;margin-right:4px;">Anterior</button>
+                        <button style="border:1px solid var(--border);background:white;padding:4px 8px;border-radius:4px;">Siguiente</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- PESTAÑA 3: COMPARAR -->
+    <div id="tab-comparar" class="tab-content">
+        
+        <div class="big-stats">
+            <div class="big-stat">
+                <h3>1,782</h3>
+                <p>Líneas de Código Originales</p>
+            </div>
+            <div class="big-stat">
+                <h3 class="text-green">450</h3>
+                <p>Líneas de Código Refactorizadas</p>
+            </div>
+            <div class="big-stat">
+                <h3 class="text-red">- 1,332</h3>
+                <p>Líneas Eliminadas (74% Reducción)</p>
+            </div>
+        </div>
+
+        <h3 style="margin-bottom: 1rem;">Análisis de Componentes del Dashboard</h3>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Elemento del UI</th>
+                    <th>Estado Anterior</th>
+                    <th>Estado Refactorizado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Banner de Bienvenida</strong></td>
+                    <td>Estático en Blade</td>
+                    <td>Mismo componente</td>
+                    <td><span class="badge badge-green">SE MANTIENE</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Tarjetas de Estadísticas Globales</strong></td>
+                    <td>Estático en Blade</td>
+                    <td>Mismo componente</td>
+                    <td><span class="badge badge-green">SE MANTIENE</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Botones de Acceso Rápido</strong></td>
+                    <td>Botones ancla HTML</td>
+                    <td>Botones ancla a Resources (/admin/...)</td>
+                    <td><span class="badge badge-green">SE MANTIENE</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Mini Tablas (Inventario/Solicitudes/Mant.)</strong></td>
+                    <td>Renderizado cliente JS + Alpine.js state</td>
+                    <td>Eliminado (El usuario usará Filament List)</td>
+                    <td><span class="badge badge-red">SE ELIMINA</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Formularios de Creación Rápida</strong></td>
+                    <td>Inyectados via getFormFields() + Alpine.js</td>
+                    <td>Reemplazado por Filament Modal / Pages</td>
+                    <td><span class="badge badge-red">SE ELIMINA</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Catálogos Slide-over (G1, G2, G3)</strong></td>
+                    <td>Lógica pesada JS y modales costum</td>
+                    <td>Botones HTML que redirigen a /admin/xxx</td>
+                    <td><span class="badge badge-yellow">CAMBIA A NATIVO</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Lógica Búsqueda / Paginación JS</strong></td>
+                    <td>~150 líneas JS (getFilteredData, paginatedData)</td>
+                    <td>Nativo en backend de Filament</td>
+                    <td><span class="badge badge-red">SE ELIMINA</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Rutas Custom (autorizar/completar)</strong></td>
+                    <td>routes/web.php (callbacks POST)</td>
+                    <td>MantenimientoResource -> Actions</td>
+                    <td><span class="badge badge-yellow">CAMBIA A NATIVO</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 style="margin-top: 3rem; margin-bottom: 1rem;">Archivos Intactos (No requieren cambios)</h3>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">La refactorización es un proceso de "eliminación segura", delegando responsabilidades a recursos existentes.</p>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Ruta del Archivo</th>
+                    <th>Rol en el Sistema</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code style="color: var(--blue);">app/Filament/Resources/*</code></td>
+                    <td>Todos los recursos de Filament (Modelos, Formularios, Tablas)</td>
+                    <td><span class="badge badge-green">SE MANTIENE</span> intacto. Ya contienen toda la lógica necesaria.</td>
+                </tr>
+                <tr>
+                    <td><code style="color: var(--blue);">app/Models/*</code></td>
+                    <td>Modelos Eloquent y Relaciones</td>
+                    <td><span class="badge badge-green">SE MANTIENE</span> intacto.</td>
+                </tr>
+                <tr>
+                    <td><code style="color: var(--blue);">database/migrations/*</code></td>
+                    <td>Estructura de la Base de Datos</td>
+                    <td><span class="badge badge-green">SE MANTIENE</span> intacto.</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<script>
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
