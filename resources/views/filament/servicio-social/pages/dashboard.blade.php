@@ -587,7 +587,7 @@
                             
                             <!-- Footer -->
                             <div class="slide-footer" style="justify-content: space-between;">
-                                <div><a :href="getExternalListUrl()" class="link-blue">Vista avanzada (Filament) →</a></div>
+                                <div><a :href="getExternalListUrl()" class="link-blue">Vista avanzada →</a></div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px;">
                                     <div class="text-secondary-util" style="font-size: 13px;">por página: <strong class="text-primary-util">10</strong> <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline-block;vertical-align:middle;"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
                                 </div>

@@ -620,7 +620,7 @@
                                         <button @click="openCreateForm(activeCatalog)" class="btn-blue">Nuevo</button>
                                     </template>
                                     <template x-if="mode === 'list' && canCreateExternal()">
-                                        <a :href="getExternalCreateUrl()" class="btn-blue" style="text-decoration:none;">Nuevo (Filament)</a>
+                                        <a :href="getExternalCreateUrl()" class="btn-blue" style="text-decoration:none;">Nuevo</a>
                                     </template>
                                     <button type="button" class="btn-close" @click="closeCatalog()">
                                         <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
@@ -688,7 +688,7 @@
                             
                             <!-- Footer -->
                             <div class="slide-footer">
-                                <div><a :href="getExternalListUrl()" class="link-blue">Vista avanzada (Filament) →</a></div>
+                                <div><a :href="getExternalListUrl()" class="link-blue">Vista avanzada →</a></div>
                                 <div class="text-secondary-util" style="font-size: 13px;">por página: <strong class="text-primary-util">10</strong> <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline-block;vertical-align:middle;"><polyline points="6 9 12 15 18 9"></polyline></svg></div>
                             </div>
                         </div>
