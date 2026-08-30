@@ -31,7 +31,7 @@ class UserResource extends Resource
                 Forms\Components\Section::make('Datos Personales')
                     ->icon('heroicon-m-user-circle')
                     ->schema([
-                        Forms\Components\TextInput::make('name')
+                        Forms\Components\TextInput::make('name')->label('Nombre')
                             ->label('Nombre(s)')
                             ->required()
                             ->prefixIcon('heroicon-m-user')
@@ -49,13 +49,13 @@ class UserResource extends Resource
                 Forms\Components\Section::make('Datos de Acceso')
                     ->icon('heroicon-m-lock-closed')
                     ->schema([
-                        Forms\Components\TextInput::make('email')
+                        Forms\Components\TextInput::make('email')->label('Correo electrónico')
                             ->label('Correo Electrónico')
                             ->email()
                             ->required()
                             ->prefixIcon('heroicon-m-envelope')
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('password')
+                        Forms\Components\TextInput::make('password')->label('Contraseña')
                             ->label('Contraseña')
                             ->password()
                             ->prefixIcon('heroicon-m-key')
@@ -84,7 +84,7 @@ class UserResource extends Resource
                 Forms\Components\Section::make('Estado y Rol')
                     ->icon('heroicon-m-shield-check')
                     ->schema([
-                        Forms\Components\Select::make('tipo_usuario')
+                        Forms\Components\Select::make('tipo_usuario')->placeholder('Selecciona...')
                             ->label('Tipo de Usuario (Sistema)')
                             ->options([
                                 'Administrador' => 'Administrador',
@@ -94,7 +94,7 @@ class UserResource extends Resource
                             ->default('Pendiente')
                             ->prefixIcon('heroicon-m-shield-check')
                             ->required(),
-                        Forms\Components\Select::make('roles')
+                        Forms\Components\Select::make('roles')->placeholder('Selecciona...')
                             ->label('Rol (Spatie)')
                             ->relationship('roles', 'name')
                             ->preload()
@@ -102,7 +102,7 @@ class UserResource extends Resource
                             ->searchable(),
                         Forms\Components\ToggleButtons::make('activo')
                             ->label('Usuario Activo')
-                            ->boolean()
+                            ->boolean(trueLabel: 'Sí', falseLabel: 'No')
                             ->inline()
                             ->default(true)
                             ->required(),
@@ -114,11 +114,11 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('name')->label('Nombre')
                     ->label('Nombre')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('email')
+                Tables\Columns\TextColumn::make('email')->label('Correo electrónico')
                     ->label('Correo Electrónico')
                     ->searchable()
                     ->sortable(),
@@ -144,7 +144,7 @@ class UserResource extends Resource
                     ->badge()
                     ->color(fn ($state) => $state ? 'success' : 'danger')
                     ->icon(fn ($state) => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle'),
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('created_at')->label('Fecha de creación')
                     ->label('Fecha de Creación')
                     ->dateTime('d/m/Y')
                     ->sortable(),

@@ -47,21 +47,21 @@ class MaterialResource extends Resource
                 Forms\Components\Section::make('Clasificación')
                     ->icon('heroicon-m-rectangle-stack')
                     ->schema([
-                        Forms\Components\Select::make('id_marca')
+                        Forms\Components\Select::make('id_marca')->placeholder('Selecciona...')
                             ->label('Marca')
                             ->relationship('marca', 'nombre')
                             ->required()
                             ->searchable()
                             ->preload()
                             ->prefixIcon('heroicon-m-star'),
-                        Forms\Components\Select::make('id_tipodematerial')
+                        Forms\Components\Select::make('id_tipodematerial')->placeholder('Selecciona...')
                             ->label('Tipo de Material')
                             ->relationship('tipo', 'nombre')
                             ->required()
                             ->searchable()
                             ->preload()
                             ->prefixIcon('heroicon-m-square-3-stack-3d'),
-                        Forms\Components\Select::make('id_unidad')
+                        Forms\Components\Select::make('id_unidad')->placeholder('Selecciona...')
                             ->label('Unidad de Medida')
                             ->relationship('unidad', 'nombre')
                             ->required()
@@ -90,7 +90,7 @@ class MaterialResource extends Resource
                             ->required(),
                         Forms\Components\ToggleButtons::make('requiere_control_individual')
                             ->label('Requiere control individual')
-                            ->boolean()
+                            ->boolean(trueLabel: 'Sí', falseLabel: 'No')
                             ->inline()
                             ->default(true)
                             ->columnSpanFull(),
@@ -190,7 +190,7 @@ class MaterialResource extends Resource
                             }),
                         \Filament\Infolists\Components\IconEntry::make('requiere_control_individual')
                             ->label('Control Individual')
-                            ->boolean(),
+                            ->boolean(trueLabel: 'Sí', falseLabel: 'No'),
                     ])->columns(4),
             ]);
     }

@@ -31,7 +31,7 @@ class MantenimientoResource extends Resource
                     Forms\Components\Wizard\Step::make('Equipo y técnico')
                         ->icon('heroicon-m-wrench')
                         ->schema([
-                            Forms\Components\Select::make('id_inventario')
+                            Forms\Components\Select::make('id_inventario')->placeholder('Selecciona...')
                                 ->label('Equipo a Reparar')
                                 ->relationship(
                                     name: 'inventario',
@@ -95,7 +95,7 @@ class MantenimientoResource extends Resource
                                         ->inline()
                                         ->required(),
                                 ]),
-                            Forms\Components\ToggleButtons::make('estado')
+                            Forms\Components\ToggleButtons::make('estado')->label('Estado')
                                 ->options([
                                     'Solicitado' => 'Solicitado',
                                     'En proceso' => 'En proceso',
@@ -121,14 +121,14 @@ class MantenimientoResource extends Resource
                         ->schema([
                             Forms\Components\Grid::make(3)
                                 ->schema([
-                                    Forms\Components\DatePicker::make('fecha_solicitud')
+                                    Forms\Components\DatePicker::make('fecha_solicitud')->label('Fecha de solicitud')
                                         ->default(now())
                                         ->prefixIcon('heroicon-m-calendar')
                                         ->required(),
-                                    Forms\Components\DatePicker::make('fecha_inicio')
+                                    Forms\Components\DatePicker::make('fecha_inicio')->label('Fecha de inicio')
                                         ->prefixIcon('heroicon-m-calendar')
                                         ->label('Fecha Inicio'),
-                                    Forms\Components\DatePicker::make('fecha_fin')
+                                    Forms\Components\DatePicker::make('fecha_fin')->label('Fecha de fin')
                                         ->prefixIcon('heroicon-m-calendar')
                                         ->label('Fecha Fin'),
                                 ]),
@@ -140,7 +140,7 @@ class MantenimientoResource extends Resource
                                 ->label('Trabajo Realizado')
                                 ->rows(2)
                                 ->columnSpanFull(),
-                            Forms\Components\Textarea::make('observaciones')
+                            Forms\Components\Textarea::make('observaciones')->label('Observaciones')
                                 ->label('Observaciones')
                                 ->rows(2)
                                 ->columnSpanFull(),
@@ -180,7 +180,7 @@ class MantenimientoResource extends Resource
                 Tables\Columns\TextColumn::make('nombre_tecnico')
                     ->label('Técnico')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('estado')
+                Tables\Columns\TextColumn::make('estado')->label('Estado')
                     ->formatStateUsing(fn ($state) => $state === 'Pendiente Revision Admin' ? 'En revisión' : $state)
                     ->badge()
                     ->colors([
@@ -197,16 +197,16 @@ class MantenimientoResource extends Resource
                         'heroicon-m-check-badge' => 'Completado',
                         'heroicon-m-x-circle' => 'Cancelado',
                     ]),
-                Tables\Columns\TextColumn::make('fecha_solicitud')
+                Tables\Columns\TextColumn::make('fecha_solicitud')->label('Fecha de solicitud')
                     ->label('Fecha Sol.')
                     ->date('d/m/Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('fecha_inicio')
+                Tables\Columns\TextColumn::make('fecha_inicio')->label('Fecha de inicio')
                     ->label('Fecha Inicio')
                     ->date('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('fecha_fin')
+                Tables\Columns\TextColumn::make('fecha_fin')->label('Fecha de fin')
                     ->label('Fecha Fin')
                     ->date('d/m/Y')
                     ->sortable()
@@ -214,7 +214,7 @@ class MantenimientoResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
-                Tables\Filters\SelectFilter::make('estado')
+                Tables\Filters\SelectFilter::make('estado')->label('Estado')
                     ->options([
                         'Solicitado' => 'Solicitado',
                         'En proceso' => 'En proceso',

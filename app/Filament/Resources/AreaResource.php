@@ -35,7 +35,7 @@ class AreaResource extends Resource
                             ->required()
                             ->prefixIcon('heroicon-m-tag')
                             ->maxLength(100),
-                        Forms\Components\Select::make('id_departamento')
+                        Forms\Components\Select::make('id_departamento')->placeholder('Selecciona...')
                             ->label('Departamento')
                             ->relationship('departamento', 'nombre')
                             ->required()
@@ -58,7 +58,7 @@ class AreaResource extends Resource
                     ->label('Departamento')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('created_at')->label('Fecha de creación')
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

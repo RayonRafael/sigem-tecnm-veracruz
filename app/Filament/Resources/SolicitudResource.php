@@ -33,7 +33,7 @@ class SolicitudResource extends Resource
                         ->schema([
                             Forms\Components\Grid::make(3)
                                 ->schema([
-                                    Forms\Components\DatePicker::make('fecha_solicitud')
+                                    Forms\Components\DatePicker::make('fecha_solicitud')->label('Fecha de solicitud')
                                         ->default(now())
                                         ->required()
                                         ->prefixIcon('heroicon-m-calendar')
@@ -55,7 +55,7 @@ class SolicitudResource extends Resource
                                         ->live()
                                         ->columnSpan(2),
                                 ]),
-                            Forms\Components\ToggleButtons::make('estado')
+                            Forms\Components\ToggleButtons::make('estado')->label('Estado')
                                 ->options([
                                     'Pendiente' => 'Pendiente',
                                     'Autorizado' => 'Autorizado',
@@ -74,7 +74,7 @@ class SolicitudResource extends Resource
                                 ->default('Pendiente')
                                 ->required()
                                 ->columnSpanFull(),
-                            Forms\Components\Textarea::make('observaciones')
+                            Forms\Components\Textarea::make('observaciones')->label('Observaciones')
                                 ->label('Detalle / Motivo de la Solicitud')
                                 ->placeholder('Explica qué necesitas y para qué...')
                                 ->rows(3)
@@ -84,7 +84,7 @@ class SolicitudResource extends Resource
                                 ->label('Materiales Solicitados')
                                 ->relationship('detalles')
                                 ->schema([
-                                    Forms\Components\Select::make('id_producto')
+                                    Forms\Components\Select::make('id_producto')->placeholder('Selecciona...')
                                         ->label('Material')
                                         ->relationship('material', 'nombre')
                                         ->searchable()
@@ -109,14 +109,14 @@ class SolicitudResource extends Resource
                         ->schema([
                             Forms\Components\Grid::make(3)
                                 ->schema([
-                                    Forms\Components\Select::make('id_usuario')
+                                    Forms\Components\Select::make('id_usuario')->placeholder('Selecciona...')
                                         ->label('Solicitante (Usuario)')
                                         ->relationship('usuario', 'name')
                                         ->required()
                                         ->searchable()
                                         ->preload()
                                         ->prefixIcon('heroicon-m-user'),
-                                    Forms\Components\Select::make('id_receptor')
+                                    Forms\Components\Select::make('id_receptor')->placeholder('Selecciona...')
                                         ->label('Receptor (Área/Persona)')
                                         ->relationship('receptor', 'nombre')
                                         ->required()
@@ -137,7 +137,7 @@ class SolicitudResource extends Resource
                                 ]),
                             Forms\Components\Grid::make(3)
                                 ->schema([
-                                    Forms\Components\Select::make('autorizado_por')
+                                    Forms\Components\Select::make('autorizado_por')->placeholder('Selecciona...')
                                         ->label('Autorizado por')
                                         ->relationship('autorizadoPor', 'name')
                                         ->searchable()
@@ -180,11 +180,11 @@ class SolicitudResource extends Resource
                     ->label('Departamento')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('fecha_solicitud')
+                Tables\Columns\TextColumn::make('fecha_solicitud')->label('Fecha de solicitud')
                     ->label('Fecha')
                     ->date('d/m/Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('estado')
+                Tables\Columns\TextColumn::make('estado')->label('Estado')
                     ->badge()
                     ->colors([
                         'warning' => 'Pendiente',
@@ -213,7 +213,7 @@ class SolicitudResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
-                Tables\Filters\SelectFilter::make('estado')
+                Tables\Filters\SelectFilter::make('estado')->label('Estado')
                     ->options([
                         'Pendiente' => 'Pendiente',
                         'Autorizado' => 'Autorizado',
@@ -284,7 +284,7 @@ class SolicitudResource extends Resource
                             ->icon('heroicon-m-hashtag'),
                         \Filament\Infolists\Components\TextEntry::make('fecha_solicitud')->label('Fecha')->date('d/m/Y')->icon('heroicon-m-calendar'),
                         \Filament\Infolists\Components\TextEntry::make('tipo_movimiento')->label('Tipo')->badge(),
-                        \Filament\Infolists\Components\TextEntry::make('estado')
+                        \Filament\Infolists\Components\TextEntry::make('estado')->label('Estado')
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 'Pendiente' => 'warning',

@@ -40,7 +40,7 @@ class InventarioResource extends Resource
                                 ->placeholder('Ej. SN-12345')
                                 ->maxLength(100)
                                 ->columnSpan(1),
-                            Forms\Components\Select::make('id_producto')
+                            Forms\Components\Select::make('id_producto')->placeholder('Selecciona...')
                                 ->label('Material / Equipo')
                                 ->relationship('material', 'nombre')
                                 ->required()
@@ -48,7 +48,7 @@ class InventarioResource extends Resource
                                 ->preload()
                                 ->prefixIcon('heroicon-m-cube')
                                 ->columnSpan(2),
-                            Forms\Components\ToggleButtons::make('estado')
+                            Forms\Components\ToggleButtons::make('estado')->label('Estado')
                                 ->options([
                                     'Disponible' => 'Disponible',
                                     'Asignado' => 'Asignado',
@@ -94,7 +94,7 @@ class InventarioResource extends Resource
                                 ->live()
                                 ->required()
                                 ->columnSpan(1),
-                            Forms\Components\Select::make('id_usuario')
+                            Forms\Components\Select::make('id_usuario')->placeholder('Selecciona...')
                                 ->label('Registrado por (Usuario)')
                                 ->relationship('usuario', 'name')
                                 ->default(auth()->id())
@@ -110,7 +110,7 @@ class InventarioResource extends Resource
                         ->schema([
                             Forms\Components\Grid::make(2)
                                 ->schema([
-                                    Forms\Components\Select::make('id_proveedor')
+                                    Forms\Components\Select::make('id_proveedor')->placeholder('Selecciona...')
                                         ->label('Proveedor')
                                         ->relationship('proveedor', 'nombre_empresa')
                                         ->searchable()
@@ -152,7 +152,7 @@ class InventarioResource extends Resource
                                     Forms\Components\DatePicker::make('garantia_fecha_fin')
                                         ->label('Fin de Garantía')
                                         ->prefixIcon('heroicon-m-shield-check'),
-                                    Forms\Components\Select::make('garantia_estado')
+                                    Forms\Components\Select::make('garantia_estado')->placeholder('Selecciona...')
                                         ->label('Estado de Garantía')
                                         ->options([
                                             'vigente' => 'Vigente',
@@ -164,7 +164,7 @@ class InventarioResource extends Resource
                             
                             Forms\Components\Grid::make(1)
                                 ->schema([
-                                    Forms\Components\Select::make('estado_registro')
+                                    Forms\Components\Select::make('estado_registro')->placeholder('Selecciona...')
                                         ->label('Estado de Registro')
                                         ->options([
                                             'Pendiente' => 'Pendiente',
@@ -206,7 +206,7 @@ class InventarioResource extends Resource
                 Tables\Columns\TextColumn::make('ubicacion_fisica')
                     ->label('Ubicación')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('estado')
+                Tables\Columns\TextColumn::make('estado')->label('Estado')
                     ->badge()
                     ->colors([
                         'success' => 'Disponible',
@@ -250,7 +250,7 @@ class InventarioResource extends Resource
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('created_at')->label('Fecha de creación')
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -259,7 +259,7 @@ class InventarioResource extends Resource
             ->filters([
                 Tables\Filters\TernaryFilter::make('aprobado')
                     ->label('Estado de Aprobación'),
-                Tables\Filters\SelectFilter::make('estado')
+                Tables\Filters\SelectFilter::make('estado')->label('Estado')
                     ->options([
                         'Disponible' => 'Disponible',
                         'Asignado' => 'Asignado',
@@ -330,7 +330,7 @@ class InventarioResource extends Resource
                             ->icon('heroicon-m-qr-code'),
                         \Filament\Infolists\Components\TextEntry::make('material.nombre')->label('Material')
                             ->icon('heroicon-m-cube'),
-                        \Filament\Infolists\Components\TextEntry::make('estado')
+                        \Filament\Infolists\Components\TextEntry::make('estado')->label('Estado')
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 'Disponible' => 'success',

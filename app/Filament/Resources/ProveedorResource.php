@@ -42,7 +42,7 @@ class ProveedorResource extends Resource
                             ->default(null),
                         Forms\Components\ToggleButtons::make('activo')
                             ->label('Proveedor Activo')
-                            ->boolean()
+                            ->boolean(trueLabel: 'Sí', falseLabel: 'No')
                             ->inline()
                             ->default(true)
                             ->required(),
@@ -99,7 +99,7 @@ class ProveedorResource extends Resource
                     ->badge()
                     ->color(fn ($state) => $state ? 'success' : 'danger')
                     ->icon(fn ($state) => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle'),
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('created_at')->label('Fecha de creación')
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

@@ -45,7 +45,7 @@ class ReceptorResource extends Resource
                             ->required()
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
-                        Forms\Components\TextInput::make('email')
+                        Forms\Components\TextInput::make('email')->label('Correo electrónico')
                             ->label('Correo Electrónico')
                             ->email()
                             ->prefixIcon('heroicon-m-envelope')
@@ -57,7 +57,7 @@ class ReceptorResource extends Resource
                             ->prefixIcon('heroicon-m-device-phone-mobile')
                             ->maxLength(20)
                             ->default(null),
-                        Forms\Components\Select::make('id_area')
+                        Forms\Components\Select::make('id_area')->placeholder('Selecciona...')
                             ->label('Área')
                             ->relationship('area', 'nombre')
                             ->required()
@@ -81,7 +81,7 @@ class ReceptorResource extends Resource
                 Tables\Columns\TextColumn::make('apellido_materno')
                     ->label('Apellido Materno')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
+                Tables\Columns\TextColumn::make('email')->label('Correo electrónico')
                     ->label('Email')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('telefono')
@@ -91,7 +91,7 @@ class ReceptorResource extends Resource
                     ->label('Área')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('created_at')->label('Fecha de creación')
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
