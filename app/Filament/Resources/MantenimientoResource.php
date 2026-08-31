@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Notifications\Notification;
+
 use App\Filament\Resources\MantenimientoResource\Pages;
 use App\Models\Mantenimiento;
 use Filament\Forms;
@@ -230,27 +232,37 @@ class MantenimientoResource extends Resource
                         'Mejora' => 'Mejora',
                     ]),
             ])
+            
+            ->emptyStateHeading('No hay registros')
+            ->emptyStateDescription('Cuando se creen registros, aparecerán aquí.')
+            ->emptyStateIcon('heroicon-o-document-text')
             ->actions([
                 Tables\Actions\Action::make('autorizar')
                     ->label('Autorizar')
                     ->icon('heroicon-m-check-circle')
                     ->color('success')
                     ->visible(fn (Mantenimiento $record): bool => $record->estado === 'Pendiente Revision Admin' || $record->estado === 'Solicitado')
-                    ->action(fn (Mantenimiento $record) => $record->update(['estado' => 'En proceso']))
+                    ->action(function (Mantenimiento $record) {
+                        $record->update(['estado' => 'En proceso']);
+                        Notification::make()->title('Mantenimiento autorizado correctamente')->success()->send();
+                    })
                     ->requiresConfirmation(),
                 Tables\Actions\Action::make('completar')
                     ->label('Completar')
                     ->icon('heroicon-m-check-badge')
                     ->color('info')
                     ->visible(fn (Mantenimiento $record): bool => $record->estado === 'En proceso')
-                    ->action(fn (Mantenimiento $record) => $record->update(['estado' => 'Completado', 'fecha_fin' => now()]))
+                    ->action(function (Mantenimiento $record) {
+                        $record->update(['estado' => 'Completado', 'fecha_fin' => now()]);
+                        Notification::make()->title('Mantenimiento completado')->success()->send();
+                    })
                     ->requiresConfirmation(),
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Mantenimiento actualizado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->successNotificationTitle('Mantenimiento eliminado'),
                 ]),
             ]);
     }

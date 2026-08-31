@@ -77,17 +77,20 @@ class Dashboard extends BaseDashboard
         }
 
         // Stats específicos para los mini módulos del nuevo layout
-        $inventarioDisponibles = Inventario::where('estado', 'Disponible')->count();
-        $inventarioAsignados = Inventario::where('estado', 'Asignado')->count();
-        $inventarioEnMantenimiento = Inventario::where('estado', 'En Mantenimiento')->count();
-        $inventarioDanados = Inventario::whereIn('estado', ['Dañado', 'Baja'])->count();
+        $estadosInventario = Inventario::selectRaw('estado, count(*) as total')->groupBy('estado')->pluck('total', 'estado');
+        $inventarioDisponibles = $estadosInventario->get('Disponible', 0);
+        $inventarioAsignados = $estadosInventario->get('Asignado', 0);
+        $inventarioEnMantenimiento = $estadosInventario->get('En Mantenimiento', 0);
+        $inventarioDanados = $estadosInventario->get('Dañado', 0) + $estadosInventario->get('Baja', 0);
 
-        $mantenimientoEnRevision = Mantenimiento::whereIn('estado', ['Pendiente Revision Admin', 'Solicitado'])->count();
-        $mantenimientoEnProceso = Mantenimiento::where('estado', 'En proceso')->count();
-        $mantenimientoCompletados = Mantenimiento::where('estado', 'Completado')->count();
+        $estadosMantenimiento = Mantenimiento::selectRaw('estado, count(*) as total')->groupBy('estado')->pluck('total', 'estado');
+        $mantenimientoEnRevision = $estadosMantenimiento->get('Pendiente Revision Admin', 0) + $estadosMantenimiento->get('Solicitado', 0);
+        $mantenimientoEnProceso = $estadosMantenimiento->get('En proceso', 0);
+        $mantenimientoCompletados = $estadosMantenimiento->get('Completado', 0);
 
-        $solicitudesAutorizadas = Solicitud::where('estado', 'Autorizado')->count();
-        $solicitudesRechazadas = Solicitud::where('estado', 'Rechazado')->count();
+        $estadosSolicitud = Solicitud::selectRaw('estado, count(*) as total')->groupBy('estado')->pluck('total', 'estado');
+        $solicitudesAutorizadas = $estadosSolicitud->get('Autorizado', 0);
+        $solicitudesRechazadas = $estadosSolicitud->get('Rechazado', 0);
 
         // 6. Catálogos Completos para los Modales
         $departamentosList = Departamento::latest()->take(50)->get();

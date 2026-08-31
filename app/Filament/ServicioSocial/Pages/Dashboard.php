@@ -69,17 +69,20 @@ class Dashboard extends BaseDashboard
         }
 
         // Stats específicos para los mini módulos del nuevo layout (SS scope)
-        $inventarioDisponibles = Inventario::where('estado', 'Disponible')->count();
-        $inventarioAsignados = Inventario::where('estado', 'Asignado')->count();
-        $inventarioEnMantenimiento = Inventario::where('estado', 'En Mantenimiento')->count();
-        $inventarioDanados = Inventario::whereIn('estado', ['Dañado', 'Baja'])->count();
+        $estadosInventario = Inventario::selectRaw('estado, count(*) as total')->groupBy('estado')->pluck('total', 'estado');
+        $inventarioDisponibles = $estadosInventario->get('Disponible', 0);
+        $inventarioAsignados = $estadosInventario->get('Asignado', 0);
+        $inventarioEnMantenimiento = $estadosInventario->get('En Mantenimiento', 0);
+        $inventarioDanados = $estadosInventario->get('Dañado', 0) + $estadosInventario->get('Baja', 0);
 
-        $mantenimientoEnRevision = Mantenimiento::where('id_usuario_solicita', $userId)->whereIn('estado', ['Pendiente Revision Admin', 'Solicitado'])->count();
-        $mantenimientoEnProceso = Mantenimiento::where('id_usuario_solicita', $userId)->where('estado', 'En proceso')->count();
-        $mantenimientoCompletados = Mantenimiento::where('id_usuario_solicita', $userId)->where('estado', 'Completado')->count();
+        $estadosMantenimiento = Mantenimiento::where('id_usuario_solicita', $userId)->selectRaw('estado, count(*) as total')->groupBy('estado')->pluck('total', 'estado');
+        $mantenimientoEnRevision = $estadosMantenimiento->get('Pendiente Revision Admin', 0) + $estadosMantenimiento->get('Solicitado', 0);
+        $mantenimientoEnProceso = $estadosMantenimiento->get('En proceso', 0);
+        $mantenimientoCompletados = $estadosMantenimiento->get('Completado', 0);
 
-        $solicitudesAutorizadas = Solicitud::where('id_usuario', $userId)->where('estado', 'Autorizado')->count();
-        $solicitudesRechazadas = Solicitud::where('id_usuario', $userId)->where('estado', 'Rechazado')->count();
+        $estadosSolicitud = Solicitud::where('id_usuario', $userId)->selectRaw('estado, count(*) as total')->groupBy('estado')->pluck('total', 'estado');
+        $solicitudesAutorizadas = $estadosSolicitud->get('Autorizado', 0);
+        $solicitudesRechazadas = $estadosSolicitud->get('Rechazado', 0);
 
         // Catálogos Completos (Read-only for SS)
         $departamentosList = Departamento::latest()->take(50)->get();

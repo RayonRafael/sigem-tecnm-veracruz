@@ -2,6 +2,8 @@
 
 namespace App\Filament\ServicioSocial\Resources;
 
+use Filament\Notifications\Notification;
+
 use App\Filament\ServicioSocial\Resources\SolicitudResource\Pages;
 use App\Models\Solicitud;
 use Filament\Forms;
@@ -183,7 +185,7 @@ class SolicitudResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Solicitud actualizada correctamente'),
             ])
             ->bulkActions([]);
     }

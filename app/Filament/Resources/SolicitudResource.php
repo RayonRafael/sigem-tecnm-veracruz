@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Notifications\Notification;
+
 use App\Filament\Resources\SolicitudResource\Pages;
 use App\Models\Solicitud;
 use Filament\Forms;
@@ -229,17 +231,24 @@ class SolicitudResource extends Resource
                         'Renta Externa' => 'Renta Externa',
                     ]),
             ])
+            
+            ->emptyStateHeading('No hay registros')
+            ->emptyStateDescription('Cuando se creen registros, aparecerán aquí.')
+            ->emptyStateIcon('heroicon-o-document-text')
             ->actions([
                 Tables\Actions\Action::make('autorizar')
                     ->label('Autorizar')
                     ->icon('heroicon-m-check-circle')
                     ->color('success')
                     ->visible(fn (Solicitud $record): bool => $record->estado === 'Pendiente')
-                    ->action(fn (Solicitud $record) => $record->update([
-                        'estado' => 'Autorizado',
-                        'fecha_autorizacion' => now(),
-                        'autorizado_por' => auth()->id()
-                    ]))
+                    ->action(function (Solicitud $record) {
+                        $record->update([
+                            'estado' => 'Autorizado',
+                            'fecha_autorizacion' => now(),
+                            'autorizado_por' => auth()->id()
+                        ]);
+                        Notification::make()->title('Solicitud autorizada correctamente')->success()->send();
+                    })
                     ->requiresConfirmation(),
                 Tables\Actions\Action::make('rechazar')
                     ->label('Rechazar')
@@ -260,14 +269,15 @@ class SolicitudResource extends Resource
                             'estado' => 'Rechazado',
                             'observaciones' => $observacion
                         ]);
+                        Notification::make()->title('Solicitud rechazada')->success()->send();
                     })
                     ->requiresConfirmation(),
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Solicitud actualizada correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->successNotificationTitle('Solicitud eliminada'),
                 ]),
             ]);
     }

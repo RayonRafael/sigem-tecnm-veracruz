@@ -161,7 +161,10 @@ class UserResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton(),
-                Tables\Actions\DeleteAction::make()
+                Tables\Actions\DeleteAction::make()->requiresConfirmation()
+                    ->modalHeading('Eliminar usuario')
+                    ->modalDescription('¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.')
+                    ->modalSubmitActionLabel('Sí, eliminar')
                     ->iconButton()
                     ->hidden(fn (User $record): bool => $record->email === 'admin@tecnm.edu.mx'),
             ])

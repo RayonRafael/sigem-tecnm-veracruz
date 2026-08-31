@@ -2,6 +2,8 @@
 
 namespace App\Filament\ServicioSocial\Resources;
 
+use Filament\Notifications\Notification;
+
 use App\Filament\ServicioSocial\Resources\MantenimientoResource\Pages;
 use App\Models\Mantenimiento;
 use Filament\Forms;
@@ -189,7 +191,7 @@ class MantenimientoResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Mantenimiento actualizado correctamente'),
             ])
             ->bulkActions([]);
     }
