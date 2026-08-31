@@ -494,8 +494,17 @@
                 <div class="timeline-item">
                     <div class="dot {{ $dot }}"></div>
                     <div class="tl-content">
-                        <p class="tl-text">Has {{ strtolower($act->accion) }} en <em>{{ $act->tabla_afectada }}</em></p>
-                        <div class="tl-time">hace {{ \Carbon\Carbon::parse($act->fecha_hora)->diffInMinutes() }} min</div>
+                        @php
+                            $accionesMap = [
+                                'crear' => 'Creaste un',
+                                'editar' => 'Editaste un',
+                                'eliminar' => 'Eliminaste un',
+                                'autorizar' => 'Autorizaste un',
+                            ];
+                            $accionTexto = $accionesMap[strtolower($act->accion)] ?? ('Has ' . strtolower($act->accion) . ' en');
+                        @endphp
+                        <p class="tl-text">{{ $accionTexto }} <em>{{ $act->tabla_afectada }}</em></p>
+                        <div class="tl-time">{{ \Carbon\Carbon::parse($act->fecha_hora)->diffForHumans() }}</div>
                     </div>
                 </div>
                 @empty

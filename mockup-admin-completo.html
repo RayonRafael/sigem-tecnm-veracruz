@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGEM - Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1b65d4;
+            --primary-hover: #1557b0;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --bg: #f3f4f6;
+            --surface: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --badge-gray: #9ca3af;
+        }
+
+        body.dark-mode {
+            --bg: #111827;
+            --surface: #1f2937;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --border: #374151;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Header */
+        .top-header {
+            background-color: var(--surface);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: transparent;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: background 0.2s;
+            color: var(--text-main);
+        }
+        .icon-btn:hover { background: var(--bg); }
+
+        /* Main Container */
+        .main-container {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Views */
+        .view { display: none; }
+        .view.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .breadcrumb a:hover { text-decoration: underline; }
+        
+        .view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Bento Grid Layout (Dashboard) */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+            grid-auto-rows: minmax(100px, auto);
+        }
+        
+        .bento-card {
+            background-color: var(--surface);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .col-span-12 { grid-column: span 12; }
+        .col-span-8 { grid-column: span 8; }
+        .col-span-4 { grid-column: span 4; }
+        .col-span-6 { grid-column: span 6; }
+        .col-span-3 { grid-column: span 3; }
+
+        /* Banner */
+        .bento-banner {
+            background: linear-gradient(135deg, var(--primary), #3b82f6);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .bento-banner h2 { font-size: 2rem; margin-bottom: 0.5rem; }
+        .bento-banner p { opacity: 0.9; font-size: 1.1rem; margin-bottom: 1rem;}
+        .banner-actions { display: flex; gap: 1rem; }
+
+        /* Stat Cards */
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .stat-icon {
+            font-size: 3rem;
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 1rem;
+        }
+        .stat-info { flex: 1; }
+        .stat-value { font-size: 2.5rem; font-weight: 700; line-height: 1; margin-bottom: 0.25rem;}
+        .stat-label { font-size: 1rem; color: var(--text-muted); font-weight: 500;}
+
+        /* Quick Access Cards */
+        .quick-access-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .quick-card {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .quick-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            background: var(--surface);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        .quick-card-icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .quick-card-title { font-weight: 700; color: var(--text-main); font-size: 1.1rem;}
+        .quick-card-count { color: var(--primary); font-weight: 700; margin-top: 0.5rem; }
+
+        /* Catalogs Grid */
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        .catalog-link {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: var(--bg);
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--text-main);
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .catalog-link:hover {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+        .catalog-count {
+            background: var(--surface);
+            padding: 0.2rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Generic Lists */
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item-content h4 { margin-bottom: 0.25rem; font-size: 1rem;}
+        .list-item-content p { color: var(--text-muted); font-size: 0.875rem; }
+
+        /* Tables */
+        .card {
+            background-color: var(--surface);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background-color: var(--bg); font-weight: 500; color: var(--text-muted); font-size: 0.875rem; border-top: 1px solid var(--border); }
+        td { font-size: 0.9rem; }
+        
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .badge-success { background-color: #d1fae5; color: var(--success); }
+        .badge-warning { background-color: #fef3c7; color: var(--warning); }
+        .badge-danger { background-color: #fee2e2; color: var(--danger); }
+        .badge-primary { background-color: #dbeafe; color: var(--primary); }
+        .badge-gray { background-color: #f3f4f6; color: var(--badge-gray); border: 1px solid var(--border); }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-success:hover { background-color: #047857; }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-outline { background-color: var(--surface); border: 1px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { background-color: var(--bg); }
+        .btn-icon { padding: 0.4rem; border-radius: 0.375rem; cursor: pointer; border: 1px solid transparent; background: transparent; transition: all 0.2s; font-size: 1.1rem;}
+        .btn-icon:hover { background: var(--bg); border-color: var(--border);}
+
+        /* Forms & Wizard */
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 0.875rem; color: var(--text-main); }
+        .form-control {
+            width: 100%; padding: 0.75rem; border: 1px solid var(--border);
+            border-radius: 0.5rem; font-family: inherit; font-size: 0.9rem; background: var(--surface); color: var(--text-main);
+        }
+        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(27, 101, 212, 0.2); }
+        
+        .wizard-steps {
+            display: flex; justify-content: space-between; margin-bottom: 3rem; position: relative; padding: 0 2rem;
+        }
+        .wizard-steps::before {
+            content: ''; position: absolute; top: 50%; left: 3rem; right: 3rem; height: 3px; background-color: var(--border); z-index: 1; transform: translateY(-50%);
+        }
+        .wizard-step {
+            position: relative; z-index: 2; background-color: var(--surface); padding: 0 1rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: var(--text-muted);
+        }
+        .wizard-step.active { color: var(--primary); font-weight: bold;}
+        .step-circle {
+            width: 2.5rem; height: 2.5rem; border-radius: 50%; background-color: var(--surface); border: 3px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem;
+        }
+        .wizard-step.active .step-circle { background-color: var(--primary); color: white; border-color: var(--primary); }
+        .wizard-step.completed .step-circle { background-color: var(--success); color: white; border-color: var(--success); }
+        .wizard-content { display: none; }
+        .wizard-content.active { display: block; animation: fadeIn 0.3s ease;}
+
+        /* Toggle Buttons */
+        .toggle-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .toggle-btn { padding: 0.625rem 1rem; border: 1px solid var(--border); border-radius: 0.5rem; background: var(--surface); color: var(--text-main); cursor: pointer; font-family: inherit; transition: all 0.2s; font-weight: 500;}
+        .toggle-btn.active { background-color: var(--primary); color: white; border-color: var(--primary); }
+        .toggle-btn.active-success { background-color: var(--success); color: white; border-color: var(--success); }
+        .toggle-btn.active-warning { background-color: var(--warning); color: white; border-color: var(--warning); }
+        .toggle-btn.active-danger { background-color: var(--danger); color: white; border-color: var(--danger); }
+
+        /* Detail Views */
+        .detail-sections-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .detail-card { background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem; }
+        .detail-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--text-main); border-bottom: 1px solid var(--border); padding-bottom: 0.75rem;}
+        .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+        .detail-item .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;}
+        .detail-item .value { font-size: 1rem; font-weight: 500; color: var(--text-main);}
+
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; backdrop-filter: blur(4px);}
+        .modal-overlay.active { display: flex; animation: fadeIn 0.2s ease;}
+        .modal { background: var(--surface); padding: 2rem; border-radius: 1rem; width: 90%; max-width: 450px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border); }
+        .modal h3 { margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.25rem;}
+        .modal p { color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.95rem; line-height: 1.5; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; }
+
+        /* Utilities */
+        .flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .items-center { align-items: center; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .text-muted { color: var(--text-muted); }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .col-span-3, .col-span-4, .col-span-6, .col-span-8 { grid-column: span 12; }
+            .catalog-grid { grid-template-columns: repeat(2, 1fr); }
+            .detail-sections-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .quick-access-grid { grid-template-columns: 1fr; }
+            .catalog-grid { grid-template-columns: 1fr; }
+            .wizard-step span { display: none; }
+            .wizard-steps::before { left: 1rem; right: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Simple Top Header -->
+    <header class="top-header">
+        <div class="logo-area" onclick="navigateTo('dashboard')">
+            <span class="emoji">🏢</span> <span class="sys-name">SIGEM</span>
+        </div>
+        <div class="header-actions">
+            <button class="icon-btn" id="theme-toggle" title="Cambiar Tema">🌙</button>
+            <button class="btn btn-outline" id="logout-btn" onclick="alert('Cerrar sesión')">🚪 Salir</button>
+        </div>
+    </header>
+
+    <main class="main-container">
+        
+        <!-- VIEW: DASHBOARD (Bento Grid) -->
+        <div id="view-dashboard" class="view active">
+            <div class="bento-grid">
+                
+                <!-- Welcome Banner -->
+                <div class="bento-card bento-banner col-span-12">
+                    <div>
+                        <h2 id="greeting">👋 ¡Buenos días, Administrador!</h2>
+                        <p>Tienes <strong>2 mantenimientos</strong> por autorizar y <strong>3 solicitudes</strong> pendientes.</p>
+                        <div class="banner-actions">
+                            <button class="btn" style="background: white; color: var(--primary); font-weight: 700;" onclick="navigateTo('inventory-create')">➕ Nuevo Inventario</button>
+                            <button class="btn" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4);" onclick="navigateTo('bitacora')">📝 Ver Bitácora</button>
+                        </div>
+                    </div>
+                    <div style="font-size: 8rem; opacity: 0.2; line-height: 1; transform: rotate(15deg);">🏢</div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="bento-card col-span-3 stat-card">
+                    <div class="stat-icon">📦</div>
+                    <div class="stat-info">
+                        <div class="stat-value">1,248</div>
+                        <div class="stat-label">Total Inventario</div>
+                    </div>
+                </div>
+                <div class="bento-card col-span-3 stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-info">
+                        <div class="stat-value" style="color: var(--success);">1,102</div>
+                        <div class="stat-label">Disponibles</div>
+                    </div>
+                </div>
+                <div class="bento-card col-span-3 stat-card">
+                    <div class="stat-icon">🔧</div>
+                    <div class="stat-info">
+                        <div class="stat-value" style="color: var(--warning);">45</div>
+                        <div class="stat-label">En Mantenimiento</div>
+                    </div>
+                </div>
+                <div class="bento-card col-span-3 stat-card">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-info">
+                        <div class="stat-value" style="color: var(--danger);">12</div>
+                        <div class="stat-label">Alertas Stock</div>
+                    </div>
+                </div>
+
+                <!-- Needs Attention & Quick Access -->
+                <div class="bento-card col-span-8">
+                    <h3 class="mb-4 text-main" style="font-size: 1.25rem;">⚡ Necesitan tu atención</h3>
+                    <div style="display:flex; flex-direction:column;">
+                        <div class="list-item">
+                            <div class="list-item-content">
+                                <h4>Mantenimiento #MAN-045</h4>
+                                <p>Proyector Epson - Preventivo (Pendiente de Autorización)</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="btn btn-success" onclick="showModal('modal-auth')">✅ Autorizar</button>
+                                <button class="btn btn-outline btn-icon" onclick="navigateTo('maintenance-view')" title="Ver detalle">👁️</button>
+                            </div>
+                        </div>
+                        <div class="list-item">
+                            <div class="list-item-content">
+                                <h4>Solicitud #SOL-089</h4>
+                                <p>Juan Pérez - 2 Laptops (En revisión)</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <button class="btn btn-primary" onclick="navigateTo('requests-list')">Revisar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Access -->
+                <div class="bento-card col-span-4" style="background: transparent; border: none; box-shadow: none; padding: 0;">
+                    <div class="quick-access-grid" style="grid-template-columns: 1fr; gap: 1.5rem; height: 100%;">
+                        <div class="quick-card" onclick="navigateTo('inventory-list')">
+                            <div class="quick-card-icon">📦</div>
+                            <div class="quick-card-title">Inventario</div>
+                            <div class="quick-card-count">Gestión completa</div>
+                        </div>
+                        <div class="quick-card" onclick="navigateTo('maintenance-list')" style="display:flex; justify-content:space-between; align-items:center; text-align:left; padding: 1rem 1.5rem;">
+                            <div class="flex items-center gap-4">
+                                <span class="quick-card-icon" style="margin:0;">🔧</span>
+                                <div>
+                                    <div class="quick-card-title">Mantenimiento</div>
+                                    <div class="quick-card-count">5 activos</div>
+                                </div>
+                            </div>
+                            <span style="font-size: 1.5rem; color: var(--border);">➡️</span>
+                        </div>
+                        <div class="quick-card" onclick="navigateTo('requests-list')" style="display:flex; justify-content:space-between; align-items:center; text-align:left; padding: 1rem 1.5rem;">
+                            <div class="flex items-center gap-4">
+                                <span class="quick-card-icon" style="margin:0;">📋</span>
+                                <div>
+                                    <div class="quick-card-title">Solicitudes</div>
+                                    <div class="quick-card-count">3 pendientes</div>
+                                </div>
+                            </div>
+                            <span style="font-size: 1.5rem; color: var(--border);">➡️</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bento-card col-span-4">
+                    <h3 class="mb-4" style="font-size: 1.25rem;">🕒 Actividad Reciente</h3>
+                    <div style="display:flex; flex-direction:column; gap: 1rem;">
+                        <div class="flex gap-2 items-start">
+                            <span class="badge badge-success" style="margin-top:2px;">ALTA</span>
+                            <div>
+                                <div style="font-size:0.9rem;"><strong>Admin</strong> registró Proyector Epson</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">Hace 2 horas</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 items-start">
+                            <span class="badge badge-warning" style="margin-top:2px;">EDIT</span>
+                            <div>
+                                <div style="font-size:0.9rem;"><strong>Técnico 1</strong> envió Silla a mantenimiento</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">Hace 4 horas</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 items-start">
+                            <span class="badge badge-primary" style="margin-top:2px;">SOL.</span>
+                            <div>
+                                <div style="font-size:0.9rem;"><strong>Juan Pérez</strong> solicitó marcadores</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">Ayer, 16:30</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 items-start">
+                            <span class="badge badge-danger" style="margin-top:2px;">BAJA</span>
+                            <div>
+                                <div style="font-size:0.9rem;"><strong>Admin</strong> dio de baja Laptop vieja</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">Ayer, 10:15</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 items-start">
+                            <span class="badge badge-success" style="margin-top:2px;">COMP</span>
+                            <div>
+                                <div style="font-size:0.9rem;"><strong>Técnico 2</strong> completó MAN-043</div>
+                                <div style="font-size:0.8rem; color:var(--text-muted);">Hace 2 días</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Catalogs Grid -->
+                <div class="bento-card col-span-8">
+                    <h3 class="mb-2" style="font-size: 1.25rem;">🗂️ Catálogos del Sistema</h3>
+                    <p class="text-muted mb-4">Gestiona los catálogos base utilizados en el registro de inventario.</p>
+                    <div class="catalog-grid">
+                        <a class="catalog-link" onclick="navigateTo('departments-list')">🏢 Departamentos <span class="catalog-count">12</span></a>
+                        <a class="catalog-link">📍 Áreas <span class="catalog-count">45</span></a>
+                        <a class="catalog-link" onclick="navigateTo('materials-list')">🗄️ Materiales <span class="catalog-count">128</span></a>
+                        <a class="catalog-link">🏷️ Marcas <span class="catalog-count">34</span></a>
+                        <a class="catalog-link">💻 Tipos <span class="catalog-count">15</span></a>
+                        <a class="catalog-link">📏 Unidades <span class="catalog-count">8</span></a>
+                        <a class="catalog-link">🤝 Proveedores <span class="catalog-count">22</span></a>
+                        <a class="catalog-link">👤 Receptores <span class="catalog-count">56</span></a>
+                        <a class="catalog-link" onclick="navigateTo('users-list')">👥 Usuarios <span class="catalog-count">65</span></a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- VIEW: INVENTORY LIST -->
+        <div id="view-inventory-list" class="view">
+            <div class="breadcrumb">
+                <a onclick="navigateTo('dashboard')">Dashboard</a> <span>/</span> <span style="color:var(--text-main); font-weight:700;">Inventario</span>
+            </div>
+            <div class="view-header">
+                <h2>📦 Inventario</h2>
+                <button class="btn btn-primary" onclick="navigateTo('inventory-create')">➕ Nuevo Inventario</button>
+            </div>
+            
+            <div class="card">
+                <div class="flex justify-between mb-4">
+                    <input type="text" class="form-control" placeholder="Buscar por código, equipo..." style="max-width: 300px;">
+                    <div class="flex gap-2">
+                        <button class="btn btn-outline">🔽 Filtros</button>
+                        <button class="btn btn-outline">📤 Exportar</button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Equipo</th>
+                                <th>Marca</th>
+                                <th>Estado</th>
+                                <th>Ubicación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>INV-2023-001</strong></td>
+                                <td>Laptop Dell Latitude</td>
+                                <td>Dell</td>
+                                <td><span class="badge badge-success">Disponible</span></td>
+                                <td>Laboratorio 1</td>
+                                <td>
+                                    <div class="flex gap-2">
+                                        <button class="btn-icon" onclick="navigateTo('inventory-view')" title="Ver">👁️</button>
+                                        <button class="btn-icon" onclick="navigateTo('inventory-edit')" title="Editar">✏️</button>
+                                        <button class="btn-icon" onclick="showModal('modal-delete')" title="Eliminar">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>INV-2023-002</strong></td>
+                                <td>Proyector Epson</td>
+                                <td>Epson</td>
+                                <td><span class="badge badge-warning">En Mantenimiento</span></td>
+                                <td>Taller Soporte</td>
+                                <td>
+                                    <div class="flex gap-2">
+                                        <button class="btn-icon" onclick="navigateTo('inventory-view')" title="Ver">👁️</button>
+                                        <button class="btn-icon" onclick="navigateTo('inventory-edit')" title="Editar">✏️</button>
+                                        <button class="btn-icon" onclick="showModal('modal-delete')" title="Eliminar">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>INV-2023-003</strong></td>
+                                <td>Silla Ejecutiva</td>
+                                <td>Herman Miller</td>
+                                <td><span class="badge badge-danger">Dañado</span></td>
+                                <td>Almacén General</td>
+                                <td>
+                                    <div class="flex gap-2">
+                                        <button class="btn-icon" onclick="navigateTo('inventory-view')" title="Ver">👁️</button>
+                                        <button class="btn-icon" onclick="navigateTo('inventory-edit')" title="Editar">✏️</button>
+                                        <button class="btn-icon" onclick="showModal('modal-delete')" title="Eliminar">🗑️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style="margin-top: 1rem; color: var(--text-muted); font-size: 0.875rem; text-align:right;">
+                    Mostrando 1-3 de 1,248 registros | ◀️ 1 2 3 ... ▶️
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: INVENTORY CREATE WIZARD -->
+        <div id="view-inventory-create" class="view">
+            <div class="breadcrumb">
+                <a onclick="navigateTo('dashboard')">Dashboard</a> <span>/</span> <a onclick="navigateTo('inventory-list')">Inventario</a> <span>/</span> <span style="color:var(--text-main); font-weight:700;">Crear</span>
+            </div>
+            <div class="view-header">
+                <h2>➕ Crear Inventario</h2>
+            </div>
+
+            <div class="card" style="max-width: 900px; margin: 0 auto;">
+                <div class="wizard-steps">
+                    <div class="wizard-step active" id="step-nav-1">
+                        <div class="step-circle">1</div>
+                        <span>Identificación</span>
+                    </div>
+                    <div class="wizard-step" id="step-nav-2">
+                        <div class="step-circle">2</div>
+                        <span>Ubicación</span>
+                    </div>
+                    <div class="wizard-step" id="step-nav-3">
+                        <div class="step-circle">3</div>
+                        <span>Documentación</span>
+                    </div>
+                    <div class="wizard-step" id="step-nav-4">
+                        <div class="step-circle">4</div>
+                        <span>Confirmación</span>
+                    </div>
+                </div>
+
+                <!-- Step 1 -->
+                <div id="wizard-step-1" class="wizard-content active">
+                    <h3 class="mb-4">Datos de Identificación</h3>
+                    <div class="detail-sections-grid">
+                        <div class="form-group">
+                            <label class="form-label">Material / Equipo</label>
+                            <select class="form-control"><option>Seleccione material...</option><option>Laptop</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Número de Serie</label>
+                            <input type="text" class="form-control" placeholder="Ej. SN-123456789">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Estado del Equipo</label>
+                            <div class="toggle-group">
+                                <button class="toggle-btn active active-success" onclick="toggleBtn(this, 'active-success')">Disponible</button>
+                                <button class="toggle-btn" onclick="toggleBtn(this, 'active-warning')">Asignado</button>
+                                <button class="toggle-btn" onclick="toggleBtn(this, 'active-warning')">En Mantenimiento</button>
+                                <button class="toggle-btn" onclick="toggleBtn(this, 'active-danger')">Dañado</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Tipo de Propiedad</label>
+                            <div class="toggle-group">
+                                <button class="toggle-btn active active-primary" onclick="toggleBtn(this, 'active-primary')">Propio</button>
+                                <button class="toggle-btn" onclick="toggleBtn(this, 'active-gray')">Rentado</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between mt-4 border-t pt-4" style="border-top: 1px solid var(--border); padding-top: 1rem;">
+                        <button class="btn btn-outline" onclick="navigateTo('inventory-list')">Cancelar</button>
+                        <button class="btn btn-primary" onclick="nextWizardStep(2)">Siguiente ➡️</button>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div id="wizard-step-2" class="wizard-content">
+                    <h3 class="mb-4">Asignación y Ubicación</h3>
+                    <div class="detail-sections-grid">
+                        <div class="form-group">
+                            <label class="form-label">Departamento</label>
+                            <select class="form-control"><option>Sistemas Computacionales</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Área</label>
+                            <select class="form-control"><option>Laboratorio de Redes</option></select>
+                        </div>
+                        <div class="form-group col-span-12">
+                            <label class="form-label">Ubicación Física</label>
+                            <input type="text" class="form-control" placeholder="Ej. Escritorio 4, Rack 2">
+                        </div>
+                    </div>
+                    <div class="flex justify-between mt-4" style="border-top: 1px solid var(--border); padding-top: 1rem;">
+                        <button class="btn btn-outline" onclick="nextWizardStep(1)">⬅️ Anterior</button>
+                        <button class="btn btn-primary" onclick="nextWizardStep(3)">Siguiente ➡️</button>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div id="wizard-step-3" class="wizard-content">
+                    <h3 class="mb-4">Documentación</h3>
+                    <div class="detail-sections-grid">
+                        <div class="form-group">
+                            <label class="form-label">Proveedor</label>
+                            <select class="form-control"><option>Compudabo S.A.</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Número de Factura</label>
+                            <input type="text" class="form-control" placeholder="Ej. FAC-9982">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Fecha de Factura</label>
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Garantía hasta</label>
+                            <input type="date" class="form-control">
+                        </div>
+                    </div>
+                    <div class="flex justify-between mt-4" style="border-top: 1px solid var(--border); padding-top: 1rem;">
+                        <button class="btn btn-outline" onclick="nextWizardStep(2)">⬅️ Anterior</button>
+                        <button class="btn btn-primary" onclick="nextWizardStep(4)">Siguiente ➡️</button>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div id="wizard-step-4" class="wizard-content">
+                    <h3 class="mb-4">Confirmación</h3>
+                    <p class="mb-4" style="color:var(--text-muted);">Revisa que los datos sean correctos antes de crear el registro.</p>
+                    
+                    <div class="detail-card mb-4">
+                        <div class="detail-title">Resumen de Registro</div>
+                        <div class="detail-grid">
+                            <div class="detail-item"><div class="label">Material</div><div class="value">Laptop Dell</div></div>
+                            <div class="detail-item"><div class="label">No. Serie</div><div class="value">SN-123456789</div></div>
+                            <div class="detail-item"><div class="label">Estado</div><div class="value"><span class="badge badge-success">Disponible</span></div></div>
+                            <div class="detail-item"><div class="label">Ubicación</div><div class="value">Laboratorio de Redes</div></div>
+                            <div class="detail-item"><div class="label">Proveedor</div><div class="value">Compudabo S.A.</div></div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between mt-4" style="border-top: 1px solid var(--border); padding-top: 1rem;">
+                        <button class="btn btn-outline" onclick="nextWizardStep(3)">⬅️ Anterior</button>
+                        <button class="btn btn-success" onclick="showModal('modal-create-success')">💾 Crear Registro</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: INVENTORY VIEW DETAIL -->
+        <div id="view-inventory-view" class="view">
+            <div class="breadcrumb">
+                <a onclick="navigateTo('dashboard')">Dashboard</a> <span>/</span> <a onclick="navigateTo('inventory-list')">Inventario</a> <span>/</span> <span style="color:var(--text-main); font-weight:700;">INV-2023-001</span>
+            </div>
+            <div class="view-header">
+                <h2>Inventario: INV-2023-001</h2>
+                <div class="flex gap-2">
+                    <button class="btn btn-outline" onclick="navigateTo('inventory-edit')">✏️ Editar</button>
+                    <button class="btn btn-danger" onclick="showModal('modal-delete')">🗑️ Eliminar</button>
+                </div>
+            </div>
+
+            <div class="detail-sections-grid">
+                <div class="detail-card">
+                    <div class="detail-title">Identificación</div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="label">No. Serie</div><div class="value">DL-99882233</div></div>
+                        <div class="detail-item"><div class="label">Material/Equipo</div><div class="value">Laptop Dell Latitude</div></div>
+                        <div class="detail-item"><div class="label">Estado</div><div class="value"><span class="badge badge-success">Disponible</span></div></div>
+                        <div class="detail-item"><div class="label">Tipo de Propiedad</div><div class="value"><span class="badge badge-primary">Propio</span></div></div>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-title">Ubicación</div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="label">Departamento</div><div class="value">Sistemas Computacionales</div></div>
+                        <div class="detail-item"><div class="label">Área</div><div class="value">Laboratorio 1</div></div>
+                        <div class="detail-item" style="grid-column: span 2;"><div class="label">Ubicación Física</div><div class="value">Mesa 4, Posición A</div></div>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-title">Documentación</div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="label">Proveedor</div><div class="value">Compudabo S.A.</div></div>
+                        <div class="detail-item"><div class="label">No. Factura</div><div class="value">FAC-99120</div></div>
+                        <div class="detail-item"><div class="label">Fecha Factura</div><div class="value">15/01/2023</div></div>
+                        <div class="detail-item"><div class="label">Garantía</div><div class="value"><span class="badge badge-success">Activa hasta 2025</span></div></div>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-title">Observaciones</div>
+                    <p style="color:var(--text-main); line-height: 1.5;">Equipo asignado originalmente a docente, devuelto por actualización. En perfectas condiciones.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: INVENTORY EDIT -->
+        <div id="view-inventory-edit" class="view">
+            <div class="breadcrumb">
+                <a onclick="navigateTo('dashboard')">Dashboard</a> <span>/</span> <a onclick="navigateTo('inventory-list')">Inventario</a> <span>/</span> <span style="color:var(--text-main); font-weight:700;">Editar INV-2023-001</span>
+            </div>
+            <div class="view-header">
+                <h2>Editar Inventario: INV-2023-001</h2>
+                <div class="flex gap-2">
+                    <button class="btn btn-outline" onclick="navigateTo('inventory-list')">Cancelar</button>
+                    <button class="btn btn-success" onclick="showModal('modal-save-changes')">💾 Guardar Cambios</button>
+                </div>
+            </div>
+
+            <div class="detail-sections-grid">
+                <!-- Identificación -->
+                <div class="card">
+                    <h3 class="mb-4">Identificación</h3>
+                    <div class="form-group">
+                        <label class="form-label">Material / Equipo</label>
+                        <select class="form-control"><option>Laptop Dell Latitude</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Número de Serie</label>
+                        <input type="text" class="form-control" value="DL-99882233">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Estado</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active active-success" onclick="toggleBtn(this, 'active-success')">Disponible</button>
+                            <button class="toggle-btn" onclick="toggleBtn(this, 'active-warning')">Asignado</button>
+                            <button class="toggle-btn" onclick="toggleBtn(this, 'active-warning')">En Mantenimiento</button>
+                            <button class="toggle-btn" onclick="toggleBtn(this, 'active-danger')">Dañado</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Propiedad</label>
+                        <select class="form-control"><option>Propio</option><option>Rentado</option></select>
+                    </div>
+                </div>
+
+                <!-- Ubicación & Docs in a column -->
+                <div style="display:flex; flex-direction:column; gap:1.5rem;">
+                    <div class="card" style="margin-bottom:0;">
+                        <h3 class="mb-4">Ubicación</h3>
+                        <div class="detail-grid">
+                            <div class="form-group">
+                                <label class="form-label">Área</label>
+                                <select class="form-control"><option>Laboratorio 1</option></select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Departamento</label>
+                                <select class="form-control"><option>Sistemas Computacionales</option></select>
+                            </div>
+                            <div class="form-group" style="grid-column:span 2;">
+                                <label class="form-label">Ubicación Física</label>
+                                <input type="text" class="form-control" value="Mesa 4, Posición A">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-bottom:0;">
+                        <h3 class="mb-4">Documentación</h3>
+                        <div class="detail-grid">
+                            <div class="form-group">
+                                <label class="form-label">Proveedor</label>
+                                <select class="form-control"><option>Compudabo S.A.</option></select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Fecha Factura</label>
+                                <input type="date" class="form-control" value="2023-01-15">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card col-span-12" style="grid-column: span 2;">
+                    <h3 class="mb-4">Observaciones</h3>
+                    <textarea class="form-control" rows="3">Equipo asignado originalmente a docente, devuelto por actualización. En perfectas condiciones.</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: MAINTENANCE LIST -->
+        <div id="view-maintenance-list" class="view">
+            <div class="breadcrumb">
+                <a onclick="navigateTo('dashboard')">Dashboard</a> <span>/</span> <span style="color:var(--text-main); font-weight:700;">Mantenimiento</span>
+            </div>
+            <div class="view-header">
+                <h2>🔧 Mantenimiento</h2>
+            </div>
+            
+            <div class="card">
+                <div class="flex justify-between mb-4">
+                    <input type="text" class="form-control" placeholder="Buscar..." style="max-width: 300px;">
+                    <div class="flex gap-2">
+                        <button class="btn btn-outline">🔽 Filtros</button>
+                        <button class="btn btn-outline">📤 Exportar</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th># Folio</th>
+                                <th>Equipo</th>
+                                <th>Técnico</th>
+                                <th>Tipo</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>MAN-045</strong></td>
+                                <td>Proyector Epson (INV-2023-002)</td>
+                                <td>Pedro Sánchez</td>
+                                <td>Preventivo</td>
+                                <td><span class="badge badge-warning">Pendiente</span></td>
+                                <td>28/08/2023</td>
+                                <td>
+                                    <div class="flex gap-2">
+                                        <button class="btn btn-success" onclick="showModal('modal-auth')" title="Autorizar">Autorizar</button>
+                                        <button class="btn btn-primary" onclick="showModal('modal-complete')" title="Completar">Completar</button>
+                                        <button class="btn-icon" onclick="navigateTo('maintenance-view')" title="Ver detalle">👁️</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: MAINTENANCE VIEW -->
+        <div id="view-maintenance-view" class="view">
+            <div class="breadcrumb">
+                <a onclick="navigateTo('dashboard')">Dashboard</a> <span>/</span> <a onclick="navigateTo('maintenance-list')">Mantenimiento</a> <span>/</span> <span style="color:var(--text-main); font-weight:700;">MAN-045</span>
+            </div>
+            <div class="view-header">
+                <h2>Mantenimiento #MAN-045</h2>
+                <div class="flex gap-2">
+                    <button class="btn btn-success" onclick="showModal('modal-auth')">✅ Autorizar</button>
+                    <button class="btn btn-primary" onclick="showModal('modal-complete')">✔️ Completar</button>
+                </div>
+            </div>
+
+            <div class="detail-sections-grid">
+                <div class="detail-card">
+                    <div class="detail-title">Equipo</div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="label">Equipo</div><div class="value">Proyector Epson</div></div>
+                        <div class="detail-item"><div class="label">Material</div><div class="value">INV-2023-002</div></div>
+                        <div class="detail-item"><div class="label">Técnico</div><div class="value">Pedro Sánchez</div></div>
+                        <div class="detail-item"><div class="label">No. Control</div><div class="value">12345678</div></div>
+                    </div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-title">Detalle del Servicio</div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="label">Tipo de Servicio</div><div class="value"><span class="badge badge-primary">Interno</span></div></div>
+                        <div class="detail-item"><div class="label">Tipo Mantenimiento</div><div class="value">Preventivo</div></div>
+                        <div class="detail-item" style="grid-column:span 2;"><div class="label">Descripción</div><div class="value">Limpieza de filtros y calibración de lente.</div></div>
+                    </div>
+                </div>
+                <div class="detail-card">
+                    <div class="detail-title">Fechas y Estado</div>
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="label">Estado</div><div class="value"><span class="badge badge-warning">Pendiente</span></div></div>
+                        <div class="detail-item"><div class="label">Fecha Solicitud</div><div class="value">28/08/2023</div></div>
+                        <div class="detail-item"><div class="label">Fecha Inicio</div><div class="value">-</div></div>
+                        <div class="detail-item"><div class="label">Fecha Fin</div><div class="value">-</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: REQUESTS LIST -->
+        <div id="view-requests-list" class="view">
+            <div class="breadcrumb">
+                <a onclick="navigateTo('dashboard')">Dashboard</a> <span>/</span> <span style="color:var(--text-main); font-weight:700;">Solicitudes</span>
+            </div>
+            <div class="view-header">
+                <h2>📋 Solicitudes</h2>
+            </div>
+            <div class="card">
+                <div class="flex justify-between mb-4">
+                    <input type="text" class="form-control" placeholder="Buscar..." style="max-width: 300px;">
+                    <div class="flex gap-2">
+                        <button class="btn btn-outline">🔽 Filtros</button>
+                        <button class="btn btn-outline">📤 Exportar</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Folio</th>
+                                <th>Solicitante</th>
+                                <th>Tipo</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>SOL-089</strong></td>
+                                <td>Juan Pérez</td>
+                                <td>Préstamo</td>
+                                <td><span class="badge badge-warning">En revisión</span></td>
+                                <td>Hoy, 10:30 AM</td>
+                                <td><div class="flex gap-2"><button class="btn-icon" title="Ver">👁️</button><button class="btn-icon" title="Editar">✏️</button></div></td>
+                            </tr>
+                            <tr>
+                                <td><strong>SOL-088</strong></td>
+                                <td>Ana Gómez</td>
+                                <td>Consumible</td>
+                                <td><span class="badge badge-success">Autorizado</span></td>
+                                <td>Ayer</td>
+                                <td><div class="flex gap-2"><button class="btn-icon" title="Ver">👁️</button><button class="btn-icon" title="Editar">✏️</button></div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: DEPARTMENTS LIST -->
+        <div id="view-departments-list" class="view">
+            <div class="breadcrumb">
+                <a onclick="navigateTo('dashboard')">Dashboard</a> <span>/</span> <span style="color:var(--text-main); font-weight:700;">Departamentos</span>
+            </div>
+            <div class="view-header">
+                <h2>🏢 Departamentos</h2>
+                <button class="btn btn-primary" onclick="navigateTo('departments-create')">➕ Nuevo Departamento</button>
+            </div>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Áreas Registradas</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Sistemas Computacionales</td>
+                            <td>5</td>
+                            <td><button class="btn-icon">👁️</button> <button class="btn-icon">✏️</button> <button class="btn-icon" onclick="showModal('modal-delete')">🗑️</button></td>
+                        </tr>
+                        <tr>
+                            <td>Recursos Humanos</td>
+                            <td>2</td>
+                            <td><button class="btn-icon">👁️</button> <button class="btn-icon">✏️</button> <button class="btn-icon" onclick="showModal('modal-delete')">🗑️</button></td>
+                        </tr>
+                        <tr>
+                            <td>Ciencias Básicas</td>
+                            <td>3</td>
+                            <td><button class="btn-icon">👁️</button> <button class="btn-icon">✏️</button> <button class="btn-icon" onclick="showModal('modal-delete')">🗑️</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- VIEW: DEPARTMENTS CREATE -->
+        <div id="view-departments-create" class="view">
+            <div class="breadcrumb">
+                <a onclick="navigateTo('dashboard')">Dashboard</a> <span>/</span> <a onclick="navigateTo('departments-list')">Departamentos</a> <span>/</span> <span style="color:var(--text-main); font-weight:700;">Crear</span>
+            </div>
+            <div class="view-header">
+                <h2>➕ Crear Departamento</h2>
+            </div>
+            <div class="card" style="max-width: 500px;">
+                <div class="form-group">
+                    <label class="form-label">Nombre del Departamento</label>
+                    <input type="text" class="form-control" placeholder="Ej. Ciencias Básicas">
+                </div>
+                <div class="flex gap-2 justify-between mt-4">
+                    <button class="btn btn-outline" onclick="navigateTo('departments-list')">Cancelar</button>
+                    <div class="flex gap-2">
+                        <button class="btn btn-outline" onclick="showModal('modal-create-another')">Crear y crear otro</button>
+                        <button class="btn btn-primary" onclick="showModal('modal-create-success')">Crear</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: MATERIALS LIST -->
+        <div id="view-materials-list" class="view">
+            <div class="breadcrumb">
+                <a onclick="navigateTo('dashboard')">Dashboard</a> <span>/</span> <span style="color:var(--text-main); font-weight:700;">Materiales</span>
+            </div>
+            <div class="view-header">
+                <h2>🗄️ Materiales</h2>
+                <button class="btn btn-primary">➕ Nuevo Material</button>
+            </div>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Marca</th>
+                            <th>Tipo</th>
+                            <th>Stock</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Marcador Pizarrón</td><td>Magistral</td><td>Consumible</td><td><span class="badge badge-success">50</span></td><td><button class="btn-icon">✏️</button></td></tr>
+                        <tr><td>Tóner Impresora</td><td>HP</td><td>Consumible</td><td><span class="badge badge-danger">2</span></td><td><button class="btn-icon">✏️</button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- VIEW: USERS LIST -->
+        <div id="view-users-list" class="view">
+            <div class="breadcrumb">
+                <a onclick="navigateTo('dashboard')">Dashboard</a> <span>/</span> <span style="color:var(--text-main); font-weight:700;">Usuarios</span>
+            </div>
+            <div class="view-header">
+                <h2>👥 Usuarios</h2>
+                <button class="btn btn-primary">➕ Nuevo Usuario</button>
+            </div>
+            <div class="card">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Correo / No. Control</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Admin General</td>
+                            <td>admin@sigem.edu</td>
+                            <td><span class="badge badge-primary">Administrador</span></td>
+                            <td><span class="badge badge-success">Activo</span></td>
+                            <td><button class="btn-icon">✏️</button></td>
+                        </tr>
+                        <tr>
+                            <td>Juan Pérez</td>
+                            <td>juan@tec.mx<br><small style="color:var(--text-muted)">18020000</small></td>
+                            <td><span class="badge badge-gray">Docente</span></td>
+                            <td><span class="badge badge-success">Activo</span></td>
+                            <td><button class="btn-icon">✏️</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- VIEW: BITACORA -->
+        <div id="view-bitacora" class="view">
+            <div class="breadcrumb">
+                <a onclick="navigateTo('dashboard')">Dashboard</a> <span>/</span> <span style="color:var(--text-main); font-weight:700;">Bitácora</span>
+            </div>
+            <div class="view-header">
+                <h2>📝 Bitácora del Sistema</h2>
+                <button class="btn btn-outline">📤 Exportar</button>
+            </div>
+            <div class="card">
+                <div class="mb-4">
+                    <input type="date" class="form-control" style="width:auto;">
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Usuario</th>
+                            <th>Acción</th>
+                            <th>Módulo</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Hoy 10:45 AM</td>
+                            <td>Admin</td>
+                            <td><span class="badge badge-success">CREAR</span></td>
+                            <td>Inventario</td>
+                            <td>Registro de equipo INV-2023-005</td>
+                        </tr>
+                        <tr>
+                            <td>Hoy 09:12 AM</td>
+                            <td>Pedro S.</td>
+                            <td><span class="badge badge-warning">ACTUALIZAR</span></td>
+                            <td>Mantenimiento</td>
+                            <td>Cambio estado MAN-044 a En Proceso</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODALS -->
+    <!-- Modal Autorizar -->
+    <div class="modal-overlay" id="modal-auth">
+        <div class="modal">
+            <h3>✅ Autorizar Mantenimiento</h3>
+            <p>¿Estás seguro de autorizar este mantenimiento? El estado cambiará a <strong>Autorizado</strong> y se notificará al técnico.</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="hideModal('modal-auth')">Cancelar</button>
+                <button class="btn btn-success" onclick="hideModal('modal-auth'); alert('Mantenimiento Autorizado')">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Completar -->
+    <div class="modal-overlay" id="modal-complete">
+        <div class="modal">
+            <h3>✔️ Completar Mantenimiento</h3>
+            <p>Al completar el mantenimiento, el equipo volverá a estar <strong>Disponible</strong> en el inventario.</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="hideModal('modal-complete')">Cancelar</button>
+                <button class="btn btn-primary" onclick="hideModal('modal-complete'); alert('Mantenimiento Completado')">Completar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Eliminar -->
+    <div class="modal-overlay" id="modal-delete">
+        <div class="modal">
+            <h3>⚠️ Eliminar Registro</h3>
+            <p>¿Estás seguro de que deseas eliminar este registro? <strong>Esta acción es irreversible y no se puede deshacer.</strong></p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="hideModal('modal-delete')">Cancelar</button>
+                <button class="btn btn-danger" onclick="hideModal('modal-delete'); alert('Registro Eliminado')">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Guardar Cambios -->
+    <div class="modal-overlay" id="modal-save-changes">
+        <div class="modal">
+            <h3>💾 Guardar Cambios</h3>
+            <p>Se actualizará la información del registro. ¿Deseas continuar?</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="hideModal('modal-save-changes')">Cancelar</button>
+                <button class="btn btn-success" onclick="hideModal('modal-save-changes'); navigateTo('inventory-list')">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear Success -->
+    <div class="modal-overlay" id="modal-create-success">
+        <div class="modal">
+            <h3>🎉 Registro Exitoso</h3>
+            <p>El registro ha sido creado correctamente en el sistema.</p>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="hideModal('modal-create-success'); navigateTo('inventory-list')">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Crear y Otro -->
+    <div class="modal-overlay" id="modal-create-another">
+        <div class="modal">
+            <h3>🎉 Registro Exitoso</h3>
+            <p>El registro fue creado. El formulario se ha limpiado para capturar otro.</p>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="hideModal('modal-create-another');">Continuar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // Navigation Logic
+        function navigateTo(viewId) {
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            const targetView = document.getElementById('view-' + viewId);
+            if(targetView) {
+                targetView.classList.add('active');
+                window.scrollTo(0, 0);
+            }
+        }
+
+        // Modals
+        function showModal(modalId) { document.getElementById(modalId).classList.add('active'); }
+        function hideModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+
+        // Close modals on clicking overlay
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if(e.target === this) this.classList.remove('active');
+            });
+        });
+
+        // Wizard Logic
+        function nextWizardStep(step) {
+            document.querySelectorAll('.wizard-step').forEach((el, index) => {
+                el.classList.remove('active', 'completed');
+                if (index < step - 1) el.classList.add('completed');
+                if (index === step - 1) el.classList.add('active');
+            });
+            document.querySelectorAll('.wizard-content').forEach(el => el.classList.remove('active'));
+            document.getElementById('wizard-step-' + step).classList.add('active');
+        }
+
+        // Toggle Buttons Logic
+        function toggleBtn(btn, activeClass = 'active-primary') {
+            let parent = btn.parentElement;
+            parent.querySelectorAll('.toggle-btn').forEach(el => {
+                el.classList.remove('active', 'active-primary', 'active-success', 'active-warning', 'active-danger', 'active-gray');
+            });
+            btn.classList.add('active', activeClass);
+        }
+
+        // Dark Mode Toggle
+        const themeBtn = document.getElementById('theme-toggle');
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            themeBtn.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        });
+
+        // Dynamic Greeting
+        const hour = new Date().getHours();
+        const greetingEl = document.getElementById('greeting');
+        let greeting = 'Buenas noches';
+        if (hour < 12) greeting = 'Buenos días';
+        else if (hour < 19) greeting = 'Buenas tardes';
+        greetingEl.textContent = `👋 ¡${greeting}, Administrador!`;
+
+    </script>
+</body>
+</html>

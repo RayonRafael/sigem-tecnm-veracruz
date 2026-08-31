@@ -73,7 +73,7 @@
                 <button class="btn btn-glass" @click="openCatalog('modulo-solicitudes')">Ver pendientes</button>
                 <a href="{{ url('/admin/inventarios/create') }}" class="btn btn-white">
                     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    Nuevo Activo
+                    Nuevo Inventario
                 </a>
             </div>
         </div>
@@ -565,8 +565,17 @@
                 <div class="timeline-item">
                     <div class="dot {{ $dot }}"></div>
                     <div class="tl-content">
-                        <p class="tl-text text-primary-util"><strong>{{ $act->usuario?->name ?? 'Usuario' }}</strong> {{ strtolower($act->accion) }} en <em>{{ $act->tabla_afectada }}</em></p>
-                        <div class="tl-time text-muted-util">hace {{ \Carbon\Carbon::parse($act->fecha_hora)->diffInMinutes() }} min</div>
+                        @php
+                            $accionesMap = [
+                                'crear' => 'creó un registro en',
+                                'editar' => 'editó un registro en',
+                                'eliminar' => 'eliminó un registro en',
+                                'autorizar' => 'autorizó un registro en',
+                            ];
+                            $accionTexto = $accionesMap[strtolower($act->accion)] ?? (strtolower($act->accion) . ' en');
+                        @endphp
+                        <p class="tl-text text-primary-util"><strong>{{ $act->usuario?->name ?? 'Usuario' }}</strong> {{ $accionTexto }} <em>{{ $act->tabla_afectada }}</em></p>
+                        <div class="tl-time text-muted-util">{{ \Carbon\Carbon::parse($act->fecha_hora)->diffForHumans() }}</div>
                     </div>
                 </div>
                 @empty
