@@ -22,9 +22,9 @@ class UnidadMedidaResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-scale';
     protected static ?string $navigationGroup = 'Catálogos';
-    protected static ?string $navigationLabel = 'Unidades de Medida';
-    protected static ?string $modelLabel = 'Unidad de Medida';
-    protected static ?string $pluralModelLabel = 'Unidades de Medida';
+    protected static ?string $navigationLabel = 'Unidades de medida';
+    protected static ?string $modelLabel = 'Unidad de medida';
+    protected static ?string $pluralModelLabel = 'Unidades de medida';
 
     public static function canCreate(): bool
     {
@@ -45,7 +45,7 @@ class UnidadMedidaResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos de la Unidad de Medida')
+                Forms\Components\Section::make('Datos de la Unidad de medida')
                     ->icon('heroicon-m-bars-3-bottom-left')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -84,7 +84,7 @@ class UnidadMedidaResource extends Resource
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos de la Unidad de Medida')
+                \Filament\Infolists\Components\Section::make('Datos de la Unidad de medida')
                     ->schema([
                         \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-bars-3-bottom-left'),
                     ]),

@@ -321,7 +321,7 @@
                 <div class="block-title-wrap">
                     <div class="block-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
                     <div>
-                        <h2 class="block-title text-primary-util">Catálogos del Sistema</h2>
+                        <h2 class="block-title text-primary-util">Catálogos del sistema</h2>
                         <p class="block-subtitle text-secondary-util">9 catálogos · {{ $totalRegistrosCatalogos ?? 0 }} registros en total</p>
                     </div>
                 </div>
@@ -840,9 +840,9 @@
                     getCatalogTitle() {
                         const titles = {
                             departamentos: 'Departamentos', areas: 'Áreas', usuarios: 'Usuarios',
-                            materiales: 'Materiales', marcas: 'Marcas', tipos: 'Tipos de Material',
-                            unidades: 'Unidades de Medida', proveedores: 'Proveedores', receptores: 'Receptores',
-                            'modulo-inventario': 'Inventario General', 'modulo-solicitudes': 'Solicitudes', 'modulo-mantenimiento': 'Mantenimientos'
+                            materiales: 'Materiales', marcas: 'Marcas', tipos: 'Tipos de material',
+                            unidades: 'Unidades de medida', proveedores: 'Proveedores', receptores: 'Receptores',
+                            'modulo-inventario': 'Inventario general', 'modulo-solicitudes': 'Solicitudes', 'modulo-mantenimiento': 'Mantenimientos'
                         };
                         return titles[this.activeCatalog] || 'Catálogo';
                     },

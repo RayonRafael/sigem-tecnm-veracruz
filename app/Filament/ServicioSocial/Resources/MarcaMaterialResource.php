@@ -22,7 +22,7 @@ class MarcaMaterialResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
     protected static ?string $navigationGroup = 'Catálogos';
-    protected static ?string $navigationLabel = 'Marcas de Material';
+    protected static ?string $navigationLabel = 'Marcas de material';
     protected static ?string $modelLabel = 'Marca';
     protected static ?string $pluralModelLabel = 'Marcas';
 

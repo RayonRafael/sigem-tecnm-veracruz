@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Notifications\Notification;
+
 use App\Filament\Resources\ReceptorResource\Pages;
 use App\Models\Receptor;
 use Filament\Forms;
@@ -102,11 +104,11 @@ class ReceptorResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Receptor actualizado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->successNotificationTitle('Receptor eliminado'),
                 ]),
             ]);
     }

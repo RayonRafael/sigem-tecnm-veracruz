@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Notifications\Notification;
+
 use App\Filament\Resources\TipoMaterialResource\Pages;
 use App\Models\TipoMaterial;
 use Filament\Forms;
@@ -27,7 +29,7 @@ class TipoMaterialResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos del Tipo de Material')
+                Forms\Components\Section::make('Datos del Tipo de material')
                     ->icon('heroicon-m-rectangle-stack')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -58,11 +60,11 @@ class TipoMaterialResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Tipo de material actualizado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->successNotificationTitle('Tipo de material eliminado'),
                 ]),
             ]);
     }
@@ -71,7 +73,7 @@ class TipoMaterialResource extends Resource
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos del Tipo de Material')
+                \Filament\Infolists\Components\Section::make('Datos del Tipo de material')
                     ->schema([
                         \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-rectangle-stack'),
                     ]),

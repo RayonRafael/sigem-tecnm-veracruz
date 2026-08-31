@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Notifications\Notification;
+
 use App\Filament\Resources\ProveedorResource\Pages;
 use App\Models\Proveedor;
 use Filament\Forms;
@@ -110,11 +112,11 @@ class ProveedorResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Proveedor actualizado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->successNotificationTitle('Proveedor eliminado'),
                 ]),
             ]);
     }

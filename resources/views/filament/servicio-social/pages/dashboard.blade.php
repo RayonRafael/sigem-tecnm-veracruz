@@ -239,7 +239,7 @@
             <div class="module-card">
                 <div class="mod-header">
                     <div class="stat-icon bg-emerald" style="width: 36px; height: 36px; border-radius: 8px;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div>
-                    <div class="mod-title">Inventario General</div>
+                    <div class="mod-title">Inventario general</div>
                     <div class="mod-badge">Consultas</div>
                 </div>
                 <div class="mod-stats">
@@ -288,7 +288,7 @@
                 <div class="block-title-wrap">
                     <div class="block-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
                     <div>
-                        <h2 class="block-title">Catálogos del Sistema</h2>
+                        <h2 class="block-title">Catálogos del sistema</h2>
                         <p class="block-subtitle">Modo sólo lectura · {{ $totalRegistrosCatalogos ?? 0 }} registros</p>
                     </div>
                 </div>
@@ -666,9 +666,9 @@
                     getCatalogTitle() {
                         const titles = {
                             departamentos: 'Departamentos', areas: 'Áreas', usuarios: 'Usuarios',
-                            materiales: 'Materiales', marcas: 'Marcas', tipos: 'Tipos de Material',
-                            unidades: 'Unidades de Medida', proveedores: 'Proveedores', receptores: 'Receptores',
-                            'modulo-inventario': 'Inventario General', 'modulo-solicitudes': 'Mis Solicitudes', 'modulo-mantenimiento': 'Mis Mantenimientos'
+                            materiales: 'Materiales', marcas: 'Marcas', tipos: 'Tipos de material',
+                            unidades: 'Unidades de medida', proveedores: 'Proveedores', receptores: 'Receptores',
+                            'modulo-inventario': 'Inventario general', 'modulo-solicitudes': 'Mis Solicitudes', 'modulo-mantenimiento': 'Mis Mantenimientos'
                         };
                         return titles[this.activeCatalog] || 'Catálogo';
                     },

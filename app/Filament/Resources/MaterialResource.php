@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Notifications\Notification;
+
 use App\Filament\Resources\MaterialResource\Pages;
 use App\Models\Material;
 use Filament\Forms;
@@ -55,14 +57,14 @@ class MaterialResource extends Resource
                             ->preload()
                             ->prefixIcon('heroicon-m-star'),
                         Forms\Components\Select::make('id_tipodematerial')->placeholder('Selecciona...')
-                            ->label('Tipo de Material')
+                            ->label('Tipo de material')
                             ->relationship('tipo', 'nombre')
                             ->required()
                             ->searchable()
                             ->preload()
                             ->prefixIcon('heroicon-m-square-3-stack-3d'),
                         Forms\Components\Select::make('id_unidad')->placeholder('Selecciona...')
-                            ->label('Unidad de Medida')
+                            ->label('Unidad de medida')
                             ->relationship('unidad', 'nombre')
                             ->required()
                             ->searchable()
@@ -145,11 +147,11 @@ class MaterialResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Material actualizado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->successNotificationTitle('Material eliminado'),
                 ]),
             ]);
     }
@@ -168,7 +170,7 @@ class MaterialResource extends Resource
                     ->schema([
                         \Filament\Infolists\Components\TextEntry::make('marca.nombre')->label('Marca')->icon('heroicon-m-star'),
                         \Filament\Infolists\Components\TextEntry::make('tipo.nombre')->label('Tipo')->icon('heroicon-m-square-3-stack-3d'),
-                        \Filament\Infolists\Components\TextEntry::make('unidad.nombre')->label('Unidad de Medida')->icon('heroicon-m-scale'),
+                        \Filament\Infolists\Components\TextEntry::make('unidad.nombre')->label('Unidad de medida')->icon('heroicon-m-scale'),
                     ])->columns(3),
                 \Filament\Infolists\Components\Section::make('Control de Stock')
                     ->schema([

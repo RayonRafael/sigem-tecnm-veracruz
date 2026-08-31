@@ -22,9 +22,9 @@ class TipoMaterialResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-bookmark';
     protected static ?string $navigationGroup = 'Catálogos';
-    protected static ?string $navigationLabel = 'Tipos de Material';
-    protected static ?string $modelLabel = 'Tipo de Material';
-    protected static ?string $pluralModelLabel = 'Tipos de Material';
+    protected static ?string $navigationLabel = 'Tipos de material';
+    protected static ?string $modelLabel = 'Tipo de material';
+    protected static ?string $pluralModelLabel = 'Tipos de material';
 
     public static function canCreate(): bool
     {
@@ -45,7 +45,7 @@ class TipoMaterialResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos del Tipo de Material')
+                Forms\Components\Section::make('Datos del Tipo de material')
                     ->icon('heroicon-m-rectangle-stack')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -84,7 +84,7 @@ class TipoMaterialResource extends Resource
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos del Tipo de Material')
+                \Filament\Infolists\Components\Section::make('Datos del Tipo de material')
                     ->schema([
                         \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-rectangle-stack'),
                     ]),

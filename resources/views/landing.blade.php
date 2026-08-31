@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIGEM — TecNM Veracruz | Gestión de Equipos y Materiales</title>
+    <title>SIGEM — TecNM Veracruz | Gestión de equipos y materiales</title>
     <link rel="icon" href="{{ asset('images/sigem-logo.svg') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -513,7 +513,7 @@
         <div class="header-actions">
             <a href="{{ url('/login') }}" class="btn btn-primary">
                 <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                Iniciar Sesión
+                Iniciar sesión
             </a>
         </div>
     </header>
@@ -521,12 +521,12 @@
     <!-- Hero Section -->
     <main class="hero">
         <div class="hero-badge">Tecnológico Nacional de México</div>
-        <h1 class="hero-title">Gestión de Equipos y Materiales</h1>
+        <h1 class="hero-title">Gestión de equipos y materiales</h1>
         <p class="hero-sub">Sistema integral para el control de inventario, gestión de préstamos, rentas y seguimiento de mantenimiento para el equipamiento del TecNM Campus Veracruz.</p>
         <div class="hero-actions">
             <a href="{{ url('/login') }}" class="btn btn-primary" style="padding: 16px 36px; font-size: 17px;">
                 <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                Iniciar Sesión
+                Iniciar sesión
             </a>
         </div>
     </main>
@@ -539,7 +539,7 @@
                 <div class="stat-icon">
                     <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                 </div>
-                <div class="stat-title">Inventario Activo</div>
+                <div class="stat-title">Inventario activo</div>
                 <div class="stat-desc">Registro detallado y seguimiento en tiempo real del estatus, ubicación y asignación de todo el equipamiento institucional.</div>
             </div>
 
@@ -548,7 +548,7 @@
                 <div class="stat-icon">
                     <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                 </div>
-                <div class="stat-title">Solicitudes y Préstamos</div>
+                <div class="stat-title">Solicitudes y préstamos</div>
                 <div class="stat-desc">Control ágil de asignaciones temporales, permanentes y rentas con flujos de autorización y fechas de devolución.</div>
             </div>
 
@@ -566,8 +566,8 @@
                 <div class="stat-icon">
                     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 </div>
-                <div class="stat-title">Bitácora del Sistema</div>
-                <div class="stat-desc">Auditoría completa de movimientos, historial de cambios de estado y supervisión de acciones con validación del Administrador.</div>
+                <div class="stat-title">Bitácora del sistema</div>
+                <div class="stat-desc">Auditoría completa de movimientos, historial de cambios de estado y supervisión de acciones con validación del administrador.</div>
             </div>
         </div>
     </section>
@@ -587,7 +587,7 @@
     <div class="mobile-login-bar" style="display: none;">
         <a href="{{ url('/login') }}" class="btn btn-primary">
             <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-            Iniciar Sesión
+            Iniciar sesión
         </a>
     </div>
 

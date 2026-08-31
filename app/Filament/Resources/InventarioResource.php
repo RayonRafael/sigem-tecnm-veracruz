@@ -21,8 +21,8 @@ class InventarioResource extends Resource
     protected static ?string $model = Inventario::class;
     protected static ?string $navigationIcon = 'heroicon-o-cube';
     protected static ?string $navigationLabel = 'Inventario';
-    protected static ?string $modelLabel = 'Activo';
-    protected static ?string $pluralModelLabel = 'Activos';
+    protected static ?string $modelLabel = 'Registro de inventario';
+    protected static ?string $pluralModelLabel = 'Registros de inventario';
     protected static ?string $navigationGroup = 'Gestión de inventario';
     protected static ?int $navigationSort = 1;
 
@@ -300,7 +300,7 @@ class InventarioResource extends Resource
                     })
                     ->requiresConfirmation(),
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Registro de inventario actualizado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -318,7 +318,7 @@ class InventarioResource extends Resource
                             Notification::make()->title('Registros aprobados exitosamente')->success()->send();
                         })
                         ->requiresConfirmation(),
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->successNotificationTitle('Registro de inventario eliminado'),
                 ]),
             ]);
     }

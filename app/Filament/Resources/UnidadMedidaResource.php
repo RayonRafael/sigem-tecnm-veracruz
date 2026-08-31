@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Filament\Notifications\Notification;
+
 use App\Filament\Resources\UnidadMedidaResource\Pages;
 use App\Models\UnidadMedida;
 use Filament\Forms;
@@ -28,7 +30,7 @@ class UnidadMedidaResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos de la Unidad de Medida')
+                Forms\Components\Section::make('Datos de la Unidad de medida')
                     ->icon('heroicon-m-bars-3-bottom-left')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -59,11 +61,11 @@ class UnidadMedidaResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Unidad de medida actualizada correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->successNotificationTitle('Unidad de medida eliminada'),
                 ]),
             ]);
     }
@@ -72,7 +74,7 @@ class UnidadMedidaResource extends Resource
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos de la Unidad de Medida')
+                \Filament\Infolists\Components\Section::make('Datos de la Unidad de medida')
                     ->schema([
                         \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-bars-3-bottom-left'),
                     ]),
