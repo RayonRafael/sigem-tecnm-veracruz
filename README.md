@@ -115,3 +115,29 @@ La autorización del sistema utiliza las mejores prácticas de **Spatie Permissi
 - Las verificaciones en el código se realizan contra permisos específicos (usando `hasPermissionTo()`) en conjunto con un `RoleEnum`.
 - **Administrador:** Cuenta con permisos totales y el permiso global de panel `access_admin_panel`. Autoriza solicitudes y edita históricos libremente.
 - **Servicio Social:** Cuenta con un subconjunto de permisos y el permiso global `access_servicio_social_panel`. Sus permisos se enfocan en registro rápido y visualización. Su actividad es auditada por `Spatie ActivityLog`.
+
+## Cambios importantes para el equipo
+
+### Nuevas URLs de acceso
+- Administración: /admin/login
+- Servicio Social: /servicio-social/login
+- La URL unificada /login ya no existe
+
+### Convención para nuevos módulos
+Si creas un módulo nuevo:
+1. Crea el permiso en database/seeders/RolesAndPermissionsSeeder.php
+2. Agrega el permiso al enum app/Enums/RoleEnum.php
+3. Usa hasPermissionTo() en Policies, NO hasRole()
+4. Asigna el permiso al rol correspondiente
+
+### Lógica de inventario
+El control de stock (increment/decrement) vive centralizado en los Observers:
+- app/Observers/InventarioObserver.php
+- app/Observers/SolicitudObserver.php
+
+NO hagas restas o sumas manuales de stock en controladores o Resources. Los Observers se encargan automáticamente.
+
+### Deploy en Railway
+- Pre-deploy: migrate + filament cache + icons cache
+- APP_DEBUG: false en producción
+- Seeder: php artisan db:seed --class=RolesAndPermissionsSeeder
