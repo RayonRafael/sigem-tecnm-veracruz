@@ -178,9 +178,8 @@ class MantenimientoResource extends Resource
                         'danger' => 'Cancelado',
                     ])
                     ->icons([
-                        'heroicon-m-clock' => 'Solicitado',
+                        'heroicon-m-clock' => ['Solicitado', 'Pendiente Revision Admin'],
                         'heroicon-m-wrench-screwdriver' => 'En proceso',
-                        'heroicon-m-clock' => 'Pendiente Revision Admin',
                         'heroicon-m-check-badge' => 'Completado',
                         'heroicon-m-x-circle' => 'Cancelado',
                     ]),

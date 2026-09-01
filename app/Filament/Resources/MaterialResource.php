@@ -203,7 +203,7 @@ class MaterialResource extends Resource
                             }),
                         IconEntry::make('requiere_control_individual')
                             ->label('Control Individual')
-                            ->boolean(trueLabel: 'Sí', falseLabel: 'No'),
+                            ->boolean(),
                     ])->columns(4),
             ]);
     }

@@ -183,7 +183,7 @@ class UserResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->action(function (Collection $records) {
-                            $records->filter(fn (User $record) => $record->email !== 'admin@tecnm.edu.mx')->each->delete();
+                            $records->filter(fn ($record) => $record->email !== 'admin@tecnm.edu.mx')->each->delete();
                         }),
                 ]),
             ]);

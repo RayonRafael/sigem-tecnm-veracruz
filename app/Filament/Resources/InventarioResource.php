@@ -222,9 +222,8 @@ class InventarioResource extends Resource
                     ->colors([
                         'success' => 'Disponible',
                         'warning' => 'Asignado',
-                        'gray' => 'En Mantenimiento',
+                        'gray' => ['En Mantenimiento', 'Baja'],
                         'danger' => 'Dañado',
-                        'gray' => 'Baja',
                         'info' => 'Devuelto a Proveedor',
                     ])
                     ->icons([
