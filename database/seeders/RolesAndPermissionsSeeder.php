@@ -57,6 +57,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'usuarios.crear',
             'usuarios.editar',
             'usuarios.eliminar',
+
+            // Permisos de Acceso a Paneles
+            \App\Enums\RoleEnum::PERM_ACCESS_ADMIN,
+            \App\Enums\RoleEnum::PERM_ACCESS_SERVICIO,
         ];
 
         foreach ($permisos as $permiso) {
@@ -65,7 +69,8 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Rol Administrador
         $admin = Role::firstOrCreate(['name' => 'Administrador']);
-        $admin->syncPermissions($permisos);
+        $adminPermissions = array_filter($permisos, fn($p) => $p !== \App\Enums\RoleEnum::PERM_ACCESS_SERVICIO);
+        $admin->syncPermissions($adminPermissions);
 
         // Rol Servicio Social
         $servicioSocial = Role::firstOrCreate(['name' => 'Servicio Social']);
@@ -81,6 +86,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'mantenimiento.editar',
             'solicitudes.ver',
             'reportes.inventario',
+            \App\Enums\RoleEnum::PERM_ACCESS_SERVICIO,
         ]);
     }
 }
