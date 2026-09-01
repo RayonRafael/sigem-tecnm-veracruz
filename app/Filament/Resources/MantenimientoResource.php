@@ -18,6 +18,7 @@ class MantenimientoResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Mantenimiento::class;
+    protected static ?string $recordTitleAttribute = 'descripcion_falla';
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
     protected static ?string $navigationLabel = 'Mantenimiento';
     protected static ?string $modelLabel = 'Mantenimiento';

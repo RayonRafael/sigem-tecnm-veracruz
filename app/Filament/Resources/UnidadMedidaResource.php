@@ -18,6 +18,7 @@ class UnidadMedidaResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = UnidadMedida::class;
+    protected static ?string $recordTitleAttribute = 'nombre';
 
     protected static ?string $navigationIcon = 'heroicon-o-bars-3-bottom-left';
     protected static ?string $navigationLabel = 'Unidades de medida';

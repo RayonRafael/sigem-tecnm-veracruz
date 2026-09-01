@@ -19,6 +19,7 @@ class InventarioResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Inventario::class;
+    protected static ?string $recordTitleAttribute = 'num_serie';
     protected static ?string $navigationIcon = 'heroicon-o-cube';
     protected static ?string $navigationLabel = 'Inventario';
     protected static ?string $modelLabel = 'Registro de inventario';

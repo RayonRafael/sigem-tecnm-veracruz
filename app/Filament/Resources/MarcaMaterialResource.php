@@ -18,6 +18,7 @@ class MarcaMaterialResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = MarcaMaterial::class;
+    protected static ?string $recordTitleAttribute = 'nombre';
     protected static ?string $navigationIcon = 'heroicon-o-tag';
     protected static ?string $navigationLabel = 'Marcas';
     protected static ?string $modelLabel = 'Marca';

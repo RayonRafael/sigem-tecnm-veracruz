@@ -19,6 +19,7 @@ class MaterialResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Material::class;
+    protected static ?string $recordTitleAttribute = 'nombre';
     protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
     protected static ?string $navigationLabel = 'Materiales';
     protected static ?string $modelLabel = 'Material';

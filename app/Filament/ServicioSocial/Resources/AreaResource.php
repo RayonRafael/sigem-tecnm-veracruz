@@ -19,6 +19,7 @@ class AreaResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Area::class;
+    protected static ?string $recordTitleAttribute = 'nombre';
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
     protected static ?string $navigationGroup = 'Catálogos';

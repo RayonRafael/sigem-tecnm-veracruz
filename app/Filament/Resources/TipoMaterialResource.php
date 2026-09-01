@@ -18,6 +18,7 @@ class TipoMaterialResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = TipoMaterial::class;
+    protected static ?string $recordTitleAttribute = 'nombre';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationLabel = 'Tipos de material';
     protected static ?string $modelLabel = 'Tipo de material';

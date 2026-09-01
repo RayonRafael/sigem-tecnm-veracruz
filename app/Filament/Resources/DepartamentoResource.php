@@ -18,6 +18,7 @@ class DepartamentoResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Departamento::class;
+    protected static ?string $recordTitleAttribute = 'nombre';
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
     protected static ?string $navigationLabel = 'Departamentos';
     protected static ?string $modelLabel = 'Departamento';

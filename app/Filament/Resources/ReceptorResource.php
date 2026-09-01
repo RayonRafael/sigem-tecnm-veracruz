@@ -18,6 +18,7 @@ class ReceptorResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Receptor::class;
+    protected static ?string $recordTitleAttribute = 'nombre';
     protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?string $navigationLabel = 'Receptores';
     protected static ?string $modelLabel = 'Receptor';

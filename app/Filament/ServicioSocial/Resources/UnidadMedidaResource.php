@@ -19,6 +19,7 @@ class UnidadMedidaResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = UnidadMedida::class;
+    protected static ?string $recordTitleAttribute = 'nombre';
 
     protected static ?string $navigationIcon = 'heroicon-o-scale';
     protected static ?string $navigationGroup = 'Catálogos';

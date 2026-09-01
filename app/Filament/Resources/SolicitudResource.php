@@ -18,6 +18,7 @@ class SolicitudResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Solicitud::class;
+    protected static ?string $recordTitleAttribute = 'observaciones';
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationLabel = 'Solicitudes';
     protected static ?string $modelLabel = 'Solicitud';

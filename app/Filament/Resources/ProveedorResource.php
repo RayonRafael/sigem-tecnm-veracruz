@@ -18,6 +18,7 @@ class ProveedorResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Proveedor::class;
+    protected static ?string $recordTitleAttribute = 'nombre';
     protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
     protected static ?string $navigationLabel = 'Proveedores';
     protected static ?string $modelLabel = 'Proveedor';
