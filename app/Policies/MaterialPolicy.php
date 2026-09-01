@@ -9,12 +9,12 @@ class MaterialPolicy
 {
     private function isAdmin(User $user): bool
     {
-        return $user->hasRole(\App\Enums\RoleEnum::ADMIN->value) || $user->tipo_usuario === \App\Enums\RoleEnum::ADMIN->value;
+        return $user->hasPermissionTo(\App\Enums\RoleEnum::PERM_ACCESS_ADMIN) || $user->tipo_usuario === \App\Enums\RoleEnum::ADMIN->value;
     }
 
     private function isShared(User $user): bool
     {
-        return $this->isAdmin($user) || $user->hasRole(\App\Enums\RoleEnum::SERVICIO_SOCIAL->value) || $user->tipo_usuario === 'Servicio';
+        return $this->isAdmin($user) || $user->hasPermissionTo(\App\Enums\RoleEnum::PERM_ACCESS_SERVICIO) || $user->tipo_usuario === 'Servicio';
     }
 
     public function viewAny(User $user): bool { return $this->isShared($user); }

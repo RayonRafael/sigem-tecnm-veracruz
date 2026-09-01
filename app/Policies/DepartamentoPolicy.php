@@ -9,7 +9,7 @@ class DepartamentoPolicy
 {
     private function isAdmin(User $user): bool
     {
-        return $user->hasRole(\App\Enums\RoleEnum::ADMIN->value) || $user->tipo_usuario === \App\Enums\RoleEnum::ADMIN->value;
+        return $user->hasPermissionTo(\App\Enums\RoleEnum::PERM_ACCESS_ADMIN) || $user->tipo_usuario === \App\Enums\RoleEnum::ADMIN->value;
     }
 
     public function viewAny(User $user): bool { return $this->isAdmin($user); }
