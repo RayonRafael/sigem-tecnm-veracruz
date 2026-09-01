@@ -7,6 +7,7 @@ Sistema integral para el control de inventario, gestión de préstamos, rentas y
 - **Framework:** Laravel 12
 - **Admin Panel:** Filament 3.3
 - **Roles & Permisos:** Spatie Laravel Permission
+- **Auditoría:** Spatie ActivityLog
 - **Estilos:** Tailwind CSS 4
 - **Base de Datos:** MySQL 8
 
@@ -55,29 +56,29 @@ Sistema integral para el control de inventario, gestión de préstamos, rentas y
 
 ## Usuarios de Prueba
 
-Para ingresar al sistema, dirígete a `http://localhost:8000/login` e inicia sesión con las siguientes credenciales:
+El sistema cuenta con dos paneles separados utilizando el sistema de autenticación nativo de Filament. Inicia sesión en las siguientes URLs:
 
 - **Administrador:** 
+  - URL de acceso: `http://localhost:8000/admin/login`
   - Correo: `admin@tecnm.edu.mx` 
   - Contraseña: `admin123` 
-  - Redirección: `/admin`
 - **Servicio Social:** 
+  - URL de acceso: `http://localhost:8000/servicio-social/login`
   - Correo: `servicio@tecnm.edu.mx` 
   - Contraseña: `servicio123` 
-  - Redirección: `/servicio-social`
 
 ## Estructura del Proyecto
 
 | Directorio | Descripción |
 |---|---|
-| `app/Models/` | Modelos Eloquent (15 modelos) |
-| `app/Filament/Resources/` | Resources del panel Admin (11 módulos) |
-| `app/Filament/ServicioSocial/Resources/` | Resources del panel Servicio Social (9 módulos) |
-| `app/Filament/Widgets/` | Widgets del dashboard (eliminados tras refactoring a favor de vistas HTML directas) |
-| `app/Observers/` | Observers para lógica de negocio y bitácora automatizada |
-| `app/Http/Controllers/Auth/` | `LoginController` para autenticación unificada con pestañas dinámicas |
-| `resources/views/` | Vistas Blade (landing, login unificado con pestañas, dashboards de Filament) |
-| `database/seeders/` | Seeders responsables de cargar roles, permisos iniciales y usuarios de prueba |
+| `app/Models/` | Modelos Eloquent. Los modelos de **catálogos utilizan Soft Deletes** para evitar pérdida de registros. |
+| `app/Enums/` | Contiene `RoleEnum` que centraliza los nombres de roles y permisos (evita *magic strings*). |
+| `app/Policies/` | Políticas estrictas de acceso que limitan acciones según permisos de Spatie. |
+| `app/Filament/Resources/` | Resources del panel Admin (Acceso total). |
+| `app/Filament/ServicioSocial/Resources/` | Resources del panel Servicio Social. |
+| `app/Observers/` | Observers puros para lógica de negocio (control de inventario, sincronización de estados). |
+| `resources/views/` | Vistas Blade para landing page y hooks visuales de autenticación. |
+| `database/seeders/` | Seeders responsables de cargar roles, permisos iniciales y usuarios de prueba. |
 
 ## Módulos del Sistema
 
@@ -94,7 +95,8 @@ Para ingresar al sistema, dirígete a `http://localhost:8000/login` e inicia ses
 10. Proveedores
 11. Receptores
 12. Usuarios
-13. Bitácora de Sistema
+
+*(La bitácora de sistema ahora se maneja invisiblemente en todo el proyecto a través de Spatie ActivityLog).*
 
 ### Panel Servicio Social (Operaciones con Supervisión)
 1. Inventario
@@ -108,5 +110,8 @@ Para ingresar al sistema, dirígete a `http://localhost:8000/login` e inicia ses
 9. Áreas
 
 ## Roles y Permisos (Spatie)
-- **Administrador:** Cuenta con 24 permisos, acceso total a todos los catálogos, configuraciones y paneles administrativos. Autoriza solicitudes y edita históricos.
-- **Servicio Social:** Cuenta con 10 permisos, destinado a registro rápido, lectura de inventario y levantamiento de solicitudes. Su actividad queda sujeta a revisión administrativa.
+
+La autorización del sistema utiliza las mejores prácticas de **Spatie Permission**:
+- Las verificaciones en el código se realizan contra permisos específicos (usando `hasPermissionTo()`) en conjunto con un `RoleEnum`.
+- **Administrador:** Cuenta con permisos totales y el permiso global de panel `access_admin_panel`. Autoriza solicitudes y edita históricos libremente.
+- **Servicio Social:** Cuenta con un subconjunto de permisos y el permiso global `access_servicio_social_panel`. Sus permisos se enfocan en registro rápido y visualización. Su actividad es auditada por `Spatie ActivityLog`.
