@@ -46,11 +46,11 @@ class Dashboard extends BaseDashboard
         $activosBueno = Inventario::whereIn('estado', ['Disponible', 'Asignado'])->count();
         $porcentajeBuenEstado = $totalActivos > 0 ? round(($activosBueno / $totalActivos) * 100) : 0;
         
-        $mantenimientosPendientes = Mantenimiento::whereIn('estado', ['Pendiente Revision Admin', 'Solicitado'])->count();
+        $mantenimientosPendientes = Mantenimiento::enRevision()->count();
         $mantenimientosTotales = Mantenimiento::count();
         
-        $materialesStockBajoCount = Material::whereColumn('stock_actual', '<', 'stock_minimo')->count();
-        $solicitudesPendientes = Solicitud::where('estado', 'Pendiente')->count();
+        $materialesStockBajoCount = Material::stockBajo()->count();
+        $solicitudesPendientes = Solicitud::pendientes()->count();
         
         $creadosEsteMes = Inventario::whereMonth('created_at', Carbon::now()->month)
                                     ->whereYear('created_at', Carbon::now()->year)->count();
@@ -76,21 +76,17 @@ class Dashboard extends BaseDashboard
             $mantenimientosRecientes = $mantenimientosCompletos->take(3);
         }
 
-        // Stats específicos para los mini módulos del nuevo layout
-        $estadosInventario = Inventario::selectRaw('estado, count(*) as total')->groupBy('estado')->pluck('total', 'estado');
-        $inventarioDisponibles = $estadosInventario->get('Disponible', 0);
-        $inventarioAsignados = $estadosInventario->get('Asignado', 0);
-        $inventarioEnMantenimiento = $estadosInventario->get('En Mantenimiento', 0);
-        $inventarioDanados = $estadosInventario->get('Dañado', 0) + $estadosInventario->get('Baja', 0);
+        $inventarioDisponibles = Inventario::disponibles()->count();
+        $inventarioAsignados = Inventario::asignados()->count();
+        $inventarioEnMantenimiento = Inventario::enMantenimiento()->count();
+        $inventarioDanados = Inventario::danados()->count();
 
-        $estadosMantenimiento = Mantenimiento::selectRaw('estado, count(*) as total')->groupBy('estado')->pluck('total', 'estado');
-        $mantenimientoEnRevision = $estadosMantenimiento->get('Pendiente Revision Admin', 0) + $estadosMantenimiento->get('Solicitado', 0);
-        $mantenimientoEnProceso = $estadosMantenimiento->get('En proceso', 0);
-        $mantenimientoCompletados = $estadosMantenimiento->get('Completado', 0);
+        $mantenimientoEnRevision = Mantenimiento::enRevision()->count();
+        $mantenimientoEnProceso = Mantenimiento::enProceso()->count();
+        $mantenimientoCompletados = Mantenimiento::completados()->count();
 
-        $estadosSolicitud = Solicitud::selectRaw('estado, count(*) as total')->groupBy('estado')->pluck('total', 'estado');
-        $solicitudesAutorizadas = $estadosSolicitud->get('Autorizado', 0);
-        $solicitudesRechazadas = $estadosSolicitud->get('Rechazado', 0);
+        $solicitudesAutorizadas = Solicitud::autorizadas()->count();
+        $solicitudesRechazadas = Solicitud::rechazadas()->count();
 
         // 6. Catálogos Completos para los Modales
         $departamentosList = Departamento::latest()->take(50)->get();

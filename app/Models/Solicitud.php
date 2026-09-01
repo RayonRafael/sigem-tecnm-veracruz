@@ -44,4 +44,20 @@ class Solicitud extends Model
     {
         return $this->hasMany(DetalleSolicitud::class, 'id_solicitud', 'id_solicitud');
     }
+
+    // Scopes de estado
+    public function scopePendientes($query)
+    {
+        return $query->where('estado', 'Pendiente');
+    }
+
+    public function scopeAutorizadas($query)
+    {
+        return $query->where('estado', 'Autorizado');
+    }
+
+    public function scopeRechazadas($query)
+    {
+        return $query->where('estado', 'Rechazado');
+    }
 }

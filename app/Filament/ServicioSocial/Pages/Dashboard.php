@@ -45,7 +45,7 @@ class Dashboard extends BaseDashboard
 
         // 1. Welcome Card Stats (Specific for SS as requested)
         $misSolicitudes = Solicitud::where('id_usuario', $userId)->count();
-        $misSolicitudesPendientes = Solicitud::where('id_usuario', $userId)->where('estado', 'Pendiente')->count();
+        $misSolicitudesPendientes = Solicitud::where('id_usuario', $userId)->pendientes()->count();
         $misMantenimientos = Mantenimiento::where('id_usuario_solicita', $userId)->count();
         $totalActivos = Inventario::count();
         
@@ -68,21 +68,17 @@ class Dashboard extends BaseDashboard
             $mantenimientosRecientes = $mantenimientosCompletos->take(3);
         }
 
-        // Stats específicos para los mini módulos del nuevo layout (SS scope)
-        $estadosInventario = Inventario::selectRaw('estado, count(*) as total')->groupBy('estado')->pluck('total', 'estado');
-        $inventarioDisponibles = $estadosInventario->get('Disponible', 0);
-        $inventarioAsignados = $estadosInventario->get('Asignado', 0);
-        $inventarioEnMantenimiento = $estadosInventario->get('En Mantenimiento', 0);
-        $inventarioDanados = $estadosInventario->get('Dañado', 0) + $estadosInventario->get('Baja', 0);
+        $inventarioDisponibles = Inventario::disponibles()->count();
+        $inventarioAsignados = Inventario::asignados()->count();
+        $inventarioEnMantenimiento = Inventario::enMantenimiento()->count();
+        $inventarioDanados = Inventario::danados()->count();
 
-        $estadosMantenimiento = Mantenimiento::where('id_usuario_solicita', $userId)->selectRaw('estado, count(*) as total')->groupBy('estado')->pluck('total', 'estado');
-        $mantenimientoEnRevision = $estadosMantenimiento->get('Pendiente Revision Admin', 0) + $estadosMantenimiento->get('Solicitado', 0);
-        $mantenimientoEnProceso = $estadosMantenimiento->get('En proceso', 0);
-        $mantenimientoCompletados = $estadosMantenimiento->get('Completado', 0);
+        $mantenimientoEnRevision = Mantenimiento::where('id_usuario_solicita', $userId)->enRevision()->count();
+        $mantenimientoEnProceso = Mantenimiento::where('id_usuario_solicita', $userId)->enProceso()->count();
+        $mantenimientoCompletados = Mantenimiento::where('id_usuario_solicita', $userId)->completados()->count();
 
-        $estadosSolicitud = Solicitud::where('id_usuario', $userId)->selectRaw('estado, count(*) as total')->groupBy('estado')->pluck('total', 'estado');
-        $solicitudesAutorizadas = $estadosSolicitud->get('Autorizado', 0);
-        $solicitudesRechazadas = $estadosSolicitud->get('Rechazado', 0);
+        $solicitudesAutorizadas = Solicitud::where('id_usuario', $userId)->autorizadas()->count();
+        $solicitudesRechazadas = Solicitud::where('id_usuario', $userId)->rechazadas()->count();
 
         // Catálogos Completos (Read-only for SS)
         $departamentosList = Departamento::latest()->take(50)->get();

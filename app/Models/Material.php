@@ -39,4 +39,10 @@ class Material extends Model
     {
         return $this->hasMany(Inventario::class, 'id_producto', 'id_producto');
     }
+
+    // Scopes
+    public function scopeStockBajo($query)
+    {
+        return $query->whereColumn('stock_actual', '<', 'stock_minimo');
+    }
 }
