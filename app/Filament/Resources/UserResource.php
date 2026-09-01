@@ -90,8 +90,8 @@ class UserResource extends Resource
                         Forms\Components\Select::make('tipo_usuario')->placeholder('Selecciona...')
                             ->label('Tipo de Usuario (Sistema)')
                             ->options([
-                                'Administrador' => 'Administrador',
-                                'Servicio' => 'Servicio Social',
+                                \App\Enums\RoleEnum::ADMIN->value => \App\Enums\RoleEnum::ADMIN->value,
+                                'Servicio' => \App\Enums\RoleEnum::SERVICIO_SOCIAL->value,
                                 'Pendiente' => 'Pendiente',
                             ])
                             ->default('Pendiente')
@@ -132,12 +132,12 @@ class UserResource extends Resource
                     ->label('Tipo')
                     ->badge()
                     ->colors([
-                        'success' => 'Administrador',
+                        'success' => \App\Enums\RoleEnum::ADMIN->value,
                         'warning' => 'Servicio',
                         'gray' => 'Pendiente',
                     ])
                     ->icons([
-                        'heroicon-m-shield-check' => 'Administrador',
+                        'heroicon-m-shield-check' => \App\Enums\RoleEnum::ADMIN->value,
                         'heroicon-m-academic-cap' => 'Servicio',
                         'heroicon-m-clock' => 'Pendiente',
                     ]),
@@ -156,8 +156,8 @@ class UserResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('tipo_usuario')
                     ->options([
-                        'Administrador' => 'Administrador',
-                        'Servicio' => 'Servicio Social',
+                        \App\Enums\RoleEnum::ADMIN->value => \App\Enums\RoleEnum::ADMIN->value,
+                        'Servicio' => \App\Enums\RoleEnum::SERVICIO_SOCIAL->value,
                         'Pendiente' => 'Pendiente',
                     ]),
             ])
@@ -207,12 +207,12 @@ class UserResource extends Resource
                             ->label('Tipo de Usuario')
                             ->badge()
                             ->color(fn (string $state): string => match($state) {
-                                'Administrador' => 'success',
+                                \App\Enums\RoleEnum::ADMIN->value => 'success',
                                 'Servicio' => 'warning',
                                 default => 'gray',
                             })
                             ->icon(fn (string $state): string => match($state) {
-                                'Administrador' => 'heroicon-m-shield-check',
+                                \App\Enums\RoleEnum::ADMIN->value => 'heroicon-m-shield-check',
                                 'Servicio' => 'heroicon-m-academic-cap',
                                 default => 'heroicon-m-clock',
                             }),

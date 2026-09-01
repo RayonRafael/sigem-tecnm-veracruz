@@ -73,12 +73,12 @@ class MantenimientoResource extends Resource
                                     Forms\Components\ToggleButtons::make('tipo_servicio')
                                         ->label('Tipo de Servicio')
                                         ->options([
-                                            'Servicio Social' => 'Servicio Social',
+                                            \App\Enums\RoleEnum::SERVICIO_SOCIAL->value => \App\Enums\RoleEnum::SERVICIO_SOCIAL->value,
                                             'Prácticas Profesionales' => 'Prácticas Profesionales',
                                             'Personal Técnico' => 'Personal Técnico',
                                         ])
                                         ->colors([
-                                            'Servicio Social' => 'primary',
+                                            \App\Enums\RoleEnum::SERVICIO_SOCIAL->value => 'primary',
                                             'Prácticas Profesionales' => 'info',
                                             'Personal Técnico' => 'success',
                                         ])
