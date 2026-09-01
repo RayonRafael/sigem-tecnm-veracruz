@@ -50,7 +50,10 @@ class Dashboard extends BaseDashboard
         $totalActivos = Inventario::count();
         
         // Bitacora activity just for this user
-        $actividadReciente = \App\Models\BitacoraSistema::with('usuario')->where('id_usuario', $userId)->latest('fecha_hora')->limit(5)->get();
+        $actividadReciente = \Spatie\Activitylog\Models\Activity::with('causer')
+            ->where('causer_id', $userId)
+            ->where('causer_type', \App\Models\User::class)
+            ->latest()->limit(5)->get();
 
         // Colecciones limitadas (mini tablas) y completas (modales)
         $inventariosCompletos = Inventario::with(['material', 'material.marca', 'material.tipo'])->latest('created_at')->take(50)->get();

@@ -4,10 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Proveedor extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['nombre_empresa', 'rfc', 'activo', 'contacto_nombre', 'contacto_telefono', 'contacto_email'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(function (string $eventName) {
+                $acciones = [
+                    'created' => 'creado',
+                    'updated' => 'actualizado',
+                    'deleted' => 'eliminado',
+                ];
+                return $acciones[$eventName] ?? $eventName;
+            });
+    }
 
     protected $table = 'proveedores';
     protected $primaryKey = 'id_proveedor';

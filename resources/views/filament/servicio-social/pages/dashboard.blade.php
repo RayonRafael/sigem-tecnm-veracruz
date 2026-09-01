@@ -485,7 +485,7 @@
                 @forelse($actividadReciente ?? [] as $act)
                     @php
                         $dot = 'create';
-                        $acc = strtolower($act->accion);
+                        $acc = strtolower($act->event ?? '');
                         if(str_contains($acc, 'crea')) $dot = 'create';
                         elseif(str_contains($acc, 'actualiza') || str_contains($acc, 'edita')) $dot = 'update';
                         elseif(str_contains($acc, 'autoriza')) $dot = 'auth';
@@ -501,10 +501,10 @@
                                 'eliminar' => 'Eliminaste un',
                                 'autorizar' => 'Autorizaste un',
                             ];
-                            $accionTexto = $accionesMap[strtolower($act->accion)] ?? ('Has ' . strtolower($act->accion) . ' en');
+                            $accionTexto = $accionesMap[strtolower($act->event ?? '')] ?? ('Has ' . strtolower($act->event ?? '') . ' en');
                         @endphp
-                        <p class="tl-text">{{ $accionTexto }} <em>{{ $act->tabla_afectada }}</em></p>
-                        <div class="tl-time">{{ \Carbon\Carbon::parse($act->fecha_hora)->diffForHumans() }}</div>
+                        <p class="tl-text">{{ $accionTexto }} <em>{{ class_basename($act->subject_type) }}</em></p>
+                        <div class="tl-time">{{ \Carbon\Carbon::parse($act->created_at)->diffForHumans() }}</div>
                     </div>
                 </div>
                 @empty

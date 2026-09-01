@@ -4,10 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Solicitud extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['estado', 'fecha_autorizacion', 'autorizado_por', 'fecha_devolucion_real', 'observaciones', 'tipo_movimiento'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(function (string $eventName) {
+                $acciones = [
+                    'created' => 'creado',
+                    'updated' => 'actualizado',
+                    'deleted' => 'eliminado',
+                ];
+                return $acciones[$eventName] ?? $eventName;
+            });
+    }
 
     protected $table = 'solicitud';
     protected $primaryKey = 'id_solicitud';

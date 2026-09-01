@@ -4,10 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Mantenimiento extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['estado', 'tipo_servicio', 'tipo_mantenimiento', 'descripcion_falla', 'descripcion_trabajo', 'fecha_inicio', 'fecha_fin', 'observaciones'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(function (string $eventName) {
+                $acciones = [
+                    'created' => 'creado',
+                    'updated' => 'actualizado',
+                    'deleted' => 'eliminado',
+                ];
+                return $acciones[$eventName] ?? $eventName;
+            });
+    }
 
     protected $table = 'mantenimiento';
     protected $primaryKey = 'id_mantenimiento';

@@ -3,7 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\Area;
-use App\Models\BitacoraSistema;
+
 use App\Models\Departamento;
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
@@ -56,7 +56,7 @@ class Dashboard extends BaseDashboard
                                     ->whereYear('created_at', Carbon::now()->year)->count();
 
         // 2. Actividad Reciente (5 items)
-        $actividadReciente = BitacoraSistema::with('usuario')->latest('fecha_hora')->limit(5)->get();
+        $actividadReciente = \Spatie\Activitylog\Models\Activity::with('causer')->latest()->limit(5)->get();
 
         // 3. Inventario (completos y limitados)
         $inventariosCompletos = Inventario::with(['material', 'material.marca', 'material.tipo', 'proveedor', 'usuario'])->latest('created_at')->take(50)->get();
