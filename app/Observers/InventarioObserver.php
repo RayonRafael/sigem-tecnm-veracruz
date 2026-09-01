@@ -13,6 +13,13 @@ class InventarioObserver
         }
     }
 
+    public function updating(Inventario $inventario): void
+    {
+        if ($inventario->isDirty('estado') && $inventario->estado === 'Baja' && empty($inventario->fecha_baja)) {
+            $inventario->fecha_baja = now();
+        }
+    }
+
     public function updated(Inventario $inventario): void
     {
         if ($inventario->isDirty('id_producto')) {
@@ -23,11 +30,6 @@ class InventarioObserver
             if ($inventario->material) {
                 $inventario->material->increment('stock_actual');
             }
-        }
-
-        if ($inventario->isDirty('estado') && $inventario->estado === 'Baja' && empty($inventario->fecha_baja)) {
-            $inventario->fecha_baja = now();
-            $inventario->saveQuietly();
         }
     }
 

@@ -6,10 +6,6 @@ use App\Models\Solicitud;
 
 class SolicitudObserver
 {
-    public function created(Solicitud $solicitud): void
-    {
-    }
-
     public function updated(Solicitud $solicitud): void
     {
         if ($solicitud->isDirty('estado')) {
