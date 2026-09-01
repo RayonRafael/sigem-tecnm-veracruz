@@ -17,14 +17,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bind(\Filament\Http\Responses\Auth\Contracts\LogoutResponse::class, function () {
-            return new class implements \Filament\Http\Responses\Auth\Contracts\LogoutResponse {
-                public function toResponse($request): \Illuminate\Http\RedirectResponse
-                {
-                    return redirect()->to('/login');
-                }
-            };
-        });
+        //
     }
 
     public function boot(): void
@@ -51,5 +44,20 @@ class AppServiceProvider extends ServiceProvider
         Inventario::observe(InventarioObserver::class);
         Mantenimiento::observe(MantenimientoObserver::class);
         Solicitud::observe(SolicitudObserver::class);
+
+        \Illuminate\Support\Facades\Event::listen(function (\Illuminate\Auth\Events\Attempting $event) {
+            $panel = \Filament\Facades\Filament::getCurrentPanel();
+            if (! $panel) {
+                return;
+            }
+
+            $user = \App\Models\User::where('email', $event->credentials['email'] ?? '')->first();
+            
+            if ($user && ! $user->canAccessPanel($panel)) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'data.email' => __('filament-panels::pages/auth/login.messages.failed'),
+                ]);
+            }
+        });
     }
 }

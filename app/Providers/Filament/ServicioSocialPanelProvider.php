@@ -58,6 +58,29 @@ class ServicioSocialPanelProvider extends PanelProvider
 </div>
 ')
             )
+            ->renderHook(
+                PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE,
+                fn (): string => Blade::render('
+<div class="flex justify-center items-center gap-4 mb-6">
+    <img src="{{ asset(\'images/sigem-logo.svg\') }}" alt="SIGEM" style="height: 40px; object-fit: contain;">
+    <img src="{{ asset(\'images/tecnm-logo.png\') }}" alt="TecNM" style="height: 40px; object-fit: contain;">
+    <img src="{{ asset(\'images/itv-logo.png\') }}" alt="ITV" style="height: 40px; object-fit: contain;">
+</div>
+')
+            )
+            ->renderHook(
+                PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
+                fn (): string => Blade::render('
+<div class="text-center mt-6 flex flex-col gap-3">
+    <a href="{{ url(\'/admin/login\') }}" class="text-sm font-medium" style="color: #1b65d4; text-decoration: underline;">
+        ¿Eres Administrador? Inicia sesión aquí
+    </a>
+    <a href="{{ url(\'/\') }}" class="text-sm text-gray-500 hover:text-gray-700 font-medium">
+        &larr; Ir al inicio
+    </a>
+</div>
+')
+            )
 
             ->navigationGroups([
                 NavigationGroup::make()
