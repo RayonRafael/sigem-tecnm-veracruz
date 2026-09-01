@@ -270,7 +270,7 @@
                 </div>
                 <div class="mini-table-wrap">
                     <table class="mod-table">
-                        <thead><tr><th class="text-secondary-util">#</th><th class="text-secondary-util">Equipo</th><th class="text-secondary-util">Estado</th><th class="text-secondary-util">Acciones</th></tr></thead>
+                        <thead><tr><th class="text-secondary-util">#</th><th class="text-secondary-util">Equipo</th><th class="text-secondary-util">Estado</th></tr></thead>
                         <tbody>
                             @forelse($mantenimientosRecientes ?? [] as $mant)
                             <tr>
@@ -285,24 +285,9 @@
                                     @endphp
                                     <span class="badge {{ $cls }}">{{ $mant->estado }}</span>
                                 </td>
-                                <td>
-                                    @if(in_array($mant->estado, ['Solicitado', 'Pendiente Revision Admin']))
-                                        <form action="{{ route('mantenimientos.autorizar', $mant->id_mantenimiento) }}" method="POST" style="display:inline;" @submit.prevent="let f = $el; openConfirm('Autorizar mantenimiento', '¿Estás seguro de autorizar este mantenimiento?', 'blue', () => f.submit())">
-                                            @csrf
-                                            <button type="submit" class="btn-blue" style="padding:4px 10px;font-size:11px;">Autorizar</button>
-                                        </form>
-                                    @elseif($mant->estado === 'En proceso')
-                                        <form action="{{ route('mantenimientos.completar', $mant->id_mantenimiento) }}" method="POST" style="display:inline;" @submit.prevent="let f = $el; openConfirm('Completar mantenimiento', '¿Estás seguro de marcar este mantenimiento como completado?', 'green', () => f.submit())">
-                                            @csrf
-                                            <button type="submit" class="btn-blue" style="padding:4px 10px;font-size:11px;background:#059669;">Completar</button>
-                                        </form>
-                                    @else
-                                        <span class="text-muted-util" style="font-size:11px;">-</span>
-                                    @endif
-                                </td>
                             </tr>
                             @empty
-                            <tr><td colspan="4" class="text-muted-util" style="text-align: center; padding: 24px;">Sin registros.</td></tr>
+                            <tr><td colspan="3" class="text-muted-util" style="text-align: center; padding: 24px;">Sin registros.</td></tr>
                             @endforelse
                         </tbody>
                     </table>
