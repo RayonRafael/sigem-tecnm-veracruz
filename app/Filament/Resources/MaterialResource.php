@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\TrashedFilter;
 use Illuminate\Database\Eloquent\Builder;
 
 class MaterialResource extends Resource
@@ -144,6 +145,7 @@ class MaterialResource extends Resource
             ])
             ->defaultSort('nombre', 'asc')
             ->filters([
+                TrashedFilter::make(),
                 //
             ])
             ->actions([

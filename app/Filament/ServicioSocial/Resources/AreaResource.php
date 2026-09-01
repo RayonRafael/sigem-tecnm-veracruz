@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\TrashedFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
@@ -84,6 +85,7 @@ class AreaResource extends Resource
             ])
             ->defaultSort('nombre', 'asc')
             ->filters([
+                TrashedFilter::make(),
                 //
             ])
             ->actions([

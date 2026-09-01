@@ -59,7 +59,7 @@ class User extends Authenticatable implements FilamentUser
             return $this->hasPermissionTo(\App\Enums\RoleEnum::PERM_ACCESS_ADMIN) || $this->tipo_usuario === \App\Enums\RoleEnum::ADMIN->value;
         }
         if ($panel->getId() === 'servicio-social') {
-            return $this->hasPermissionTo(\App\Enums\RoleEnum::PERM_ACCESS_SERVICIO) || $this->tipo_usuario === 'Servicio';
+            return $this->hasPermissionTo(\App\Enums\RoleEnum::PERM_ACCESS_SERVICIO) || $this->tipo_usuario === \App\Enums\RoleEnum::SERVICIO_TIPO->value;
         }
         return false;
     }

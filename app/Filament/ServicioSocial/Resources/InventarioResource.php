@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\TrashedFilter;
 use Illuminate\Database\Eloquent\Builder;
 
 class InventarioResource extends Resource
@@ -217,6 +218,7 @@ class InventarioResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('estado')
                     ->options([
                         'Disponible' => 'Disponible',

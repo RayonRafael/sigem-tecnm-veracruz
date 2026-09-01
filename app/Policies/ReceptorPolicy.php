@@ -14,7 +14,7 @@ class ReceptorPolicy
 
     private function isShared(User $user): bool
     {
-        return $this->isAdmin($user) || $user->hasPermissionTo(\App\Enums\RoleEnum::PERM_ACCESS_SERVICIO) || $user->tipo_usuario === 'Servicio';
+        return $this->isAdmin($user) || $user->hasPermissionTo(\App\Enums\RoleEnum::PERM_ACCESS_SERVICIO) || $user->tipo_usuario === \App\Enums\RoleEnum::SERVICIO_TIPO->value;
     }
 
     public function viewAny(User $user): bool { return $this->isShared($user); }

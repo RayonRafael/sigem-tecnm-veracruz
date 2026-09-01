@@ -10,6 +10,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\TrashedFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -258,6 +259,7 @@ class InventarioResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                TrashedFilter::make(),
                 Tables\Filters\TernaryFilter::make('aprobado')
                     ->label('Estado de Aprobación'),
                 Tables\Filters\SelectFilter::make('estado')->label('Estado')

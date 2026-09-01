@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\TrashedFilter;
 
 class ProveedorResource extends Resource
 {
@@ -109,6 +110,7 @@ class ProveedorResource extends Resource
             ])
             ->defaultSort('nombre_empresa', 'asc')
             ->filters([
+                TrashedFilter::make(),
                 //
             ])
             ->actions([

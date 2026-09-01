@@ -91,7 +91,7 @@ class UserResource extends Resource
                             ->label('Tipo de Usuario (Sistema)')
                             ->options([
                                 \App\Enums\RoleEnum::ADMIN->value => \App\Enums\RoleEnum::ADMIN->value,
-                                'Servicio' => \App\Enums\RoleEnum::SERVICIO_SOCIAL->value,
+                                \App\Enums\RoleEnum::SERVICIO_TIPO->value => \App\Enums\RoleEnum::SERVICIO_SOCIAL->value,
                                 'Pendiente' => 'Pendiente',
                             ])
                             ->default('Pendiente')
@@ -133,12 +133,12 @@ class UserResource extends Resource
                     ->badge()
                     ->colors([
                         'success' => \App\Enums\RoleEnum::ADMIN->value,
-                        'warning' => 'Servicio',
+                        'warning' => \App\Enums\RoleEnum::SERVICIO_TIPO->value,
                         'gray' => 'Pendiente',
                     ])
                     ->icons([
                         'heroicon-m-shield-check' => \App\Enums\RoleEnum::ADMIN->value,
-                        'heroicon-m-academic-cap' => 'Servicio',
+                        'heroicon-m-academic-cap' => \App\Enums\RoleEnum::SERVICIO_TIPO->value,
                         'heroicon-m-clock' => 'Pendiente',
                     ]),
                 Tables\Columns\TextColumn::make('activo')
@@ -157,7 +157,7 @@ class UserResource extends Resource
                 Tables\Filters\SelectFilter::make('tipo_usuario')
                     ->options([
                         \App\Enums\RoleEnum::ADMIN->value => \App\Enums\RoleEnum::ADMIN->value,
-                        'Servicio' => \App\Enums\RoleEnum::SERVICIO_SOCIAL->value,
+                        \App\Enums\RoleEnum::SERVICIO_TIPO->value => \App\Enums\RoleEnum::SERVICIO_SOCIAL->value,
                         'Pendiente' => 'Pendiente',
                     ]),
             ])
@@ -208,12 +208,12 @@ class UserResource extends Resource
                             ->badge()
                             ->color(fn (string $state): string => match($state) {
                                 \App\Enums\RoleEnum::ADMIN->value => 'success',
-                                'Servicio' => 'warning',
+                                \App\Enums\RoleEnum::SERVICIO_TIPO->value => 'warning',
                                 default => 'gray',
                             })
                             ->icon(fn (string $state): string => match($state) {
                                 \App\Enums\RoleEnum::ADMIN->value => 'heroicon-m-shield-check',
-                                'Servicio' => 'heroicon-m-academic-cap',
+                                \App\Enums\RoleEnum::SERVICIO_TIPO->value => 'heroicon-m-academic-cap',
                                 default => 'heroicon-m-clock',
                             }),
                         \Filament\Infolists\Components\TextEntry::make('roles.name')->label('Rol')->badge()->icon('heroicon-m-key'),
