@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Inventario extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -24,19 +24,21 @@ class Inventario extends Model
                     'updated' => 'actualizado',
                     'deleted' => 'eliminado',
                 ];
+
                 return $acciones[$eventName] ?? $eventName;
             });
     }
 
     protected $table = 'inventario';
+
     protected $primaryKey = 'id_inventario';
-    
+
     protected $fillable = [
         'num_serie', 'id_producto', 'id_usuario', 'id_proveedor', 'estado', 'estado_registro',
         'tipo_propiedad', 'ubicacion_fisica', 'fecha_registro', 'fecha_factura', 'num_factura',
         'fecha_baja', 'fecha_inicio_renta', 'fecha_fin_renta', 'observaciones_renta',
         'observaciones_generales', 'garantia_fecha_fin', 'garantia_estado',
-        'aprobado', 'aprobado_por', 'fecha_aprobacion'
+        'aprobado', 'aprobado_por', 'fecha_aprobacion',
     ];
 
     // Convertir fechas automáticamente a objetos Carbon

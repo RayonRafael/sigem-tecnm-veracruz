@@ -3,29 +3,34 @@
 namespace App\Filament\ServicioSocial\Resources;
 
 use App\Filament\ServicioSocial\Resources\AreaResource\Pages;
-use App\Filament\ServicioSocial\Resources\AreaResource\RelationManagers;
 use App\Models\Area;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Filters\TrashedFilter;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class AreaResource extends Resource
 {
-
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Area::class;
+
     protected static ?string $recordTitleAttribute = 'nombre';
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
+
     protected static ?string $navigationGroup = 'Catálogos';
+
     protected static ?string $navigationLabel = 'Áreas';
+
     protected static ?string $modelLabel = 'Área';
+
     protected static ?string $pluralModelLabel = 'Áreas';
 
     public static function canCreate(): bool
@@ -33,12 +38,12 @@ class AreaResource extends Resource
         return false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return false;
     }
@@ -94,14 +99,14 @@ class AreaResource extends Resource
             ->bulkActions([]);
     }
 
-    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos del Área')
+                Section::make('Datos del Área')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-map-pin'),
-                        \Filament\Infolists\Components\TextEntry::make('departamento.nombre')->label('Departamento')->icon('heroicon-m-building-office-2'),
+                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-map-pin'),
+                        TextEntry::make('departamento.nombre')->label('Departamento')->icon('heroicon-m-building-office-2'),
                     ])->columns(2),
             ]);
     }

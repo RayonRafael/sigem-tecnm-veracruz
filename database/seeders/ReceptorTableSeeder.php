@@ -6,7 +6,6 @@ use Illuminate\Database\Seeder;
 
 class ReceptorTableSeeder extends Seeder
 {
-
     /**
      * Auto generated seed file
      *
@@ -14,13 +13,11 @@ class ReceptorTableSeeder extends Seeder
      */
     public function run()
     {
-        
 
         \DB::table('receptor')->delete();
-        
-        \DB::table('receptor')->insert(array (
-            0 => 
-            array (
+
+        \DB::table('receptor')->insert([
+            0 => [
                 'id_receptor' => 1,
                 'nombre' => 'Alejandro',
                 'apellido_paterno' => 'Morales',
@@ -28,12 +25,11 @@ class ReceptorTableSeeder extends Seeder
                 'email' => 'alejandro.perez@itver.edu.mx',
                 'telefono' => '2299812345',
                 'id_area' => 24,
-                'deleted_at' => NULL,
+                'deleted_at' => null,
                 'created_at' => '2026-08-10 17:31:49',
                 'updated_at' => '2026-08-10 17:31:49',
-            ),
-        ));
-        
-        
+            ],
+        ]);
+
     }
 }

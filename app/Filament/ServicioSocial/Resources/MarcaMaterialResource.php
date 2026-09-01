@@ -3,29 +3,34 @@
 namespace App\Filament\ServicioSocial\Resources;
 
 use App\Filament\ServicioSocial\Resources\MarcaMaterialResource\Pages;
-use App\Filament\ServicioSocial\Resources\MarcaMaterialResource\RelationManagers;
 use App\Models\MarcaMaterial;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Filters\TrashedFilter;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class MarcaMaterialResource extends Resource
 {
-
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = MarcaMaterial::class;
+
     protected static ?string $recordTitleAttribute = 'nombre';
 
     protected static ?string $navigationIcon = 'heroicon-o-tag';
+
     protected static ?string $navigationGroup = 'Catálogos';
+
     protected static ?string $navigationLabel = 'Marcas de material';
+
     protected static ?string $modelLabel = 'Marca';
+
     protected static ?string $pluralModelLabel = 'Marcas';
 
     public static function canCreate(): bool
@@ -33,12 +38,12 @@ class MarcaMaterialResource extends Resource
         return false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return false;
     }
@@ -83,13 +88,13 @@ class MarcaMaterialResource extends Resource
             ->bulkActions([]);
     }
 
-    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos de la Marca')
+                Section::make('Datos de la Marca')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-tag'),
+                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-tag'),
                     ]),
             ]);
     }

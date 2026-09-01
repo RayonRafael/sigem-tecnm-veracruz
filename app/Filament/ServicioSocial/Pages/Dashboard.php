@@ -15,27 +15,31 @@ use App\Models\TipoMaterial;
 use App\Models\UnidadMedida;
 use App\Models\User;
 use Filament\Pages\Dashboard as BaseDashboard;
-use Illuminate\Support\Carbon;
+use Spatie\Activitylog\Models\Activity;
 
 class Dashboard extends BaseDashboard
 {
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $navigationIcon = 'heroicon-o-home';
+
     protected static ?string $navigationLabel = 'Panel';
+
     protected static ?string $navigationGroup = 'Panel';
+
     protected static ?string $title = 'SIGEM - Servicio Social';
+
     protected static string $view = 'filament.servicio-social.pages.dashboard';
 
-    public function getColumns(): int | string | array
+    public function getColumns(): int|string|array
     {
         return [
             'default' => 12,
-            'sm'      => 12,
-            'md'      => 12,
-            'lg'      => 12,
-            'xl'      => 12,
-            '2xl'     => 12,
+            'sm' => 12,
+            'md' => 12,
+            'lg' => 12,
+            'xl' => 12,
+            '2xl' => 12,
         ];
     }
 
@@ -48,11 +52,11 @@ class Dashboard extends BaseDashboard
         $misSolicitudesPendientes = Solicitud::where('id_usuario', $userId)->pendientes()->count();
         $misMantenimientos = Mantenimiento::where('id_usuario_solicita', $userId)->count();
         $totalActivos = Inventario::count();
-        
+
         // Bitacora activity just for this user
-        $actividadReciente = \Spatie\Activitylog\Models\Activity::with('causer')
+        $actividadReciente = Activity::with('causer')
             ->where('causer_id', $userId)
-            ->where('causer_type', \App\Models\User::class)
+            ->where('causer_type', User::class)
             ->latest()->limit(5)->get();
 
         // Colecciones limitadas (mini tablas) y completas (modales)
@@ -93,9 +97,9 @@ class Dashboard extends BaseDashboard
         $proveedoresList = Proveedor::latest()->take(50)->get();
         $receptoresList = Receptor::with('area.departamento')->latest()->take(50)->get();
         $usuariosList = User::with('roles')->latest()->take(50)->get();
-        
-        $totalRegistrosCatalogos = $departamentosList->count() + $materialesList->count() + $areasList->count() + 
-                                   $marcasList->count() + $tiposList->count() + $unidadesList->count() + 
+
+        $totalRegistrosCatalogos = $departamentosList->count() + $materialesList->count() + $areasList->count() +
+                                   $marcasList->count() + $tiposList->count() + $unidadesList->count() +
                                    $proveedoresList->count() + $receptoresList->count() + $usuariosList->count();
 
         return [
@@ -103,7 +107,7 @@ class Dashboard extends BaseDashboard
             'misSolicitudesPendientes' => $misSolicitudesPendientes,
             'misMantenimientos' => $misMantenimientos,
             'totalActivos' => $totalActivos,
-            
+
             'actividadReciente' => $actividadReciente,
             'inventariosRecientes' => $inventariosRecientes,
             'solicitudesRecientes' => $solicitudesRecientes,
@@ -125,7 +129,7 @@ class Dashboard extends BaseDashboard
             'inventariosCompletos' => $inventariosCompletos,
             'solicitudesCompletas' => $solicitudesCompletas,
             'mantenimientosCompletos' => $mantenimientosCompletos,
-            
+
             'departamentosList' => $departamentosList,
             'materialesList' => $materialesList,
             'areasList' => $areasList,
@@ -135,7 +139,7 @@ class Dashboard extends BaseDashboard
             'proveedoresList' => $proveedoresList,
             'receptoresList' => $receptoresList,
             'usuariosList' => $usuariosList,
-            
+
             'totalRegistrosCatalogos' => $totalRegistrosCatalogos,
         ];
     }

@@ -6,7 +6,6 @@ use Illuminate\Database\Seeder;
 
 class ProveedoresTableSeeder extends Seeder
 {
-
     /**
      * Auto generated seed file
      *
@@ -14,13 +13,11 @@ class ProveedoresTableSeeder extends Seeder
      */
     public function run()
     {
-        
 
         \DB::table('proveedores')->delete();
-        
-        \DB::table('proveedores')->insert(array (
-            0 => 
-            array (
+
+        \DB::table('proveedores')->insert([
+            0 => [
                 'id_proveedor' => 1,
                 'nombre_empresa' => 'Cyberpuerta S.A. de C.V.',
                 'rfc' => 'CYB120410AB3',
@@ -30,9 +27,8 @@ class ProveedoresTableSeeder extends Seeder
                 'activo' => 1,
                 'created_at' => '2026-08-10 17:22:56',
                 'updated_at' => '2026-08-10 17:22:56',
-            ),
-            1 => 
-            array (
+            ],
+            1 => [
                 'id_proveedor' => 2,
                 'nombre_empresa' => 'Electrónica Steren de Veracruz S.A. de C.V.',
                 'rfc' => 'EST850615A89',
@@ -42,9 +38,8 @@ class ProveedoresTableSeeder extends Seeder
                 'activo' => 1,
                 'created_at' => '2026-08-10 17:25:24',
                 'updated_at' => '2026-08-10 17:25:24',
-            ),
-            2 => 
-            array (
+            ],
+            2 => [
                 'id_proveedor' => 3,
                 'nombre_empresa' => 'Soluciones de Redes y Conectividad Panduit',
                 'rfc' => 'SRC150820KL4',
@@ -54,9 +49,8 @@ class ProveedoresTableSeeder extends Seeder
                 'activo' => 1,
                 'created_at' => '2026-08-10 17:29:34',
                 'updated_at' => '2026-08-10 17:29:34',
-            ),
-        ));
-        
-        
+            ],
+        ]);
+
     }
 }

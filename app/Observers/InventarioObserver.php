@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Inventario;
+use App\Models\Material;
 
 class InventarioObserver
 {
@@ -22,8 +23,8 @@ class InventarioObserver
 
     public function updated(Inventario $inventario): void
     {
-        if ($inventario->isDirty('id_producto')) {
-            $oldMaterial = \App\Models\Material::find($inventario->getOriginal('id_producto'));
+        if ($inventario->wasChanged('id_producto')) {
+            $oldMaterial = Material::find($inventario->getOriginal('id_producto'));
             if ($oldMaterial) {
                 $oldMaterial->decrement('stock_actual');
             }

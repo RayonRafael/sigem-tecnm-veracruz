@@ -11,7 +11,9 @@ class MarcaMaterial extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'marca_material';
+
     protected $primaryKey = 'id_marca';
+
     protected $fillable = ['nombre'];
 
     // RELACIONES: Una marca tiene muchos materiales

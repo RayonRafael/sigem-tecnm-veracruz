@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -28,6 +27,5 @@ class DatabaseSeeder extends Seeder
         $this->call(DetalleSolicitudTableSeeder::class);
         $this->call(MantenimientoTableSeeder::class);
         $this->call(HistorialEstadosTableSeeder::class);
-        $this->call(BitacoraSistemaTableSeeder::class);
     }
 }

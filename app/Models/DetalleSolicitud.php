@@ -10,7 +10,9 @@ class DetalleSolicitud extends Model
     use HasFactory;
 
     protected $table = 'detalle_solicitud';
+
     protected $primaryKey = 'id_detalle';
+
     protected $fillable = ['cantidad', 'id_solicitud', 'id_producto', 'id_inventario'];
 
     public function solicitud()

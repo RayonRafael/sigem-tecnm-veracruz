@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\RoleEnum;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -12,7 +12,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, HasRoles, Notifiable;
 
     /**
      * Los atributos que se pueden asignar en masa.
@@ -56,11 +56,12 @@ class User extends Authenticatable implements FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {
-            return $this->hasPermissionTo(\App\Enums\RoleEnum::PERM_ACCESS_ADMIN) || $this->tipo_usuario === \App\Enums\RoleEnum::ADMIN->value;
+            return $this->hasPermissionTo(RoleEnum::PERM_ACCESS_ADMIN) || $this->tipo_usuario === RoleEnum::ADMIN->value;
         }
         if ($panel->getId() === 'servicio-social') {
-            return $this->hasPermissionTo(\App\Enums\RoleEnum::PERM_ACCESS_SERVICIO) || $this->tipo_usuario === \App\Enums\RoleEnum::SERVICIO_TIPO->value;
+            return $this->hasPermissionTo(RoleEnum::PERM_ACCESS_SERVICIO) || $this->tipo_usuario === RoleEnum::SERVICIO_TIPO->value;
         }
+
         return false;
     }
 
@@ -87,7 +88,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(Mantenimiento::class, 'id_usuario_solicita', 'id');
     }
-    
+
     public function historialEstados()
     {
         return $this->hasMany(HistorialEstado::class, 'id_usuario', 'id');

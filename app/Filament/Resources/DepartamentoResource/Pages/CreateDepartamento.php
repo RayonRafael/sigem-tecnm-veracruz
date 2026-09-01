@@ -3,14 +3,13 @@
 namespace App\Filament\Resources\DepartamentoResource\Pages;
 
 use App\Filament\Concerns\ConDashboardBreadcrumb;
-
 use App\Filament\Resources\DepartamentoResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateDepartamento extends CreateRecord
 {
     use ConDashboardBreadcrumb;
+
     protected static string $resource = DepartamentoResource::class;
 
     protected function getRedirectUrl(): string

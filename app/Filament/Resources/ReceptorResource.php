@@ -2,29 +2,36 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Notifications\Notification;
-
 use App\Filament\Resources\ReceptorResource\Pages;
 use App\Models\Receptor;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
 
 class ReceptorResource extends Resource
 {
-
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Receptor::class;
+
     protected static ?string $recordTitleAttribute = 'nombre';
+
     protected static ?string $navigationIcon = 'heroicon-o-users';
+
     protected static ?string $navigationLabel = 'Receptores';
+
     protected static ?string $modelLabel = 'Receptor';
+
     protected static ?string $pluralModelLabel = 'Receptores';
+
     protected static ?string $navigationGroup = 'Catálogos';
+
     protected static ?int $navigationSort = 7;
 
     public static function form(Form $form): Form
@@ -116,18 +123,18 @@ class ReceptorResource extends Resource
             ]);
     }
 
-    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos del Receptor')
+                Section::make('Datos del Receptor')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-user'),
-                        \Filament\Infolists\Components\TextEntry::make('apellido_paterno')->label('Apellido Paterno')->icon('heroicon-m-user'),
-                        \Filament\Infolists\Components\TextEntry::make('apellido_materno')->label('Apellido Materno')->icon('heroicon-m-user'),
-                        \Filament\Infolists\Components\TextEntry::make('email')->label('Email')->icon('heroicon-m-envelope'),
-                        \Filament\Infolists\Components\TextEntry::make('telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
-                        \Filament\Infolists\Components\TextEntry::make('area.nombre')->label('Área')->icon('heroicon-m-building-office'),
+                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-user'),
+                        TextEntry::make('apellido_paterno')->label('Apellido Paterno')->icon('heroicon-m-user'),
+                        TextEntry::make('apellido_materno')->label('Apellido Materno')->icon('heroicon-m-user'),
+                        TextEntry::make('email')->label('Email')->icon('heroicon-m-envelope'),
+                        TextEntry::make('telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
+                        TextEntry::make('area.nombre')->label('Área')->icon('heroicon-m-building-office'),
                     ])->columns(3),
             ]);
     }

@@ -7,9 +7,9 @@ trait ConDashboardBreadcrumb
     public function getBreadcrumbs(): array
     {
         $breadcrumbs = parent::getBreadcrumbs();
-        
-        $dashboardUrl = request()->is('servicio-social*') 
-            ? url('/servicio-social') 
+
+        $dashboardUrl = request()->is('servicio-social*')
+            ? url('/servicio-social')
             : url('/admin');
 
         return array_merge(

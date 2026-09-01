@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\SolicitudResource\Pages;
 
 use App\Filament\Concerns\ConDashboardBreadcrumb;
-
 use App\Filament\Resources\SolicitudResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -11,6 +10,7 @@ use Filament\Resources\Pages\EditRecord;
 class EditSolicitud extends EditRecord
 {
     use ConDashboardBreadcrumb;
+
     protected static string $resource = SolicitudResource::class;
 
     protected function getHeaderActions(): array

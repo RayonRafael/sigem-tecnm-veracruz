@@ -10,14 +10,14 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('departamento', function (Blueprint $table) {
-        $table->id('id_departamento'); // <-- Cambiar esto
-        $table->string('nombre', 100);
-        $table->softDeletes();
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('departamento', function (Blueprint $table) {
+            $table->id('id_departamento'); // <-- Cambiar esto
+            $table->string('nombre', 100);
+            $table->softDeletes();
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

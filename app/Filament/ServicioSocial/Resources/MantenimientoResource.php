@@ -2,12 +2,14 @@
 
 namespace App\Filament\ServicioSocial\Resources;
 
-use Filament\Notifications\Notification;
-
+use App\Enums\RoleEnum;
 use App\Filament\ServicioSocial\Resources\MantenimientoResource\Pages;
 use App\Models\Mantenimiento;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,16 +17,22 @@ use Illuminate\Database\Eloquent\Builder;
 
 class MantenimientoResource extends Resource
 {
-
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Mantenimiento::class;
+
     protected static ?string $recordTitleAttribute = 'descripcion_falla';
+
     protected static ?string $navigationIcon = 'heroicon-o-wrench-screwdriver';
+
     protected static ?string $navigationLabel = 'Mantenimiento';
+
     protected static ?string $modelLabel = 'Mantenimiento';
+
     protected static ?string $pluralModelLabel = 'Mantenimientos';
+
     protected static ?string $navigationGroup = 'Inventario';
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
@@ -53,7 +61,7 @@ class MantenimientoResource extends Resource
                                     Forms\Components\TextInput::make('nombre_tecnico')
                                         ->label('Técnico / Alumno')
                                         ->required()
-                                        ->default(fn () => auth()->user() ? trim(auth()->user()->name . ' ' . auth()->user()->apellido_paterno . ' ' . auth()->user()->apellido_materno) : null)
+                                        ->default(fn () => auth()->user() ? trim(auth()->user()->name.' '.auth()->user()->apellido_paterno.' '.auth()->user()->apellido_materno) : null)
                                         ->prefixIcon('heroicon-m-user')
                                         ->maxLength(150),
                                     Forms\Components\TextInput::make('num_control_tecnico')
@@ -73,7 +81,7 @@ class MantenimientoResource extends Resource
                                 ->rows(3)
                                 ->columnSpanFull(),
                         ]),
-                    
+
                     Forms\Components\Wizard\Step::make('Tipo de mantenimiento')
                         ->icon('heroicon-m-cog')
                         ->schema([
@@ -82,12 +90,12 @@ class MantenimientoResource extends Resource
                                     Forms\Components\ToggleButtons::make('tipo_servicio')
                                         ->label('Tipo de Servicio')
                                         ->options([
-                                            \App\Enums\RoleEnum::SERVICIO_SOCIAL->value => \App\Enums\RoleEnum::SERVICIO_SOCIAL->value,
+                                            RoleEnum::SERVICIO_SOCIAL->value => RoleEnum::SERVICIO_SOCIAL->value,
                                             'Prácticas Profesionales' => 'Prácticas Profesionales',
                                             'Personal Técnico' => 'Personal Técnico',
                                         ])
                                         ->colors([
-                                            \App\Enums\RoleEnum::SERVICIO_SOCIAL->value => 'primary',
+                                            RoleEnum::SERVICIO_SOCIAL->value => 'primary',
                                             'Prácticas Profesionales' => 'info',
                                             'Personal Técnico' => 'success',
                                         ])
@@ -197,23 +205,23 @@ class MantenimientoResource extends Resource
             ->bulkActions([]);
     }
 
-    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Equipo y Técnico')
+                Section::make('Equipo y Técnico')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('inventario.num_serie')->label('No. Serie')
+                        TextEntry::make('inventario.num_serie')->label('No. Serie')
                             ->fontFamily('mono')
                             ->icon('heroicon-m-qr-code'),
-                        \Filament\Infolists\Components\TextEntry::make('inventario.material.nombre')->label('Material')->icon('heroicon-m-cube'),
-                        \Filament\Infolists\Components\TextEntry::make('nombre_tecnico')->label('Técnico')->icon('heroicon-m-user'),
-                        \Filament\Infolists\Components\TextEntry::make('num_control_tecnico')->label('No. Control')->icon('heroicon-m-identification'),
+                        TextEntry::make('inventario.material.nombre')->label('Material')->icon('heroicon-m-cube'),
+                        TextEntry::make('nombre_tecnico')->label('Técnico')->icon('heroicon-m-user'),
+                        TextEntry::make('num_control_tecnico')->label('No. Control')->icon('heroicon-m-identification'),
                     ])->columns(4),
-                \Filament\Infolists\Components\Section::make('Detalles del Servicio')
+                Section::make('Detalles del Servicio')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('tipo_servicio')->label('Servicio')->badge(),
-                        \Filament\Infolists\Components\TextEntry::make('tipo_mantenimiento')->label('Tipo')
+                        TextEntry::make('tipo_servicio')->label('Servicio')->badge(),
+                        TextEntry::make('tipo_mantenimiento')->label('Tipo')
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 'Preventivo' => 'success',
@@ -227,7 +235,7 @@ class MantenimientoResource extends Resource
                                 'Mejora' => 'heroicon-m-arrow-trending-up',
                                 default => 'heroicon-m-minus',
                             }),
-                        \Filament\Infolists\Components\TextEntry::make('estado')->label('Estado')
+                        TextEntry::make('estado')->label('Estado')
                             ->formatStateUsing(fn ($state) => $state === 'Pendiente Revision Admin' ? 'En revisión' : $state)
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
@@ -247,11 +255,11 @@ class MantenimientoResource extends Resource
                                 default => 'heroicon-m-minus',
                             }),
                     ])->columns(3),
-                \Filament\Infolists\Components\Section::make('Fechas y Reportes')
+                Section::make('Fechas y Reportes')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('fecha_solicitud')->label('Solicitud')->date('d/m/Y')->icon('heroicon-m-calendar'),
-                        \Filament\Infolists\Components\TextEntry::make('descripcion_falla')->label('Falla')->columnSpanFull(),
-                        \Filament\Infolists\Components\TextEntry::make('observaciones')->label('Observaciones')->columnSpanFull(),
+                        TextEntry::make('fecha_solicitud')->label('Solicitud')->date('d/m/Y')->icon('heroicon-m-calendar'),
+                        TextEntry::make('descripcion_falla')->label('Falla')->columnSpanFull(),
+                        TextEntry::make('observaciones')->label('Observaciones')->columnSpanFull(),
                     ])->columns(3),
             ]);
     }

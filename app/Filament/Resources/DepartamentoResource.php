@@ -2,29 +2,35 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Notifications\Notification;
-
 use App\Filament\Resources\DepartamentoResource\Pages;
 use App\Models\Departamento;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Tables\Filters\TrashedFilter;
 
 class DepartamentoResource extends Resource
 {
-
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Departamento::class;
+
     protected static ?string $recordTitleAttribute = 'nombre';
+
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
+
     protected static ?string $navigationLabel = 'Departamentos';
+
     protected static ?string $modelLabel = 'Departamento';
+
     protected static ?string $pluralModelLabel = 'Departamentos';
+
     protected static ?string $navigationGroup = 'Catálogos';
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
@@ -61,17 +67,16 @@ class DepartamentoResource extends Resource
             ]);
     }
 
-    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos del Departamento')
+                Section::make('Datos del Departamento')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-building-office-2'),
+                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-building-office-2'),
                     ]),
             ]);
     }
-
 
     public static function getRelations(): array
     {

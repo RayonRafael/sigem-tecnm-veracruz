@@ -2,29 +2,36 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Notifications\Notification;
-
 use App\Filament\Resources\TipoMaterialResource\Pages;
 use App\Models\TipoMaterial;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
 
 class TipoMaterialResource extends Resource
 {
-
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = TipoMaterial::class;
+
     protected static ?string $recordTitleAttribute = 'nombre';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
     protected static ?string $navigationLabel = 'Tipos de material';
+
     protected static ?string $modelLabel = 'Tipo de material';
+
     protected static ?string $pluralModelLabel = 'Tipos de material';
+
     protected static ?string $navigationGroup = 'Catálogos';
+
     protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
@@ -72,13 +79,13 @@ class TipoMaterialResource extends Resource
             ]);
     }
 
-    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos del Tipo de material')
+                Section::make('Datos del Tipo de material')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-rectangle-stack'),
+                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-rectangle-stack'),
                     ]),
             ]);
     }

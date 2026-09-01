@@ -11,7 +11,9 @@ class Area extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'area';
+
     protected $primaryKey = 'id_area';
+
     protected $fillable = ['nombre', 'id_departamento'];
 
     // RELACIONES: Un área pertenece a un departamento

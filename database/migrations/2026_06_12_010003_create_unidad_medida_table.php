@@ -10,13 +10,13 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-{
-    Schema::create('unidad_medida', function (Blueprint $table) {
-        $table->id('id_unidad'); // <-- Cambiar esto
-        $table->string('nombre', 50)->unique();
-        $table->timestamps();
-    });
-}
+    {
+        Schema::create('unidad_medida', function (Blueprint $table) {
+            $table->id('id_unidad'); // <-- Cambiar esto
+            $table->string('nombre', 50)->unique();
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

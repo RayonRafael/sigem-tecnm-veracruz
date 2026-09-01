@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id('id_area');
             $table->string('nombre', 100);
             $table->foreignId('id_departamento')
-                  ->constrained('departamento', 'id_departamento')
-                  ->onDelete('restrict')
-                  ->onUpdate('cascade');
+                ->constrained('departamento', 'id_departamento')
+                ->onDelete('restrict')
+                ->onUpdate('cascade');
             $table->softDeletes();
             $table->timestamps();
         });

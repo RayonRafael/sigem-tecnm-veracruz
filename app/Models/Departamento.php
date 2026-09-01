@@ -11,7 +11,9 @@ class Departamento extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'departamento';
+
     protected $primaryKey = 'id_departamento';
+
     protected $fillable = ['nombre'];
 
     // RELACIONES: Un departamento tiene muchas áreas

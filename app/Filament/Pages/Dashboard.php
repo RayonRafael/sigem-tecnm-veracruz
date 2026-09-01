@@ -3,7 +3,6 @@
 namespace App\Filament\Pages;
 
 use App\Models\Area;
-
 use App\Models\Departamento;
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
@@ -17,25 +16,31 @@ use App\Models\UnidadMedida;
 use App\Models\User;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Support\Carbon;
+use Spatie\Activitylog\Models\Activity;
 
 class Dashboard extends BaseDashboard
 {
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $navigationIcon = 'heroicon-o-home';
+
     protected static ?string $navigationGroup = 'Panel principal';
+
     protected static ?string $navigationLabel = 'Panel principal';
+
     protected static ?int $navigationSort = -2;
+
     protected static ?string $title = 'SIGEM - TecNM Veracruz';
+
     protected static string $view = 'filament.pages.dashboard';
-    
-    public function getColumns(): int | string | array
+
+    public function getColumns(): int|string|array
     {
         return [
             'default' => 12,
-            'sm'      => 12,
-            'md'      => 12,
-            'lg'      => 12,
+            'sm' => 12,
+            'md' => 12,
+            'lg' => 12,
         ];
     }
 
@@ -45,18 +50,18 @@ class Dashboard extends BaseDashboard
         $totalActivos = Inventario::count();
         $activosBueno = Inventario::whereIn('estado', ['Disponible', 'Asignado'])->count();
         $porcentajeBuenEstado = $totalActivos > 0 ? round(($activosBueno / $totalActivos) * 100) : 0;
-        
+
         $mantenimientosPendientes = Mantenimiento::enRevision()->count();
         $mantenimientosTotales = Mantenimiento::count();
-        
+
         $materialesStockBajoCount = Material::stockBajo()->count();
         $solicitudesPendientes = Solicitud::pendientes()->count();
-        
+
         $creadosEsteMes = Inventario::whereMonth('created_at', Carbon::now()->month)
-                                    ->whereYear('created_at', Carbon::now()->year)->count();
+            ->whereYear('created_at', Carbon::now()->year)->count();
 
         // 2. Actividad Reciente (5 items)
-        $actividadReciente = \Spatie\Activitylog\Models\Activity::with('causer')->latest()->limit(5)->get();
+        $actividadReciente = Activity::with('causer')->latest()->limit(5)->get();
 
         // 3. Inventario (completos y limitados)
         $inventariosCompletos = Inventario::with(['material', 'material.marca', 'material.tipo', 'proveedor', 'usuario'])->latest('created_at')->take(50)->get();
@@ -98,9 +103,9 @@ class Dashboard extends BaseDashboard
         $proveedoresList = Proveedor::latest()->take(50)->get();
         $receptoresList = Receptor::with('area.departamento')->latest()->take(50)->get();
         $usuariosList = User::with('roles')->latest()->take(50)->get();
-        
-        $totalRegistrosCatalogos = $departamentosList->count() + $materialesList->count() + $areasList->count() + 
-                                   $marcasList->count() + $tiposList->count() + $unidadesList->count() + 
+
+        $totalRegistrosCatalogos = $departamentosList->count() + $materialesList->count() + $areasList->count() +
+                                   $marcasList->count() + $tiposList->count() + $unidadesList->count() +
                                    $proveedoresList->count() + $receptoresList->count() + $usuariosList->count();
 
         return [
@@ -112,7 +117,7 @@ class Dashboard extends BaseDashboard
             'materialesStockBajoCount' => $materialesStockBajoCount,
             'solicitudesPendientes' => $solicitudesPendientes,
             'creadosEsteMes' => $creadosEsteMes,
-            
+
             'actividadReciente' => $actividadReciente,
             'inventariosRecientes' => $inventariosRecientes,
             'solicitudesRecientes' => $solicitudesRecientes,
@@ -135,7 +140,7 @@ class Dashboard extends BaseDashboard
             'inventariosCompletos' => $inventariosCompletos,
             'solicitudesCompletas' => $solicitudesCompletas,
             'mantenimientosCompletos' => $mantenimientosCompletos,
-            
+
             'departamentosList' => $departamentosList,
             'materialesList' => $materialesList,
             'areasList' => $areasList,
@@ -145,11 +150,11 @@ class Dashboard extends BaseDashboard
             'proveedoresList' => $proveedoresList,
             'receptoresList' => $receptoresList,
             'usuariosList' => $usuariosList,
-            
+
             'totalRegistrosCatalogos' => $totalRegistrosCatalogos,
         ];
     }
-    
+
     // =========================================================================
     // MÉTODOS LIVEWIRE PARA OPERACIONES INLINE (CRUD) EN SLIDE-OVERS
     // =========================================================================
@@ -160,7 +165,7 @@ class Dashboard extends BaseDashboard
         if (empty(trim($nombre))) {
             return;
         }
-        
+
         if ($id) {
             $dep = Departamento::find($id);
             if ($dep) {
@@ -175,7 +180,9 @@ class Dashboard extends BaseDashboard
     public function deleteDepartamento($id)
     {
         $dep = Departamento::find($id);
-        if ($dep) $dep->delete();
+        if ($dep) {
+            $dep->delete();
+        }
     }
 
     // ÁREA
@@ -184,7 +191,7 @@ class Dashboard extends BaseDashboard
         if (empty(trim($nombre)) || empty($id_departamento)) {
             return;
         }
-        
+
         if ($id) {
             $area = Area::find($id);
             if ($area) {
@@ -200,14 +207,18 @@ class Dashboard extends BaseDashboard
     public function deleteArea($id)
     {
         $area = Area::find($id);
-        if ($area) $area->delete();
+        if ($area) {
+            $area->delete();
+        }
     }
 
     // MARCA
     public function saveMarca($id, $nombre)
     {
-        if (empty(trim($nombre))) return;
-        
+        if (empty(trim($nombre))) {
+            return;
+        }
+
         if ($id) {
             $marca = MarcaMaterial::find($id);
             if ($marca) {
@@ -222,14 +233,18 @@ class Dashboard extends BaseDashboard
     public function deleteMarca($id)
     {
         $marca = MarcaMaterial::find($id);
-        if ($marca) $marca->delete();
+        if ($marca) {
+            $marca->delete();
+        }
     }
 
     // TIPO MATERIAL
     public function saveTipo($id, $nombre)
     {
-        if (empty(trim($nombre))) return;
-        
+        if (empty(trim($nombre))) {
+            return;
+        }
+
         if ($id) {
             $tipo = TipoMaterial::find($id);
             if ($tipo) {
@@ -244,14 +259,18 @@ class Dashboard extends BaseDashboard
     public function deleteTipo($id)
     {
         $tipo = TipoMaterial::find($id);
-        if ($tipo) $tipo->delete();
+        if ($tipo) {
+            $tipo->delete();
+        }
     }
 
     // UNIDAD MEDIDA
     public function saveUnidad($id, $nombre)
     {
-        if (empty(trim($nombre))) return;
-        
+        if (empty(trim($nombre))) {
+            return;
+        }
+
         if ($id) {
             $unidad = UnidadMedida::find($id);
             if ($unidad) {
@@ -266,6 +285,8 @@ class Dashboard extends BaseDashboard
     public function deleteUnidad($id)
     {
         $unidad = UnidadMedida::find($id);
-        if ($unidad) $unidad->delete();
+        if ($unidad) {
+            $unidad->delete();
+        }
     }
 }

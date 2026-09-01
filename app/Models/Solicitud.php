@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Solicitud extends Model
 {
@@ -23,17 +23,19 @@ class Solicitud extends Model
                     'updated' => 'actualizado',
                     'deleted' => 'eliminado',
                 ];
+
                 return $acciones[$eventName] ?? $eventName;
             });
     }
 
     protected $table = 'solicitud';
+
     protected $primaryKey = 'id_solicitud';
-    
+
     protected $fillable = [
         'fecha_solicitud', 'observaciones', 'fecha_autorizacion', 'autorizado_por',
         'estado', 'fecha_devolucion_estimada', 'fecha_devolucion_real',
-        'id_usuario', 'id_receptor', 'tipo_movimiento'
+        'id_usuario', 'id_receptor', 'tipo_movimiento',
     ];
 
     protected $casts = [

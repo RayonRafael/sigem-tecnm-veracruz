@@ -2,30 +2,36 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Notifications\Notification;
-
 use App\Filament\Resources\UnidadMedidaResource\Pages;
 use App\Models\UnidadMedida;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
 
 class UnidadMedidaResource extends Resource
 {
-
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = UnidadMedida::class;
+
     protected static ?string $recordTitleAttribute = 'nombre';
 
     protected static ?string $navigationIcon = 'heroicon-o-bars-3-bottom-left';
+
     protected static ?string $navigationLabel = 'Unidades de medida';
+
     protected static ?string $modelLabel = 'Unidad de medida';
+
     protected static ?string $pluralModelLabel = 'Unidades de medida';
+
     protected static ?string $navigationGroup = 'Catálogos';
+
     protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
@@ -73,13 +79,13 @@ class UnidadMedidaResource extends Resource
             ]);
     }
 
-    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos de la Unidad de medida')
+                Section::make('Datos de la Unidad de medida')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-bars-3-bottom-left'),
+                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-bars-3-bottom-left'),
                     ]),
             ]);
     }

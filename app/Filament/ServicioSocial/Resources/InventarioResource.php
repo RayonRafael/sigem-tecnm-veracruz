@@ -2,30 +2,37 @@
 
 namespace App\Filament\ServicioSocial\Resources;
 
-use Filament\Notifications\Notification;
-
 use App\Filament\ServicioSocial\Resources\InventarioResource\Pages;
 use App\Models\Inventario;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 class InventarioResource extends Resource
 {
-
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Inventario::class;
+
     protected static ?string $recordTitleAttribute = 'num_serie';
+
     protected static ?string $navigationIcon = 'heroicon-o-cube';
+
     protected static ?string $navigationLabel = 'Inventario (Servicio Social)';
+
     protected static ?string $modelLabel = 'Activo';
+
     protected static ?string $pluralModelLabel = 'Activos';
+
     protected static ?string $navigationGroup = 'Inventario';
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
@@ -164,13 +171,13 @@ class InventarioResource extends Resource
                                         ])
                                         ->default('sin_garantia'),
                                 ]),
-                            
+
                             Forms\Components\Grid::make(1)
                                 ->schema([
                                     Forms\Components\Textarea::make('observaciones_generales')
                                         ->label('Observaciones Generales')
                                         ->rows(2),
-                                ])
+                                ]),
                         ]),
                 ])->columnSpanFull(),
             ]);
@@ -236,18 +243,18 @@ class InventarioResource extends Resource
             ->bulkActions([]);
     }
 
-    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Identificación del Activo')
+                Section::make('Identificación del Activo')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('num_serie')->label('No. Serie')
+                        TextEntry::make('num_serie')->label('No. Serie')
                             ->fontFamily('mono')
                             ->icon('heroicon-m-qr-code'),
-                        \Filament\Infolists\Components\TextEntry::make('material.nombre')->label('Material')
+                        TextEntry::make('material.nombre')->label('Material')
                             ->icon('heroicon-m-cube'),
-                        \Filament\Infolists\Components\TextEntry::make('estado')
+                        TextEntry::make('estado')
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 'Disponible' => 'success',
@@ -264,26 +271,26 @@ class InventarioResource extends Resource
                                 default => 'heroicon-m-minus',
                             }),
                     ])->columns(3),
-                \Filament\Infolists\Components\Section::make('Ubicación y Asignación')
+                Section::make('Ubicación y Asignación')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('ubicacion_fisica')->label('Ubicación')
+                        TextEntry::make('ubicacion_fisica')->label('Ubicación')
                             ->icon('heroicon-m-building-office'),
-                        \Filament\Infolists\Components\TextEntry::make('tipo_propiedad')->label('Propiedad')
+                        TextEntry::make('tipo_propiedad')->label('Propiedad')
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 'Propio' => 'primary',
                                 'Rentado' => 'gray',
                                 default => 'gray',
                             }),
-                        \Filament\Infolists\Components\TextEntry::make('usuario.name')->label('Registrado por')
+                        TextEntry::make('usuario.name')->label('Registrado por')
                             ->icon('heroicon-m-user'),
                     ])->columns(3),
-                \Filament\Infolists\Components\Section::make('Detalles Adicionales')
+                Section::make('Detalles Adicionales')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('proveedor.nombre_empresa')->label('Proveedor'),
-                        \Filament\Infolists\Components\TextEntry::make('num_factura')->label('Factura'),
-                        \Filament\Infolists\Components\TextEntry::make('garantia_estado')->label('Garantía'),
-                        \Filament\Infolists\Components\TextEntry::make('observaciones_generales')->label('Observaciones')->columnSpanFull(),
+                        TextEntry::make('proveedor.nombre_empresa')->label('Proveedor'),
+                        TextEntry::make('num_factura')->label('Factura'),
+                        TextEntry::make('garantia_estado')->label('Garantía'),
+                        TextEntry::make('observaciones_generales')->label('Observaciones')->columnSpanFull(),
                     ])->columns(3),
             ]);
     }

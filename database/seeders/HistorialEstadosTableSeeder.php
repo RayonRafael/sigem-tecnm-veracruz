@@ -6,7 +6,6 @@ use Illuminate\Database\Seeder;
 
 class HistorialEstadosTableSeeder extends Seeder
 {
-
     /**
      * Auto generated seed file
      *
@@ -14,11 +13,8 @@ class HistorialEstadosTableSeeder extends Seeder
      */
     public function run()
     {
-        
 
         \DB::table('historial_estados')->delete();
-        
-        
-        
+
     }
 }

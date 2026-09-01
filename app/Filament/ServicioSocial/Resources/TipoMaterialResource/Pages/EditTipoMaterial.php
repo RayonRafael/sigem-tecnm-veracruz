@@ -3,7 +3,6 @@
 namespace App\Filament\ServicioSocial\Resources\TipoMaterialResource\Pages;
 
 use App\Filament\Concerns\ConDashboardBreadcrumb;
-
 use App\Filament\ServicioSocial\Resources\TipoMaterialResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -11,6 +10,7 @@ use Filament\Resources\Pages\EditRecord;
 class EditTipoMaterial extends EditRecord
 {
     use ConDashboardBreadcrumb;
+
     protected static string $resource = TipoMaterialResource::class;
 
     protected function getHeaderActions(): array

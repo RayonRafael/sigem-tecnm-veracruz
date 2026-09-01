@@ -2,12 +2,13 @@
 
 namespace App\Filament\ServicioSocial\Resources;
 
-use Filament\Notifications\Notification;
-
 use App\Filament\ServicioSocial\Resources\SolicitudResource\Pages;
 use App\Models\Solicitud;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,16 +16,22 @@ use Illuminate\Database\Eloquent\Builder;
 
 class SolicitudResource extends Resource
 {
-
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Solicitud::class;
+
     protected static ?string $recordTitleAttribute = 'observaciones';
+
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
+
     protected static ?string $navigationLabel = 'Solicitudes';
+
     protected static ?string $modelLabel = 'Solicitud';
+
     protected static ?string $pluralModelLabel = 'Solicitudes';
+
     protected static ?string $navigationGroup = 'Inventario';
+
     protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
@@ -97,7 +104,7 @@ class SolicitudResource extends Resource
                                 ->defaultItems(1)
                                 ->addActionLabel('Añadir material'),
                         ]),
-                    
+
                     Forms\Components\Wizard\Step::make('Participantes y detalles')
                         ->icon('heroicon-m-users')
                         ->schema([
@@ -142,7 +149,7 @@ class SolicitudResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('id_solicitud')
                     ->label('Folio')
-                    ->formatStateUsing(fn ($state) => 'FOLIO-' . str_pad($state, 5, '0', STR_PAD_LEFT))
+                    ->formatStateUsing(fn ($state) => 'FOLIO-'.str_pad($state, 5, '0', STR_PAD_LEFT))
                     ->fontFamily('mono')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tipo_movimiento')
@@ -191,19 +198,19 @@ class SolicitudResource extends Resource
             ->bulkActions([]);
     }
 
-    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos de la Solicitud')
+                Section::make('Datos de la Solicitud')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('id_solicitud')->label('Folio')
-                            ->formatStateUsing(fn ($state) => 'FOLIO-' . str_pad($state, 5, '0', STR_PAD_LEFT))
+                        TextEntry::make('id_solicitud')->label('Folio')
+                            ->formatStateUsing(fn ($state) => 'FOLIO-'.str_pad($state, 5, '0', STR_PAD_LEFT))
                             ->fontFamily('mono')
                             ->icon('heroicon-m-hashtag'),
-                        \Filament\Infolists\Components\TextEntry::make('fecha_solicitud')->label('Fecha')->date('d/m/Y')->icon('heroicon-m-calendar'),
-                        \Filament\Infolists\Components\TextEntry::make('tipo_movimiento')->label('Tipo')->badge(),
-                        \Filament\Infolists\Components\TextEntry::make('estado')
+                        TextEntry::make('fecha_solicitud')->label('Fecha')->date('d/m/Y')->icon('heroicon-m-calendar'),
+                        TextEntry::make('tipo_movimiento')->label('Tipo')->badge(),
+                        TextEntry::make('estado')
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 'Pendiente' => 'warning',
@@ -222,17 +229,17 @@ class SolicitudResource extends Resource
                                 default => 'heroicon-m-minus',
                             }),
                     ])->columns(4),
-                \Filament\Infolists\Components\Section::make('Participantes')
+                Section::make('Participantes')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('usuario.name')->label('Solicitante')->icon('heroicon-m-user'),
-                        \Filament\Infolists\Components\TextEntry::make('receptor.nombre')->label('Receptor')->icon('heroicon-m-user-group'),
-                        \Filament\Infolists\Components\TextEntry::make('receptor.area.departamento.nombre')->label('Departamento')->icon('heroicon-m-building-office'),
+                        TextEntry::make('usuario.name')->label('Solicitante')->icon('heroicon-m-user'),
+                        TextEntry::make('receptor.nombre')->label('Receptor')->icon('heroicon-m-user-group'),
+                        TextEntry::make('receptor.area.departamento.nombre')->label('Departamento')->icon('heroicon-m-building-office'),
                     ])->columns(3),
-                \Filament\Infolists\Components\Section::make('Devoluciones y Observaciones')
+                Section::make('Devoluciones y Observaciones')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('fecha_devolucion_estimada')->label('Devolución Estimada')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
-                        \Filament\Infolists\Components\TextEntry::make('fecha_devolucion_real')->label('Devolución Real')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
-                        \Filament\Infolists\Components\TextEntry::make('observaciones')->label('Observaciones')->columnSpanFull(),
+                        TextEntry::make('fecha_devolucion_estimada')->label('Devolución Estimada')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
+                        TextEntry::make('fecha_devolucion_real')->label('Devolución Real')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
+                        TextEntry::make('observaciones')->label('Observaciones')->columnSpanFull(),
                     ])->columns(2),
             ]);
     }

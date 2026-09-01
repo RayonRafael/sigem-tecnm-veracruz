@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\ProveedorResource\Pages;
 
 use App\Filament\Concerns\ConDashboardBreadcrumb;
-
 use App\Filament\Resources\ProveedorResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -11,6 +10,7 @@ use Filament\Resources\Pages\ListRecords;
 class ListProveedors extends ListRecords
 {
     use ConDashboardBreadcrumb;
+
     protected static string $resource = ProveedorResource::class;
 
     protected function getHeaderActions(): array

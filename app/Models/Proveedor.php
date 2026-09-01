@@ -5,8 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Proveedor extends Model
 {
@@ -24,12 +24,15 @@ class Proveedor extends Model
                     'updated' => 'actualizado',
                     'deleted' => 'eliminado',
                 ];
+
                 return $acciones[$eventName] ?? $eventName;
             });
     }
 
     protected $table = 'proveedores';
+
     protected $primaryKey = 'id_proveedor';
+
     protected $fillable = ['nombre_empresa', 'rfc', 'contacto_nombre', 'contacto_telefono', 'contacto_email', 'activo'];
 
     public function inventarios()

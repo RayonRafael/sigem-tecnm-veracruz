@@ -11,7 +11,9 @@ class UnidadMedida extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'unidad_medida';
+
     protected $primaryKey = 'id_unidad';
+
     protected $fillable = ['nombre'];
 
     public function materiales()

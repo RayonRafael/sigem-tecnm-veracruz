@@ -6,7 +6,6 @@ use Illuminate\Database\Seeder;
 
 class SolicitudTableSeeder extends Seeder
 {
-
     /**
      * Auto generated seed file
      *
@@ -14,13 +13,11 @@ class SolicitudTableSeeder extends Seeder
      */
     public function run()
     {
-        
 
         \DB::table('solicitud')->delete();
-        
-        \DB::table('solicitud')->insert(array (
-            0 => 
-            array (
+
+        \DB::table('solicitud')->insert([
+            0 => [
                 'id_solicitud' => 1,
                 'fecha_solicitud' => '2026-08-10 00:00:00',
                 'observaciones' => 'Mantenimiento preventivo e incremento de memoria en laboratorio de cómputo.',
@@ -34,9 +31,8 @@ class SolicitudTableSeeder extends Seeder
                 'tipo_movimiento' => 'Asignacion Temporal',
                 'created_at' => '2026-08-10 18:28:18',
                 'updated_at' => '2026-08-10 18:34:44',
-            ),
-            1 => 
-            array (
+            ],
+            1 => [
                 'id_solicitud' => 2,
                 'fecha_solicitud' => '2026-08-10 00:00:00',
                 'observaciones' => 'Mantenimiento preventivo de gabinetes y periféricos en el centro de cómputo.',
@@ -50,9 +46,8 @@ class SolicitudTableSeeder extends Seeder
                 'tipo_movimiento' => 'Asignacion Temporal',
                 'created_at' => '2026-08-10 18:41:50',
                 'updated_at' => '2026-08-10 18:43:07',
-            ),
-        ));
-        
-        
+            ],
+        ]);
+
     }
 }

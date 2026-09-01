@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreignId('id_area')->constrained('area', 'id_area')->onDelete('restrict')->onUpdate('cascade');
             $table->softDeletes();
             $table->timestamps();
-     });
+        });
     }
 
     /**

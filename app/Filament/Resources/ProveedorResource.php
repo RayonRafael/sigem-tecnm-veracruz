@@ -2,29 +2,36 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Notifications\Notification;
-
 use App\Filament\Resources\ProveedorResource\Pages;
 use App\Models\Proveedor;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
 
 class ProveedorResource extends Resource
 {
-
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Proveedor::class;
+
     protected static ?string $recordTitleAttribute = 'nombre';
+
     protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
+
     protected static ?string $navigationLabel = 'Proveedores';
+
     protected static ?string $modelLabel = 'Proveedor';
+
     protected static ?string $pluralModelLabel = 'Proveedores';
+
     protected static ?string $navigationGroup = 'Catálogos';
+
     protected static ?int $navigationSort = 6;
 
     public static function form(Form $form): Form
@@ -124,26 +131,26 @@ class ProveedorResource extends Resource
             ]);
     }
 
-    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos de la Empresa')
+                Section::make('Datos de la Empresa')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('nombre_empresa')->label('Empresa')->icon('heroicon-m-building-storefront'),
-                        \Filament\Infolists\Components\TextEntry::make('rfc')->label('RFC')->fontFamily('mono')->icon('heroicon-m-identification'),
-                        \Filament\Infolists\Components\TextEntry::make('activo')
+                        TextEntry::make('nombre_empresa')->label('Empresa')->icon('heroicon-m-building-storefront'),
+                        TextEntry::make('rfc')->label('RFC')->fontFamily('mono')->icon('heroicon-m-identification'),
+                        TextEntry::make('activo')
                             ->label('Estado')
                             ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Inactivo')
                             ->badge()
                             ->color(fn ($state) => $state ? 'success' : 'danger')
                             ->icon(fn ($state) => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle'),
                     ])->columns(3),
-                \Filament\Infolists\Components\Section::make('Contacto')
+                Section::make('Contacto')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('contacto_nombre')->label('Contacto')->icon('heroicon-m-user'),
-                        \Filament\Infolists\Components\TextEntry::make('contacto_telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
-                        \Filament\Infolists\Components\TextEntry::make('contacto_email')->label('Email')->icon('heroicon-m-envelope'),
+                        TextEntry::make('contacto_nombre')->label('Contacto')->icon('heroicon-m-user'),
+                        TextEntry::make('contacto_telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
+                        TextEntry::make('contacto_email')->label('Email')->icon('heroicon-m-envelope'),
                     ])->columns(3),
             ]);
     }

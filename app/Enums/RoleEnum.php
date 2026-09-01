@@ -9,5 +9,6 @@ enum RoleEnum: string
     case SERVICIO_TIPO = 'Servicio';
 
     public const PERM_ACCESS_ADMIN = 'access_admin_panel';
+
     public const PERM_ACCESS_SERVICIO = 'access_servicio_social_panel';
 }

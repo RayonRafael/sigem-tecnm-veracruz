@@ -2,14 +2,14 @@
 
 namespace Tests\Feature\Auth;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\AdminUserSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\ServicioSocialUserSeeder;
-use Livewire\Livewire;
-use Filament\Pages\Auth\Login;
 use Filament\Facades\Filament;
+use Filament\Pages\Auth\Login;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
 
 class LoginTest extends TestCase
 {

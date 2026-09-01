@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Notifications\Notification;
-
+use App\Enums\RoleEnum;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -15,16 +17,22 @@ use Illuminate\Database\Eloquent\Collection;
 
 class UserResource extends Resource
 {
-
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = User::class;
+
     protected static ?string $recordTitleAttribute = 'name';
+
     protected static ?string $navigationIcon = 'heroicon-o-users';
+
     protected static ?string $navigationLabel = 'Usuarios';
+
     protected static ?string $modelLabel = 'Usuario';
+
     protected static ?string $pluralModelLabel = 'Usuarios';
+
     protected static ?string $navigationGroup = 'Administración';
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
@@ -90,8 +98,8 @@ class UserResource extends Resource
                         Forms\Components\Select::make('tipo_usuario')->placeholder('Selecciona...')
                             ->label('Tipo de Usuario (Sistema)')
                             ->options([
-                                \App\Enums\RoleEnum::ADMIN->value => \App\Enums\RoleEnum::ADMIN->value,
-                                \App\Enums\RoleEnum::SERVICIO_TIPO->value => \App\Enums\RoleEnum::SERVICIO_SOCIAL->value,
+                                RoleEnum::ADMIN->value => RoleEnum::ADMIN->value,
+                                RoleEnum::SERVICIO_TIPO->value => RoleEnum::SERVICIO_SOCIAL->value,
                                 'Pendiente' => 'Pendiente',
                             ])
                             ->default('Pendiente')
@@ -132,13 +140,13 @@ class UserResource extends Resource
                     ->label('Tipo')
                     ->badge()
                     ->colors([
-                        'success' => \App\Enums\RoleEnum::ADMIN->value,
-                        'warning' => \App\Enums\RoleEnum::SERVICIO_TIPO->value,
+                        'success' => RoleEnum::ADMIN->value,
+                        'warning' => RoleEnum::SERVICIO_TIPO->value,
                         'gray' => 'Pendiente',
                     ])
                     ->icons([
-                        'heroicon-m-shield-check' => \App\Enums\RoleEnum::ADMIN->value,
-                        'heroicon-m-academic-cap' => \App\Enums\RoleEnum::SERVICIO_TIPO->value,
+                        'heroicon-m-shield-check' => RoleEnum::ADMIN->value,
+                        'heroicon-m-academic-cap' => RoleEnum::SERVICIO_TIPO->value,
                         'heroicon-m-clock' => 'Pendiente',
                     ]),
                 Tables\Columns\TextColumn::make('activo')
@@ -156,8 +164,8 @@ class UserResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('tipo_usuario')
                     ->options([
-                        \App\Enums\RoleEnum::ADMIN->value => \App\Enums\RoleEnum::ADMIN->value,
-                        \App\Enums\RoleEnum::SERVICIO_TIPO->value => \App\Enums\RoleEnum::SERVICIO_SOCIAL->value,
+                        RoleEnum::ADMIN->value => RoleEnum::ADMIN->value,
+                        RoleEnum::SERVICIO_TIPO->value => RoleEnum::SERVICIO_SOCIAL->value,
                         'Pendiente' => 'Pendiente',
                     ]),
             ])
@@ -181,43 +189,43 @@ class UserResource extends Resource
             ]);
     }
 
-    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos Personales')
+                Section::make('Datos Personales')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('name')->label('Nombre')->icon('heroicon-m-user'),
-                        \Filament\Infolists\Components\TextEntry::make('apellido_paterno')->label('Apellido Paterno')->icon('heroicon-m-user'),
-                        \Filament\Infolists\Components\TextEntry::make('apellido_materno')->label('Apellido Materno')->icon('heroicon-m-user'),
+                        TextEntry::make('name')->label('Nombre')->icon('heroicon-m-user'),
+                        TextEntry::make('apellido_paterno')->label('Apellido Paterno')->icon('heroicon-m-user'),
+                        TextEntry::make('apellido_materno')->label('Apellido Materno')->icon('heroicon-m-user'),
                     ])->columns(3),
-                \Filament\Infolists\Components\Section::make('Datos de Acceso')
+                Section::make('Datos de Acceso')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('email')->label('Correo Electrónico')->icon('heroicon-m-envelope'),
+                        TextEntry::make('email')->label('Correo Electrónico')->icon('heroicon-m-envelope'),
                     ])->columns(1),
-                \Filament\Infolists\Components\Section::make('Datos Institucionales')
+                Section::make('Datos Institucionales')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('num_control')->label('Número de Control')->icon('heroicon-m-identification'),
-                        \Filament\Infolists\Components\TextEntry::make('carrera')->label('Carrera')->icon('heroicon-m-academic-cap'),
-                        \Filament\Infolists\Components\TextEntry::make('RFC')->label('RFC')->fontFamily('mono')->icon('heroicon-m-identification'),
+                        TextEntry::make('num_control')->label('Número de Control')->icon('heroicon-m-identification'),
+                        TextEntry::make('carrera')->label('Carrera')->icon('heroicon-m-academic-cap'),
+                        TextEntry::make('RFC')->label('RFC')->fontFamily('mono')->icon('heroicon-m-identification'),
                     ])->columns(3),
-                \Filament\Infolists\Components\Section::make('Estado y Rol')
+                Section::make('Estado y Rol')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('tipo_usuario')
+                        TextEntry::make('tipo_usuario')
                             ->label('Tipo de Usuario')
                             ->badge()
-                            ->color(fn (string $state): string => match($state) {
-                                \App\Enums\RoleEnum::ADMIN->value => 'success',
-                                \App\Enums\RoleEnum::SERVICIO_TIPO->value => 'warning',
+                            ->color(fn (string $state): string => match ($state) {
+                                RoleEnum::ADMIN->value => 'success',
+                                RoleEnum::SERVICIO_TIPO->value => 'warning',
                                 default => 'gray',
                             })
-                            ->icon(fn (string $state): string => match($state) {
-                                \App\Enums\RoleEnum::ADMIN->value => 'heroicon-m-shield-check',
-                                \App\Enums\RoleEnum::SERVICIO_TIPO->value => 'heroicon-m-academic-cap',
+                            ->icon(fn (string $state): string => match ($state) {
+                                RoleEnum::ADMIN->value => 'heroicon-m-shield-check',
+                                RoleEnum::SERVICIO_TIPO->value => 'heroicon-m-academic-cap',
                                 default => 'heroicon-m-clock',
                             }),
-                        \Filament\Infolists\Components\TextEntry::make('roles.name')->label('Rol')->badge()->icon('heroicon-m-key'),
-                        \Filament\Infolists\Components\TextEntry::make('activo')
+                        TextEntry::make('roles.name')->label('Rol')->badge()->icon('heroicon-m-key'),
+                        TextEntry::make('activo')
                             ->label('Estado')
                             ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Inactivo')
                             ->badge()

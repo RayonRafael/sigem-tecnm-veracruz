@@ -2,13 +2,13 @@
 
 namespace Tests\Feature\Roles;
 
+use App\Enums\RoleEnum;
+use App\Models\User;
+use Database\Seeders\AdminUserSeeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
+use Database\Seeders\ServicioSocialUserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
-use Database\Seeders\RolesAndPermissionsSeeder;
-use Database\Seeders\AdminUserSeeder;
-use Database\Seeders\ServicioSocialUserSeeder;
-use App\Models\User;
-use App\Enums\RoleEnum;
 
 class PermissionsTest extends TestCase
 {
@@ -38,31 +38,31 @@ class PermissionsTest extends TestCase
     {
         $admin = User::where('email', 'admin@tecnm.edu.mx')->first();
         $panel = filament()->getPanel('admin');
-        
+
         $this->assertTrue($admin->canAccessPanel($panel));
     }
-    
+
     public function test_servicio_social_can_access_servicio_social_panel(): void
     {
         $servicio = User::where('email', 'servicio@tecnm.edu.mx')->first();
         $panel = filament()->getPanel('servicio-social');
-        
+
         $this->assertTrue($servicio->canAccessPanel($panel));
     }
-    
+
     public function test_admin_cannot_access_servicio_social_panel(): void
     {
         $admin = User::where('email', 'admin@tecnm.edu.mx')->first();
         $panel = filament()->getPanel('servicio-social');
-        
+
         $this->assertFalse($admin->canAccessPanel($panel));
     }
-    
+
     public function test_servicio_social_cannot_access_admin_panel(): void
     {
         $servicio = User::where('email', 'servicio@tecnm.edu.mx')->first();
         $panel = filament()->getPanel('admin');
-        
+
         $this->assertFalse($servicio->canAccessPanel($panel));
     }
 }

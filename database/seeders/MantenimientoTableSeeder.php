@@ -6,7 +6,6 @@ use Illuminate\Database\Seeder;
 
 class MantenimientoTableSeeder extends Seeder
 {
-
     /**
      * Auto generated seed file
      *
@@ -14,13 +13,11 @@ class MantenimientoTableSeeder extends Seeder
      */
     public function run()
     {
-        
 
         \DB::table('mantenimiento')->delete();
-        
-        \DB::table('mantenimiento')->insert(array (
-            0 => 
-            array (
+
+        \DB::table('mantenimiento')->insert([
+            0 => [
                 'id_mantenimiento' => 1,
                 'id_inventario' => 2,
                 'id_usuario_solicita' => 2,
@@ -29,17 +26,16 @@ class MantenimientoTableSeeder extends Seeder
                 'tipo_servicio' => 'Servicio Social',
                 'tipo_mantenimiento' => 'Correctivo',
                 'descripcion_falla' => 'Se rompio',
-                'descripcion_trabajo' => NULL,
+                'descripcion_trabajo' => null,
                 'fecha_solicitud' => '2026-08-14 00:00:00',
-                'fecha_inicio' => NULL,
-                'fecha_fin' => NULL,
+                'fecha_inicio' => null,
+                'fecha_fin' => null,
                 'estado' => 'Pendiente Revision Admin',
                 'observaciones' => 'Se le callo al wey y se rompio',
                 'created_at' => '2026-08-14 17:21:40',
                 'updated_at' => '2026-08-14 17:21:40',
-            ),
-        ));
-        
-        
+            ],
+        ]);
+
     }
 }

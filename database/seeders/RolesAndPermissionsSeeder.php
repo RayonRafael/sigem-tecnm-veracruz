@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\RoleEnum;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -59,8 +60,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'usuarios.eliminar',
 
             // Permisos de Acceso a Paneles
-            \App\Enums\RoleEnum::PERM_ACCESS_ADMIN,
-            \App\Enums\RoleEnum::PERM_ACCESS_SERVICIO,
+            RoleEnum::PERM_ACCESS_ADMIN,
+            RoleEnum::PERM_ACCESS_SERVICIO,
         ];
 
         foreach ($permisos as $permiso) {
@@ -69,7 +70,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // Rol Administrador
         $admin = Role::firstOrCreate(['name' => 'Administrador']);
-        $adminPermissions = array_filter($permisos, fn($p) => $p !== \App\Enums\RoleEnum::PERM_ACCESS_SERVICIO);
+        $adminPermissions = array_filter($permisos, fn ($p) => $p !== RoleEnum::PERM_ACCESS_SERVICIO);
         $admin->syncPermissions($adminPermissions);
 
         // Rol Servicio Social
@@ -86,7 +87,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'mantenimiento.editar',
             'solicitudes.ver',
             'reportes.inventario',
-            \App\Enums\RoleEnum::PERM_ACCESS_SERVICIO,
+            RoleEnum::PERM_ACCESS_SERVICIO,
         ]);
     }
 }

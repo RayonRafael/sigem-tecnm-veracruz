@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Material extends Model
 {
-    use HasFactory, SoftDeletes, LogsActivity;
+    use HasFactory, LogsActivity, SoftDeletes;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -24,16 +24,19 @@ class Material extends Model
                     'updated' => 'actualizado',
                     'deleted' => 'eliminado',
                 ];
+
                 return $acciones[$eventName] ?? $eventName;
             });
     }
 
     protected $table = 'material';
+
     protected $primaryKey = 'id_producto';
+
     protected $fillable = [
-        'nombre', 'descripcion', 'modelo', 
-        'id_unidad', 'id_marca', 'id_tipodematerial', 
-        'requiere_control_individual', 'stock_actual', 'stock_minimo'
+        'nombre', 'descripcion', 'modelo',
+        'id_unidad', 'id_marca', 'id_tipodematerial',
+        'requiere_control_individual', 'stock_actual', 'stock_minimo',
     ];
 
     // RELACIONES: Pertenece a una unidad, marca y tipo

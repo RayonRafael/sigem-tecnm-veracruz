@@ -3,7 +3,6 @@
 namespace App\Filament\ServicioSocial\Resources\InventarioResource\Pages;
 
 use App\Filament\Concerns\ConDashboardBreadcrumb;
-
 use App\Filament\ServicioSocial\Resources\InventarioResource;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
@@ -11,6 +10,7 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateInventario extends CreateRecord
 {
     use ConDashboardBreadcrumb;
+
     protected static string $resource = InventarioResource::class;
 
     protected function getCreatedNotification(): ?Notification

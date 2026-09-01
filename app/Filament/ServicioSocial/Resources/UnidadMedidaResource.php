@@ -3,29 +3,34 @@
 namespace App\Filament\ServicioSocial\Resources;
 
 use App\Filament\ServicioSocial\Resources\UnidadMedidaResource\Pages;
-use App\Filament\ServicioSocial\Resources\UnidadMedidaResource\RelationManagers;
 use App\Models\UnidadMedida;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Filters\TrashedFilter;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class UnidadMedidaResource extends Resource
 {
-
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = UnidadMedida::class;
+
     protected static ?string $recordTitleAttribute = 'nombre';
 
     protected static ?string $navigationIcon = 'heroicon-o-scale';
+
     protected static ?string $navigationGroup = 'Catálogos';
+
     protected static ?string $navigationLabel = 'Unidades de medida';
+
     protected static ?string $modelLabel = 'Unidad de medida';
+
     protected static ?string $pluralModelLabel = 'Unidades de medida';
 
     public static function canCreate(): bool
@@ -33,12 +38,12 @@ class UnidadMedidaResource extends Resource
         return false;
     }
 
-    public static function canEdit(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canEdit(Model $record): bool
     {
         return false;
     }
 
-    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    public static function canDelete(Model $record): bool
     {
         return false;
     }
@@ -83,13 +88,13 @@ class UnidadMedidaResource extends Resource
             ->bulkActions([]);
     }
 
-    public static function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
+    public static function infolist(Infolist $infolist): Infolist
     {
         return $infolist
             ->schema([
-                \Filament\Infolists\Components\Section::make('Datos de la Unidad de medida')
+                Section::make('Datos de la Unidad de medida')
                     ->schema([
-                        \Filament\Infolists\Components\TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-bars-3-bottom-left'),
+                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-bars-3-bottom-left'),
                     ]),
             ]);
     }

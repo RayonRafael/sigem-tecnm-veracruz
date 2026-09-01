@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\ServicioSocial\Pages\Dashboard;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -98,7 +99,7 @@ class ServicioSocialPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/ServicioSocial/Resources'), for: 'App\\Filament\\ServicioSocial\\Resources')
             ->discoverPages(in: app_path('Filament/ServicioSocial/Pages'), for: 'App\\Filament\\ServicioSocial\\Pages')
             ->pages([
-                \App\Filament\ServicioSocial\Pages\Dashboard::class,
+                Dashboard::class,
             ])
             ->widgets([])
             ->middleware([
