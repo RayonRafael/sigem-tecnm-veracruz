@@ -92,9 +92,4 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(HistorialEstado::class, 'id_usuario', 'id');
     }
-    
-    public function bitacora()
-    {
-        return $this->hasMany(BitacoraSistema::class, 'id_usuario', 'id');
-    }
 }
