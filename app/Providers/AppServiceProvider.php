@@ -8,10 +8,8 @@ use App\Models\Mantenimiento;
 use App\Models\Solicitud;
 use App\Models\Proveedor;
 use App\Observers\InventarioObserver;
-use App\Observers\MaterialObserver;
 use App\Observers\MantenimientoObserver;
 use App\Observers\SolicitudObserver;
-use App\Observers\ProveedorObserver;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 
@@ -51,9 +49,7 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Gate::policy(\App\Models\Receptor::class, \App\Policies\ReceptorPolicy::class);
 
         Inventario::observe(InventarioObserver::class);
-        Material::observe(MaterialObserver::class);
         Mantenimiento::observe(MantenimientoObserver::class);
         Solicitud::observe(SolicitudObserver::class);
-        Proveedor::observe(ProveedorObserver::class);
     }
 }
