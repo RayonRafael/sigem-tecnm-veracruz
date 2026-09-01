@@ -29,9 +29,9 @@ class AreaResource extends Resource
 
     protected static ?string $navigationLabel = 'Áreas';
 
-    protected static ?string $modelLabel = 'Área';
+    protected static ?string $modelLabel = 'área';
 
-    protected static ?string $pluralModelLabel = 'Áreas';
+    protected static ?string $pluralModelLabel = 'áreas';
 
     public static function canCreate(): bool
     {

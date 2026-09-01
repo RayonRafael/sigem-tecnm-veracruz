@@ -14,9 +14,9 @@ class DetallesRelationManager extends RelationManager
 
     protected static ?string $title = 'Detalles de la Solicitud';
 
-    protected static ?string $modelLabel = 'Detalle';
+    protected static ?string $modelLabel = 'detalle';
 
-    protected static ?string $pluralModelLabel = 'Detalles';
+    protected static ?string $pluralModelLabel = 'detalles';
 
     public function form(Form $form): Form
     {

@@ -27,9 +27,9 @@ class MantenimientoResource extends Resource
 
     protected static ?string $navigationLabel = 'Mantenimiento';
 
-    protected static ?string $modelLabel = 'Mantenimiento';
+    protected static ?string $modelLabel = 'mantenimiento';
 
-    protected static ?string $pluralModelLabel = 'Mantenimientos';
+    protected static ?string $pluralModelLabel = 'mantenimientos';
 
     protected static ?string $navigationGroup = 'Gestión de inventario';
 

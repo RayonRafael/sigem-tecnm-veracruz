@@ -26,9 +26,9 @@ class ReceptorResource extends Resource
 
     protected static ?string $navigationLabel = 'Receptores';
 
-    protected static ?string $modelLabel = 'Receptor';
+    protected static ?string $modelLabel = 'receptor';
 
-    protected static ?string $pluralModelLabel = 'Receptores';
+    protected static ?string $pluralModelLabel = 'receptores';
 
     protected static ?string $navigationGroup = 'Catálogos';
 

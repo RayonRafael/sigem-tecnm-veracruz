@@ -27,9 +27,9 @@ class InventarioResource extends Resource
 
     protected static ?string $navigationLabel = 'Inventario (Servicio Social)';
 
-    protected static ?string $modelLabel = 'Activo';
+    protected static ?string $modelLabel = 'activo';
 
-    protected static ?string $pluralModelLabel = 'Activos';
+    protected static ?string $pluralModelLabel = 'activos';
 
     protected static ?string $navigationGroup = 'Inventario';
 

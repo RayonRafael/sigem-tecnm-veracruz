@@ -25,9 +25,9 @@ class DepartamentoResource extends Resource
 
     protected static ?string $navigationLabel = 'Departamentos';
 
-    protected static ?string $modelLabel = 'Departamento';
+    protected static ?string $modelLabel = 'departamento';
 
-    protected static ?string $pluralModelLabel = 'Departamentos';
+    protected static ?string $pluralModelLabel = 'departamentos';
 
     protected static ?string $navigationGroup = 'Catálogos';
 

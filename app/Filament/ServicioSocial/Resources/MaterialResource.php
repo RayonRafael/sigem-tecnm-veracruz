@@ -27,9 +27,9 @@ class MaterialResource extends Resource
 
     protected static ?string $navigationLabel = 'Materiales';
 
-    protected static ?string $modelLabel = 'Material';
+    protected static ?string $modelLabel = 'material';
 
-    protected static ?string $pluralModelLabel = 'Materiales';
+    protected static ?string $pluralModelLabel = 'materiales';
 
     protected static ?string $navigationGroup = 'Catálogos';
 
