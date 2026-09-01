@@ -26,9 +26,9 @@ class MarcaMaterialResource extends Resource
 
     protected static ?string $navigationLabel = 'Marcas';
 
-    protected static ?string $modelLabel = 'Marca';
+    protected static ?string $modelLabel = 'marca';
 
-    protected static ?string $pluralModelLabel = 'Marcas';
+    protected static ?string $pluralModelLabel = 'marcas';
 
     protected static ?string $navigationGroup = 'Catálogos';
 

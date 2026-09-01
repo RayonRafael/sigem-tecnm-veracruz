@@ -26,9 +26,9 @@ class TipoMaterialResource extends Resource
 
     protected static ?string $navigationLabel = 'Tipos de material';
 
-    protected static ?string $modelLabel = 'Tipo de material';
+    protected static ?string $modelLabel = 'tipo de material';
 
-    protected static ?string $pluralModelLabel = 'Tipos de material';
+    protected static ?string $pluralModelLabel = 'tipos de material';
 
     protected static ?string $navigationGroup = 'Catálogos';
 

@@ -29,9 +29,9 @@ class InventarioResource extends Resource
 
     protected static ?string $navigationLabel = 'Inventario';
 
-    protected static ?string $modelLabel = 'Registro de inventario';
+    protected static ?string $modelLabel = 'registro de inventario';
 
-    protected static ?string $pluralModelLabel = 'Registros de inventario';
+    protected static ?string $pluralModelLabel = 'registros de inventario';
 
     protected static ?string $navigationGroup = 'Gestión de inventario';
 

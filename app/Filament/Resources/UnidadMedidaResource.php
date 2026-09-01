@@ -26,9 +26,9 @@ class UnidadMedidaResource extends Resource
 
     protected static ?string $navigationLabel = 'Unidades de medida';
 
-    protected static ?string $modelLabel = 'Unidad de medida';
+    protected static ?string $modelLabel = 'unidad de medida';
 
-    protected static ?string $pluralModelLabel = 'Unidades de medida';
+    protected static ?string $pluralModelLabel = 'unidades de medida';
 
     protected static ?string $navigationGroup = 'Catálogos';
 

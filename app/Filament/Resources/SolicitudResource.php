@@ -27,9 +27,9 @@ class SolicitudResource extends Resource
 
     protected static ?string $navigationLabel = 'Solicitudes';
 
-    protected static ?string $modelLabel = 'Solicitud';
+    protected static ?string $modelLabel = 'solicitud';
 
-    protected static ?string $pluralModelLabel = 'Solicitudes';
+    protected static ?string $pluralModelLabel = 'solicitudes';
 
     protected static ?string $navigationGroup = 'Gestión de inventario';
 
