@@ -34,6 +34,11 @@ class TipoMaterialResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
+    public static function hasRecordTitle(): bool
+    {
+        return false;
+    }
+
     public static function form(Form $form): Form
     {
         return $form

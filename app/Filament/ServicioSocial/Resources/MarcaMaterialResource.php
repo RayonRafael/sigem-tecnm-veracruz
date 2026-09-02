@@ -48,6 +48,11 @@ class MarcaMaterialResource extends Resource
         return false;
     }
 
+    public static function hasRecordTitle(): bool
+    {
+        return false;
+    }
+
     public static function form(Form $form): Form
     {
         return $form
