@@ -278,6 +278,6 @@ class SolicitudResource extends Resource
 
     public static function getRecordTitle(?Model $record): ?string
     {
-        return null;
+        return '';
     }
 }
