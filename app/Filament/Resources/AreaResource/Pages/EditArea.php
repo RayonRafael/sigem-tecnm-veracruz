@@ -9,6 +9,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditArea extends EditRecord
 {
+    public static ?string $title = 'Editar';
+
     use ConDashboardBreadcrumb;
 
     protected static string $resource = AreaResource::class;
