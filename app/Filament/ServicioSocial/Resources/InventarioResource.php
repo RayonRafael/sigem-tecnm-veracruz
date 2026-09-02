@@ -2,8 +2,6 @@
 
 namespace App\Filament\ServicioSocial\Resources;
 
-use Illuminate\Database\Eloquent\Model;
-
 use App\Filament\ServicioSocial\Resources\InventarioResource\Pages;
 use App\Models\Inventario;
 use Filament\Forms;
@@ -315,8 +313,8 @@ class InventarioResource extends Resource
         return parent::getEloquentQuery();
     }
 
-    public static function getRecordTitle(?Model $record): ?string
+    public static function hasRecordTitle(): bool
     {
-        return '';
+        return false;
     }
 }

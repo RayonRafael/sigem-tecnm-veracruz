@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use Illuminate\Database\Eloquent\Model;
-
 use App\Filament\Resources\ReceptorResource\Pages;
 use App\Models\Receptor;
 use Filament\Forms;
@@ -155,8 +153,8 @@ class ReceptorResource extends Resource
         ];
     }
 
-    public static function getRecordTitle(?Model $record): ?string
+    public static function hasRecordTitle(): bool
     {
-        return '';
+        return false;
     }
 }

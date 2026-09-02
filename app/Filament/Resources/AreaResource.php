@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use Illuminate\Database\Eloquent\Model;
-
 use App\Filament\Resources\AreaResource\Pages;
 use App\Models\Area;
 use Filament\Forms;
@@ -118,8 +116,8 @@ class AreaResource extends Resource
         ];
     }
 
-    public static function getRecordTitle(?Model $record): ?string
+    public static function hasRecordTitle(): bool
     {
-        return '';
+        return false;
     }
 }

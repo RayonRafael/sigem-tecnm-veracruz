@@ -2,8 +2,6 @@
 
 namespace App\Filament\ServicioSocial\Resources;
 
-use Illuminate\Database\Eloquent\Model;
-
 use App\Filament\ServicioSocial\Resources\MaterialResource\Pages;
 use App\Models\Material;
 use Filament\Forms;
@@ -204,8 +202,8 @@ class MaterialResource extends Resource
         ];
     }
 
-    public static function getRecordTitle(?Model $record): ?string
+    public static function hasRecordTitle(): bool
     {
-        return '';
+        return false;
     }
 }

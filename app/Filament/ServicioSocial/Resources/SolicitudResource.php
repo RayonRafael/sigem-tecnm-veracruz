@@ -2,8 +2,6 @@
 
 namespace App\Filament\ServicioSocial\Resources;
 
-use Illuminate\Database\Eloquent\Model;
-
 use App\Filament\ServicioSocial\Resources\SolicitudResource\Pages;
 use App\Models\Solicitud;
 use Filament\Forms;
@@ -276,8 +274,8 @@ class SolicitudResource extends Resource
         return $query;
     }
 
-    public static function getRecordTitle(?Model $record): ?string
+    public static function hasRecordTitle(): bool
     {
-        return '';
+        return false;
     }
 }

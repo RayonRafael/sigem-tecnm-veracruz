@@ -153,8 +153,8 @@ class ReceptorResource extends Resource
         ];
     }
 
-    public static function getRecordTitle(?Model $record): ?string
+    public static function hasRecordTitle(): bool
     {
-        return '';
+        return false;
     }
 }

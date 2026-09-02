@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use Illuminate\Database\Eloquent\Model;
-
 use App\Filament\Resources\UnidadMedidaResource\Pages;
 use App\Models\UnidadMedida;
 use Filament\Forms;
@@ -106,8 +104,8 @@ class UnidadMedidaResource extends Resource
         ];
     }
 
-    public static function getRecordTitle(?Model $record): ?string
+    public static function hasRecordTitle(): bool
     {
-        return '';
+        return false;
     }
 }

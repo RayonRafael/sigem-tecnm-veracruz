@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use Illuminate\Database\Eloquent\Model;
-
 use App\Filament\Resources\ProveedorResource\Pages;
 use App\Models\Proveedor;
 use Filament\Forms;
@@ -171,8 +169,8 @@ class ProveedorResource extends Resource
         ];
     }
 
-    public static function getRecordTitle(?Model $record): ?string
+    public static function hasRecordTitle(): bool
     {
-        return '';
+        return false;
     }
 }
