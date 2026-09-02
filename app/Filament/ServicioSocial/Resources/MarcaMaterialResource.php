@@ -112,4 +112,9 @@ class MarcaMaterialResource extends Resource
             'edit' => Pages\EditMarcaMaterial::route('/{record}/edit'),
         ];
     }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
+    }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+
 use App\Filament\Resources\MaterialResource\Pages;
 use App\Models\Material;
 use Filament\Forms;
@@ -220,5 +222,10 @@ class MaterialResource extends Resource
             'create' => Pages\CreateMaterial::route('/create'),
             'edit' => Pages\EditMaterial::route('/{record}/edit'),
         ];
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
     }
 }

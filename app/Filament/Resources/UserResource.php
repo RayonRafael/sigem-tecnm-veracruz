@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+
 use App\Enums\RoleEnum;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
@@ -247,5 +249,10 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
     }
 }

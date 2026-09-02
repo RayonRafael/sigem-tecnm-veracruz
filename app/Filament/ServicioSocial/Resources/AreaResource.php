@@ -124,4 +124,9 @@ class AreaResource extends Resource
             'edit' => Pages\EditArea::route('/{record}/edit'),
         ];
     }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
+    }
 }

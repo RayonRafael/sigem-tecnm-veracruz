@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+
 use App\Filament\Resources\ProveedorResource\Pages;
 use App\Models\Proveedor;
 use Filament\Forms;
@@ -167,5 +169,10 @@ class ProveedorResource extends Resource
             'create' => Pages\CreateProveedor::route('/create'),
             'edit' => Pages\EditProveedor::route('/{record}/edit'),
         ];
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
     }
 }

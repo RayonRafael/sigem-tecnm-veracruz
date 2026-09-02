@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+
 use App\Filament\Resources\TipoMaterialResource\Pages;
 use App\Models\TipoMaterial;
 use Filament\Forms;
@@ -102,5 +104,10 @@ class TipoMaterialResource extends Resource
             'create' => Pages\CreateTipoMaterial::route('/create'),
             'edit' => Pages\EditTipoMaterial::route('/{record}/edit'),
         ];
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
     }
 }

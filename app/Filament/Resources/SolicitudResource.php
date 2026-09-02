@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+
 use App\Filament\Resources\SolicitudResource\Pages;
 use App\Models\Receptor;
 use App\Models\Solicitud;
@@ -355,5 +357,10 @@ class SolicitudResource extends Resource
             'create' => Pages\CreateSolicitud::route('/create'),
             'edit' => Pages\EditSolicitud::route('/{record}/edit'),
         ];
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
     }
 }

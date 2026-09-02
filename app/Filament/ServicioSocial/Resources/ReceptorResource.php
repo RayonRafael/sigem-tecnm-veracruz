@@ -152,4 +152,9 @@ class ReceptorResource extends Resource
             'edit' => Pages\EditReceptor::route('/{record}/edit'),
         ];
     }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
+    }
 }

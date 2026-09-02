@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+
 use App\Filament\Resources\DepartamentoResource\Pages;
 use App\Models\Departamento;
 use Filament\Forms;
@@ -90,5 +92,10 @@ class DepartamentoResource extends Resource
             'create' => Pages\CreateDepartamento::route('/create'),
             'edit' => Pages\EditDepartamento::route('/{record}/edit'),
         ];
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
     }
 }

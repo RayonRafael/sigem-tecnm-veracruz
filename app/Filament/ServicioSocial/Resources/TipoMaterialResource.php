@@ -112,4 +112,9 @@ class TipoMaterialResource extends Resource
             'edit' => Pages\EditTipoMaterial::route('/{record}/edit'),
         ];
     }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
+    }
 }

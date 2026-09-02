@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+
 use App\Enums\RoleEnum;
 use App\Filament\Resources\MantenimientoResource\Pages;
 use App\Models\Mantenimiento;
@@ -350,5 +352,10 @@ class MantenimientoResource extends Resource
             'create' => Pages\CreateMantenimiento::route('/create'),
             'edit' => Pages\EditMantenimiento::route('/{record}/edit'),
         ];
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+
 use App\Filament\Resources\AreaResource\Pages;
 use App\Models\Area;
 use Filament\Forms;
@@ -114,5 +116,10 @@ class AreaResource extends Resource
             'create' => Pages\CreateArea::route('/create'),
             'edit' => Pages\EditArea::route('/{record}/edit'),
         ];
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
     }
 }

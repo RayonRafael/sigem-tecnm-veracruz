@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+
 use App\Filament\Resources\MarcaMaterialResource\Pages;
 use App\Models\MarcaMaterial;
 use Filament\Forms;
@@ -102,5 +104,10 @@ class MarcaMaterialResource extends Resource
             'create' => Pages\CreateMarcaMaterial::route('/create'),
             'edit' => Pages\EditMarcaMaterial::route('/{record}/edit'),
         ];
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
     }
 }

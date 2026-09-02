@@ -112,4 +112,9 @@ class UnidadMedidaResource extends Resource
             'edit' => Pages\EditUnidadMedida::route('/{record}/edit'),
         ];
     }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
+    }
 }

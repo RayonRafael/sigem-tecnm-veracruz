@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+
 use App\Enums\RoleEnum;
 use App\Filament\Resources\InventarioResource\Pages;
 use App\Models\Inventario;
@@ -391,5 +393,10 @@ class InventarioResource extends Resource
             'create' => Pages\CreateInventario::route('/create'),
             'edit' => Pages\EditInventario::route('/{record}/edit'),
         ];
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
     }
 }

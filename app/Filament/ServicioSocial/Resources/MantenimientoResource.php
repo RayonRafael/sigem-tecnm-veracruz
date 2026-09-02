@@ -2,6 +2,8 @@
 
 namespace App\Filament\ServicioSocial\Resources;
 
+use Illuminate\Database\Eloquent\Model;
+
 use App\Enums\RoleEnum;
 use App\Filament\ServicioSocial\Resources\MantenimientoResource\Pages;
 use App\Models\Mantenimiento;
@@ -289,5 +291,10 @@ class MantenimientoResource extends Resource
         }
         
         return $query;
+    }
+
+    public static function getRecordTitle(?Model $record): ?string
+    {
+        return null;
     }
 }
