@@ -51,17 +51,17 @@ class ReceptorResource extends Resource
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
                         Forms\Components\TextInput::make('apellido_paterno')
-                            ->label('Apellido Paterno')
+                            ->label('Apellido paterno')
                             ->required()
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
                         Forms\Components\TextInput::make('apellido_materno')
-                            ->label('Apellido Materno')
+                            ->label('Apellido materno')
                             ->required()
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
                         Forms\Components\TextInput::make('email')
-                            ->label('Correo Electrónico')
+                            ->label('Correo electrónico')
                             ->email()
                             ->prefixIcon('heroicon-m-envelope')
                             ->maxLength(100)
@@ -91,10 +91,10 @@ class ReceptorResource extends Resource
                     ->label('Nombre')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('apellido_paterno')
-                    ->label('Apellido Paterno')
+                    ->label('Apellido paterno')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('apellido_materno')
-                    ->label('Apellido Materno')
+                    ->label('Apellido materno')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->label('Email')
@@ -130,8 +130,8 @@ class ReceptorResource extends Resource
                 Section::make('Datos del Receptor')
                     ->schema([
                         TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-user'),
-                        TextEntry::make('apellido_paterno')->label('Apellido Paterno')->icon('heroicon-m-user'),
-                        TextEntry::make('apellido_materno')->label('Apellido Materno')->icon('heroicon-m-user'),
+                        TextEntry::make('apellido_paterno')->label('Apellido paterno')->icon('heroicon-m-user'),
+                        TextEntry::make('apellido_materno')->label('Apellido materno')->icon('heroicon-m-user'),
                         TextEntry::make('email')->label('Email')->icon('heroicon-m-envelope'),
                         TextEntry::make('telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
                         TextEntry::make('area.nombre')->label('Área')->icon('heroicon-m-building-office'),

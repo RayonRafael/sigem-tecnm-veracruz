@@ -48,11 +48,11 @@ class UserResource extends Resource
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('apellido_paterno')
-                            ->label('Apellido Paterno')
+                            ->label('Apellido paterno')
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('apellido_materno')
-                            ->label('Apellido Materno')
+                            ->label('Apellido materno')
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(255),
                     ])->columns(3),
@@ -61,7 +61,7 @@ class UserResource extends Resource
                     ->icon('heroicon-m-lock-closed')
                     ->schema([
                         Forms\Components\TextInput::make('email')->label('Correo electrónico')
-                            ->label('Correo Electrónico')
+                            ->label('Correo electrónico')
                             ->email()
                             ->required()
                             ->prefixIcon('heroicon-m-envelope')
@@ -79,15 +79,15 @@ class UserResource extends Resource
                     ->icon('heroicon-m-academic-cap')
                     ->schema([
                         Forms\Components\TextInput::make('num_control')
-                            ->label('Número de Control')
+                            ->label('Número de control')
                             ->prefixIcon('heroicon-m-identification')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('carrera')
-                            ->label('Carrera / Área')
+                            ->label('Carrera / área')
                             ->prefixIcon('heroicon-m-academic-cap')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('RFC')
-                            ->label('RFC (Opcional)')
+                            ->label('RFC (opcional)')
                             ->prefixIcon('heroicon-m-identification')
                             ->maxLength(13),
                     ])->columns(3),
@@ -96,7 +96,7 @@ class UserResource extends Resource
                     ->icon('heroicon-m-shield-check')
                     ->schema([
                         Forms\Components\Select::make('tipo_usuario')->placeholder('Selecciona...')
-                            ->label('Tipo de Usuario (Sistema)')
+                            ->label('Tipo de usuario (sistema)')
                             ->options([
                                 RoleEnum::ADMIN->value => RoleEnum::ADMIN->value,
                                 RoleEnum::SERVICIO_TIPO->value => RoleEnum::SERVICIO_SOCIAL->value,
@@ -112,7 +112,7 @@ class UserResource extends Resource
                             ->prefixIcon('heroicon-m-key')
                             ->searchable(),
                         Forms\Components\ToggleButtons::make('activo')
-                            ->label('Usuario Activo')
+                            ->label('Usuario activo')
                             ->boolean(trueLabel: 'Sí', falseLabel: 'No')
                             ->inline()
                             ->default(true)
@@ -130,7 +130,7 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email')->label('Correo electrónico')
-                    ->label('Correo Electrónico')
+                    ->label('Correo electrónico')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('num_control')
@@ -156,7 +156,7 @@ class UserResource extends Resource
                     ->color(fn ($state) => $state ? 'success' : 'danger')
                     ->icon(fn ($state) => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle'),
                 Tables\Columns\TextColumn::make('created_at')->label('Fecha de creación')
-                    ->label('Fecha de Creación')
+                    ->label('Fecha de creación')
                     ->dateTime('d/m/Y')
                     ->sortable(),
             ])
@@ -196,23 +196,23 @@ class UserResource extends Resource
                 Section::make('Datos Personales')
                     ->schema([
                         TextEntry::make('name')->label('Nombre')->icon('heroicon-m-user'),
-                        TextEntry::make('apellido_paterno')->label('Apellido Paterno')->icon('heroicon-m-user'),
-                        TextEntry::make('apellido_materno')->label('Apellido Materno')->icon('heroicon-m-user'),
+                        TextEntry::make('apellido_paterno')->label('Apellido paterno')->icon('heroicon-m-user'),
+                        TextEntry::make('apellido_materno')->label('Apellido materno')->icon('heroicon-m-user'),
                     ])->columns(3),
                 Section::make('Datos de Acceso')
                     ->schema([
-                        TextEntry::make('email')->label('Correo Electrónico')->icon('heroicon-m-envelope'),
+                        TextEntry::make('email')->label('Correo electrónico')->icon('heroicon-m-envelope'),
                     ])->columns(1),
                 Section::make('Datos Institucionales')
                     ->schema([
-                        TextEntry::make('num_control')->label('Número de Control')->icon('heroicon-m-identification'),
+                        TextEntry::make('num_control')->label('Número de control')->icon('heroicon-m-identification'),
                         TextEntry::make('carrera')->label('Carrera')->icon('heroicon-m-academic-cap'),
                         TextEntry::make('RFC')->label('RFC')->fontFamily('mono')->icon('heroicon-m-identification'),
                     ])->columns(3),
                 Section::make('Estado y Rol')
                     ->schema([
                         TextEntry::make('tipo_usuario')
-                            ->label('Tipo de Usuario')
+                            ->label('Tipo de usuario')
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 RoleEnum::ADMIN->value => 'success',

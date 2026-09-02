@@ -42,7 +42,7 @@ class TipoMaterialResource extends Resource
                     ->icon('heroicon-m-rectangle-stack')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
-                            ->label('Nombre del Tipo')
+                            ->label('Nombre del tipo')
                             ->required()
                             ->prefixIcon('heroicon-m-rectangle-stack')
                             ->maxLength(100),

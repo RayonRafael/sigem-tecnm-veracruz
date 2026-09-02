@@ -56,7 +56,7 @@ class AreaResource extends Resource
                     ->icon('heroicon-m-map-pin')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
-                            ->label('Nombre del Área')
+                            ->label('Nombre del área')
                             ->required()
                             ->prefixIcon('heroicon-m-tag')
                             ->maxLength(100),

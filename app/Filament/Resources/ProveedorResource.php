@@ -42,7 +42,7 @@ class ProveedorResource extends Resource
                     ->icon('heroicon-m-building-office-2')
                     ->schema([
                         Forms\Components\TextInput::make('nombre_empresa')
-                            ->label('Nombre de la Empresa')
+                            ->label('Nombre de la empresa')
                             ->required()
                             ->prefixIcon('heroicon-m-building-storefront')
                             ->maxLength(150),
@@ -52,7 +52,7 @@ class ProveedorResource extends Resource
                             ->maxLength(13)
                             ->default(null),
                         Forms\Components\ToggleButtons::make('activo')
-                            ->label('Proveedor Activo')
+                            ->label('Proveedor activo')
                             ->boolean(trueLabel: 'Sí', falseLabel: 'No')
                             ->inline()
                             ->default(true)
@@ -63,7 +63,7 @@ class ProveedorResource extends Resource
                     ->icon('heroicon-m-phone')
                     ->schema([
                         Forms\Components\TextInput::make('contacto_nombre')
-                            ->label('Nombre del Contacto')
+                            ->label('Nombre del contacto')
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(100)
                             ->default(null),
@@ -74,7 +74,7 @@ class ProveedorResource extends Resource
                             ->maxLength(20)
                             ->default(null),
                         Forms\Components\TextInput::make('contacto_email')
-                            ->label('Correo Electrónico')
+                            ->label('Correo electrónico')
                             ->email()
                             ->prefixIcon('heroicon-m-envelope')
                             ->maxLength(100)

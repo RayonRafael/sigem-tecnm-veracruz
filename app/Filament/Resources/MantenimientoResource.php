@@ -59,13 +59,13 @@ class MantenimientoResource extends Resource
                             Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\TextInput::make('nombre_tecnico')
-                                        ->label('Técnico / Alumno')
+                                        ->label('Técnico / alumno')
                                         ->required()
                                         ->default(fn () => auth()->user() ? trim(auth()->user()->name.' '.auth()->user()->apellido_paterno.' '.auth()->user()->apellido_materno) : null)
                                         ->prefixIcon('heroicon-m-user')
                                         ->maxLength(150),
                                     Forms\Components\TextInput::make('num_control_tecnico')
-                                        ->label('Número de Control Técnico')
+                                        ->label('Número de control técnico')
                                         ->default(fn () => auth()->user()?->num_control)
                                         ->prefixIcon('heroicon-m-identification')
                                         ->maxLength(100),
@@ -80,7 +80,7 @@ class MantenimientoResource extends Resource
                             Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\ToggleButtons::make('tipo_servicio')
-                                        ->label('Tipo de Servicio')
+                                        ->label('Tipo de servicio')
                                         ->options([
                                             RoleEnum::SERVICIO_SOCIAL->value => RoleEnum::SERVICIO_SOCIAL->value,
                                             'Prácticas Profesionales' => 'Prácticas Profesionales',
@@ -139,13 +139,13 @@ class MantenimientoResource extends Resource
                                         ->required(),
                                     Forms\Components\DatePicker::make('fecha_inicio')->label('Fecha de inicio')
                                         ->prefixIcon('heroicon-m-calendar')
-                                        ->label('Fecha Inicio'),
+                                        ->label('Fecha inicio'),
                                     Forms\Components\DatePicker::make('fecha_fin')->label('Fecha de fin')
                                         ->prefixIcon('heroicon-m-calendar')
-                                        ->label('Fecha Fin'),
+                                        ->label('Fecha fin'),
                                 ]),
                             Forms\Components\Textarea::make('descripcion_falla')
-                                ->label('Descripción de la Falla')
+                                ->label('Descripción de la falla')
                                 ->rows(2)
                                 ->columnSpanFull(),
                             Forms\Components\Textarea::make('descripcion_trabajo')
@@ -166,14 +166,14 @@ class MantenimientoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('inventario.num_serie')
-                    ->label('No. Serie (Activo)')
+                    ->label('No. serie (activo)')
                     ->fontFamily('mono')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('inventario.material.nombre')
                     ->label('Material')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tipo_mantenimiento')
-                    ->label('Tipo Mantenimiento')
+                    ->label('Tipo mantenimiento')
                     ->badge()
                     ->colors([
                         'success' => 'Preventivo',
@@ -187,7 +187,7 @@ class MantenimientoResource extends Resource
                     ])
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tipo_servicio')
-                    ->label('Tipo Servicio')
+                    ->label('Tipo servicio')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('nombre_tecnico')
                     ->label('Técnico')
@@ -209,16 +209,16 @@ class MantenimientoResource extends Resource
                         'heroicon-m-x-circle' => 'Cancelado',
                     ]),
                 Tables\Columns\TextColumn::make('fecha_solicitud')->label('Fecha de solicitud')
-                    ->label('Fecha Sol.')
+                    ->label('Fecha sol.')
                     ->date('d/m/Y')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('fecha_inicio')->label('Fecha de inicio')
-                    ->label('Fecha Inicio')
+                    ->label('Fecha inicio')
                     ->date('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('fecha_fin')->label('Fecha de fin')
-                    ->label('Fecha Fin')
+                    ->label('Fecha fin')
                     ->date('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -234,7 +234,7 @@ class MantenimientoResource extends Resource
                         'Cancelado' => 'Cancelado',
                     ]),
                 Tables\Filters\SelectFilter::make('tipo_mantenimiento')
-                    ->label('Tipo de Mantenimiento')
+                    ->label('Tipo de mantenimiento')
                     ->options([
                         'Preventivo' => 'Preventivo',
                         'Correctivo' => 'Correctivo',

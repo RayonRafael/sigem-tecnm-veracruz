@@ -87,7 +87,7 @@ class SolicitudResource extends Resource
                                 ->required()
                                 ->columnSpanFull(),
                             Forms\Components\Textarea::make('observaciones')->label('Observaciones')
-                                ->label('Detalle / Motivo de la Solicitud')
+                                ->label('Detalle / motivo de la solicitud')
                                 ->placeholder('Explica qué necesitas y para qué...')
                                 ->rows(3)
                                 ->required()
@@ -122,14 +122,14 @@ class SolicitudResource extends Resource
                             Forms\Components\Grid::make(3)
                                 ->schema([
                                     Forms\Components\Select::make('id_usuario')->placeholder('Selecciona...')
-                                        ->label('Solicitante (Usuario)')
+                                        ->label('Solicitante (usuario)')
                                         ->relationship('usuario', 'name')
                                         ->required()
                                         ->searchable()
                                         ->preload()
                                         ->prefixIcon('heroicon-m-user'),
                                     Forms\Components\Select::make('id_receptor')->placeholder('Selecciona...')
-                                        ->label('Receptor (Área/Persona)')
+                                        ->label('Receptor (área/persona)')
                                         ->relationship('receptor', 'nombre')
                                         ->required()
                                         ->searchable()
@@ -158,11 +158,11 @@ class SolicitudResource extends Resource
                                         ->preload()
                                         ->prefixIcon('heroicon-m-shield-check'),
                                     Forms\Components\DatePicker::make('fecha_devolucion_estimada')
-                                        ->label('Devolución Estimada')
+                                        ->label('Devolución estimada')
                                         ->prefixIcon('heroicon-m-calendar-days')
                                         ->visible(fn (Forms\Get $get) => $get('tipo_movimiento') === 'Asignacion Temporal'),
                                     Forms\Components\DatePicker::make('fecha_devolucion_real')
-                                        ->label('Devolución Real')
+                                        ->label('Devolución real')
                                         ->prefixIcon('heroicon-m-calendar-days')
                                         ->visible(fn (Forms\Get $get) => $get('tipo_movimiento') === 'Asignacion Temporal'),
                                 ]),
@@ -181,7 +181,7 @@ class SolicitudResource extends Resource
                     ->fontFamily('mono')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tipo_movimiento')
-                    ->label('Tipo de Movimiento')
+                    ->label('Tipo de movimiento')
                     ->badge()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('usuario.name')
@@ -215,7 +215,7 @@ class SolicitudResource extends Resource
                         'heroicon-m-no-symbol' => 'Cancelado',
                     ]),
                 Tables\Columns\TextColumn::make('fecha_devolucion_estimada')
-                    ->label('Devolución Estimada')
+                    ->label('Devolución estimada')
                     ->date('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -236,7 +236,7 @@ class SolicitudResource extends Resource
                         'Cancelado' => 'Cancelado',
                     ]),
                 Tables\Filters\SelectFilter::make('tipo_movimiento')
-                    ->label('Tipo de Movimiento')
+                    ->label('Tipo de movimiento')
                     ->options([
                         'Asignacion Temporal' => 'Asignación Temporal',
                         'Asignacion Permanente' => 'Asignación Permanente',
@@ -334,8 +334,8 @@ class SolicitudResource extends Resource
                     ])->columns(4),
                 Section::make('Devoluciones y Observaciones')
                     ->schema([
-                        TextEntry::make('fecha_devolucion_estimada')->label('Devolución Estimada')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
-                        TextEntry::make('fecha_devolucion_real')->label('Devolución Real')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
+                        TextEntry::make('fecha_devolucion_estimada')->label('Devolución estimada')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
+                        TextEntry::make('fecha_devolucion_real')->label('Devolución real')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
                         TextEntry::make('observaciones')->label('Observaciones')->columnSpanFull(),
                     ])->columns(2),
             ]);

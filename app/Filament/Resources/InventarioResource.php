@@ -46,13 +46,13 @@ class InventarioResource extends Resource
                         ->icon('heroicon-m-identification')
                         ->schema([
                             Forms\Components\TextInput::make('num_serie')
-                                ->label('Número de Serie')
+                                ->label('Número de serie')
                                 ->prefixIcon('heroicon-m-qr-code')
                                 ->placeholder('Ej. SN-12345')
                                 ->maxLength(100)
                                 ->columnSpan(1),
                             Forms\Components\Select::make('id_producto')->placeholder('Selecciona...')
-                                ->label('Material / Equipo')
+                                ->label('Material / equipo')
                                 ->relationship('material', 'nombre')
                                 ->required()
                                 ->searchable()
@@ -106,7 +106,7 @@ class InventarioResource extends Resource
                                 ->required()
                                 ->columnSpan(1),
                             Forms\Components\Select::make('id_usuario')->placeholder('Selecciona...')
-                                ->label('Registrado por (Usuario)')
+                                ->label('Registrado por (usuario)')
                                 ->relationship('usuario', 'name')
                                 ->default(auth()->id())
                                 ->required()
@@ -129,12 +129,12 @@ class InventarioResource extends Resource
                                         ->prefixIcon('heroicon-m-truck')
                                         ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
                                     Forms\Components\TextInput::make('num_factura')
-                                        ->label('Número de Factura')
+                                        ->label('Número de factura')
                                         ->prefixIcon('heroicon-m-hashtag')
                                         ->maxLength(100)
                                         ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
                                     Forms\Components\DatePicker::make('fecha_factura')
-                                        ->label('Fecha de Factura')
+                                        ->label('Fecha de factura')
                                         ->prefixIcon('heroicon-m-calendar')
                                         ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
                                 ]),
@@ -142,13 +142,13 @@ class InventarioResource extends Resource
                             Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\DatePicker::make('fecha_inicio_renta')
-                                        ->label('Inicio de Renta')
+                                        ->label('Inicio de renta')
                                         ->prefixIcon('heroicon-m-calendar-days'),
                                     Forms\Components\DatePicker::make('fecha_fin_renta')
-                                        ->label('Fin de Renta')
+                                        ->label('Fin de renta')
                                         ->prefixIcon('heroicon-m-calendar-days'),
                                     Forms\Components\Textarea::make('observaciones_renta')
-                                        ->label('Observaciones de Renta')
+                                        ->label('Observaciones de renta')
                                         ->columnSpanFull(),
                                 ])
                                 ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
@@ -156,15 +156,15 @@ class InventarioResource extends Resource
                             Forms\Components\Grid::make(3)
                                 ->schema([
                                     Forms\Components\DatePicker::make('fecha_registro')
-                                        ->label('Fecha de Registro')
+                                        ->label('Fecha de registro')
                                         ->default(now())
                                         ->required()
                                         ->prefixIcon('heroicon-m-clock'),
                                     Forms\Components\DatePicker::make('garantia_fecha_fin')
-                                        ->label('Fin de Garantía')
+                                        ->label('Fin de garantía')
                                         ->prefixIcon('heroicon-m-shield-check'),
                                     Forms\Components\Select::make('garantia_estado')->placeholder('Selecciona...')
-                                        ->label('Estado de Garantía')
+                                        ->label('Estado de garantía')
                                         ->options([
                                             'vigente' => 'Vigente',
                                             'vencida' => 'Vencida',
@@ -176,7 +176,7 @@ class InventarioResource extends Resource
                             Forms\Components\Grid::make(1)
                                 ->schema([
                                     Forms\Components\Select::make('estado_registro')->placeholder('Selecciona...')
-                                        ->label('Estado de Registro')
+                                        ->label('Estado de registro')
                                         ->options([
                                             'Pendiente' => 'Pendiente',
                                             'Aprobado' => 'Aprobado',
@@ -186,7 +186,7 @@ class InventarioResource extends Resource
                                         ->required()
                                         ->visible(fn () => auth()->user() && auth()->user()->hasPermissionTo(RoleEnum::PERM_ACCESS_ADMIN)),
                                     Forms\Components\Textarea::make('observaciones_generales')
-                                        ->label('Observaciones Generales')
+                                        ->label('Observaciones generales')
                                         ->rows(2),
                                 ]),
                         ]),
@@ -269,7 +269,7 @@ class InventarioResource extends Resource
             ->filters([
                 TrashedFilter::make(),
                 Tables\Filters\TernaryFilter::make('aprobado')
-                    ->label('Estado de Aprobación'),
+                    ->label('Estado de aprobación'),
                 Tables\Filters\SelectFilter::make('estado')->label('Estado')
                     ->options([
                         'Disponible' => 'Disponible',

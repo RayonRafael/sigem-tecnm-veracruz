@@ -76,7 +76,7 @@ class SolicitudResource extends Resource
                                 ->required()
                                 ->columnSpanFull(),
                             Forms\Components\Textarea::make('observaciones')
-                                ->label('Detalle / Motivo de la Solicitud')
+                                ->label('Detalle / motivo de la solicitud')
                                 ->placeholder('Explica qué necesitas y para qué...')
                                 ->rows(3)
                                 ->required()
@@ -111,7 +111,7 @@ class SolicitudResource extends Resource
                             Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\Select::make('id_usuario')
-                                        ->label('Solicitante (Usuario)')
+                                        ->label('Solicitante (usuario)')
                                         ->relationship('usuario', 'name')
                                         ->default(auth()->id())
                                         ->required()
@@ -119,7 +119,7 @@ class SolicitudResource extends Resource
                                         ->preload()
                                         ->prefixIcon('heroicon-m-user'),
                                     Forms\Components\Select::make('id_receptor')
-                                        ->label('Receptor (Área/Persona)')
+                                        ->label('Receptor (área/persona)')
                                         ->relationship('receptor', 'nombre')
                                         ->required()
                                         ->searchable()
@@ -130,11 +130,11 @@ class SolicitudResource extends Resource
                             Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\DatePicker::make('fecha_devolucion_estimada')
-                                        ->label('Devolución Estimada')
+                                        ->label('Devolución estimada')
                                         ->prefixIcon('heroicon-m-calendar-days')
                                         ->visible(fn (Forms\Get $get) => $get('tipo_movimiento') === 'Asignacion Temporal'),
                                     Forms\Components\DatePicker::make('fecha_devolucion_real')
-                                        ->label('Devolución Real')
+                                        ->label('Devolución real')
                                         ->prefixIcon('heroicon-m-calendar-days')
                                         ->visible(fn (Forms\Get $get) => $get('tipo_movimiento') === 'Asignacion Temporal'),
                                 ]),
@@ -153,7 +153,7 @@ class SolicitudResource extends Resource
                     ->fontFamily('mono')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tipo_movimiento')
-                    ->label('Tipo de Movimiento')
+                    ->label('Tipo de movimiento')
                     ->badge()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('receptor.nombre')
@@ -237,8 +237,8 @@ class SolicitudResource extends Resource
                     ])->columns(3),
                 Section::make('Devoluciones y Observaciones')
                     ->schema([
-                        TextEntry::make('fecha_devolucion_estimada')->label('Devolución Estimada')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
-                        TextEntry::make('fecha_devolucion_real')->label('Devolución Real')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
+                        TextEntry::make('fecha_devolucion_estimada')->label('Devolución estimada')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
+                        TextEntry::make('fecha_devolucion_real')->label('Devolución real')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
                         TextEntry::make('observaciones')->label('Observaciones')->columnSpanFull(),
                     ])->columns(2),
             ]);

@@ -42,7 +42,7 @@ class MarcaMaterialResource extends Resource
                     ->icon('heroicon-m-tag')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
-                            ->label('Nombre de la Marca')
+                            ->label('Nombre de la marca')
                             ->required()
                             ->prefixIcon('heroicon-m-tag')
                             ->maxLength(100),

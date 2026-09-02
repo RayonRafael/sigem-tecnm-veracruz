@@ -23,7 +23,7 @@ class DetallesRelationManager extends RelationManager
         return $form
             ->schema([
                 Forms\Components\Select::make('id_producto')
-                    ->label('Material / Equipo')
+                    ->label('Material / equipo')
                     ->relationship('material', 'nombre')
                     ->searchable()
                     ->preload()
@@ -35,7 +35,7 @@ class DetallesRelationManager extends RelationManager
                     ->required()
                     ->minValue(1),
                 Forms\Components\Select::make('id_inventario')
-                    ->label('Activo (Inventario)')
+                    ->label('Activo (inventario)')
                     ->relationship('inventario', 'num_serie')
                     ->searchable()
                     ->preload(),
@@ -48,12 +48,12 @@ class DetallesRelationManager extends RelationManager
             ->recordTitleAttribute('id_detalle')
             ->columns([
                 Tables\Columns\TextColumn::make('material.nombre')
-                    ->label('Material / Equipo'),
+                    ->label('Material / equipo'),
                 Tables\Columns\TextColumn::make('cantidad')
                     ->label('Cantidad')
                     ->numeric(),
                 Tables\Columns\TextColumn::make('inventario.num_serie')
-                    ->label('No. Serie (Asignado)')
+                    ->label('No. serie (asignado)')
                     ->fontFamily('mono')
                     ->placeholder('N/A'),
             ])

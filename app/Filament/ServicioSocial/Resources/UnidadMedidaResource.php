@@ -56,7 +56,7 @@ class UnidadMedidaResource extends Resource
                     ->icon('heroicon-m-bars-3-bottom-left')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
-                            ->label('Nombre de la Unidad')
+                            ->label('Nombre de la unidad')
                             ->required()
                             ->prefixIcon('heroicon-m-bars-3-bottom-left')
                             ->maxLength(50),

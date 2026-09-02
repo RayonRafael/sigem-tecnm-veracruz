@@ -82,7 +82,7 @@ class MaterialResource extends Resource
                     ])->columns(3),
 
                 Forms\Components\TextInput::make('stock_actual')
-                    ->label('Stock Actual')
+                    ->label('Stock actual')
                     ->numeric()
                     ->minValue(0)
                     ->default(0)
@@ -116,15 +116,15 @@ class MaterialResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('stock_actual')
-                    ->label('Stock Actual')
+                    ->label('Stock actual')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('stock_minimo')
-                    ->label('Stock Mín.')
+                    ->label('Stock mín.')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('stock_status')
-                    ->label('Estado de Stock')
+                    ->label('Estado de stock')
                     ->getStateUsing(fn ($record) => $record->stock_actual < $record->stock_minimo ? 'Stock bajo' : 'Normal')
                     ->badge()
                     ->colors([
@@ -165,8 +165,8 @@ class MaterialResource extends Resource
                     ])->columns(3),
                 Section::make('Control de Stock')
                     ->schema([
-                        TextEntry::make('stock_actual')->label('Stock Actual')->icon('heroicon-m-archive-box'),
-                        TextEntry::make('stock_minimo')->label('Stock Mínimo')->icon('heroicon-m-bell-alert'),
+                        TextEntry::make('stock_actual')->label('Stock actual')->icon('heroicon-m-archive-box'),
+                        TextEntry::make('stock_minimo')->label('Stock mínimo')->icon('heroicon-m-bell-alert'),
                         TextEntry::make('estado_stock')
                             ->label('Estado')
                             ->getStateUsing(fn ($record) => $record->stock_actual < $record->stock_minimo ? 'Stock bajo' : 'Normal')
@@ -182,7 +182,7 @@ class MaterialResource extends Resource
                                 default => 'heroicon-m-minus',
                             }),
                         IconEntry::make('requiere_control_individual')
-                            ->label('Control Individual')
+                            ->label('Control individual')
                             ->boolean(),
                     ])->columns(4),
             ]);
