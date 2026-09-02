@@ -80,7 +80,7 @@ class InventarioResource extends Resource
                         ->icon('heroicon-m-map-pin')
                         ->schema([
                             Forms\Components\TextInput::make('ubicacion_fisica')
-                                ->label('Ubicación Física')
+                                ->label('Ubicación física')
                                 ->prefixIcon('heroicon-m-building-office')
                                 ->maxLength(150)
                                 ->columnSpan(2),
@@ -188,7 +188,7 @@ class InventarioResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('num_serie')
-                    ->label('No. Serie')
+                    ->label('No. serie')
                     ->fontFamily('mono')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('material.nombre')
@@ -249,7 +249,7 @@ class InventarioResource extends Resource
             ->schema([
                 Section::make('Identificación del Activo')
                     ->schema([
-                        TextEntry::make('num_serie')->label('No. Serie')
+                        TextEntry::make('num_serie')->label('No. serie')
                             ->fontFamily('mono')
                             ->icon('heroicon-m-qr-code'),
                         TextEntry::make('material.nombre')->label('Material')

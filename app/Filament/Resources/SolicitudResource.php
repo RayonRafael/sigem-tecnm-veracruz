@@ -93,7 +93,7 @@ class SolicitudResource extends Resource
                                 ->required()
                                 ->columnSpanFull(),
                             Forms\Components\Repeater::make('detalles')
-                                ->label('Materiales Solicitados')
+                                ->label('Materiales solicitados')
                                 ->relationship('detalles')
                                 ->schema([
                                     Forms\Components\Select::make('id_producto')->placeholder('Selecciona...')

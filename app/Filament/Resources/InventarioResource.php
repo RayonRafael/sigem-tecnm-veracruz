@@ -86,7 +86,7 @@ class InventarioResource extends Resource
                         ->icon('heroicon-m-map-pin')
                         ->schema([
                             Forms\Components\TextInput::make('ubicacion_fisica')
-                                ->label('Ubicación Física')
+                                ->label('Ubicación física')
                                 ->prefixIcon('heroicon-m-building-office')
                                 ->placeholder('Ej. Laboratorio 1, Edificio B')
                                 ->maxLength(150)
@@ -199,7 +199,7 @@ class InventarioResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('num_serie')
-                    ->label('No. Serie')
+                    ->label('No. serie')
                     ->fontFamily('mono')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('material.nombre')
@@ -256,7 +256,7 @@ class InventarioResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('fecha_aprobacion')
-                    ->label('Fecha Aprobación')
+                    ->label('Fecha aprobación')
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -316,7 +316,7 @@ class InventarioResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\BulkAction::make('aprobarMasivo')
-                        ->label('Aprobar Seleccionados')
+                        ->label('Aprobar seleccionados')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->visible(fn (): bool => auth()->user()->can('aprobaciones.aprobar'))
@@ -340,7 +340,7 @@ class InventarioResource extends Resource
             ->schema([
                 Section::make('Identificación del Activo')
                     ->schema([
-                        TextEntry::make('num_serie')->label('No. Serie')
+                        TextEntry::make('num_serie')->label('No. serie')
                             ->fontFamily('mono')
                             ->icon('heroicon-m-qr-code'),
                         TextEntry::make('material.nombre')->label('Material')

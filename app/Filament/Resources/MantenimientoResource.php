@@ -44,7 +44,7 @@ class MantenimientoResource extends Resource
                         ->icon('heroicon-m-wrench')
                         ->schema([
                             Forms\Components\Select::make('id_inventario')->placeholder('Selecciona...')
-                                ->label('Equipo a Reparar')
+                                ->label('Equipo a reparar')
                                 ->relationship(
                                     name: 'inventario',
                                     titleAttribute: 'num_serie',
@@ -149,7 +149,7 @@ class MantenimientoResource extends Resource
                                 ->rows(2)
                                 ->columnSpanFull(),
                             Forms\Components\Textarea::make('descripcion_trabajo')
-                                ->label('Trabajo Realizado')
+                                ->label('Trabajo realizado')
                                 ->rows(2)
                                 ->columnSpanFull(),
                             Forms\Components\Textarea::make('observaciones')->label('Observaciones')
@@ -282,12 +282,12 @@ class MantenimientoResource extends Resource
             ->schema([
                 Section::make('Equipo y Técnico')
                     ->schema([
-                        TextEntry::make('inventario.num_serie')->label('No. Serie')
+                        TextEntry::make('inventario.num_serie')->label('No. serie')
                             ->fontFamily('mono')
                             ->icon('heroicon-m-qr-code'),
                         TextEntry::make('inventario.material.nombre')->label('Material')->icon('heroicon-m-cube'),
                         TextEntry::make('nombre_tecnico')->label('Técnico')->icon('heroicon-m-user'),
-                        TextEntry::make('num_control_tecnico')->label('No. Control')->icon('heroicon-m-identification'),
+                        TextEntry::make('num_control_tecnico')->label('No. control')->icon('heroicon-m-identification'),
                     ])->columns(4),
                 Section::make('Detalles del Servicio')
                     ->schema([
@@ -332,7 +332,7 @@ class MantenimientoResource extends Resource
                         TextEntry::make('fecha_inicio')->label('Inicio')->date('d/m/Y')->icon('heroicon-m-calendar'),
                         TextEntry::make('fecha_fin')->label('Fin')->date('d/m/Y')->icon('heroicon-m-calendar'),
                         TextEntry::make('descripcion_falla')->label('Falla')->columnSpanFull(),
-                        TextEntry::make('descripcion_trabajo')->label('Trabajo Realizado')->columnSpanFull(),
+                        TextEntry::make('descripcion_trabajo')->label('Trabajo realizado')->columnSpanFull(),
                         TextEntry::make('observaciones')->label('Observaciones')->columnSpanFull(),
                     ])->columns(3),
             ]);

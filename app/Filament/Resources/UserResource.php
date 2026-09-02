@@ -134,7 +134,7 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('num_control')
-                    ->label('No. Control')
+                    ->label('No. control')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('tipo_usuario')
                     ->label('Tipo')

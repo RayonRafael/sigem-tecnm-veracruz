@@ -44,7 +44,7 @@ class MantenimientoResource extends Resource
                         ->icon('heroicon-m-wrench')
                         ->schema([
                             Forms\Components\Select::make('id_inventario')
-                                ->label('Equipo a Reparar')
+                                ->label('Equipo a reparar')
                                 ->relationship(
                                     name: 'inventario',
                                     titleAttribute: 'num_serie',
@@ -210,12 +210,12 @@ class MantenimientoResource extends Resource
             ->schema([
                 Section::make('Equipo y Técnico')
                     ->schema([
-                        TextEntry::make('inventario.num_serie')->label('No. Serie')
+                        TextEntry::make('inventario.num_serie')->label('No. serie')
                             ->fontFamily('mono')
                             ->icon('heroicon-m-qr-code'),
                         TextEntry::make('inventario.material.nombre')->label('Material')->icon('heroicon-m-cube'),
                         TextEntry::make('nombre_tecnico')->label('Técnico')->icon('heroicon-m-user'),
-                        TextEntry::make('num_control_tecnico')->label('No. Control')->icon('heroicon-m-identification'),
+                        TextEntry::make('num_control_tecnico')->label('No. control')->icon('heroicon-m-identification'),
                     ])->columns(4),
                 Section::make('Detalles del Servicio')
                     ->schema([
