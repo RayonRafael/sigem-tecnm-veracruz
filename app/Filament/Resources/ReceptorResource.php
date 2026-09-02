@@ -85,23 +85,41 @@ class ReceptorResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')
                     ->label('Nombre')
-                    ->searchable(),
+                    ->icon('heroicon-m-user')
+                    ->searchable()
+                    ->limit(25)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('apellido_paterno')
                     ->label('Apellido paterno')
-                    ->searchable(),
+                    ->searchable()
+                    ->limit(20)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('apellido_materno')
                     ->label('Apellido materno')
-                    ->searchable(),
+                    ->searchable()
+                    ->limit(20)
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('email')->label('Correo electrónico')
                     ->label('Email')
-                    ->searchable(),
+                    ->icon('heroicon-m-envelope')
+                    ->searchable()
+                    ->limit(25)
+                    ->toggleable()
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('telefono')
                     ->label('Teléfono')
-                    ->searchable(),
+                    ->icon('heroicon-m-device-phone-mobile')
+                    ->searchable()
+                    ->toggleable()
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('area.nombre')
                     ->label('Área')
+                    ->icon('heroicon-m-building-office')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(25)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('created_at')->label('Fecha de creación')
                     ->dateTime('d/m/Y')
                     ->sortable()

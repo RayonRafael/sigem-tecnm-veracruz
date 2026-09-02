@@ -116,38 +116,54 @@ class MaterialResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')
                     ->label('Nombre')
+                    ->icon('heroicon-m-cube')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(30)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('modelo')
                     ->label('Modelo')
-                    ->searchable(),
+                    ->icon('heroicon-m-qr-code')
+                    ->searchable()
+                    ->limit(20)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('marca.nombre')
                     ->label('Marca')
+                    ->icon('heroicon-m-tag')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(20)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('tipo.nombre')
                     ->label('Tipo')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(20)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('stock_actual')
                     ->label('Stock actual')
+                    ->icon('heroicon-m-archive-box')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('stock_minimo')
                     ->label('Stock mín.')
+                    ->icon('heroicon-m-bell-alert')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('stock_status')
                     ->label('Estado de stock')
-                    ->getStateUsing(fn ($record) => $record->stock_actual < $record->stock_minimo ? 'Stock bajo' : 'Normal')
+                    ->getStateUsing(fn ($record) => $record->stock_actual == 0 ? 'Agotado' : ($record->stock_actual <= $record->stock_minimo ? 'Bajo' : 'Suficiente'))
                     ->badge()
                     ->colors([
-                        'danger' => 'Stock bajo',
-                        'success' => 'Normal',
+                        'danger' => 'Agotado',
+                        'warning' => 'Bajo',
+                        'success' => 'Suficiente',
                     ])
                     ->icons([
-                        'heroicon-m-exclamation-triangle' => 'Stock bajo',
-                        'heroicon-m-check-circle' => 'Normal',
+                        'heroicon-m-x-circle' => 'Agotado',
+                        'heroicon-m-exclamation-triangle' => 'Bajo',
+                        'heroicon-m-check-circle' => 'Suficiente',
                     ])
                     ->sortable(query: fn (Builder $query, string $direction) => $query->orderByRaw('stock_actual - stock_minimo '.$direction)),
             ])

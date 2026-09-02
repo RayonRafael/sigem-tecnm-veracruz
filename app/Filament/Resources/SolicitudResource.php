@@ -186,14 +186,25 @@ class SolicitudResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('usuario.name')
                     ->label('Solicitante')
-                    ->searchable(),
+                    ->icon('heroicon-m-user')
+                    ->searchable()
+                    ->limit(25)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('receptor.nombre')
                     ->label('Receptor')
-                    ->searchable(),
+                    ->icon('heroicon-m-user-group')
+                    ->searchable()
+                    ->limit(25)
+                    ->toggleable()
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('receptor.area.departamento.nombre')
                     ->label('Departamento')
+                    ->icon('heroicon-m-building-office')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(25)
+                    ->toggleable()
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('fecha_solicitud')->label('Fecha de solicitud')
                     ->label('Fecha')
                     ->date('d/m/Y')
@@ -221,9 +232,12 @@ class SolicitudResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('autorizadoPor.name')
                     ->label('Autorizado por')
+                    ->icon('heroicon-m-shield-check')
                     ->searchable()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->limit(25)
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->wrap(false),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([

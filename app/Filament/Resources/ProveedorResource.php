@@ -89,21 +89,37 @@ class ProveedorResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre_empresa')
                     ->label('Empresa')
+                    ->icon('heroicon-m-building-storefront')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(30)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('rfc')
                     ->label('RFC')
                     ->fontFamily('mono')
-                    ->searchable(),
+                    ->searchable()
+                    ->limit(15)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('contacto_nombre')
                     ->label('Contacto')
-                    ->searchable(),
+                    ->icon('heroicon-m-user')
+                    ->searchable()
+                    ->limit(25)
+                    ->toggleable()
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('contacto_telefono')
                     ->label('Teléfono')
-                    ->searchable(),
+                    ->icon('heroicon-m-device-phone-mobile')
+                    ->searchable()
+                    ->toggleable()
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('contacto_email')
                     ->label('Email')
-                    ->searchable(),
+                    ->icon('heroicon-m-envelope')
+                    ->searchable()
+                    ->limit(25)
+                    ->toggleable()
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('activo')
                     ->label('Estado')
                     ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Inactivo')

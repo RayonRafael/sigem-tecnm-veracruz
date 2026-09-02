@@ -63,12 +63,18 @@ class AreaResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')
                     ->label('Nombre')
+                    ->icon('heroicon-m-map-pin')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(50)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('departamento.nombre')
                     ->label('Departamento')
+                    ->icon('heroicon-m-building-office-2')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(40)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('created_at')->label('Fecha de creación')
                     ->dateTime('d/m/Y')
                     ->sortable()

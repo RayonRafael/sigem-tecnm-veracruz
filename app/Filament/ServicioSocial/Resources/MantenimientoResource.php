@@ -145,11 +145,15 @@ class MantenimientoResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('inventario.num_serie')
                     ->label('No. serie (activo)')
+                    ->icon('heroicon-m-cube')
                     ->fontFamily('mono')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('inventario.material.nombre')
                     ->label('Material')
-                    ->searchable(),
+                    ->icon('heroicon-m-cube')
+                    ->searchable()
+                    ->limit(30)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('tipo_mantenimiento')
                     ->label('Tipo mantenimiento')
                     ->badge()
@@ -163,10 +167,14 @@ class MantenimientoResource extends Resource
                         'heroicon-m-exclamation-triangle' => 'Correctivo',
                         'heroicon-m-arrow-trending-up' => 'Mejora',
                     ])
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('nombre_tecnico')
                     ->label('Técnico')
-                    ->searchable(),
+                    ->icon('heroicon-m-user')
+                    ->searchable()
+                    ->limit(30)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('estado')
                     ->formatStateUsing(fn ($state) => $state === 'Pendiente Revision Admin' ? 'En revisión' : $state)
                     ->badge()

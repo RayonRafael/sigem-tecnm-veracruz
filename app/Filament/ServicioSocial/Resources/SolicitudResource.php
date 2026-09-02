@@ -160,7 +160,11 @@ class SolicitudResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('receptor.nombre')
                     ->label('Receptor')
-                    ->searchable(),
+                    ->icon('heroicon-m-user-group')
+                    ->searchable()
+                    ->limit(25)
+                    ->toggleable()
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('fecha_solicitud')
                     ->label('Fecha')
                     ->date('d/m/Y')

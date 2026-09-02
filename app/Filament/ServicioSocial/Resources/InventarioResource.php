@@ -189,15 +189,23 @@ class InventarioResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('num_serie')
                     ->label('No. serie')
+                    ->icon('heroicon-m-identification')
                     ->fontFamily('mono')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('material.nombre')
                     ->label('Material')
+                    ->icon('heroicon-m-cube')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(30)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('ubicacion_fisica')
                     ->label('Ubicación')
-                    ->searchable(),
+                    ->icon('heroicon-m-map-pin')
+                    ->searchable()
+                    ->limit(30)
+                    ->toggleable()
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('estado')
                     ->badge()
                     ->colors([

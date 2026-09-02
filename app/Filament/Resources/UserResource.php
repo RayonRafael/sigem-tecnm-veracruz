@@ -127,15 +127,24 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->label('Nombre')
                     ->label('Nombre')
+                    ->icon('heroicon-m-user')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(25)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('email')->label('Correo electrónico')
                     ->label('Correo electrónico')
+                    ->icon('heroicon-m-envelope')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(25)
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('num_control')
                     ->label('No. control')
-                    ->searchable(),
+                    ->icon('heroicon-m-identification')
+                    ->searchable()
+                    ->toggleable()
+                    ->wrap(false),
                 Tables\Columns\TextColumn::make('tipo_usuario')
                     ->label('Tipo')
                     ->badge()
@@ -158,7 +167,8 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')->label('Fecha de creación')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([

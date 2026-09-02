@@ -53,7 +53,18 @@ class DepartamentoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nombre')->label('Nombre')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('nombre')
+                    ->label('Nombre')
+                    ->icon('heroicon-m-building-office-2')
+                    ->searchable()
+                    ->sortable()
+                    ->limit(50)
+                    ->wrap(false),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Fecha de creación')
+                    ->dateTime('d/m/Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('nombre', 'asc')
             ->actions([
