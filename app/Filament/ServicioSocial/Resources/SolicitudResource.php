@@ -147,23 +147,23 @@ class SolicitudResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id_solicitud')
+                Tables\Columns\TextColumn::make('id_solicitud')->wrap(false)->limit(30)->grow(false)
                     ->label('Folio')
                     ->formatStateUsing(fn ($state) => 'FOLIO-'.str_pad($state, 5, '0', STR_PAD_LEFT))
                     ->fontFamily('mono')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('tipo_movimiento')
+                Tables\Columns\TextColumn::make('tipo_movimiento')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo de movimiento')
                     ->badge()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('receptor.nombre')
+                Tables\Columns\TextColumn::make('receptor.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Receptor')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('fecha_solicitud')
+                Tables\Columns\TextColumn::make('fecha_solicitud')->wrap(false)->limit(30)->grow(false)
                     ->label('Fecha')
                     ->date('d/m/Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('estado')
+                Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)
                     ->badge()
                     ->colors([
                         'warning' => 'Pendiente',
@@ -181,6 +181,8 @@ class SolicitudResource extends Resource
                     ]),
             ])
             ->defaultSort('created_at', 'desc')
+            ->striped()
+            ->defaultPaginationPageOption(10)
             ->filters([
                 Tables\Filters\SelectFilter::make('estado')
                     ->options([

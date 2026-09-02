@@ -187,18 +187,18 @@ class InventarioResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('num_serie')
+                Tables\Columns\TextColumn::make('num_serie')->wrap(false)->limit(30)->grow(false)
                     ->label('No. serie')
                     ->fontFamily('mono')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('material.nombre')
+                Tables\Columns\TextColumn::make('material.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Material')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('ubicacion_fisica')
+                Tables\Columns\TextColumn::make('ubicacion_fisica')->wrap(false)->limit(30)->grow(false)
                     ->label('Ubicación')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('estado')
+                Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)
                     ->badge()
                     ->colors([
                         'success' => 'Disponible',
@@ -212,18 +212,20 @@ class InventarioResource extends Resource
                         'heroicon-m-wrench' => 'En Mantenimiento',
                         'heroicon-m-exclamation-triangle' => 'Dañado',
                     ]),
-                Tables\Columns\TextColumn::make('aprobado')
+                Tables\Columns\TextColumn::make('aprobado')->wrap(false)->limit(30)->grow(false)
                     ->label('Estado aprobación')
                     ->formatStateUsing(fn ($state) => $state ? 'Aprobado' : 'Pendiente')
                     ->badge()
                     ->color(fn ($state) => $state ? 'success' : 'warning')
                     ->icon(fn ($state) => $state ? 'heroicon-m-shield-check' : 'heroicon-m-clock'),
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('created_at')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
+            ->striped()
+            ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('estado')

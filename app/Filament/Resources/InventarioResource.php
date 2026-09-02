@@ -198,26 +198,26 @@ class InventarioResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('num_serie')
+                Tables\Columns\TextColumn::make('num_serie')->wrap(false)->limit(30)->grow(false)
                     ->label('No. serie')
                     ->fontFamily('mono')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('material.nombre')
+                Tables\Columns\TextColumn::make('material.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Material')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('material.marca.nombre')
+                Tables\Columns\TextColumn::make('material.marca.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Marca')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('material.tipo.nombre')
+                Tables\Columns\TextColumn::make('material.tipo.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('ubicacion_fisica')
+                Tables\Columns\TextColumn::make('ubicacion_fisica')->wrap(false)->limit(30)->grow(false)
                     ->label('Ubicación')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('estado')->label('Estado')
+                Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)->label('Estado')
                     ->badge()
                     ->colors([
                         'success' => 'Disponible',
@@ -234,7 +234,7 @@ class InventarioResource extends Resource
                         'heroicon-m-minus-circle' => 'Baja',
                         'heroicon-m-arrow-path' => 'Devuelto a Proveedor',
                     ]),
-                Tables\Columns\TextColumn::make('tipo_propiedad')
+                Tables\Columns\TextColumn::make('tipo_propiedad')->wrap(false)->limit(30)->grow(false)
                     ->label('Propiedad')
                     ->badge()
                     ->colors([
@@ -245,27 +245,29 @@ class InventarioResource extends Resource
                         'heroicon-m-building-library' => 'Propio',
                         'heroicon-m-currency-dollar' => 'Rentado',
                     ]),
-                Tables\Columns\TextColumn::make('aprobado')
+                Tables\Columns\TextColumn::make('aprobado')->wrap(false)->limit(30)->grow(false)
                     ->label('Aprobado')
                     ->formatStateUsing(fn ($state) => $state ? 'Aprobado' : 'Pendiente')
                     ->badge()
                     ->color(fn ($state) => $state ? 'success' : 'warning')
                     ->icon(fn ($state) => $state ? 'heroicon-m-shield-check' : 'heroicon-m-clock'),
-                Tables\Columns\TextColumn::make('aprobadoPor.name')
+                Tables\Columns\TextColumn::make('aprobadoPor.name')->wrap(false)->limit(30)->grow(false)
                     ->label('Aprobado por')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('fecha_aprobacion')
+                Tables\Columns\TextColumn::make('fecha_aprobacion')->wrap(false)->limit(30)->grow(false)
                     ->label('Fecha aprobación')
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('created_at')->label('Fecha de creación')
+                Tables\Columns\TextColumn::make('created_at')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)->label('Fecha de creación')
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
+            ->striped()
+            ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),
                 Tables\Filters\TernaryFilter::make('aprobado')

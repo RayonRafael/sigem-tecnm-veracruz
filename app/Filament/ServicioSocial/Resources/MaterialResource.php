@@ -100,30 +100,30 @@ class MaterialResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nombre')
+                Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('modelo')
+                Tables\Columns\TextColumn::make('modelo')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Modelo')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('marca.nombre')
+                Tables\Columns\TextColumn::make('marca.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Marca')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('tipo.nombre')
+                Tables\Columns\TextColumn::make('tipo.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('stock_actual')
+                Tables\Columns\TextColumn::make('stock_actual')->wrap(false)->limit(30)->grow(false)
                     ->label('Stock actual')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('stock_minimo')
+                Tables\Columns\TextColumn::make('stock_minimo')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Stock mín.')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('stock_status')
+                Tables\Columns\TextColumn::make('stock_status')->wrap(false)->limit(30)->grow(false)
                     ->label('Estado de stock')
                     ->getStateUsing(fn ($record) => $record->stock_actual < $record->stock_minimo ? 'Stock bajo' : 'Normal')
                     ->badge()
@@ -137,6 +137,8 @@ class MaterialResource extends Resource
                     ]),
             ])
             ->defaultSort('nombre', 'asc')
+            ->striped()
+            ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),
             ])

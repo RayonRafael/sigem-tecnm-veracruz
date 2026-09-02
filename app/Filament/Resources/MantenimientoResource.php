@@ -165,14 +165,14 @@ class MantenimientoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('inventario.num_serie')
+                Tables\Columns\TextColumn::make('inventario.num_serie')->wrap(false)->limit(30)->grow(false)
                     ->label('No. serie (activo)')
                     ->fontFamily('mono')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('inventario.material.nombre')
+                Tables\Columns\TextColumn::make('inventario.material.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Material')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('tipo_mantenimiento')
+                Tables\Columns\TextColumn::make('tipo_mantenimiento')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Tipo mantenimiento')
                     ->badge()
                     ->colors([
@@ -186,13 +186,13 @@ class MantenimientoResource extends Resource
                         'heroicon-m-arrow-trending-up' => 'Mejora',
                     ])
                     ->searchable(),
-                Tables\Columns\TextColumn::make('tipo_servicio')
+                Tables\Columns\TextColumn::make('tipo_servicio')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo servicio')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('nombre_tecnico')
+                Tables\Columns\TextColumn::make('nombre_tecnico')->wrap(false)->limit(30)->grow(false)
                     ->label('Técnico')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('estado')->label('Estado')
+                Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)->label('Estado')
                     ->formatStateUsing(fn ($state) => $state === 'Pendiente Revision Admin' ? 'En revisión' : $state)
                     ->badge()
                     ->colors([
@@ -208,22 +208,24 @@ class MantenimientoResource extends Resource
                         'heroicon-m-check-badge' => 'Completado',
                         'heroicon-m-x-circle' => 'Cancelado',
                     ]),
-                Tables\Columns\TextColumn::make('fecha_solicitud')->label('Fecha de solicitud')
+                Tables\Columns\TextColumn::make('fecha_solicitud')->wrap(false)->limit(30)->grow(false)->label('Fecha de solicitud')
                     ->label('Fecha sol.')
                     ->date('d/m/Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('fecha_inicio')->label('Fecha de inicio')
+                Tables\Columns\TextColumn::make('fecha_inicio')->wrap(false)->limit(30)->grow(false)->label('Fecha de inicio')
                     ->label('Fecha inicio')
                     ->date('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('fecha_fin')->label('Fecha de fin')
+                Tables\Columns\TextColumn::make('fecha_fin')->wrap(false)->limit(30)->grow(false)->label('Fecha de fin')
                     ->label('Fecha fin')
                     ->date('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
+            ->striped()
+            ->defaultPaginationPageOption(10)
             ->filters([
                 Tables\Filters\SelectFilter::make('estado')->label('Estado')
                     ->options([

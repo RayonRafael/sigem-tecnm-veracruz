@@ -87,31 +87,33 @@ class ReceptorResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nombre')
+                Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('apellido_paterno')
+                Tables\Columns\TextColumn::make('apellido_paterno')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Apellido paterno')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('apellido_materno')
+                Tables\Columns\TextColumn::make('apellido_materno')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Apellido materno')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
+                Tables\Columns\TextColumn::make('email')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('telefono')
+                Tables\Columns\TextColumn::make('telefono')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Teléfono')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('area.nombre')
+                Tables\Columns\TextColumn::make('area.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Área')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('created_at')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('nombre', 'asc')
+            ->striped()
+            ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),
                 //

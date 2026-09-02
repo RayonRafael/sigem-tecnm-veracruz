@@ -87,35 +87,37 @@ class ProveedorResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nombre_empresa')
+                Tables\Columns\TextColumn::make('nombre_empresa')->wrap(false)->limit(30)->grow(false)
                     ->label('Empresa')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('rfc')
+                Tables\Columns\TextColumn::make('rfc')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('RFC')
                     ->fontFamily('mono')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('contacto_nombre')
+                Tables\Columns\TextColumn::make('contacto_nombre')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Contacto')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('contacto_telefono')
+                Tables\Columns\TextColumn::make('contacto_telefono')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Teléfono')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('contacto_email')
+                Tables\Columns\TextColumn::make('contacto_email')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('activo')
+                Tables\Columns\TextColumn::make('activo')->wrap(false)->limit(30)->grow(false)
                     ->label('Estado')
                     ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Inactivo')
                     ->badge()
                     ->color(fn ($state) => $state ? 'success' : 'danger')
                     ->icon(fn ($state) => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle'),
-                Tables\Columns\TextColumn::make('created_at')->label('Fecha de creación')
+                Tables\Columns\TextColumn::make('created_at')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)->label('Fecha de creación')
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('nombre_empresa', 'asc')
+            ->striped()
+            ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),
                 //

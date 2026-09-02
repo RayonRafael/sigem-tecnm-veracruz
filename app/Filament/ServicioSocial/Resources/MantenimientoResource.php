@@ -143,14 +143,14 @@ class MantenimientoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('inventario.num_serie')
+                Tables\Columns\TextColumn::make('inventario.num_serie')->wrap(false)->limit(30)->grow(false)
                     ->label('No. serie (activo)')
                     ->fontFamily('mono')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('inventario.material.nombre')
+                Tables\Columns\TextColumn::make('inventario.material.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Material')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('tipo_mantenimiento')
+                Tables\Columns\TextColumn::make('tipo_mantenimiento')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Tipo mantenimiento')
                     ->badge()
                     ->colors([
@@ -164,10 +164,10 @@ class MantenimientoResource extends Resource
                         'heroicon-m-arrow-trending-up' => 'Mejora',
                     ])
                     ->searchable(),
-                Tables\Columns\TextColumn::make('nombre_tecnico')
+                Tables\Columns\TextColumn::make('nombre_tecnico')->wrap(false)->limit(30)->grow(false)
                     ->label('Técnico')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('estado')
+                Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)
                     ->formatStateUsing(fn ($state) => $state === 'Pendiente Revision Admin' ? 'En revisión' : $state)
                     ->badge()
                     ->colors([
@@ -183,12 +183,14 @@ class MantenimientoResource extends Resource
                         'heroicon-m-check-badge' => 'Completado',
                         'heroicon-m-x-circle' => 'Cancelado',
                     ]),
-                Tables\Columns\TextColumn::make('fecha_solicitud')
+                Tables\Columns\TextColumn::make('fecha_solicitud')->wrap(false)->limit(30)->grow(false)
                     ->label('Fecha sol.')
                     ->date('d/m/Y')
                     ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
+            ->striped()
+            ->defaultPaginationPageOption(10)
             ->filters([
                 Tables\Filters\SelectFilter::make('estado')
                     ->options([

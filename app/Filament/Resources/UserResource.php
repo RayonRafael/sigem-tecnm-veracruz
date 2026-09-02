@@ -125,18 +125,18 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')->label('Nombre')
+                Tables\Columns\TextColumn::make('name')->wrap(false)->limit(30)->grow(false)->label('Nombre')
                     ->label('Nombre')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('email')->label('Correo electrónico')
+                Tables\Columns\TextColumn::make('email')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)->label('Correo electrónico')
                     ->label('Correo electrónico')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('num_control')
+                Tables\Columns\TextColumn::make('num_control')->wrap(false)->limit(30)->grow(false)
                     ->label('No. control')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('tipo_usuario')
+                Tables\Columns\TextColumn::make('tipo_usuario')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo')
                     ->badge()
                     ->colors([
@@ -149,18 +149,20 @@ class UserResource extends Resource
                         'heroicon-m-academic-cap' => RoleEnum::SERVICIO_TIPO->value,
                         'heroicon-m-clock' => 'Pendiente',
                     ]),
-                Tables\Columns\TextColumn::make('activo')
+                Tables\Columns\TextColumn::make('activo')->wrap(false)->limit(30)->grow(false)
                     ->label('Estado')
                     ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Inactivo')
                     ->badge()
                     ->color(fn ($state) => $state ? 'success' : 'danger')
                     ->icon(fn ($state) => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle'),
-                Tables\Columns\TextColumn::make('created_at')->label('Fecha de creación')
+                Tables\Columns\TextColumn::make('created_at')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)->label('Fecha de creación')
                     ->label('Fecha de creación')
                     ->dateTime('d/m/Y')
                     ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
+            ->striped()
+            ->defaultPaginationPageOption(10)
             ->filters([
                 Tables\Filters\SelectFilter::make('tipo_usuario')
                     ->options([

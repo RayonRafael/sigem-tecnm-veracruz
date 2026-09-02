@@ -175,30 +175,30 @@ class SolicitudResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id_solicitud')
+                Tables\Columns\TextColumn::make('id_solicitud')->wrap(false)->limit(30)->grow(false)
                     ->label('Folio')
                     ->formatStateUsing(fn ($state) => 'FOLIO-'.str_pad($state, 5, '0', STR_PAD_LEFT))
                     ->fontFamily('mono')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('tipo_movimiento')
+                Tables\Columns\TextColumn::make('tipo_movimiento')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo de movimiento')
                     ->badge()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('usuario.name')
+                Tables\Columns\TextColumn::make('usuario.name')->wrap(false)->limit(30)->grow(false)
                     ->label('Solicitante')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('receptor.nombre')
+                Tables\Columns\TextColumn::make('receptor.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Receptor')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('receptor.area.departamento.nombre')
+                Tables\Columns\TextColumn::make('receptor.area.departamento.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Departamento')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('fecha_solicitud')->label('Fecha de solicitud')
+                Tables\Columns\TextColumn::make('fecha_solicitud')->wrap(false)->limit(30)->grow(false)->label('Fecha de solicitud')
                     ->label('Fecha')
                     ->date('d/m/Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('estado')->label('Estado')
+                Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)->label('Estado')
                     ->badge()
                     ->colors([
                         'warning' => 'Pendiente',
@@ -214,18 +214,20 @@ class SolicitudResource extends Resource
                         'heroicon-m-x-circle' => 'Rechazado',
                         'heroicon-m-no-symbol' => 'Cancelado',
                     ]),
-                Tables\Columns\TextColumn::make('fecha_devolucion_estimada')
+                Tables\Columns\TextColumn::make('fecha_devolucion_estimada')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Devolución estimada')
                     ->date('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('autorizadoPor.name')
+                Tables\Columns\TextColumn::make('autorizadoPor.name')->wrap(false)->limit(30)->grow(false)
                     ->label('Autorizado por')
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
+            ->striped()
+            ->defaultPaginationPageOption(10)
             ->filters([
                 Tables\Filters\SelectFilter::make('estado')->label('Estado')
                     ->options([

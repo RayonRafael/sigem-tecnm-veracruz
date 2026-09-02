@@ -53,7 +53,7 @@ class DepartamentoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nombre')->label('Nombre')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)->label('Nombre')->searchable()->sortable(),
             ])
             ->defaultSort('nombre', 'asc')
             ->actions([
