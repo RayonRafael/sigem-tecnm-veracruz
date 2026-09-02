@@ -122,7 +122,27 @@ class InventarioResource extends Resource
                                         ->searchable()
                                         ->preload()
                                         ->prefixIcon('heroicon-m-truck')
-                                        ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
+                                        ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado')
+                                        ->createOptionForm([
+                                            Forms\Components\TextInput::make('nombre_empresa')
+                                                ->label('Nombre de la empresa')
+                                                ->required()
+                                                ->maxLength(150),
+                                            Forms\Components\TextInput::make('rfc')
+                                                ->label('RFC')
+                                                ->maxLength(13),
+                                            Forms\Components\TextInput::make('contacto_nombre')
+                                                ->label('Nombre del contacto')
+                                                ->maxLength(150),
+                                            Forms\Components\TextInput::make('contacto_telefono')
+                                                ->label('Teléfono del contacto')
+                                                ->tel()
+                                                ->maxLength(20),
+                                            Forms\Components\TextInput::make('contacto_email')
+                                                ->label('Email del contacto')
+                                                ->email()
+                                                ->maxLength(100),
+                                        ]),
                                     Forms\Components\TextInput::make('num_factura')
                                         ->label('Número de factura')
                                         ->prefixIcon('heroicon-m-hashtag')

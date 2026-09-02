@@ -52,7 +52,13 @@ class AreaResource extends Resource
                             ->required()
                             ->searchable()
                             ->preload()
-                            ->prefixIcon('heroicon-m-building-office-2'),
+                            ->prefixIcon('heroicon-m-building-office-2')
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('nombre')
+                                    ->label('Nombre del departamento')
+                                    ->required()
+                                    ->maxLength(100),
+                            ]),
                     ])->columns(2),
             ]);
     }

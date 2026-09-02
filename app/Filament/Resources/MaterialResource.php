@@ -40,51 +40,71 @@ class MaterialResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos del material')
-                    ->icon('heroicon-m-cube')
-                    ->schema([
-                        Forms\Components\TextInput::make('nombre')
-                            ->required()
-                            ->prefixIcon('heroicon-m-tag')
-                            ->maxLength(150),
-                        Forms\Components\TextInput::make('modelo')
-                            ->prefixIcon('heroicon-m-qr-code')
-                            ->maxLength(100),
-                        Forms\Components\Textarea::make('descripcion')
-                            ->label('Descripción')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                    ])->columns(2),
+                Forms\Components\Wizard::make([
+                    Forms\Components\Wizard\Step::make('Datos y clasificación')
+                        ->icon('heroicon-m-cube')
+                        ->schema([
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\TextInput::make('nombre')
+                                        ->required()
+                                        ->prefixIcon('heroicon-m-tag')
+                                        ->maxLength(150),
+                                    Forms\Components\TextInput::make('modelo')
+                                        ->prefixIcon('heroicon-m-qr-code')
+                                        ->maxLength(100),
+                                    Forms\Components\Textarea::make('descripcion')
+                                        ->label('Descripción')
+                                        ->rows(3)
+                                        ->columnSpanFull(),
+                                ]),
+                            Forms\Components\Grid::make(3)
+                                ->schema([
+                                    Forms\Components\Select::make('id_marca')->placeholder('Selecciona...')
+                                        ->label('Marca')
+                                        ->relationship('marca', 'nombre')
+                                        ->required()
+                                        ->searchable()
+                                        ->preload()
+                                        ->prefixIcon('heroicon-m-star')
+                                        ->createOptionForm([
+                                            Forms\Components\TextInput::make('nombre')
+                                                ->label('Nombre de la marca')
+                                                ->required()
+                                                ->maxLength(100),
+                                        ]),
+                                    Forms\Components\Select::make('id_tipodematerial')->placeholder('Selecciona...')
+                                        ->label('Tipo de material')
+                                        ->relationship('tipo', 'nombre')
+                                        ->required()
+                                        ->searchable()
+                                        ->preload()
+                                        ->prefixIcon('heroicon-m-square-3-stack-3d')
+                                        ->createOptionForm([
+                                            Forms\Components\TextInput::make('nombre')
+                                                ->label('Nombre del tipo de material')
+                                                ->required()
+                                                ->maxLength(100),
+                                        ]),
+                                    Forms\Components\Select::make('id_unidad')->placeholder('Selecciona...')
+                                        ->label('Unidad de medida')
+                                        ->relationship('unidad', 'nombre')
+                                        ->required()
+                                        ->searchable()
+                                        ->preload()
+                                        ->prefixIcon('heroicon-m-scale')
+                                        ->createOptionForm([
+                                            Forms\Components\TextInput::make('nombre')
+                                                ->label('Nombre de la unidad de medida')
+                                                ->required()
+                                                ->maxLength(100),
+                                        ]),
+                                ]),
+                        ]),
 
-                Forms\Components\Section::make('Clasificación')
-                    ->icon('heroicon-m-rectangle-stack')
-                    ->schema([
-                        Forms\Components\Select::make('id_marca')->placeholder('Selecciona...')
-                            ->label('Marca')
-                            ->relationship('marca', 'nombre')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->prefixIcon('heroicon-m-star'),
-                        Forms\Components\Select::make('id_tipodematerial')->placeholder('Selecciona...')
-                            ->label('Tipo de material')
-                            ->relationship('tipo', 'nombre')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->prefixIcon('heroicon-m-square-3-stack-3d'),
-                        Forms\Components\Select::make('id_unidad')->placeholder('Selecciona...')
-                            ->label('Unidad de medida')
-                            ->relationship('unidad', 'nombre')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->prefixIcon('heroicon-m-scale'),
-                    ])->columns(3),
-
-                Forms\Components\Section::make('Control de stock')
-                    ->icon('heroicon-m-chart-bar')
-                    ->schema([
+                    Forms\Components\Wizard\Step::make('Control de stock')
+                        ->icon('heroicon-m-chart-bar')
+                        ->schema([
                         Forms\Components\TextInput::make('stock_actual')
                             ->label('Stock actual')
                             ->numeric()
@@ -107,6 +127,7 @@ class MaterialResource extends Resource
                             ->default(true)
                             ->columnSpanFull(),
                     ])->columns(2),
+                ])->columnSpanFull(),
             ]);
     }
 

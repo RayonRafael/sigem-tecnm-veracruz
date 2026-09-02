@@ -135,7 +135,35 @@ class SolicitudResource extends Resource
                                         ->searchable()
                                         ->preload()
                                         ->prefixIcon('heroicon-m-user-group')
-                                        ->live(),
+                                        ->live()
+                                        ->createOptionForm([
+                                            Forms\Components\TextInput::make('nombre')
+                                                ->label('Nombre')
+                                                ->required()
+                                                ->maxLength(100),
+                                            Forms\Components\TextInput::make('apellido_paterno')
+                                                ->label('Apellido paterno')
+                                                ->required()
+                                                ->maxLength(100),
+                                            Forms\Components\TextInput::make('apellido_materno')
+                                                ->label('Apellido materno')
+                                                ->required()
+                                                ->maxLength(100),
+                                            Forms\Components\TextInput::make('email')
+                                                ->label('Correo electrónico')
+                                                ->email()
+                                                ->maxLength(100),
+                                            Forms\Components\TextInput::make('telefono')
+                                                ->label('Teléfono')
+                                                ->tel()
+                                                ->maxLength(20),
+                                            Forms\Components\Select::make('id_area')->placeholder('Selecciona...')
+                                                ->label('Área')
+                                                ->options(\App\Models\Area::pluck('nombre', 'id'))
+                                                ->required()
+                                                ->searchable()
+                                                ->preload(),
+                                        ]),
                                     Forms\Components\Placeholder::make('departamento')
                                         ->label('Departamento')
                                         ->content(function (callable $get) {

@@ -50,13 +50,13 @@ class PolicyTest extends TestCase
         $this->assertTrue($servicio->can('viewAny', Inventario::class));
     }
 
-    public function test_servicio_social_cannot_create_update_delete_shared_resources(): void
+    public function test_servicio_social_can_create_but_not_update_delete_shared_resources(): void
     {
         $servicio = User::where('email', 'servicio@tecnm.edu.mx')->first();
 
         // Shared Resource (Inventario)
         $inventario = new Inventario;
-        $this->assertFalse($servicio->can('create', Inventario::class));
+        $this->assertTrue($servicio->can('create', Inventario::class));
         $this->assertFalse($servicio->can('update', $inventario));
         $this->assertFalse($servicio->can('delete', $inventario));
     }

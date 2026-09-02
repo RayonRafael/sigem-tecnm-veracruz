@@ -74,7 +74,19 @@ class ReceptorResource extends Resource
                             ->required()
                             ->searchable()
                             ->preload()
-                            ->prefixIcon('heroicon-m-building-office'),
+                            ->prefixIcon('heroicon-m-building-office')
+                            ->createOptionForm([
+                                Forms\Components\TextInput::make('nombre')
+                                    ->label('Nombre del área')
+                                    ->required()
+                                    ->maxLength(100),
+                                Forms\Components\Select::make('id_departamento')->placeholder('Selecciona...')
+                                    ->label('Departamento')
+                                    ->options(\App\Models\Departamento::pluck('nombre', 'id'))
+                                    ->searchable()
+                                    ->preload()
+                                    ->required(),
+                            ]),
                     ])->columns(2),
             ]);
     }
