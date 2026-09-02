@@ -134,7 +134,7 @@ class InventarioResource extends Resource
                                                 ->required()
                                                 ->maxLength(150),
                                             Forms\Components\TextInput::make('rfc')
-                                                ->label('RFC')
+                                                ->label('Rfc')
                                                 ->maxLength(13),
                                             Forms\Components\TextInput::make('contacto_nombre')
                                                 ->label('Nombre del contacto')

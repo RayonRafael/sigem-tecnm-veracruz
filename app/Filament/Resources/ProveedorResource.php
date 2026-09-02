@@ -52,7 +52,7 @@ class ProveedorResource extends Resource
                             ->prefixIcon('heroicon-m-building-storefront')
                             ->maxLength(150),
                         Forms\Components\TextInput::make('rfc')
-                            ->label('RFC')
+                            ->label('Rfc')
                             ->prefixIcon('heroicon-m-identification')
                             ->maxLength(13)
                             ->default(null),
@@ -97,7 +97,7 @@ class ProveedorResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('rfc')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
-                    ->label('RFC')
+                    ->label('Rfc')
                     ->fontFamily('mono')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('contacto_nombre')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
@@ -145,7 +145,7 @@ class ProveedorResource extends Resource
                 Section::make('Datos de la empresa')
                     ->schema([
                         TextEntry::make('nombre_empresa')->label('Empresa')->icon('heroicon-m-building-storefront'),
-                        TextEntry::make('rfc')->label('RFC')->fontFamily('mono')->icon('heroicon-m-identification'),
+                        TextEntry::make('rfc')->label('Rfc')->fontFamily('mono')->icon('heroicon-m-identification'),
                         TextEntry::make('activo')
                             ->label('Estado')
                             ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Inactivo')

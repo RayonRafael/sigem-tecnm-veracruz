@@ -90,7 +90,7 @@ class UserResource extends Resource
                             ->prefixIcon('heroicon-m-academic-cap')
                             ->maxLength(255),
                         Forms\Components\TextInput::make('RFC')
-                            ->label('RFC (opcional)')
+                            ->label('Rfc (opcional)')
                             ->prefixIcon('heroicon-m-identification')
                             ->maxLength(13),
                     ])->columns(3),
@@ -213,7 +213,7 @@ class UserResource extends Resource
                     ->schema([
                         TextEntry::make('num_control')->label('Número de control')->icon('heroicon-m-identification'),
                         TextEntry::make('carrera')->label('Carrera')->icon('heroicon-m-academic-cap'),
-                        TextEntry::make('RFC')->label('RFC')->fontFamily('mono')->icon('heroicon-m-identification'),
+                        TextEntry::make('RFC')->label('Rfc')->fontFamily('mono')->icon('heroicon-m-identification'),
                     ])->columns(3),
                 Section::make('Estado y rol')
                     ->schema([
