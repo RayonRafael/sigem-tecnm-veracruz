@@ -199,7 +199,10 @@ class MantenimientoResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Mantenimiento actualizado correctamente'),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->successNotificationTitle('Mantenimiento actualizado correctamente')
+                    ->visible(fn ($record) => $record->estado === 'Solicitado'),
             ])
             ->bulkActions([]);
     }
@@ -279,6 +282,12 @@ class MantenimientoResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('id_usuario_solicita', auth()->id());
+        $query = parent::getEloquentQuery();
+        
+        if (!auth()->user()->hasRole(\App\Enums\RoleEnum::ADMIN->value)) {
+            $query->where('id_usuario_solicita', auth()->id());
+        }
+        
+        return $query;
     }
 }

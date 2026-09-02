@@ -25,17 +25,27 @@ class SolicitudPolicy
 
     public function view(User $user, Solicitud $modelInstance): bool
     {
-        return $this->isShared($user);
+        if ($this->isAdmin($user)) {
+            return true;
+        }
+
+        return $this->isShared($user) && $modelInstance->id_usuario === $user->id;
     }
 
     public function create(User $user): bool
     {
-        return $this->isAdmin($user);
+        return $this->isShared($user);
     }
 
     public function update(User $user, Solicitud $modelInstance): bool
     {
-        return $this->isAdmin($user);
+        if ($this->isAdmin($user)) {
+            return true;
+        }
+
+        return $this->isShared($user) 
+            && $modelInstance->id_usuario === $user->id 
+            && $modelInstance->estado === 'Pendiente';
     }
 
     public function delete(User $user, Solicitud $modelInstance): bool

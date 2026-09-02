@@ -238,7 +238,6 @@ class InventarioResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Registro de inventario actualizado correctamente'),
             ])
             ->bulkActions([]);
     }
@@ -311,6 +310,6 @@ class InventarioResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('id_usuario', auth()->id());
+        return parent::getEloquentQuery();
     }
 }

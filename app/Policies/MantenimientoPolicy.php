@@ -25,17 +25,27 @@ class MantenimientoPolicy
 
     public function view(User $user, Mantenimiento $modelInstance): bool
     {
-        return $this->isShared($user);
+        if ($this->isAdmin($user)) {
+            return true;
+        }
+
+        return $this->isShared($user) && $modelInstance->id_usuario_solicita === $user->id;
     }
 
     public function create(User $user): bool
     {
-        return $this->isAdmin($user);
+        return $this->isShared($user);
     }
 
     public function update(User $user, Mantenimiento $modelInstance): bool
     {
-        return $this->isAdmin($user);
+        if ($this->isAdmin($user)) {
+            return true;
+        }
+
+        return $this->isShared($user) 
+            && $modelInstance->id_usuario_solicita === $user->id 
+            && $modelInstance->estado === 'Solicitado';
     }
 
     public function delete(User $user, Mantenimiento $modelInstance): bool

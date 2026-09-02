@@ -114,6 +114,8 @@ class SolicitudResource extends Resource
                                         ->label('Solicitante (usuario)')
                                         ->relationship('usuario', 'name')
                                         ->default(auth()->id())
+                                        ->disabled()
+                                        ->dehydrated()
                                         ->required()
                                         ->searchable()
                                         ->preload()
@@ -193,7 +195,10 @@ class SolicitudResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Solicitud actualizada correctamente'),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->successNotificationTitle('Solicitud actualizada correctamente')
+                    ->visible(fn ($record) => $record->estado === 'Pendiente'),
             ])
             ->bulkActions([]);
     }
@@ -260,6 +265,12 @@ class SolicitudResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('id_usuario', auth()->id());
+        $query = parent::getEloquentQuery();
+        
+        if (!auth()->user()->hasRole(\App\Enums\RoleEnum::ADMIN->value)) {
+            $query->where('id_usuario', auth()->id());
+        }
+        
+        return $query;
     }
 }
