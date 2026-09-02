@@ -40,7 +40,7 @@ class MantenimientoResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Wizard::make([
-                    Forms\Components\Wizard\Step::make('Equipo y falla')
+                    Forms\Components\Wizard\Step::make('Equipo y técnico')
                         ->icon('heroicon-m-wrench')
                         ->schema([
                             Forms\Components\Select::make('id_inventario')
@@ -72,17 +72,9 @@ class MantenimientoResource extends Resource
                                 ]),
                             Forms\Components\Hidden::make('id_usuario_solicita')
                                 ->default(fn () => auth()->id()),
-                            Forms\Components\DatePicker::make('fecha_solicitud')
-                                ->default(now())
-                                ->required()
-                                ->prefixIcon('heroicon-m-calendar'),
-                            Forms\Components\Textarea::make('descripcion_falla')
-                                ->label('Descripción de la falla')
-                                ->rows(3)
-                                ->columnSpanFull(),
                         ]),
 
-                    Forms\Components\Wizard\Step::make('Tipo de mantenimiento')
+                    Forms\Components\Wizard\Step::make('Servicio y detalles')
                         ->icon('heroicon-m-cog')
                         ->schema([
                             Forms\Components\Grid::make(2)
@@ -129,6 +121,14 @@ class MantenimientoResource extends Resource
                                 ->inline()
                                 ->default('Pendiente Revision Admin')
                                 ->required()
+                                ->columnSpanFull(),
+                            Forms\Components\DatePicker::make('fecha_solicitud')
+                                ->default(now())
+                                ->required()
+                                ->prefixIcon('heroicon-m-calendar'),
+                            Forms\Components\Textarea::make('descripcion_falla')
+                                ->label('Descripción de la falla')
+                                ->rows(3)
                                 ->columnSpanFull(),
                             Forms\Components\Textarea::make('observaciones')
                                 ->label('Observaciones')

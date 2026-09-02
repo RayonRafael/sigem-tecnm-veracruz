@@ -39,8 +39,9 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos personales')
-                    ->icon('heroicon-m-user-circle')
+                Forms\Components\Wizard::make([
+                    Forms\Components\Wizard\Step::make('Datos personales y acceso')
+                        ->icon('heroicon-m-user-circle')
                     ->schema([
                         Forms\Components\TextInput::make('name')->label('Nombre')
                             ->label('Nombre(s)')
@@ -55,11 +56,8 @@ class UserResource extends Resource
                             ->label('Apellido materno')
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(255),
-                    ])->columns(3),
-
-                Forms\Components\Section::make('Datos de acceso')
-                    ->icon('heroicon-m-lock-closed')
-                    ->schema([
+                        Forms\Components\Grid::make(2)
+                            ->schema([
                         Forms\Components\TextInput::make('email')->label('Correo electrónico')
                             ->label('Correo electrónico')
                             ->email()
@@ -73,10 +71,10 @@ class UserResource extends Resource
                             ->required(fn (string $operation): bool => $operation === 'create')
                             ->dehydrated(fn (?string $state): bool => filled($state))
                             ->maxLength(255),
-                    ])->columns(2),
+                    ])->columns(3),
 
-                Forms\Components\Section::make('Datos institucionales')
-                    ->icon('heroicon-m-academic-cap')
+                    Forms\Components\Wizard\Step::make('Datos institucionales y rol')
+                        ->icon('heroicon-m-academic-cap')
                     ->schema([
                         Forms\Components\TextInput::make('num_control')
                             ->label('Número de control')
@@ -92,9 +90,8 @@ class UserResource extends Resource
                             ->maxLength(13),
                     ])->columns(3),
 
-                Forms\Components\Section::make('Estado y rol')
-                    ->icon('heroicon-m-shield-check')
-                    ->schema([
+                        Forms\Components\Grid::make(3)
+                            ->schema([
                         Forms\Components\Select::make('tipo_usuario')->placeholder('Selecciona...')
                             ->label('Tipo de usuario (sistema)')
                             ->options([
@@ -117,7 +114,9 @@ class UserResource extends Resource
                             ->inline()
                             ->default(true)
                             ->required(),
-                    ])->columns(3),
+                            ])->columns(3),
+                    ])->columnSpanFull(),
+                ])->columnSpanFull(),
             ]);
     }
 

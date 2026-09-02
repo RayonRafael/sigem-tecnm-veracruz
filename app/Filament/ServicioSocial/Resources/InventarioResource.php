@@ -40,7 +40,7 @@ class InventarioResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Wizard::make([
-                    Forms\Components\Wizard\Step::make('Identificación')
+                    Forms\Components\Wizard\Step::make('Identificación y ubicación')
                         ->icon('heroicon-m-identification')
                         ->schema([
                             Forms\Components\TextInput::make('num_serie')
@@ -74,11 +74,6 @@ class InventarioResource extends Resource
                                 ->default('Disponible')
                                 ->required()
                                 ->columnSpanFull(),
-                        ])->columns(3),
-
-                    Forms\Components\Wizard\Step::make('Ubicación y asignación')
-                        ->icon('heroicon-m-map-pin')
-                        ->schema([
                             Forms\Components\TextInput::make('ubicacion_fisica')
                                 ->label('Ubicación física')
                                 ->prefixIcon('heroicon-m-building-office')
@@ -115,7 +110,7 @@ class InventarioResource extends Resource
                                 ->default('Pendiente'),
                         ])->columns(3),
 
-                    Forms\Components\Wizard\Step::make('Garantía y Facturación')
+                    Forms\Components\Wizard\Step::make('Factura y proveedor')
                         ->icon('heroicon-m-document-text')
                         ->schema([
                             Forms\Components\Grid::make(2)
@@ -137,7 +132,6 @@ class InventarioResource extends Resource
                                         ->prefixIcon('heroicon-m-calendar')
                                         ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
                                 ]),
-
                             Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\DatePicker::make('fecha_inicio_renta')
@@ -151,6 +145,11 @@ class InventarioResource extends Resource
                                         ->columnSpanFull(),
                                 ])
                                 ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
+                        ]),
+
+                    Forms\Components\Wizard\Step::make('Garantía y observaciones')
+                        ->icon('heroicon-m-clipboard-document-check')
+                        ->schema([
 
                             Forms\Components\Grid::make(3)
                                 ->schema([

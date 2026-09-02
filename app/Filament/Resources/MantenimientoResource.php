@@ -74,7 +74,7 @@ class MantenimientoResource extends Resource
                                 ->default(fn () => auth()->id()),
                         ]),
 
-                    Forms\Components\Wizard\Step::make('Tipo de servicio')
+                    Forms\Components\Wizard\Step::make('Servicio y detalles')
                         ->icon('heroicon-m-cog')
                         ->schema([
                             Forms\Components\Grid::make(2)
@@ -125,12 +125,9 @@ class MantenimientoResource extends Resource
                                 ->inline()
                                 ->default('Pendiente Revision Admin')
                                 ->required()
+                                ->required()
                                 ->columnSpanFull(),
-                        ]),
 
-                    Forms\Components\Wizard\Step::make('Fechas y detalles')
-                        ->icon('heroicon-m-calendar-days')
-                        ->schema([
                             Forms\Components\Grid::make(3)
                                 ->schema([
                                     Forms\Components\DatePicker::make('fecha_solicitud')->label('Fecha de solicitud')
