@@ -71,7 +71,7 @@ class DepartamentoResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos del Departamento')
+                Section::make('Datos del departamento')
                     ->schema([
                         TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-building-office-2'),
                     ]),

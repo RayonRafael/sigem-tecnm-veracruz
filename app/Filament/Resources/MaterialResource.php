@@ -171,7 +171,7 @@ class MaterialResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos del Material')
+                Section::make('Datos del material')
                     ->schema([
                         TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-tag'),
                         TextEntry::make('modelo')->label('Modelo')->icon('heroicon-m-qr-code'),
@@ -183,7 +183,7 @@ class MaterialResource extends Resource
                         TextEntry::make('tipo.nombre')->label('Tipo')->icon('heroicon-m-square-3-stack-3d'),
                         TextEntry::make('unidad.nombre')->label('Unidad de medida')->icon('heroicon-m-scale'),
                     ])->columns(3),
-                Section::make('Control de Stock')
+                Section::make('Control de stock')
                     ->schema([
                         TextEntry::make('stock_actual')->label('Stock actual')->icon('heroicon-m-archive-box'),
                         TextEntry::make('stock_minimo')->label('Stock mínimo')->icon('heroicon-m-bell-alert'),

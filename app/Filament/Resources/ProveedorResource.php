@@ -38,7 +38,7 @@ class ProveedorResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos de la Empresa')
+                Forms\Components\Section::make('Datos de la empresa')
                     ->icon('heroicon-m-building-office-2')
                     ->schema([
                         Forms\Components\TextInput::make('nombre_empresa')
@@ -59,7 +59,7 @@ class ProveedorResource extends Resource
                             ->required(),
                     ])->columns(3),
 
-                Forms\Components\Section::make('Información de Contacto')
+                Forms\Components\Section::make('Información de contacto')
                     ->icon('heroicon-m-phone')
                     ->schema([
                         Forms\Components\TextInput::make('contacto_nombre')
@@ -135,7 +135,7 @@ class ProveedorResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos de la Empresa')
+                Section::make('Datos de la empresa')
                     ->schema([
                         TextEntry::make('nombre_empresa')->label('Empresa')->icon('heroicon-m-building-storefront'),
                         TextEntry::make('rfc')->label('RFC')->fontFamily('mono')->icon('heroicon-m-identification'),

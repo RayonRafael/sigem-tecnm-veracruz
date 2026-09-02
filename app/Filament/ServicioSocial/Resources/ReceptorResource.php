@@ -42,7 +42,7 @@ class ReceptorResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos del Receptor')
+                Forms\Components\Section::make('Datos del receptor')
                     ->icon('heroicon-m-user-circle')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -127,7 +127,7 @@ class ReceptorResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos del Receptor')
+                Section::make('Datos del receptor')
                     ->schema([
                         TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-user'),
                         TextEntry::make('apellido_paterno')->label('Apellido paterno')->icon('heroicon-m-user'),

@@ -280,7 +280,7 @@ class MantenimientoResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Equipo y Técnico')
+                Section::make('Equipo y técnico')
                     ->schema([
                         TextEntry::make('inventario.num_serie')->label('No. serie')
                             ->fontFamily('mono')
@@ -289,7 +289,7 @@ class MantenimientoResource extends Resource
                         TextEntry::make('nombre_tecnico')->label('Técnico')->icon('heroicon-m-user'),
                         TextEntry::make('num_control_tecnico')->label('No. control')->icon('heroicon-m-identification'),
                     ])->columns(4),
-                Section::make('Detalles del Servicio')
+                Section::make('Detalles del servicio')
                     ->schema([
                         TextEntry::make('tipo_servicio')->label('Servicio')->badge(),
                         TextEntry::make('tipo_mantenimiento')->label('Tipo')
@@ -326,7 +326,7 @@ class MantenimientoResource extends Resource
                                 default => 'heroicon-m-minus',
                             }),
                     ])->columns(3),
-                Section::make('Fechas y Reportes')
+                Section::make('Fechas y reportes')
                     ->schema([
                         TextEntry::make('fecha_solicitud')->label('Solicitud')->date('d/m/Y')->icon('heroicon-m-calendar'),
                         TextEntry::make('fecha_inicio')->label('Inicio')->date('d/m/Y')->icon('heroicon-m-calendar'),

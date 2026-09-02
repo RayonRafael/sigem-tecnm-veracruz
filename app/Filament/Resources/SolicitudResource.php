@@ -298,7 +298,7 @@ class SolicitudResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos de la Solicitud')
+                Section::make('Datos de la solicitud')
                     ->schema([
                         TextEntry::make('id_solicitud')->label('Folio')
                             ->formatStateUsing(fn ($state) => 'FOLIO-'.str_pad($state, 5, '0', STR_PAD_LEFT))
@@ -332,7 +332,7 @@ class SolicitudResource extends Resource
                         TextEntry::make('receptor.area.departamento.nombre')->label('Departamento')->icon('heroicon-m-building-office'),
                         TextEntry::make('autorizadoPor.name')->label('Autorizado por')->icon('heroicon-m-shield-check'),
                     ])->columns(4),
-                Section::make('Devoluciones y Observaciones')
+                Section::make('Devoluciones y observaciones')
                     ->schema([
                         TextEntry::make('fecha_devolucion_estimada')->label('Devolución estimada')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
                         TextEntry::make('fecha_devolucion_real')->label('Devolución real')->date('d/m/Y')->icon('heroicon-m-calendar-days'),

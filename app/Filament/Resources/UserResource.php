@@ -39,7 +39,7 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos Personales')
+                Forms\Components\Section::make('Datos personales')
                     ->icon('heroicon-m-user-circle')
                     ->schema([
                         Forms\Components\TextInput::make('name')->label('Nombre')
@@ -57,7 +57,7 @@ class UserResource extends Resource
                             ->maxLength(255),
                     ])->columns(3),
 
-                Forms\Components\Section::make('Datos de Acceso')
+                Forms\Components\Section::make('Datos de acceso')
                     ->icon('heroicon-m-lock-closed')
                     ->schema([
                         Forms\Components\TextInput::make('email')->label('Correo electrónico')
@@ -75,7 +75,7 @@ class UserResource extends Resource
                             ->maxLength(255),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Datos Institucionales')
+                Forms\Components\Section::make('Datos institucionales')
                     ->icon('heroicon-m-academic-cap')
                     ->schema([
                         Forms\Components\TextInput::make('num_control')
@@ -92,7 +92,7 @@ class UserResource extends Resource
                             ->maxLength(13),
                     ])->columns(3),
 
-                Forms\Components\Section::make('Estado y Rol')
+                Forms\Components\Section::make('Estado y rol')
                     ->icon('heroicon-m-shield-check')
                     ->schema([
                         Forms\Components\Select::make('tipo_usuario')->placeholder('Selecciona...')
@@ -193,23 +193,23 @@ class UserResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos Personales')
+                Section::make('Datos personales')
                     ->schema([
                         TextEntry::make('name')->label('Nombre')->icon('heroicon-m-user'),
                         TextEntry::make('apellido_paterno')->label('Apellido paterno')->icon('heroicon-m-user'),
                         TextEntry::make('apellido_materno')->label('Apellido materno')->icon('heroicon-m-user'),
                     ])->columns(3),
-                Section::make('Datos de Acceso')
+                Section::make('Datos de acceso')
                     ->schema([
                         TextEntry::make('email')->label('Correo electrónico')->icon('heroicon-m-envelope'),
                     ])->columns(1),
-                Section::make('Datos Institucionales')
+                Section::make('Datos institucionales')
                     ->schema([
                         TextEntry::make('num_control')->label('Número de control')->icon('heroicon-m-identification'),
                         TextEntry::make('carrera')->label('Carrera')->icon('heroicon-m-academic-cap'),
                         TextEntry::make('RFC')->label('RFC')->fontFamily('mono')->icon('heroicon-m-identification'),
                     ])->columns(3),
-                Section::make('Estado y Rol')
+                Section::make('Estado y rol')
                     ->schema([
                         TextEntry::make('tipo_usuario')
                             ->label('Tipo de usuario')

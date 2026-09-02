@@ -338,7 +338,7 @@ class InventarioResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Identificación del Activo')
+                Section::make('Identificación del activo')
                     ->schema([
                         TextEntry::make('num_serie')->label('No. serie')
                             ->fontFamily('mono')
@@ -355,7 +355,7 @@ class InventarioResource extends Resource
                                 default => 'gray',
                             }),
                     ])->columns(3),
-                Section::make('Ubicación y Asignación')
+                Section::make('Ubicación y asignación')
                     ->schema([
                         TextEntry::make('ubicacion_fisica')->label('Ubicación')
                             ->icon('heroicon-m-building-office'),
@@ -369,7 +369,7 @@ class InventarioResource extends Resource
                         TextEntry::make('usuario.name')->label('Registrado por')
                             ->icon('heroicon-m-user'),
                     ])->columns(3),
-                Section::make('Detalles Adicionales')
+                Section::make('Detalles adicionales')
                     ->schema([
                         TextEntry::make('proveedor.nombre_empresa')->label('Proveedor'),
                         TextEntry::make('num_factura')->label('Factura'),

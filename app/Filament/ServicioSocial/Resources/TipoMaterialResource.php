@@ -52,7 +52,7 @@ class TipoMaterialResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos del Tipo de material')
+                Forms\Components\Section::make('Datos del tipo de material')
                     ->icon('heroicon-m-rectangle-stack')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -92,7 +92,7 @@ class TipoMaterialResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos del Tipo de material')
+                Section::make('Datos del tipo de material')
                     ->schema([
                         TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-rectangle-stack'),
                     ]),

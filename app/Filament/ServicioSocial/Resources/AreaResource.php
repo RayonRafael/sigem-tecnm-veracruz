@@ -52,7 +52,7 @@ class AreaResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos del Área')
+                Forms\Components\Section::make('Datos del área')
                     ->icon('heroicon-m-map-pin')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -103,7 +103,7 @@ class AreaResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos del Área')
+                Section::make('Datos del área')
                     ->schema([
                         TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-map-pin'),
                         TextEntry::make('departamento.nombre')->label('Departamento')->icon('heroicon-m-building-office-2'),

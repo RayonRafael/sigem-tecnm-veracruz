@@ -52,7 +52,7 @@ class UnidadMedidaResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos de la Unidad de medida')
+                Forms\Components\Section::make('Datos de la unidad de medida')
                     ->icon('heroicon-m-bars-3-bottom-left')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -92,7 +92,7 @@ class UnidadMedidaResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos de la Unidad de medida')
+                Section::make('Datos de la unidad de medida')
                     ->schema([
                         TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-bars-3-bottom-left'),
                     ]),

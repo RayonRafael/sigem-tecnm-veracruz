@@ -38,7 +38,7 @@ class MarcaMaterialResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos de la Marca')
+                Forms\Components\Section::make('Datos de la marca')
                     ->icon('heroicon-m-tag')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -83,7 +83,7 @@ class MarcaMaterialResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos de la Marca')
+                Section::make('Datos de la marca')
                     ->schema([
                         TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-tag'),
                     ]),
