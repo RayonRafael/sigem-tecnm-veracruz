@@ -8,6 +8,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditSolicitud extends EditRecord
 {
+    public static ?string $title = 'Editar';
+
     use ConDashboardBreadcrumb;
 
     protected static string $resource = SolicitudResource::class;

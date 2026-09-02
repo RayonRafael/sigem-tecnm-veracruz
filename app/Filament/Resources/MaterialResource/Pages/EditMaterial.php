@@ -9,6 +9,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditMaterial extends EditRecord
 {
+    public static ?string $title = 'Editar';
+
     use ConDashboardBreadcrumb;
 
     protected static string $resource = MaterialResource::class;

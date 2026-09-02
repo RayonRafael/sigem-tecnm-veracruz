@@ -30,7 +30,7 @@ class InventarioPolicy
 
     public function create(User $user): bool
     {
-        return $this->isAdmin($user);
+        return $this->isShared($user);
     }
 
     public function update(User $user, Inventario $modelInstance): bool

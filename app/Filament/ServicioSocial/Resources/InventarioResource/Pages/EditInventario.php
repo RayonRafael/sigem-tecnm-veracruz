@@ -8,6 +8,8 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditInventario extends EditRecord
 {
+    public static ?string $title = 'Editar';
+
     use ConDashboardBreadcrumb;
 
     protected static string $resource = InventarioResource::class;
