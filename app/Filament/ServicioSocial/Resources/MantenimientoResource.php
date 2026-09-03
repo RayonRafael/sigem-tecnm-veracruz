@@ -204,6 +204,8 @@ class MantenimientoResource extends Resource
                         'Pendiente Revision Admin' => 'En revisión',
                     ]),
             ])
+            ->recordUrl(null)
+            ->recordAction(null)
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Mantenimiento actualizado correctamente'),

@@ -63,6 +63,8 @@ class DetallesRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
             ])
+            ->recordUrl(null)
+            ->recordAction(null)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

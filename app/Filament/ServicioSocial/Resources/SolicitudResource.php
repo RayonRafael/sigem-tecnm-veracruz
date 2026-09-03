@@ -198,6 +198,8 @@ class SolicitudResource extends Resource
                         'Cancelado' => 'Cancelado',
                     ]),
             ])
+            ->recordUrl(null)
+            ->recordAction(null)
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Solicitud actualizada correctamente'),

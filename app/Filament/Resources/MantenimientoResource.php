@@ -249,6 +249,8 @@ class MantenimientoResource extends Resource
             ->emptyStateHeading('No hay registros')
             ->emptyStateDescription('Cuando se creen registros, aparecerán aquí.')
             ->emptyStateIcon('heroicon-o-document-text')
+            ->recordUrl(null)
+            ->recordAction(null)
             ->actions([
                 Tables\Actions\Action::make('autorizar')
                     ->label('Autorizar')

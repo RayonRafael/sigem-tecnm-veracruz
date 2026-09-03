@@ -61,6 +61,8 @@ class DepartamentoResource extends Resource
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)->label('Nombre')->searchable()->sortable(),
             ])
             ->defaultSort('nombre', 'asc')
+            ->recordUrl(null)
+            ->recordAction(null)
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Departamento actualizado correctamente'),

@@ -75,6 +75,8 @@ class UnidadMedidaResource extends Resource
                 TrashedFilter::make(),
                 //
             ])
+            ->recordUrl(null)
+            ->recordAction(null)
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Unidad de medida actualizada correctamente'),

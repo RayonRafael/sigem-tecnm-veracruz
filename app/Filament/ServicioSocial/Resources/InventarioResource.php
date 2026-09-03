@@ -242,6 +242,8 @@ class InventarioResource extends Resource
                 Tables\Filters\TernaryFilter::make('aprobado')
                     ->label('Estado de aprobación'),
             ])
+            ->recordUrl(null)
+            ->recordAction(null)
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Registro de inventario actualizado correctamente'),
