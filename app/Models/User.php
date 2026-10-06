@@ -6,7 +6,7 @@ use App\Enums\RoleEnum;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use MongoDB\Laravel\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -55,11 +55,13 @@ class User extends Authenticatable implements FilamentUser
      */
     public function canAccessPanel(Panel $panel): bool
     {
+        // NOTA: Se removieron temporalmente los chequeos de Spatie ($this->hasPermissionTo)
+        // porque Spatie usa SQL nativo que no es compatible con MongoDB.
         if ($panel->getId() === 'admin') {
-            return $this->hasPermissionTo(RoleEnum::PERM_ACCESS_ADMIN) || $this->tipo_usuario === RoleEnum::ADMIN->value;
+            return $this->tipo_usuario === RoleEnum::ADMIN->value;
         }
         if ($panel->getId() === 'servicio-social') {
-            return $this->hasPermissionTo(RoleEnum::PERM_ACCESS_SERVICIO) || $this->tipo_usuario === RoleEnum::SERVICIO_TIPO->value;
+            return $this->tipo_usuario === RoleEnum::SERVICIO_TIPO->value;
         }
 
         return false;

@@ -1,0 +1,100 @@
+[33m8c4db1b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32msecundario[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m fix: desactivar modo SPA para evitar error 419 en navegación intensiva
+[33m12c3922[m chore: eliminar scripts temporales
+[33m26f61f9[m[33m ([m[1;31morigin/secundario[m[33m)[m feat: desactivar click en filas de tablas en todos los Resources
+[33mf215448[m fix: restaurar labels y sections normalizados después del merge
+[33m654d304[m fix: restaurar labels, sections y breadcrumb después del merge
+[33m37e4166[m feat: botones de creación rápida en Selects, Wizard en MaterialResource y test actualizado
+[33mea64859[m Merge main into secundario, resolving conflicts by taking ours for Resources
+[33m452c56b[m feat: reducir pasos de Wizards en UserResource, InventarioResource y MantenimientoResource
+[33mf42fad2[m chore: eliminar script temporal update_tables3.php
+[33m7a24330[m feat: eliminar scroll horizontal y compactar tablas en todos los Resources
+[33m0990a71[m UI: Improve table designs with icons, badges and scroll fixes
+[33m04fccb7[m fix: eliminar breadcrumb vacío en páginas de edición y vista
+[33mc7e57e1[m fix: getRecordTitle retornar string vacío en vez de null
+[33m1f959e7[m fix: quitar título del registro del breadcrumb en todos los Resources
+[33m0a00a7a[m fix: quitar nombre del registro de títulos de edición y vista en todos los Resources
+[33m1109b91[m feat: permisos de crear/editar para Servicio Social en solicitudes, mantenimientos e inventario
+[33m2105e27[m fix: normalizar mayúsculas en Section::make() de formularios y vistas
+[33me362f3d[m fix: corregir últimos 8 labels con mayúsculas incorrectas
+[33ma7fa8a9[m fix: normalizar mayúsculas en labels de formularios y tablas
+[33m52e3801[m Merge branch 'secundario'
+[33m760aef3[m fix(labels): corregir mayúsculas en modelLabel de Resources para Filament
+[33me29a36e[m docs(fase-final-8): documentar cambios importantes para el equipo en README
+[33ma7d51ff[m refactor(fase-final-3): integrar PHPStan/Larastan nivel 5, corregir errores de tipado (0 errores, 45 tests)
+[33m9a8c721[m test(fase-final-1-2): tests para error pages 403/419, Laravel Pint PSR-12 (45 tests, 94 assertions)
+[33mcdb1cee[m refactor(fase-r1-r3): TrashedFilter en Resources, transacciones DB en Observer, eliminar último magic string
+[33md335728[m test(fase-m5b): agregar tests automatizados para login, permisos y policies (16 tests, 50 assertions)
+[33mcedb1ff[m docs(fase-m5a): actualizar README.md con arquitectura actual del proyecto
+[33m8df77f2[m refactor(fase-m4): migrar de hasRole() a hasPermissionTo(), agregar permisos de acceso a paneles
+[33m5c29ec2[m refactor(fase-m3): optimizar Observers, eliminar saveQuietly redundante y código muerto
+[33m7663286[m refactor(fase-m2): agregar RoleEnum, reemplazar magic strings, policies restrictivas según rol
+[33m6e19652[m refactor(fase-m1): eliminar tabla bitacora_sistema, agregar SoftDeletes a catálogos, traducciones Filament al español
+[33madb7713[m refactor(fase-6): migrar login a Filament Auth nativo, eliminar LoginController y middleware custom
+[33m4ce3c0f[m refactor(fase-5c): eliminar archivos obsoletos de bitácora (MigrateBitacora, BitacoraSistema, BitacoraSistemaResource)
+[33mc182182[m refactor(fase-5b): limpiar Observers, eliminar trait RegistraBitacora y observers redundantes
+[33mb7577dd[m refactor(fase-5a): instalar spatie/activitylog, configurar modelos, migrar datos y actualizar dashboards
+[33m6bdaff6[m refactor(fase-3): configurar Global Search en Resources de Admin y Servicio Social
+[33ma532a76[m refactor(fase-2): eliminar rutas custom de mantenimiento y referencias en Blade
+[33mb33bd09[m refactor(fase-1): agregar Eloquent Scopes y reemplazar consultas repetitivas en dashboards
+[33m3a5fc88[m fix: corregir mayusculas en labels, toasts, dashboards, widgets, landing y login
+[33meace9fb[m feat: mejoras UX - confirmaciones, notificaciones, estados vacios, optimizacion consultas
+[33m4545440[m fix: corregir bugs de tiempo, texto de actividad y nombres en dashboards
+[33m9de0557[m fix: quitar texto '(Filament)' de los dashboards
+[33m62f120e[m fix: traducir interfaz de Filament al español
+[33m06a5876[m[33m ([m[1;31morigin/refactor-dashboard[m[33m, [m[1;32mrefactor-dashboard[m[33m)[m refactor: eliminar código duplicado de dashboards, delegar CRUD a Resources nativos de Filament
+[33m86dc688[m feat: modal de confirmación con x-teleport, estilo Filament, soporte modo oscuro
+[33m3674e5f[m feat: agregar botones Autorizar y Completar en tabla de Mantenimiento del dashboard admin
+[33m90c0e9a[m cleanup: eliminar carpeta docs con mockup HTML
+[33m0c0f27b[m cleanup: eliminar archivos basura, idiomas innecesarios, seeders redundantes y theme.css sin uso
+[33md020a16[m fix: grid-2 para Mis Solicitudes y Mis Mantenimientos en dashboard SS
+[33m08bdd37[m cleanup: eliminar nixpacks.toml y UsersTableSeeder.php sin uso
+[33m99cc3b0[m fix: forzar HTTPS en producción para Railway
+[33mf28ff38[m Fix PHP platform version for Railway
+[33m006f8bb[m Fix: agregar dependencias de extensiones PHP para Railpack y actualizar Filament
+[33mc4a40f6[m fix: railway.toml, Dockerfile y DatabaseSeeder
+[33m68b5eb7[m fix: agregar extensiones PHP intl y zip para Railway
+[33me0c5dc6[m Agregando seeders con datos iniciales del sistema
+[33me279da4[m fix: SPA Alpine.js restaurado en dashboard Servicio Social
+[33mdb692c4[m fix: restaurar header Filament en Resources, logo SIGEM en topbar, fix SPA Alpine.js, comentario LoginController
+[33mefaf11b[m Coreccion de errores visuales y funcionales generales en los usuarios e introduccion de datos para el testeo funcional del sistema
+[33m7b01619[m style: fondo institucional azul suave (#f0f7ff) en dashboards
+[33m2c42771[m fix: dashboard carga correctamente al navegar desde Resources via SPA — Alpine.js re-registro inteligente
+[33m21bd218[m feat: logo y nombre SIGEM en topbar de Filament para Resources, header nativo restaurado
+[33m54e5e61[m refactor: CSS inline de dashboards extraído y consolidado en sigem-theme.css
+[33mff50e15[m fix: textos legibles en modo oscuro SS, limpieza de CSS redundante en sigem-theme
+[33m360289d[m feat: adaptabilidad selectiva — dashboards simplificados en móvil, accesos rápidos, slide-over pantalla completa, landing sticky, login sin imagen
+[33md4d327a[m fix: saludo dinámico según hora del día usando JavaScript
+[33mb2e478c[m fix: stock protegido, fecha_baja automática, aprobaciones unificadas, observer inteligente, soft deletes restaurables
+[33mc990f7a[m feat: stock automático, CSS externo, Policies de seguridad, fuga de datos SS corregida, Repeater en solicitud
+[33md24edf5[m fix: slide-overs ahora muestran filas de datos correctamente
+[33mc46224d[m perf: consultas limitadas, búsqueda global de Filament, paginación en slide-overs
+[33mc2f2db0[m feat: páginas de error personalizadas con diseño SIGEM (404, 403, 419, 500)
+[33m26f5bc6[m feat: protección completa contra navegación del navegador — no-cache, notificaciones de éxito, redirects
+[33m64ea866[m refactor: botón Volver reemplazado por breadcrumbs nativos de Filament en todos los Resources
+[33m16f1fcd[m fix: banner texto blanco, favicon SIGEM, traducción al español completa
+[33m58cb7b5[m fix: Wizard multi-paso funcional, botones + en catálogos Admin, reorden Bento Grid, campo detalle en solicitud
+[33m67a76f8[m fix: radio buttons con indicador visual de selección
+[33mf808868[m fix: slide-over SS con vista avanzada, catálogos complejos verificados, login unificado confirmado
+[33m0506a43[m fix: estilos de Filament unificados, botón volver discreto, eliminado icono notificaciones
+[33mb1baae8[m chore: limpieza de código muerto — variable catalogosCount eliminada
+[33md345265[m feat: Bento Grid profesional con slide-overs, catálogos inline y header limpio
+[33mac00b1a[m style: gradiente sutil, textura de grano y mejora visual global del sistema
+[33md43cfcd[m fix: contraste de botones, favicon SIGEM en login y landing, modo oscuro funcional
+[33ma666d6f[m feat: redirect al dashboard después de crear/editar registros + botón volver en PanelProviders
+[33m04b936b[m fix: eliminar espacio lateral del sidebar en ambos paneles
+[33m6363ce9[m feat: sidebar oculto, catálogos CRUD en modales, navegación por Bento Grid
+[33m337c3e5[m feat: Bento Grid dashboard con ventanas flotantes para Admin y Servicio Social
+[33m08f1824[m feat: rediseño estructural de Landing Page y Login
+[33m3309340[m Se agrego canbios en el modulo de inventario en ambos usuarios (generacion de de apartados a la hora de seleccionar inventario o equipo rentado)
+[33mb7b94c7[m feat: refactor general, validación estricta de roles y middleware global de login
+[33m70110e0[m feat: login unificado con pestañas + fix autenticación admin + logout redirect
+[33m4c1a6df[m feat: landing page institucional con fondo, logos y login unificado
+[33m504ac3e[m feat: sistema de roles Spatie + panel Servicio Social + landing page + flujo de aprobación
+[33m6794caf[m feat: rediseño visual del panel administrativo SIGEM con identidad TecNM
+[33mdfb3ab3[m feat(dashboard): implementar diseño Bento Grid y paleta de colores institucional del TecNM
+[33ma5186ca[m feat(dashboard): implementa layout Bento Grid con StatsOverview
+[33m25280c0[m feat: implementar diseño Bento Grid con widgets en grid de 2 columnas - colores TecNM pendientes para siguiente sesión
+[33me7d5ce4[m feat: Fase 4 completada - Observers de mantenimiento y solicitudes
+[33me8c3c0c[m feat: completar Fase 3 - dashboard, widgets, inventario, solicitudes y mantenimiento
+[33m3b8151a[m feat: completar Fase 1, 2 y 3 - migraciones, modelos, recursos Filament y widgets de dashboard
+[33md7d2660[m feat: inicializar proyecto SIGEM-TECNM-Veracruz con Laravel 11 y FilamentPHP 3.3
