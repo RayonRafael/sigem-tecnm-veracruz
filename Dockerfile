@@ -11,10 +11,12 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     libcurl4-openssl-dev \
     pkg-config \
+    libicu-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # 3. Instalar extensiones PHP base
-RUN docker-php-ext-install zip
+RUN docker-php-ext-configure intl \
+    && docker-php-ext-install zip intl pdo pdo_mysql
 
 # 4. Instalar extensión de MONGODB (ESTO ES LO MÁS IMPORTANTE)
 RUN pecl install mongodb \
@@ -33,7 +35,7 @@ WORKDIR /var/www/html
 COPY . .
 
 # 8. Instalar dependencias de Laravel
-RUN composer install --optimize-autoloader --no-dev
+RUN composer install --optimize-autoloader --no-dev --ignore-platform-req=ext-mongodb
 
 # 9. Asignar permisos correctos a las carpetas de caché
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
