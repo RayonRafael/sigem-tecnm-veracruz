@@ -12,12 +12,13 @@ class UnidadMedida extends Model
 
     protected $table = 'unidad_medida';
 
-    protected $primaryKey = 'id_unidad';
+    protected $primaryKey = '_id';
+    protected $keyType = 'string';
 
     protected $fillable = ['nombre'];
 
     public function materiales()
     {
-        return $this->hasMany(Material::class, 'id_unidad', 'id_unidad');
+        return $this->hasMany(Material::class, 'id_unidad', '_id');
     }
 }

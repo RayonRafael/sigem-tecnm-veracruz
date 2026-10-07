@@ -9,7 +9,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Mantenimiento extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -30,7 +30,8 @@ class Mantenimiento extends Model
 
     protected $table = 'mantenimiento';
 
-    protected $primaryKey = 'id_mantenimiento';
+    protected $primaryKey = '_id';
+    protected $keyType = 'string';
 
     protected $fillable = [
         'id_inventario', 'id_usuario_solicita', 'nombre_tecnico', 'num_control_tecnico',
@@ -46,12 +47,12 @@ class Mantenimiento extends Model
 
     public function inventario()
     {
-        return $this->belongsTo(Inventario::class, 'id_inventario', 'id_inventario');
+        return $this->belongsTo(Inventario::class, 'id_inventario', '_id');
     }
 
     public function usuarioSolicita()
     {
-        return $this->belongsTo(User::class, 'id_usuario_solicita', 'id');
+        return $this->belongsTo(User::class, 'id_usuario_solicita', '_id');
     }
 
     // Scopes de estado

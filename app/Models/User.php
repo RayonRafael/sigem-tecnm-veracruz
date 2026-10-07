@@ -12,7 +12,10 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser
 {
-    use HasFactory, HasRoles, Notifiable;
+    use HasFactory, Notifiable;
+
+    protected $primaryKey = '_id';
+    protected $keyType = 'string';
 
     /**
      * Los atributos que se pueden asignar en masa.
@@ -73,26 +76,26 @@ class User extends Authenticatable implements FilamentUser
 
     public function inventarios()
     {
-        return $this->hasMany(Inventario::class, 'id_usuario', 'id');
+        return $this->hasMany(Inventario::class, 'id_usuario', '_id');
     }
 
     public function solicitudes()
     {
-        return $this->hasMany(Solicitud::class, 'id_usuario', 'id');
+        return $this->hasMany(Solicitud::class, 'id_usuario', '_id');
     }
 
     public function autorizaciones()
     {
-        return $this->hasMany(Solicitud::class, 'autorizado_por', 'id');
+        return $this->hasMany(Solicitud::class, 'autorizado_por', '_id');
     }
 
     public function mantenimientosSolicitados()
     {
-        return $this->hasMany(Mantenimiento::class, 'id_usuario_solicita', 'id');
+        return $this->hasMany(Mantenimiento::class, 'id_usuario_solicita', '_id');
     }
 
     public function historialEstados()
     {
-        return $this->hasMany(HistorialEstado::class, 'id_usuario', 'id');
+        return $this->hasMany(HistorialEstado::class, 'id_usuario', '_id');
     }
 }

@@ -10,7 +10,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Material extends Model
 {
-    use HasFactory, LogsActivity, SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -31,7 +31,8 @@ class Material extends Model
 
     protected $table = 'material';
 
-    protected $primaryKey = 'id_producto';
+    protected $primaryKey = '_id';
+    protected $keyType = 'string';
 
     protected $fillable = [
         'nombre', 'descripcion', 'modelo',
@@ -42,28 +43,32 @@ class Material extends Model
     // RELACIONES: Pertenece a una unidad, marca y tipo
     public function unidad()
     {
-        return $this->belongsTo(UnidadMedida::class, 'id_unidad', 'id_unidad');
+        return $this->belongsTo(UnidadMedida::class, 'id_unidad', '_id');
     }
 
     public function marca()
     {
-        return $this->belongsTo(MarcaMaterial::class, 'id_marca', 'id_marca');
+        return $this->belongsTo(MarcaMaterial::class, 'id_marca', '_id');
     }
 
     public function tipo()
     {
-        return $this->belongsTo(TipoMaterial::class, 'id_tipodematerial', 'id_tipodematerial');
+        return $this->belongsTo(TipoMaterial::class, 'id_tipodematerial', '_id');
     }
 
     // RELACIONES: Un material tiene muchos inventarios
     public function inventarios()
     {
-        return $this->hasMany(Inventario::class, 'id_producto', 'id_producto');
+        return $this->hasMany(Inventario::class, 'id_producto', '_id');
     }
 
     // Scopes
     public function scopeStockBajo($query)
     {
-        return $query->whereColumn('stock_actual', '<', 'stock_minimo');
+        return $query->whereRaw([
+            '$expr' => [
+                '$lt' => ['$stock_actual', '$stock_minimo']
+            ]
+        ]);
     }
 }

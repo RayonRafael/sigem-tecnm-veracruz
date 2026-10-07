@@ -12,17 +12,18 @@ class Receptor extends Model
 
     protected $table = 'receptor';
 
-    protected $primaryKey = 'id_receptor';
+    protected $primaryKey = '_id';
+    protected $keyType = 'string';
 
     protected $fillable = ['nombre', 'apellido_paterno', 'apellido_materno', 'email', 'telefono', 'id_area'];
 
     public function area()
     {
-        return $this->belongsTo(Area::class, 'id_area', 'id_area');
+        return $this->belongsTo(Area::class, 'id_area', '_id');
     }
 
     public function solicitudes()
     {
-        return $this->hasMany(Solicitud::class, 'id_receptor', 'id_receptor');
+        return $this->hasMany(Solicitud::class, 'id_receptor', '_id');
     }
 }

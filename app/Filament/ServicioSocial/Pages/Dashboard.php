@@ -54,10 +54,8 @@ class Dashboard extends BaseDashboard
         $totalActivos = Inventario::count();
 
         // Bitacora activity just for this user
-        $actividadReciente = Activity::with('causer')
-            ->where('causer_id', $userId)
-            ->where('causer_type', User::class)
-            ->latest()->limit(5)->get();
+        // NOTA: Spatie Activitylog requiere PDO SQL.
+        $actividadReciente = collect([]);
 
         // Colecciones limitadas (mini tablas) y completas (modales)
         $inventariosCompletos = Inventario::with(['material', 'material.marca', 'material.tipo'])->latest('created_at')->take(50)->get();
@@ -91,12 +89,12 @@ class Dashboard extends BaseDashboard
         $departamentosList = Departamento::latest()->take(50)->get();
         $materialesList = Material::with(['tipo', 'unidad', 'marca'])->latest()->take(50)->get();
         $areasList = Area::with('departamento')->latest()->take(50)->get();
-        $marcasList = MarcaMaterial::withCount('materiales')->latest()->take(50)->get();
+        $marcasList = MarcaMaterial::latest()->take(50)->get();
         $tiposList = TipoMaterial::latest()->take(50)->get();
         $unidadesList = UnidadMedida::latest()->take(50)->get();
         $proveedoresList = Proveedor::latest()->take(50)->get();
         $receptoresList = Receptor::with('area.departamento')->latest()->take(50)->get();
-        $usuariosList = User::with('roles')->latest()->take(50)->get();
+        $usuariosList = User::latest()->take(50)->get();
 
         $totalRegistrosCatalogos = $departamentosList->count() + $materialesList->count() + $areasList->count() +
                                    $marcasList->count() + $tiposList->count() + $unidadesList->count() +

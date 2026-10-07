@@ -12,13 +12,14 @@ class Departamento extends Model
 
     protected $table = 'departamento';
 
-    protected $primaryKey = 'id_departamento';
+    protected $primaryKey = '_id';
+    protected $keyType = 'string';
 
     protected $fillable = ['nombre'];
 
     // RELACIONES: Un departamento tiene muchas áreas
     public function areas()
     {
-        return $this->hasMany(Area::class, 'id_departamento', 'id_departamento');
+        return $this->hasMany(Area::class, 'id_departamento', '_id');
     }
 }

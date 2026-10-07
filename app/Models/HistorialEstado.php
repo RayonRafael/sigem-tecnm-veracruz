@@ -11,7 +11,8 @@ class HistorialEstado extends Model
 
     protected $table = 'historial_estados';
 
-    protected $primaryKey = 'id_historial';
+    protected $primaryKey = '_id';
+    protected $keyType = 'string';
 
     public $timestamps = false; // Desactiva created_at/updated_at
 
@@ -19,11 +20,11 @@ class HistorialEstado extends Model
 
     public function inventario()
     {
-        return $this->belongsTo(Inventario::class, 'id_inventario', 'id_inventario');
+        return $this->belongsTo(Inventario::class, 'id_inventario', '_id');
     }
 
     public function usuario()
     {
-        return $this->belongsTo(User::class, 'id_usuario', 'id');
+        return $this->belongsTo(User::class, 'id_usuario', '_id');
     }
 }

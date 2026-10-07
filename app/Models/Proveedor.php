@@ -10,7 +10,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Proveedor extends Model
 {
-    use HasFactory, LogsActivity, SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -31,12 +31,13 @@ class Proveedor extends Model
 
     protected $table = 'proveedores';
 
-    protected $primaryKey = 'id_proveedor';
+    protected $primaryKey = '_id';
+    protected $keyType = 'string';
 
     protected $fillable = ['nombre_empresa', 'rfc', 'contacto_nombre', 'contacto_telefono', 'contacto_email', 'activo'];
 
     public function inventarios()
     {
-        return $this->hasMany(Inventario::class, 'id_proveedor', 'id_proveedor');
+        return $this->hasMany(Inventario::class, 'id_proveedor', '_id');
     }
 }

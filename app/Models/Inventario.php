@@ -10,7 +10,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Inventario extends Model
 {
-    use HasFactory, LogsActivity, SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -31,7 +31,8 @@ class Inventario extends Model
 
     protected $table = 'inventario';
 
-    protected $primaryKey = 'id_inventario';
+    protected $primaryKey = '_id';
+    protected $keyType = 'string';
 
     protected $fillable = [
         'num_serie', 'id_producto', 'id_usuario', 'id_proveedor', 'estado', 'estado_registro',
@@ -55,37 +56,37 @@ class Inventario extends Model
 
     public function material()
     {
-        return $this->belongsTo(Material::class, 'id_producto', 'id_producto');
+        return $this->belongsTo(Material::class, 'id_producto', '_id');
     }
 
     public function usuario()
     {
-        return $this->belongsTo(User::class, 'id_usuario', 'id');
+        return $this->belongsTo(User::class, 'id_usuario', '_id');
     }
 
     public function proveedor()
     {
-        return $this->belongsTo(Proveedor::class, 'id_proveedor', 'id_proveedor');
+        return $this->belongsTo(Proveedor::class, 'id_proveedor', '_id');
     }
 
     public function aprobadoPor()
     {
-        return $this->belongsTo(User::class, 'aprobado_por', 'id');
+        return $this->belongsTo(User::class, 'aprobado_por', '_id');
     }
 
     public function detallesSolicitud()
     {
-        return $this->hasMany(DetalleSolicitud::class, 'id_inventario', 'id_inventario');
+        return $this->hasMany(DetalleSolicitud::class, 'id_inventario', '_id');
     }
 
     public function mantenimientos()
     {
-        return $this->hasMany(Mantenimiento::class, 'id_inventario', 'id_inventario');
+        return $this->hasMany(Mantenimiento::class, 'id_inventario', '_id');
     }
 
     public function historial()
     {
-        return $this->hasMany(HistorialEstado::class, 'id_inventario', 'id_inventario');
+        return $this->hasMany(HistorialEstado::class, 'id_inventario', '_id');
     }
 
     // Scopes de estado

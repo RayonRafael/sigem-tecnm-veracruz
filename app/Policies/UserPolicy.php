@@ -9,7 +9,7 @@ class UserPolicy
 {
     private function isAdmin(User $user): bool
     {
-        return $user->hasPermissionTo(RoleEnum::PERM_ACCESS_ADMIN) || $user->tipo_usuario === RoleEnum::ADMIN->value;
+        return $user->tipo_usuario === RoleEnum::ADMIN->value;
     }
 
     public function viewAny(User $user): bool

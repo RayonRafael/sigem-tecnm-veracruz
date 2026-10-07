@@ -107,12 +107,7 @@ class UserResource extends Resource
                             ->default('Pendiente')
                             ->prefixIcon('heroicon-m-shield-check')
                             ->required(),
-                        Forms\Components\Select::make('roles')->placeholder('Selecciona...')
-                            ->label('Rol (Spatie)')
-                            ->relationship('roles', 'name')
-                            ->preload()
-                            ->prefixIcon('heroicon-m-key')
-                            ->searchable(),
+                        // NOTA: Se eliminó el campo 'roles' de Spatie por incompatibilidad con MongoDB
                         Forms\Components\ToggleButtons::make('activo')
                             ->label('Usuario activo')
                             ->boolean(trueLabel: 'Sí', falseLabel: 'No')
@@ -232,7 +227,7 @@ class UserResource extends Resource
                                 RoleEnum::SERVICIO_TIPO->value => 'heroicon-m-academic-cap',
                                 default => 'heroicon-m-clock',
                             }),
-                        TextEntry::make('roles.name')->label('Rol')->badge()->icon('heroicon-m-key'),
+                        // NOTA: Se eliminó roles.name
                         TextEntry::make('activo')
                             ->label('Estado')
                             ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Inactivo')

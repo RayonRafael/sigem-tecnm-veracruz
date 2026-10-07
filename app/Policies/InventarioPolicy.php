@@ -10,12 +10,12 @@ class InventarioPolicy
 {
     private function isAdmin(User $user): bool
     {
-        return $user->hasPermissionTo(RoleEnum::PERM_ACCESS_ADMIN) || $user->tipo_usuario === RoleEnum::ADMIN->value;
+        return $user->tipo_usuario === RoleEnum::ADMIN->value;
     }
 
     private function isShared(User $user): bool
     {
-        return $this->isAdmin($user) || $user->hasPermissionTo(RoleEnum::PERM_ACCESS_SERVICIO) || $user->tipo_usuario === RoleEnum::SERVICIO_TIPO->value;
+        return $this->isAdmin($user) || $user->tipo_usuario === RoleEnum::SERVICIO_TIPO->value;
     }
 
     public function viewAny(User $user): bool

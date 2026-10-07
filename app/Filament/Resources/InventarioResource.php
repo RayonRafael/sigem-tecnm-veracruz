@@ -208,7 +208,7 @@ class InventarioResource extends Resource
                                         ])
                                         ->default('Pendiente')
                                         ->required()
-                                        ->visible(fn () => auth()->user() && auth()->user()->hasPermissionTo(RoleEnum::PERM_ACCESS_ADMIN)),
+                                        ->visible(fn () => auth()->user() && auth()->user()->tipo_usuario === RoleEnum::ADMIN->value),
                                     Forms\Components\Textarea::make('observaciones_generales')
                                         ->label('Observaciones generales')
                                         ->rows(2),

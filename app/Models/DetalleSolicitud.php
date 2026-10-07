@@ -11,22 +11,23 @@ class DetalleSolicitud extends Model
 
     protected $table = 'detalle_solicitud';
 
-    protected $primaryKey = 'id_detalle';
+    protected $primaryKey = '_id';
+    protected $keyType = 'string';
 
     protected $fillable = ['cantidad', 'id_solicitud', 'id_producto', 'id_inventario'];
 
     public function solicitud()
     {
-        return $this->belongsTo(Solicitud::class, 'id_solicitud', 'id_solicitud');
+        return $this->belongsTo(Solicitud::class, 'id_solicitud', '_id');
     }
 
     public function material()
     {
-        return $this->belongsTo(Material::class, 'id_producto', 'id_producto');
+        return $this->belongsTo(Material::class, 'id_producto', '_id');
     }
 
     public function inventario()
     {
-        return $this->belongsTo(Inventario::class, 'id_inventario', 'id_inventario');
+        return $this->belongsTo(Inventario::class, 'id_inventario', '_id');
     }
 }

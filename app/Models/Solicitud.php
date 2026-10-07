@@ -9,7 +9,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 
 class Solicitud extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -30,7 +30,8 @@ class Solicitud extends Model
 
     protected $table = 'solicitud';
 
-    protected $primaryKey = 'id_solicitud';
+    protected $primaryKey = '_id';
+    protected $keyType = 'string';
 
     protected $fillable = [
         'fecha_solicitud', 'observaciones', 'fecha_autorizacion', 'autorizado_por',
@@ -47,22 +48,22 @@ class Solicitud extends Model
 
     public function usuario()
     {
-        return $this->belongsTo(User::class, 'id_usuario', 'id');
+        return $this->belongsTo(User::class, 'id_usuario', '_id');
     }
 
     public function receptor()
     {
-        return $this->belongsTo(Receptor::class, 'id_receptor', 'id_receptor');
+        return $this->belongsTo(Receptor::class, 'id_receptor', '_id');
     }
 
     public function autorizadoPor()
     {
-        return $this->belongsTo(User::class, 'autorizado_por', 'id');
+        return $this->belongsTo(User::class, 'autorizado_por', '_id');
     }
 
     public function detalles()
     {
-        return $this->hasMany(DetalleSolicitud::class, 'id_solicitud', 'id_solicitud');
+        return $this->hasMany(DetalleSolicitud::class, 'id_solicitud', '_id');
     }
 
     // Scopes de estado

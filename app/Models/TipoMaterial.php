@@ -12,12 +12,13 @@ class TipoMaterial extends Model
 
     protected $table = 'tipo_material';
 
-    protected $primaryKey = 'id_tipodematerial';
+    protected $primaryKey = '_id';
+    protected $keyType = 'string';
 
     protected $fillable = ['nombre'];
 
     public function materiales()
     {
-        return $this->hasMany(Material::class, 'id_tipodematerial', 'id_tipodematerial');
+        return $this->hasMany(Material::class, 'id_tipodematerial', '_id');
     }
 }

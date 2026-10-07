@@ -12,19 +12,20 @@ class Area extends Model
 
     protected $table = 'area';
 
-    protected $primaryKey = 'id_area';
+    protected $primaryKey = '_id';
+    protected $keyType = 'string';
 
     protected $fillable = ['nombre', 'id_departamento'];
 
     // RELACIONES: Un área pertenece a un departamento
     public function departamento()
     {
-        return $this->belongsTo(Departamento::class, 'id_departamento', 'id_departamento');
+        return $this->belongsTo(Departamento::class, 'id_departamento', '_id');
     }
 
     // RELACIONES: Un área tiene muchos receptores
     public function receptores()
     {
-        return $this->hasMany(Receptor::class, 'id_area', 'id_area');
+        return $this->hasMany(Receptor::class, 'id_area', '_id');
     }
 }

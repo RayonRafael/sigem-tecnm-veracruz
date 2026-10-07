@@ -5,7 +5,7 @@
         @php
             $user = auth()->user();
             $initial = substr($user->name ?? 'U', 0, 1);
-            $role = $user->roles?->first()?->name ?? 'Usuario';
+            $role = $user->tipo_usuario ?? 'Usuario';
         @endphp
 
         <!-- 1. HEADER -->
@@ -922,7 +922,7 @@
                             } else if (this.activeCatalog === 'areas') {
                                 cols = `<td>${item.nombre}</td><td>${item.departamento?.nombre || ''}</td><td><span class="badge badge-green">Activo</span></td>${actions}`;
                             } else if (this.activeCatalog === 'usuarios') {
-                                let roles = item.roles?.map(r=>r.name).join(', ') || '';
+                                let roles = item.tipo_usuario || '';
                                 cols = `<td>${item.name}</td><td>${item.email}</td><td>${roles}</td>${actions}`;
                             } else if (this.activeCatalog === 'materiales') {
                                 cols = `<td>${item.nombre}</td><td>${item.tipo?.nombre || ''}</td><td>${item.unidad?.nombre || ''}</td><td>${item.marca?.nombre || ''}</td>${actions}`;

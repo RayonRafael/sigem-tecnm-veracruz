@@ -12,13 +12,14 @@ class MarcaMaterial extends Model
 
     protected $table = 'marca_material';
 
-    protected $primaryKey = 'id_marca';
+    protected $primaryKey = '_id';
+    protected $keyType = 'string';
 
     protected $fillable = ['nombre'];
 
     // RELACIONES: Una marca tiene muchos materiales
     public function materiales()
     {
-        return $this->hasMany(Material::class, 'id_marca', 'id_marca');
+        return $this->hasMany(Material::class, 'id_marca', '_id');
     }
 }

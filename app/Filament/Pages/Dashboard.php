@@ -57,11 +57,14 @@ class Dashboard extends BaseDashboard
         $materialesStockBajoCount = Material::stockBajo()->count();
         $solicitudesPendientes = Solicitud::pendientes()->count();
 
-        $creadosEsteMes = Inventario::whereMonth('created_at', Carbon::now()->month)
-            ->whereYear('created_at', Carbon::now()->year)->count();
+        $creadosEsteMes = Inventario::whereBetween('created_at', [
+            Carbon::now()->startOfMonth(),
+            Carbon::now()->endOfMonth(),
+        ])->count();
 
         // 2. Actividad Reciente (5 items)
-        $actividadReciente = Activity::with('causer')->latest()->limit(5)->get();
+        // NOTA: Spatie Activitylog requiere PDO SQL. Se deshabilita para evitar crash.
+        $actividadReciente = collect([]);
 
         // 3. Inventario (completos y limitados)
         $inventariosCompletos = Inventario::with(['material', 'material.marca', 'material.tipo', 'proveedor', 'usuario'])->latest('created_at')->take(50)->get();
@@ -97,12 +100,13 @@ class Dashboard extends BaseDashboard
         $departamentosList = Departamento::latest()->take(50)->get();
         $materialesList = Material::with(['tipo', 'unidad', 'marca'])->latest()->take(50)->get();
         $areasList = Area::with('departamento')->latest()->take(50)->get();
-        $marcasList = MarcaMaterial::withCount('materiales')->latest()->take(50)->get();
+        $marcasList = MarcaMaterial::latest()->take(50)->get();
         $tiposList = TipoMaterial::latest()->take(50)->get();
         $unidadesList = UnidadMedida::latest()->take(50)->get();
         $proveedoresList = Proveedor::latest()->take(50)->get();
         $receptoresList = Receptor::with('area.departamento')->latest()->take(50)->get();
-        $usuariosList = User::with('roles')->latest()->take(50)->get();
+        // NOTA: 'roles' es una relación de Spatie (SQL) que rompe en MongoDB.
+        $usuariosList = User::latest()->take(50)->get();
 
         $totalRegistrosCatalogos = $departamentosList->count() + $materialesList->count() + $areasList->count() +
                                    $marcasList->count() + $tiposList->count() + $unidadesList->count() +
