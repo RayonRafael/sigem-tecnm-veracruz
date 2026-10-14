@@ -48,7 +48,7 @@ class AppServiceProvider extends ServiceProvider
     {
         app()->setLocale('es');
 
-        if (config('app.env') === 'production') {
+        if ($this->app->environment('production') || str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }
 
