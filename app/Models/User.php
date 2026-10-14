@@ -8,7 +8,6 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use MongoDB\Laravel\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser
 {
@@ -54,17 +53,88 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
+     * Determina si el usuario posee el rol especificado (compatible con Spatie / NoSQL).
+     *
+     * @param  string|\BackedEnum|array  $roles
+     * @return bool
+     */
+    public function hasRole(mixed $roles): bool
+    {
+        $currentRole = $this->tipo_usuario ?? $this->rol;
+
+        if ($currentRole === null) {
+            return false;
+        }
+
+        if ($currentRole instanceof \BackedEnum) {
+            $currentRole = $currentRole->value;
+        }
+
+        if (! is_array($roles) && ! ($roles instanceof \Illuminate\Support\Collection)) {
+            $roles = [$roles];
+        }
+
+        foreach ($roles as $role) {
+            if ($role instanceof \BackedEnum) {
+                $role = $role->value;
+            }
+
+            if (strcasecmp((string) $role, (string) $currentRole) === 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determina si el usuario posee cualquiera de los roles dados.
+     */
+    public function hasAnyRole(mixed ...$roles): bool
+    {
+        $flattened = [];
+        foreach ($roles as $role) {
+            if (is_array($role)) {
+                $flattened = array_merge($flattened, $role);
+            } else {
+                $flattened[] = $role;
+            }
+        }
+
+        return $this->hasRole($flattened);
+    }
+
+    /**
+     * Compatibilidad con chequeos de permisos de Spatie en entorno NoSQL.
+     */
+    public function hasPermissionTo(mixed $permission, ?string $guardName = null): bool
+    {
+        if ($this->hasRole([RoleEnum::ADMIN->value, 'Administrador', 'admin'])) {
+            return true;
+        }
+
+        if ($permission === RoleEnum::PERM_ACCESS_SERVICIO) {
+            return $this->hasRole([RoleEnum::SERVICIO_SOCIAL->value, RoleEnum::SERVICIO_TIPO->value, 'Servicio Social', 'Servicio']);
+        }
+
+        return false;
+    }
+
+    /**
      * Método requerido por Filament para permitir el acceso al panel.
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        // NOTA: Se removieron temporalmente los chequeos de Spatie ($this->hasPermissionTo)
-        // porque Spatie usa SQL nativo que no es compatible con MongoDB.
-        if ($panel->getId() === 'admin') {
-            return $this->tipo_usuario === RoleEnum::ADMIN->value;
+        if ($this->activo === false) {
+            return false;
         }
+
+        if ($panel->getId() === 'admin') {
+            return $this->hasRole([RoleEnum::ADMIN->value, 'Administrador', 'admin']);
+        }
+
         if ($panel->getId() === 'servicio-social') {
-            return $this->tipo_usuario === RoleEnum::SERVICIO_TIPO->value;
+            return $this->hasRole([RoleEnum::SERVICIO_SOCIAL->value, RoleEnum::SERVICIO_TIPO->value, 'Servicio Social', 'Servicio']);
         }
 
         return false;
