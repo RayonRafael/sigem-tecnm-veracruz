@@ -18,6 +18,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
@@ -30,11 +31,16 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('SIGEM - TecNM Veracruz')
-            ->brandLogo(asset('images/sigem-logo.svg'))
-            ->brandLogoHeight('2.5rem')
+            ->brandLogo(new HtmlString('<div class="sigem-brand"><div class="sigem-brand-logo">S</div></div>'))
+            ->brandLogoHeight('auto')
             ->favicon(asset('images/sigem-favicon.svg?v=2'))
+            ->font('DM Sans')
             ->colors([
-                'primary' => Color::Blue,
+                'primary' => Color::hex('#1b65d4'),
+                'success' => Color::hex('#059669'),
+                'warning' => Color::hex('#d97706'),
+                'danger'  => Color::hex('#dc2626'),
+                'info'    => Color::hex('#0891b2'),
             ])
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
@@ -77,6 +83,59 @@ class AdminPanelProvider extends PanelProvider
 </div>
 ')
             )
+            ->renderHook(
+                PanelsRenderHook::SIDEBAR_FOOTER,
+                fn (): string => Blade::render('
+<div class="sigem-user-card">
+    <div class="sigem-avatar" title="{{ auth()->user()?->name ?? \'Usuario\' }}">
+        {{ mb_strtoupper(mb_substr(auth()->user()?->name ?? \'U\', 0, 1)) }}
+    </div>
+    <form method="POST" action="{{ route(\'filament.admin.auth.logout\') }}" class="m-0 p-0 flex items-center justify-center">
+        @csrf
+        <button type="submit" class="sigem-logout" title="Cerrar sesión" aria-label="Cerrar sesión">
+            &#x23FB;
+        </button>
+    </form>
+</div>
+')
+            )
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn (): string => Blade::render('
+<script>
+    (function () {
+        function initSidebarTooltips() {
+            document.querySelectorAll(\'.fi-sidebar-item\').forEach(function (item) {
+                var label = item.querySelector(\'.fi-sidebar-item-label, .fi-sidebar-nav-item-label\');
+                var text = label ? label.textContent.trim() : \'\';
+                if (!text) {
+                    var link = item.querySelector(\'a\');
+                    if (link && link.title) {
+                        text = link.title.trim();
+                    }
+                }
+                if (text) {
+                    item.setAttribute(\'data-tooltip\', text);
+                }
+            });
+        }
+        if (document.readyState === \'loading\') {
+            document.addEventListener(\'DOMContentLoaded\', initSidebarTooltips);
+        } else {
+            initSidebarTooltips();
+        }
+        document.addEventListener(\'livewire:navigated\', initSidebarTooltips);
+        var observer = new MutationObserver(function () {
+            initSidebarTooltips();
+        });
+        var sidebar = document.querySelector(\'.fi-sidebar\');
+        if (sidebar) {
+            observer.observe(sidebar, { childList: true, subtree: true });
+        }
+    })();
+</script>
+')
+            )
 
             ->navigationGroups([
                 NavigationGroup::make()
@@ -92,7 +151,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label('Administración')
                     ->collapsible(true),
             ])
-            ->sidebarWidth('20rem')
+            ->sidebarWidth('64px')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
