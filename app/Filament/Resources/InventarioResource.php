@@ -457,7 +457,8 @@ class InventarioResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
-            ->defaultPaginationPageOption(10)
+            ->defaultPaginationPageOption(fn () => \App\Support\SigemPagination::getPageOption())
+            ->paginationPageOptions(fn () => \App\Support\SigemPagination::getPageOptions())
             ->filters([
                 TrashedFilter::make(),
                 Tables\Filters\TernaryFilter::make('aprobado')

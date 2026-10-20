@@ -29,7 +29,9 @@ use App\Policies\SolicitudPolicy;
 use App\Policies\TipoMaterialPolicy;
 use App\Policies\UnidadMedidaPolicy;
 use App\Policies\UserPolicy;
+use App\Support\SigemPagination;
 use Filament\Facades\Filament;
+use Filament\Tables\Table;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
@@ -51,6 +53,13 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
         }
+
+        // Configuración centralizada de paginado para tablas Filament
+        Table::configureUsing(function (Table $table): void {
+            $table
+                ->paginationPageOptions(fn () => SigemPagination::getPageOptions())
+                ->defaultPaginationPageOption(fn () => SigemPagination::getPageOption());
+        });
 
         Gate::before(function ($user, $ability) {
             return ($user && ($user->hasRole('Administrador') || $user->hasRole('Admin'))) ? true : null;

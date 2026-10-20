@@ -57,8 +57,8 @@
             </a>
 
             <!-- 4. Ver bitácora -->
-            {{-- TODO: Enlazar a página/recurso de bitácora cuando exista; actualmente anclado al bloque de Actividad Reciente del dashboard --}}
-            <a class="sigem-quick" href="#actividad-reciente">
+            {{-- Fase 10: Enlazado a la pestaña Bitácora de Configuración & Catálogos (/admin/configuracion) --}}
+            <a class="sigem-quick" href="{{ url('/admin/configuracion') }}">
                 <div class="arrow">→</div>
                 <div class="sigem-quick-ico sigem-i-info">🕘</div>
                 <div class="sigem-quick-title">Ver bitácora</div>

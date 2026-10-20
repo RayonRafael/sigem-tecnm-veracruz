@@ -100,8 +100,28 @@ class AdminPanelProvider extends PanelProvider
 ')
             )
             ->renderHook(
+                PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
+                fn (): string => Blade::render('
+@if (auth()->check())
+{{-- Campo de búsqueda aparente en el topbar (Fase 9: Buscador global) --}}
+<div class="sigem-topbar-search"
+     role="button"
+     tabindex="0"
+     aria-label="Buscar en SIGEM"
+     onclick="window.dispatchEvent(new CustomEvent(\'abrir-command-palette\'))"
+     onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.dispatchEvent(new CustomEvent(\'abrir-command-palette\'));}">
+    <span>🔍</span>
+    <span>Buscar en SIGEM…</span>
+</div>
+@endif
+')
+            )
+            ->renderHook(
                 PanelsRenderHook::BODY_END,
                 fn (): string => Blade::render('
+@if (auth()->check())
+    @livewire(\App\Livewire\CommandPalette::class)
+@endif
 <script>
     (function () {
         function initSidebarTooltips() {

@@ -106,7 +106,7 @@ class ConfiguracionPage extends Page
 
     public function guardarPreferencias(): void
     {
-        // TODO: Conectar dinámicamente al paginado de todas las tablas Filament (Table::$defaultPaginationPageOption / paginate()) a través de un middleware o servicio global.
+        // Resuelto Fase 10: Conectado centralizadamente vía App\Support\SigemPagination y Table::configureUsing
         if (! empty($this->otroValor)) {
             $val = (int) $this->otroValor;
             if ($val < 5 || $val > 500) {
@@ -210,7 +210,7 @@ class ConfiguracionPage extends Page
         $createUrl = $cat['resource']::getUrl('create');
         $indexUrl = $cat['resource']::getUrl('index');
 
-        // TODO: Integración embebida directa con ListRecords si se requiere paginación nativa inline completa.
+        // TODO [Fase 10 - Documentado]: Vista previa embebida en pestaña Catálogos; cada catálogo redirige a su ListRecords nativo completo al hacer clic.
         switch ($cat['id']) {
             case 'departamentos':
                 $headers = ['ID', 'Nombre del departamento', 'Acciones'];

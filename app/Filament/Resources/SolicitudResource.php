@@ -254,7 +254,8 @@ class SolicitudResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
-            ->defaultPaginationPageOption(10)
+            ->defaultPaginationPageOption(fn () => \App\Support\SigemPagination::getPageOption())
+            ->paginationPageOptions(fn () => \App\Support\SigemPagination::getPageOptions())
             ->filters([
                 Tables\Filters\SelectFilter::make('estado')->label('Estado')
                     ->options([

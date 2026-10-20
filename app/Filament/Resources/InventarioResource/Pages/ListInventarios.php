@@ -76,4 +76,23 @@ class ListInventarios extends ListRecords implements HasInfolists
         return InventarioResource::infolist($infolist)
             ->record($this->activeRecord);
     }
+
+    public function filtrarPorEstado(?string $estado = null): void
+    {
+        $actual = $this->tableFilters['estado']['value'] ?? null;
+        if ($actual === $estado || empty($estado)) {
+            $this->tableFilters['estado']['value'] = null;
+        } else {
+            $this->tableFilters['estado']['value'] = $estado;
+        }
+    }
+
+    public function filtrarPorCategoria(?string $categoria = null): void
+    {
+        if ($this->tableSearch === $categoria || empty($categoria)) {
+            $this->tableSearch = '';
+        } else {
+            $this->tableSearch = $categoria;
+        }
+    }
 }

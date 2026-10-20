@@ -105,6 +105,9 @@
                                     stroke-dasharray="{{ $dashLen }} {{ $dashGap }}"
                                     stroke-dashoffset="{{ -$currentOffset }}"
                                     transform="rotate(-90 60 60)"
+                                    style="cursor: pointer;"
+                                    wire:click="filtrarPorEstado('{{ $estKey }}')"
+                                    title="Filtrar por {{ $item['label'] }}"
                                 />
                             @endif
                         @endforeach
@@ -112,17 +115,24 @@
                         <circle cx="60" cy="60" r="42" fill="none" stroke="#e5e7eb" stroke-width="16" />
                     @endif
                 </svg>
-                <div class="sigem-donut-center">
+                <div class="sigem-donut-center" wire:click="filtrarPorEstado(null)" style="cursor: pointer;" title="Mostrar todos los equipos">
                     <b>{{ $totalEquipos }}</b>
                     <span>equipos</span>
                 </div>
             </div>
 
-            <!-- 2. Leyenda de estados -->
+            <!-- 2. Leyenda de estados (Fase 10: clics funcionales para filtrar tabla) -->
             <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 3px;">
+                @php $estadoActivo = $this->tableFilters['estado']['value'] ?? null; @endphp
                 @foreach($estadosDef as $estKey => $item)
-                    <!-- TODO: clic para filtrar por estado $estKey -->
-                    <div class="sigem-lg">
+                    <div
+                        class="sigem-lg {{ $estadoActivo === $estKey ? 'active' : '' }}"
+                        wire:click="filtrarPorEstado('{{ $estKey }}')"
+                        role="button"
+                        tabindex="0"
+                        title="{{ $estadoActivo === $estKey ? 'Quitar filtro de ' . $item['label'] : 'Filtrar por ' . $item['label'] }}"
+                        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();$wire.filtrarPorEstado('{{ $estKey }}')}"
+                    >
                         <i style="background: {{ $item['color'] }};"></i>
                         <span>{{ $item['label'] }}</span>
                         <b>{{ $item['cant'] }}</b>
@@ -130,18 +140,26 @@
                 @endforeach
             </div>
 
-            <!-- 3. Barras por categoría -->
+            <!-- 3. Barras por categoría (Fase 10: clics funcionales para búsqueda de categoría) -->
             <div style="margin-top: 18px; border-top: 1px solid var(--sig-border); padding-top: 14px;">
                 <div style="font-size: 13.5px; font-weight: 700; color: var(--sig-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px;">
                     Por categoría
                 </div>
+                @php $busquedaActiva = $this->tableSearch ?? ''; @endphp
                 @forelse($categoriasTop as $catNom => $catCant)
                     @php
                         $pct = $totalEquipos > 0 ? round(($catCant / $totalEquipos) * 100) : 0;
+                        $esCatActiva = $busquedaActiva === $catNom;
                     @endphp
-                    <!-- TODO: clic para filtrar por categoría $catNom -->
-                    <div class="sigem-cb">
-                        <span title="{{ $catNom }}">{{ $catNom }}</span>
+                    <div
+                        class="sigem-cb {{ $esCatActiva ? 'active' : '' }}"
+                        wire:click="filtrarPorCategoria('{{ $catNom }}')"
+                        role="button"
+                        tabindex="0"
+                        title="{{ $esCatActiva ? 'Quitar búsqueda de ' . $catNom : 'Buscar por ' . $catNom }}"
+                        onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();$wire.filtrarPorCategoria('{{ $catNom }}')}"
+                    >
+                        <span title="{{ $catNom }}" style="{{ $esCatActiva ? 'font-weight: 700; color: var(--sig-primary);' : '' }}">{{ $catNom }}</span>
                         <div><span style="width: {{ $pct }}%;"></span></div>
                         <span style="text-align: right; font-weight: 600;">{{ $catCant }}</span>
                     </div>

@@ -36,8 +36,9 @@ class ReportesPage extends Page
 
     public function mount(): void
     {
-        // TODO: Si se requiere persistencia permanente entre limpiezas de caché (php artisan cache:clear),
-        // implementar tabla dedicada de settings/preferencias en la base de datos.
+        // TODO [Fase 10 - Documentado]: No existe tabla de settings en la base de datos actual.
+        // La visibilidad persiste en Cache::forever con fallback a los 3 reportes base del cliente.
+        // Si se requiere persistencia permanente tras 'cache:clear', crear tabla 'settings' en fase futura.
         $defaults = [
             'inventario_categoria'     => true,
             'equipos_area'             => true,
@@ -47,13 +48,12 @@ class ReportesPage extends Page
             'movimientos_recientes'    => false,
         ];
 
-        $this->visibilidadServicioSocial = Cache::get('sigem_reportes_visibilidad_ss', $defaults);
+        $cached = Cache::get('sigem_reportes_visibilidad_ss', []);
+        $this->visibilidadServicioSocial = array_merge($defaults, is_array($cached) ? $cached : []);
     }
 
     public function toggleVisibilidad(string $reportId): void
     {
-        // TODO: requiere almacenamiento de preferencias persistente en BD si se necesita
-        // persistencia tras limpieza total de caché del sistema.
         $current = $this->visibilidadServicioSocial[$reportId] ?? false;
         $this->visibilidadServicioSocial[$reportId] = ! $current;
 
@@ -78,7 +78,7 @@ class ReportesPage extends Page
 
     public function exportarReporte(string $reportId): ?StreamedResponse
     {
-        // TODO: Opcionalmente integrar exportación en formato PDF o Excel formal cuando se instale una librería compatible.
+        // TODO [Fase 10 - Documentado]: Exportación actual genera CSV estándar nativo sin dependencias externas. Integrar PDF o Excel nativo con paquete dedicado en fase futura.
         $reporte = $this->getDatosReporte($reportId);
         if (! $reporte || empty($reporte['rows'])) {
             Notification::make()
