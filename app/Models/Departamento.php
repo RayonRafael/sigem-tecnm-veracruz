@@ -14,7 +14,16 @@ class Departamento extends Model
 
     protected $primaryKey = 'id_departamento';
 
-    protected $fillable = ['nombre'];
+    protected $fillable = [
+        'nombre',
+        'edificio_id',
+    ];
+
+    // RELACIONES: Un departamento pertenece a un edificio
+    public function edificio()
+    {
+        return $this->belongsTo(Edificio::class, 'edificio_id');
+    }
 
     // RELACIONES: Un departamento tiene muchas áreas
     public function areas()

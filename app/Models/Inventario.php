@@ -15,7 +15,7 @@ class Inventario extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['num_serie', 'estado', 'ubicacion_fisica', 'tipo_propiedad', 'id_usuario', 'estado_registro', 'aprobado', 'aprobado_por', 'fecha_aprobacion', 'fecha_baja'])
+            ->logOnly(['num_serie', 'especificaciones', 'estado', 'ubicacion_fisica', 'tipo_propiedad', 'id_usuario', 'estado_registro', 'aprobado', 'aprobado_por', 'fecha_aprobacion', 'fecha_baja'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(function (string $eventName) {
@@ -34,7 +34,7 @@ class Inventario extends Model
     protected $primaryKey = 'id_inventario';
 
     protected $fillable = [
-        'num_serie', 'id_producto', 'id_usuario', 'id_proveedor', 'estado', 'estado_registro',
+        'num_serie', 'especificaciones', 'id_producto', 'id_usuario', 'id_proveedor', 'estado', 'estado_registro',
         'tipo_propiedad', 'ubicacion_fisica', 'fecha_registro', 'fecha_factura', 'num_factura',
         'fecha_baja', 'fecha_inicio_renta', 'fecha_fin_renta', 'observaciones_renta',
         'observaciones_generales', 'garantia_fecha_fin', 'garantia_estado',
@@ -51,6 +51,7 @@ class Inventario extends Model
         'garantia_fecha_fin' => 'date',
         'aprobado' => 'boolean',
         'fecha_aprobacion' => 'datetime',
+        'especificaciones' => 'array',
     ];
 
     public function material()

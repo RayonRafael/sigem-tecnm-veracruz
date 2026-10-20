@@ -27,4 +27,10 @@ class Area extends Model
     {
         return $this->hasMany(Receptor::class, 'id_area', 'id_area');
     }
+
+    // RELACIONES: Un área tiene muchos salones
+    public function salones()
+    {
+        return $this->hasMany(Salon::class, 'area_id', 'id_area');
+    }
 }
