@@ -14,7 +14,11 @@ class ProveedoresTableSeeder extends Seeder
     public function run()
     {
 
-        \DB::table('proveedores')->delete();
+        // Candado: nunca sembrar datos de ejemplo en produccion ni sobrescribir datos existentes.
+        // (Antes aqui se hacia un delete() de la tabla completa.)
+        if (app()->isProduction() || \DB::table('proveedores')->exists()) {
+            return;
+        }
 
         \DB::table('proveedores')->insert([
             0 => [

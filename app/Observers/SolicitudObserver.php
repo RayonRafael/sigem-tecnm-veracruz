@@ -2,38 +2,11 @@
 
 namespace App\Observers;
 
-use App\Models\Solicitud;
-use Illuminate\Support\Facades\DB;
-
+/**
+ * El stock de Material es un valor derivado (ver Material::stockActual()),
+ * por lo que las solicitudes ya no descuentan ni restituyen stock manualmente.
+ * El observer se conserva registrado para futuras reglas de negocio.
+ */
 class SolicitudObserver
 {
-    public function updated(Solicitud $solicitud): void
-    {
-        if ($solicitud->isDirty('estado')) {
-            $estadoAnterior = $solicitud->getOriginal('estado');
-            $estadoNuevo = $solicitud->estado;
-
-            if ($solicitud->tipo_movimiento === 'Asignacion Permanente') {
-                if ($estadoAnterior !== 'Autorizado' && $estadoNuevo === 'Autorizado') {
-                    // Decrement stock
-                    DB::transaction(function () use ($solicitud) {
-                        foreach ($solicitud->detalles as $detalle) {
-                            if ($detalle->material) {
-                                $detalle->material->decrement('stock_actual', $detalle->cantidad);
-                            }
-                        }
-                    });
-                } elseif ($estadoAnterior === 'Autorizado' && $estadoNuevo === 'Rechazado') {
-                    // Restore stock
-                    DB::transaction(function () use ($solicitud) {
-                        foreach ($solicitud->detalles as $detalle) {
-                            if ($detalle->material) {
-                                $detalle->material->increment('stock_actual', $detalle->cantidad);
-                            }
-                        }
-                    });
-                }
-            }
-        }
-    }
 }

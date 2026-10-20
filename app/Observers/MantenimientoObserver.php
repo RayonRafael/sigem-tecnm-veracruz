@@ -23,8 +23,9 @@ class MantenimientoObserver
             if ($estadoNuevo === 'Completado') {
                 $inventario = $mantenimiento->inventario;
                 if ($inventario) {
-                    $nuevoEstado = $inventario->id_usuario ? 'Asignado' : 'Disponible';
-                    $inventario->update(['estado' => $nuevoEstado]);
+                    // inventario.id_usuario es quien REGISTRO la pieza (NOT NULL), no un prestatario,
+                    // por lo que no sirve para deducir asignacion. Se devuelve a Disponible siempre.
+                    $inventario->update(['estado' => 'Disponible']);
                 }
             }
         }

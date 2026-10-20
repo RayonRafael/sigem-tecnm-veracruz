@@ -113,11 +113,10 @@ class MaterialResource extends Resource
                         Forms\Components\TextInput::make('stock_actual')
                             ->label('Stock actual')
                             ->numeric()
-                            ->minValue(0)
-                            ->default(0)
                             ->prefixIcon('heroicon-m-archive-box')
-                            ->dehydrated()
-                            ->required(),
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->helperText('Calculado automáticamente'),
                         Forms\Components\TextInput::make('stock_minimo')
                             ->label('Stock mínimo')
                             ->numeric()
@@ -158,7 +157,8 @@ class MaterialResource extends Resource
                 Tables\Columns\TextColumn::make('stock_actual')->wrap(false)->limit(30)->grow(false)
                     ->label('Stock actual')
                     ->numeric()
-                    ->sortable(),
+                    // Se ordena por el stock derivado, no por la columna fisica obsoleta.
+                    ->sortable(query: fn (Builder $query, string $direction) => $query->orderByRaw(\App\Models\Material::stockDerivadoSql().' '.$direction)),
                 Tables\Columns\TextColumn::make('stock_minimo')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Stock mín.')
                     ->numeric()
@@ -175,7 +175,7 @@ class MaterialResource extends Resource
                         'heroicon-m-exclamation-triangle' => 'Stock bajo',
                         'heroicon-m-check-circle' => 'Normal',
                     ])
-                    ->sortable(query: fn (Builder $query, string $direction) => $query->orderByRaw('stock_actual - stock_minimo '.$direction)),
+                    ->sortable(query: fn (Builder $query, string $direction) => $query->orderByRaw(\App\Models\Material::stockDerivadoSql().' - material.stock_minimo '.$direction)),
             ])
             ->defaultSort('nombre', 'asc')
             ->striped()

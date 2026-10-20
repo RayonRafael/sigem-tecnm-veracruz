@@ -14,7 +14,11 @@ class TipoMaterialTableSeeder extends Seeder
     public function run()
     {
 
-        \DB::table('tipo_material')->delete();
+        // Candado: nunca sembrar datos de ejemplo en produccion ni sobrescribir datos existentes.
+        // (Antes aqui se hacia un delete() de la tabla completa.)
+        if (app()->isProduction() || \DB::table('tipo_material')->exists()) {
+            return;
+        }
 
         \DB::table('tipo_material')->insert([
             0 => [

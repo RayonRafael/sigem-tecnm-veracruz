@@ -5,6 +5,7 @@ namespace Tests\Feature\Observers;
 use App\Models\Area;
 use App\Models\Departamento;
 use App\Models\DetalleSolicitud;
+use App\Models\Inventario;
 use App\Models\MarcaMaterial;
 use App\Models\Material;
 use App\Models\Receptor;
@@ -69,85 +70,96 @@ class SolicitudObserverTest extends TestCase
         ]);
     }
 
-    public function test_authorizing_solicitud_decrements_material_stock(): void
+    private function piezas(Material $material, int $n): array
     {
-        $material = $this->createMaterial();
-        $receptor = $this->createReceptor();
+        $area = $this->createArea();
         $user = $this->getUser();
+        $out = [];
+        for ($k = 0; $k < $n; $k++) {
+            $out[] = Inventario::create([
+                'numero_serie' => 'SN-'.uniqid(),
+                'id_producto' => $material->id_producto,
+                'id_area' => $area->id_area,
+                'estado' => 'Disponible',
+                'estado_registro' => 'Aprobado',
+                'tipo_propiedad' => 'Propio',
+                'id_usuario' => $user->id,
+                'fecha_registro' => now(),
+            ]);
+        }
 
+        return $out;
+    }
+
+    private function solicitud(Material $material, int $cantidad, string $estado = 'Pendiente'): Solicitud
+    {
         $solicitud = Solicitud::create([
-            'id_receptor' => $receptor->id_receptor,
+            'id_receptor' => $this->createReceptor()->id_receptor,
             'tipo_movimiento' => 'Asignacion Permanente',
-            'estado' => 'Pendiente',
-            'id_usuario' => $user->id,
+            'estado' => $estado,
+            'id_usuario' => $this->getUser()->id,
             'fecha_solicitud' => now(),
         ]);
-
         DetalleSolicitud::create([
             'id_solicitud' => $solicitud->id_solicitud,
             'id_producto' => $material->id_producto,
-            'cantidad' => 2,
+            'cantidad' => $cantidad,
         ]);
 
+        return $solicitud;
+    }
+
+    public function test_stock_is_derived_and_follows_solicitud_state(): void
+    {
+        $material = $this->createMaterial();
+        $this->piezas($material, 10);
+
+        $solicitud = $this->solicitud($material, 2);
         $this->assertEquals(10, $material->fresh()->stock_actual);
 
         $solicitud->update(['estado' => 'Autorizado']);
-
-        $this->assertEquals(8, $material->fresh()->stock_actual);
-    }
-
-    public function test_rejecting_authorized_solicitud_restores_material_stock(): void
-    {
-        $material = $this->createMaterial();
-        $receptor = $this->createReceptor();
-        $user = $this->getUser();
-
-        $solicitud = Solicitud::create([
-            'id_receptor' => $receptor->id_receptor,
-            'tipo_movimiento' => 'Asignacion Permanente',
-            'estado' => 'Pendiente',
-            'id_usuario' => $user->id,
-            'fecha_solicitud' => now(),
-        ]);
-
-        DetalleSolicitud::create([
-            'id_solicitud' => $solicitud->id_solicitud,
-            'id_producto' => $material->id_producto,
-            'cantidad' => 2,
-        ]);
-
-        $solicitud->update(['estado' => 'Autorizado']);
         $this->assertEquals(8, $material->fresh()->stock_actual);
 
-        $solicitud->update(['estado' => 'Rechazado']);
-
+        // Cancelar (caso que antes desincronizaba) restituye solo.
+        $solicitud->update(['estado' => 'Cancelado']);
         $this->assertEquals(10, $material->fresh()->stock_actual);
     }
 
-    public function test_rejecting_pending_solicitud_does_not_change_stock(): void
+    public function test_stock_ignores_unapproved_pieces_and_never_goes_negative(): void
     {
         $material = $this->createMaterial();
-        $receptor = $this->createReceptor();
-        $user = $this->getUser();
+        $piezas = $this->piezas($material, 3);
+        $piezas[0]->update(['estado_registro' => 'Pendiente']);
+        $this->assertEquals(2, $material->fresh()->stock_actual);
 
-        $solicitud = Solicitud::create([
-            'id_receptor' => $receptor->id_receptor,
-            'tipo_movimiento' => 'Asignacion Permanente',
-            'estado' => 'Pendiente',
-            'id_usuario' => $user->id,
-            'fecha_solicitud' => now(),
-        ]);
+        $this->solicitud($material, 50, 'Autorizado');
+        $this->assertEquals(0, $material->fresh()->stock_actual);
+    }
 
-        DetalleSolicitud::create([
-            'id_solicitud' => $solicitud->id_solicitud,
-            'id_producto' => $material->id_producto,
-            'cantidad' => 2,
-        ]);
+    public function test_editing_quantity_and_deleting_solicitud_stay_consistent(): void
+    {
+        $material = $this->createMaterial();
+        $this->piezas($material, 10);
+        $solicitud = $this->solicitud($material, 2, 'Autorizado');
+        $this->assertEquals(8, $material->fresh()->stock_actual);
 
+        DetalleSolicitud::where('id_solicitud', $solicitud->id_solicitud)->update(['cantidad' => 5]);
+        $this->assertEquals(5, $material->fresh()->stock_actual);
+
+        DetalleSolicitud::where('id_solicitud', $solicitud->id_solicitud)->delete();
+        $solicitud->delete();
         $this->assertEquals(10, $material->fresh()->stock_actual);
+    }
 
-        $solicitud->update(['estado' => 'Rechazado']);
+    public function test_stock_bajo_scope_uses_derived_stock(): void
+    {
+        $material = $this->createMaterial();
+        $material->update(['stock_minimo' => 3]);
+        $this->piezas($material, 2);
 
-        $this->assertEquals(10, $material->fresh()->stock_actual);
+        $this->assertTrue(Material::stockBajo()->whereKey($material->id_producto)->exists());
+
+        $this->piezas($material, 5);
+        $this->assertFalse(Material::stockBajo()->whereKey($material->id_producto)->exists());
     }
 }

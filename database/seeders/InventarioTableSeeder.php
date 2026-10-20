@@ -14,7 +14,11 @@ class InventarioTableSeeder extends Seeder
     public function run()
     {
 
-        \DB::table('inventario')->delete();
+        // Candado: nunca sembrar datos de ejemplo en produccion ni sobrescribir datos existentes.
+        // (Antes aqui se hacia un delete() de la tabla completa.)
+        if (app()->isProduction() || \DB::table('inventario')->exists()) {
+            return;
+        }
 
         \DB::table('inventario')->insert([
             0 => [

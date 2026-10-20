@@ -14,6 +14,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class MaterialResource extends Resource
 {
@@ -94,11 +95,10 @@ class MaterialResource extends Resource
                             Forms\Components\TextInput::make('stock_actual')
                                 ->label('Stock actual')
                                 ->numeric()
-                                ->minValue(0)
-                                ->default(0)
                                 ->prefixIcon('heroicon-m-archive-box')
-                                ->dehydrated()
-                                ->required(),
+                                ->disabled()
+                                ->dehydrated(false)
+                                ->helperText('Calculado automáticamente'),
                             Forms\Components\Hidden::make('stock_minimo')
                                 ->default(0),
                             Forms\Components\Hidden::make('requiere_control_individual')
@@ -130,7 +130,8 @@ class MaterialResource extends Resource
                 Tables\Columns\TextColumn::make('stock_actual')->wrap(false)->limit(30)->grow(false)
                     ->label('Stock actual')
                     ->numeric()
-                    ->sortable(),
+                    // Se ordena por el stock derivado, no por la columna fisica obsoleta.
+                    ->sortable(query: fn (Builder $query, string $direction) => $query->orderByRaw(\App\Models\Material::stockDerivadoSql().' '.$direction)),
                 Tables\Columns\TextColumn::make('stock_minimo')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Stock mín.')
                     ->numeric()
