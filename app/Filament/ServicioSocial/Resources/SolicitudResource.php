@@ -113,25 +113,16 @@ class SolicitudResource extends Resource
                     Forms\Components\Wizard\Step::make('Participantes y detalles')
                         ->icon('heroicon-m-users')
                         ->schema([
-                            Forms\Components\Grid::make(2)
-                                ->schema([
-                                    Forms\Components\Select::make('id_usuario')
-                                        ->label('Solicitante (usuario)')
-                                        ->relationship('usuario', 'name')
-                                        ->default(auth()->id())
-                                        ->required()
-                                        ->searchable()
-                                        ->preload()
-                                        ->prefixIcon('heroicon-m-user'),
-                                    Forms\Components\Select::make('id_receptor')
-                                        ->label('Receptor (área/persona)')
-                                        ->relationship('receptor', 'nombre')
-                                        ->required()
-                                        ->searchable()
-                                        ->preload()
-                                        ->prefixIcon('heroicon-m-user-group')
-                                        ->live(),
-                                ]),
+                            Forms\Components\Hidden::make('id_usuario')
+                                ->default(auth()->id()),
+                            Forms\Components\Select::make('id_receptor')
+                                ->label('Receptor (área/persona)')
+                                ->relationship('receptor', 'nombre')
+                                ->required()
+                                ->searchable()
+                                ->preload()
+                                ->prefixIcon('heroicon-m-user-group')
+                                ->live(),
                             Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\DatePicker::make('fecha_devolucion_estimada')
@@ -267,7 +258,7 @@ class SolicitudResource extends Resource
         ];
     }
 
-    public static function getEloquentQuery(): Builder
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         return parent::getEloquentQuery()->where('id_usuario', auth()->id());
     }
