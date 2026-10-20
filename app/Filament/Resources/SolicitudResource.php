@@ -12,13 +12,12 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
 
 class SolicitudResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
-
     protected static ?string $model = Solicitud::class;
 
     protected static ?string $recordTitleAttribute = 'observaciones';
@@ -212,6 +211,8 @@ class SolicitudResource extends Resource
                     ->label('Folio')
                     ->formatStateUsing(fn ($state) => 'FOLIO-'.str_pad($state, 5, '0', STR_PAD_LEFT))
                     ->fontFamily('mono')
+                    ->weight(FontWeight::Bold)
+                    ->extraAttributes(['class' => 'sigem-td-folio'])
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tipo_movimiento')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo de movimiento')
@@ -234,18 +235,11 @@ class SolicitudResource extends Resource
                 Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)->label('Estado')
                     ->badge()
                     ->colors([
+                        'success' => 'Autorizado',
                         'warning' => 'Pendiente',
-                        'primary' => 'Autorizado',
-                        'success' => 'Completado',
-                        'danger' => 'Rechazado',
-                        'gray' => 'Cancelado',
-                    ])
-                    ->icons([
-                        'heroicon-m-clock' => 'Pendiente',
-                        'heroicon-m-check-circle' => 'Autorizado',
-                        'heroicon-m-check-badge' => 'Completado',
-                        'heroicon-m-x-circle' => 'Rechazado',
-                        'heroicon-m-no-symbol' => 'Cancelado',
+                        'info'    => 'Entregado',
+                        'danger'  => 'Rechazado',
+                        'gray'    => ['Completado', 'Cancelado'],
                     ]),
                 Tables\Columns\TextColumn::make('fecha_devolucion_estimada')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Devolución estimada')

@@ -12,13 +12,13 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\ActionSize;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
 
 class MantenimientoResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
-
     protected static ?string $model = Mantenimiento::class;
 
     protected static ?string $recordTitleAttribute = 'descripcion_falla';
@@ -168,12 +168,16 @@ class MantenimientoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('inventario.num_serie')->wrap(false)->limit(30)->grow(false)
-                    ->label('No. serie (activo)')
+                    ->label('Equipo')
                     ->fontFamily('mono')
-                    ->searchable(),
+                    ->weight(FontWeight::Bold)
+                    ->extraAttributes(['class' => 'sigem-td-folio'])
+                    ->searchable()
+                    ->description(fn (Mantenimiento $record): ?string => $record->inventario?->material?->nombre),
                 Tables\Columns\TextColumn::make('inventario.material.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Material')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('tipo_mantenimiento')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Tipo mantenimiento')
                     ->badge()
@@ -195,20 +199,19 @@ class MantenimientoResource extends Resource
                     ->label('Técnico')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)->label('Estado')
-                    ->formatStateUsing(fn ($state) => $state === 'Pendiente Revision Admin' ? 'En revisión' : $state)
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'Pendiente Revision Admin' => 'En revisión',
+                        'Completado' => 'Terminado',
+                        'Cancelado' => 'Rechazado',
+                        default => $state,
+                    })
                     ->badge()
                     ->colors([
-                        'warning' => 'Solicitado',
-                        'primary' => 'En proceso',
-                        'info' => 'Pendiente Revision Admin',
-                        'success' => 'Completado',
-                        'danger' => 'Cancelado',
-                    ])
-                    ->icons([
-                        'heroicon-m-clock' => ['Solicitado', 'Pendiente Revision Admin'],
-                        'heroicon-m-wrench-screwdriver' => 'En proceso',
-                        'heroicon-m-check-badge' => 'Completado',
-                        'heroicon-m-x-circle' => 'Cancelado',
+                        'info'    => ['En revisión', 'Pendiente Revision Admin'],
+                        'warning' => ['En proceso', 'Solicitado'],
+                        'success' => ['Terminado', 'Completado'],
+                        'danger'  => ['Rechazado', 'Cancelado'],
+                        'gray'    => 'otros',
                     ]),
                 Tables\Columns\TextColumn::make('fecha_solicitud')->wrap(false)->limit(30)->grow(false)->label('Fecha de solicitud')
                     ->label('Fecha sol.')
@@ -253,10 +256,12 @@ class MantenimientoResource extends Resource
             ->recordAction(null)
             ->actions([
                 Tables\Actions\Action::make('autorizar')
-                    ->label('Autorizar')
-                    ->icon('heroicon-m-check-circle')
-                    ->color('success')
-                    ->visible(fn (Mantenimiento $record): bool => $record->estado === 'Pendiente Revision Admin' || $record->estado === 'Solicitado')
+                    ->label('✓ Autorizar')
+                    ->button()
+                    ->size(ActionSize::Small)
+                    ->color('primary')
+                    ->extraAttributes(['class' => 'sigem-btn-inline'])
+                    ->visible(fn (Mantenimiento $record): bool => in_array($record->estado, ['Pendiente Revision Admin', 'En revisión']))
                     ->action(function (Mantenimiento $record) {
                         $record->update(['estado' => 'En proceso']);
                         Notification::make()->title('Mantenimiento autorizado correctamente')->success()->send();

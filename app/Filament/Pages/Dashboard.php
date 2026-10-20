@@ -22,8 +22,6 @@ use Spatie\Activitylog\Models\Activity;
 
 class Dashboard extends BaseDashboard
 {
-    protected static bool $shouldRegisterNavigation = false;
-
     protected static ?string $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $navigationGroup = 'Panel principal';
