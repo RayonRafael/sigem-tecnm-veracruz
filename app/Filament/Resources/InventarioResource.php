@@ -11,8 +11,7 @@ use App\Models\Inventario;
 use App\Models\Salon;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -395,14 +394,17 @@ class InventarioResource extends Resource
                 Tables\Columns\TextColumn::make('material.marca.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Marca')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('material.tipo.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('ubicacion_fisica')->wrap(false)->limit(30)->grow(false)
                     ->label('Ubicación')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)->label('Estado')
                     ->badge()
                     ->colors([
@@ -430,13 +432,15 @@ class InventarioResource extends Resource
                     ->icons([
                         'heroicon-m-building-library' => 'Propio',
                         'heroicon-m-currency-dollar' => 'Rentado',
-                    ]),
+                    ])
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('aprobado')->wrap(false)->limit(30)->grow(false)
                     ->label('Aprobado')
                     ->formatStateUsing(fn ($state) => $state ? 'Aprobado' : 'Pendiente')
                     ->badge()
                     ->color(fn ($state) => $state ? 'success' : 'warning')
-                    ->icon(fn ($state) => $state ? 'heroicon-m-shield-check' : 'heroicon-m-clock'),
+                    ->icon(fn ($state) => $state ? 'heroicon-m-shield-check' : 'heroicon-m-clock')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('aprobadoPor.name')->wrap(false)->limit(30)->grow(false)
                     ->label('Aprobado por')
                     ->sortable()
@@ -503,8 +507,8 @@ class InventarioResource extends Resource
                         Notification::make()->title('Registro rechazado exitosamente')->success()->send();
                     })
                     ->requiresConfirmation(),
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Registro de inventario actualizado correctamente'),
+                Tables\Actions\ViewAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton()->slideOver()->successNotificationTitle('Registro de inventario actualizado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -533,14 +537,23 @@ class InventarioResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Identificación del activo')
+                Infolists\Components\Section::make('Identificación del Equipo')
                     ->schema([
-                        TextEntry::make('num_serie')->label('No. serie')
+                        Infolists\Components\TextEntry::make('tipo_equipo')
+                            ->label('Tipo de equipo')
+                            ->badge()
+                            ->color('primary')
+                            ->placeholder('No definido'),
+                        Infolists\Components\TextEntry::make('num_serie')
+                            ->label('Número de serie')
                             ->fontFamily('mono')
-                            ->icon('heroicon-m-qr-code'),
-                        TextEntry::make('material.nombre')->label('Material')
+                            ->icon('heroicon-m-qr-code')
+                            ->placeholder('Sin número de serie'),
+                        Infolists\Components\TextEntry::make('material.nombre')
+                            ->label('Material / Equipo')
                             ->icon('heroicon-m-cube'),
-                        TextEntry::make('estado')->label('Estado')
+                        Infolists\Components\TextEntry::make('estado')
+                            ->label('Estado')
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 'Disponible' => 'success',
@@ -549,28 +562,49 @@ class InventarioResource extends Resource
                                 'Devuelto a Proveedor' => 'info',
                                 default => 'gray',
                             }),
-                    ])->columns(3),
-                Section::make('Ubicación y asignación')
-                    ->schema([
-                        TextEntry::make('ubicacion_fisica')->label('Ubicación')
-                            ->icon('heroicon-m-building-office'),
-                        TextEntry::make('tipo_propiedad')->label('Propiedad')
+                        Infolists\Components\TextEntry::make('tipo_propiedad')
+                            ->label('Propiedad')
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 'Propio' => 'primary',
                                 'Rentado' => 'gray',
                                 default => 'gray',
                             }),
-                        TextEntry::make('usuario.name')->label('Registrado por')
+                        Infolists\Components\TextEntry::make('usuario.name')
+                            ->label('Registrado por')
                             ->icon('heroicon-m-user'),
-                    ])->columns(3),
-                Section::make('Detalles adicionales')
+                    ])->columns(2),
+
+                Infolists\Components\Section::make('Ubicación Física')
                     ->schema([
-                        TextEntry::make('proveedor.nombre_empresa')->label('Proveedor'),
-                        TextEntry::make('num_factura')->label('Factura'),
-                        TextEntry::make('garantia_estado')->label('Garantía'),
-                        TextEntry::make('observaciones_generales')->label('Observaciones')->columnSpanFull(),
-                    ])->columns(3),
+                        Infolists\Components\TextEntry::make('ubicacion_fisica')
+                            ->label('Ubicación física descriptiva')
+                            ->icon('heroicon-m-map-pin')
+                            ->placeholder('No especificada')
+                            ->columnSpanFull(),
+                    ]),
+
+                Infolists\Components\Section::make('Componentes de la Estación')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('especificaciones.cpu_marca')->label('Marca CPU')->placeholder('—'),
+                        Infolists\Components\TextEntry::make('especificaciones.cpu_sn')->label('S/N CPU')->placeholder('—'),
+                        Infolists\Components\TextEntry::make('especificaciones.monitor_marca')->label('Marca Monitor')->placeholder('—'),
+                        Infolists\Components\TextEntry::make('especificaciones.monitor_sn')->label('S/N Monitor')->placeholder('—'),
+                        Infolists\Components\TextEntry::make('especificaciones.teclado_marca')->label('Marca Teclado')->placeholder('—'),
+                        Infolists\Components\TextEntry::make('especificaciones.teclado_sn')->label('S/N Teclado')->placeholder('—'),
+                        Infolists\Components\TextEntry::make('especificaciones.mouse_marca')->label('Marca Mouse')->placeholder('—'),
+                        Infolists\Components\TextEntry::make('especificaciones.mouse_sn')->label('S/N Mouse')->placeholder('—'),
+                    ])
+                    ->columns(4)
+                    ->visible(fn ($record) => in_array($record->tipo_equipo, ['Desktop', 'All in One', 'Computadora'])),
+
+                Infolists\Components\Section::make('Detalles adicionales')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('proveedor.nombre_empresa')->label('Proveedor')->placeholder('—'),
+                        Infolists\Components\TextEntry::make('num_factura')->label('Factura')->placeholder('—'),
+                        Infolists\Components\TextEntry::make('garantia_estado')->label('Garantía')->badge(),
+                        Infolists\Components\TextEntry::make('observaciones_generales')->label('Observaciones')->placeholder('Sin observaciones')->columnSpanFull(),
+                    ])->columns(3)->collapsible(),
             ]);
     }
 
