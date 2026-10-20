@@ -52,6 +52,10 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
+        Gate::before(function ($user, $ability) {
+            return ($user && ($user->hasRole('Administrador') || $user->hasRole('Admin'))) ? true : null;
+        });
+
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Inventario::class, InventarioPolicy::class);
         Gate::policy(Solicitud::class, SolicitudPolicy::class);

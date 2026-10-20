@@ -2,54 +2,43 @@
 
 namespace App\Policies;
 
-use App\Enums\RoleEnum;
 use App\Models\Inventario;
 use App\Models\User;
 
 class InventarioPolicy
 {
-    private function isAdmin(User $user): bool
-    {
-        return $user->hasPermissionTo(RoleEnum::PERM_ACCESS_ADMIN) || $user->tipo_usuario === RoleEnum::ADMIN->value;
-    }
-
-    private function isShared(User $user): bool
-    {
-        return $this->isAdmin($user) || $user->hasPermissionTo(RoleEnum::PERM_ACCESS_SERVICIO) || $user->tipo_usuario === RoleEnum::SERVICIO_TIPO->value;
-    }
-
     public function viewAny(User $user): bool
     {
-        return $this->isShared($user);
+        return $user->hasPermissionTo('inventario.ver');
     }
 
-    public function view(User $user, Inventario $modelInstance): bool
+    public function view(User $user, Inventario $inventario): bool
     {
-        return $this->isShared($user);
+        return $user->hasPermissionTo('inventario.ver');
     }
 
     public function create(User $user): bool
     {
-        return $this->isShared($user);
+        return $user->hasPermissionTo('inventario.crear');
     }
 
-    public function update(User $user, Inventario $modelInstance): bool
+    public function update(User $user, Inventario $inventario): bool
     {
-        return $this->isAdmin($user);
+        return $user->hasPermissionTo('inventario.editar');
     }
 
-    public function delete(User $user, Inventario $modelInstance): bool
+    public function delete(User $user, Inventario $inventario): bool
     {
-        return $this->isAdmin($user);
+        return $user->hasPermissionTo('inventario.eliminar');
     }
 
-    public function restore(User $user, Inventario $modelInstance): bool
+    public function restore(User $user, Inventario $inventario): bool
     {
-        return $this->isAdmin($user);
+        return $user->hasPermissionTo('inventario.eliminar');
     }
 
-    public function forceDelete(User $user, Inventario $modelInstance): bool
+    public function forceDelete(User $user, Inventario $inventario): bool
     {
-        return $this->isAdmin($user);
+        return $user->hasPermissionTo('inventario.eliminar');
     }
 }

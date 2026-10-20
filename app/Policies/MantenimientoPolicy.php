@@ -2,64 +2,46 @@
 
 namespace App\Policies;
 
-use App\Enums\RoleEnum;
 use App\Models\Mantenimiento;
 use App\Models\User;
 
 class MantenimientoPolicy
 {
-    private function isAdmin(User $user): bool
-    {
-        return $user->hasPermissionTo(RoleEnum::PERM_ACCESS_ADMIN) || $user->tipo_usuario === RoleEnum::ADMIN->value;
-    }
-
-    private function isShared(User $user): bool
-    {
-        return $this->isAdmin($user) || $user->hasPermissionTo(RoleEnum::PERM_ACCESS_SERVICIO) || $user->tipo_usuario === RoleEnum::SERVICIO_TIPO->value;
-    }
-
     public function viewAny(User $user): bool
     {
-        return $this->isShared($user);
+        return $user->hasPermissionTo('mantenimiento.ver');
     }
 
-    public function view(User $user, Mantenimiento $modelInstance): bool
+    public function view(User $user, Mantenimiento $mantenimiento): bool
     {
-        if ($this->isAdmin($user)) {
-            return true;
-        }
-
-        return $this->isShared($user) && $modelInstance->id_usuario_solicita === $user->id;
+        return $user->hasPermissionTo('mantenimiento.ver')
+            && $mantenimiento->id_usuario_solicita === $user->id;
     }
 
     public function create(User $user): bool
     {
-        return $this->isShared($user);
+        return $user->hasPermissionTo('mantenimiento.crear');
     }
 
-    public function update(User $user, Mantenimiento $modelInstance): bool
+    public function update(User $user, Mantenimiento $mantenimiento): bool
     {
-        if ($this->isAdmin($user)) {
-            return true;
-        }
-
-        return $this->isShared($user) 
-            && $modelInstance->id_usuario_solicita === $user->id 
-            && $modelInstance->estado === 'Solicitado';
+        return $user->hasPermissionTo('mantenimiento.editar')
+            && $mantenimiento->id_usuario_solicita === $user->id
+            && $mantenimiento->estado === 'Solicitado';
     }
 
-    public function delete(User $user, Mantenimiento $modelInstance): bool
+    public function delete(User $user, Mantenimiento $mantenimiento): bool
     {
-        return $this->isAdmin($user);
+        return $user->hasPermissionTo('mantenimiento.completar');
     }
 
-    public function restore(User $user, Mantenimiento $modelInstance): bool
+    public function restore(User $user, Mantenimiento $mantenimiento): bool
     {
-        return $this->isAdmin($user);
+        return false;
     }
 
-    public function forceDelete(User $user, Mantenimiento $modelInstance): bool
+    public function forceDelete(User $user, Mantenimiento $mantenimiento): bool
     {
-        return $this->isAdmin($user);
+        return false;
     }
 }

@@ -14,6 +14,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Spatie\Permission\Models\Role;
 
 class UserResource extends Resource
 {
@@ -95,31 +96,29 @@ class UserResource extends Resource
                             ->maxLength(13),
                     ])->columns(3),
 
-                        Forms\Components\Grid::make(3)
+                        Forms\Components\Grid::make(2)
                             ->schema([
-                        Forms\Components\Select::make('tipo_usuario')->placeholder('Selecciona...')
-                            ->label('Tipo de usuario (sistema)')
-                            ->options([
-                                RoleEnum::ADMIN->value => RoleEnum::ADMIN->value,
-                                RoleEnum::SERVICIO_TIPO->value => RoleEnum::SERVICIO_SOCIAL->value,
-                                'Pendiente' => 'Pendiente',
-                            ])
-                            ->default('Pendiente')
-                            ->prefixIcon('heroicon-m-shield-check')
-                            ->required(),
-                        Forms\Components\Select::make('roles')->placeholder('Selecciona...')
-                            ->label('Rol (Spatie)')
-                            ->relationship('roles', 'name')
-                            ->preload()
-                            ->prefixIcon('heroicon-m-key')
-                            ->searchable(),
-                        Forms\Components\ToggleButtons::make('activo')
-                            ->label('Usuario activo')
-                            ->boolean(trueLabel: 'Sí', falseLabel: 'No')
-                            ->inline()
-                            ->default(true)
-                            ->required(),
-                            ])->columns(3),
+                                Forms\Components\Select::make('roles')
+                                    ->placeholder('Selecciona...')
+                                    ->label('Rol (Spatie)')
+                                    ->relationship('roles', 'name')
+                                    ->preload()
+                                    ->prefixIcon('heroicon-m-key')
+                                    ->searchable()
+                                    ->live()
+                                    ->afterStateUpdated(function (Forms\Set $set, ?string $state) {
+                                        $set('tipo_usuario', static::mapRoleToTipoUsuario($state));
+                                    }),
+                                Forms\Components\Hidden::make('tipo_usuario')
+                                    ->default('Pendiente')
+                                    ->dehydrated(),
+                                Forms\Components\ToggleButtons::make('activo')
+                                    ->label('Usuario activo')
+                                    ->boolean(trueLabel: 'Sí', falseLabel: 'No')
+                                    ->inline()
+                                    ->default(true)
+                                    ->required(),
+                            ])->columns(2),
                     ])->columnSpanFull(),
                 ])->columnSpanFull(),
             ]);
@@ -255,5 +254,22 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    public static function mapRoleToTipoUsuario(?string $roleNameOrId): string
+    {
+        if (! $roleNameOrId) {
+            return 'Pendiente';
+        }
+
+        $roleName = is_numeric($roleNameOrId)
+            ? Role::find($roleNameOrId)?->name
+            : $roleNameOrId;
+
+        return match ($roleName) {
+            'Administrador', 'Admin' => RoleEnum::ADMIN->value,
+            'Servicio Social', 'Servicio' => RoleEnum::SERVICIO_TIPO->value,
+            default => 'Pendiente',
+        };
     }
 }

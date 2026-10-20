@@ -78,7 +78,6 @@ class RolesAndPermissionsSeeder extends Seeder
         $servicioSocial->syncPermissions([
             'inventario.ver',
             'inventario.crear',
-            'inventario.editar',
             'catalogos.ver',
             'catalogos.crear',
             'catalogos.editar',

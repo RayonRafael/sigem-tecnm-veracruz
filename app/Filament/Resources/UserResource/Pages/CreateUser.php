@@ -21,4 +21,13 @@ class CreateUser extends CreateRecord
     {
         return 'Registro creado exitosamente';
     }
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        if (isset($data['roles'])) {
+            $data['tipo_usuario'] = UserResource::mapRoleToTipoUsuario($data['roles']);
+        }
+
+        return $data;
+    }
 }

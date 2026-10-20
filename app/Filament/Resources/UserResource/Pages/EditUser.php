@@ -37,4 +37,13 @@ class EditUser extends EditRecord
     {
         return 'Registro eliminado exitosamente';
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        if (isset($data['roles'])) {
+            $data['tipo_usuario'] = UserResource::mapRoleToTipoUsuario($data['roles']);
+        }
+
+        return $data;
+    }
 }
