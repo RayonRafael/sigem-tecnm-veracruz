@@ -1746,6 +1746,83 @@ aside.fi-sidebar,
   }
 }
 
+/* ===== Fase 6: Solicitudes y Mantenimiento ===== */
 
+/* Filtros de columna (aplica si no se aplicaron en Fase 5) */
+.fi-ta-table .fi-ta-filters input,
+.fi-ta-table .fi-ta-filters select,
+.fi-ta-filters input,
+.fi-ta-filters select{
+  width:100%;min-width:84px;height:31px;font:inherit;font-size:15.5px;
+  padding:0 8px;border:1px solid var(--sig-border);border-radius:7px;
+  background:var(--sig-surface);color:var(--sig-text);box-sizing:border-box}
+.fi-ta-filters input:focus-visible,
+.fi-ta-filters select:focus-visible{outline:2px solid var(--sig-primary);outline-offset:1px}
+.fi-ta-filters .on{border-color:var(--sig-primary) !important;
+  background:var(--sig-primary-light) !important;color:var(--sig-primary-dark) !important;
+  font-weight:600 !important}
 
+/* Folio / código en negrita */
+.sigem-td-folio{font-weight:700 !important;font-variant-numeric:tabular-nums}
 
+/* Botón "Autorizar" inline en filas de Mantenimiento */
+.sigem-btn-inline,
+.fi-ta-actions .sigem-btn-inline{
+  padding:5px 11px !important;border-radius:8px !important;background:var(--sig-primary) !important;color:#fff !important;
+  font-size:14px !important;font-weight:600 !important;border:none !important;cursor:pointer;
+  display:inline-flex !important;align-items:center !important;gap:5px !important;transition:all .15s}
+.sigem-btn-inline:hover,
+.fi-ta-actions .sigem-btn-inline:hover{background:var(--sig-primary-dark) !important;
+  box-shadow:0 3px 9px rgba(27,101,212,.32) !important}
+.sigem-btn-inline:focus-visible,
+.fi-ta-actions .sigem-btn-inline:focus-visible{outline:2px solid var(--sig-primary) !important;outline-offset:2px}
+
+/* ===== Fase 7: Reportes ===== */
+.sigem-rep-header{margin-bottom:16px}
+.sigem-rep-header h1{font-size:24px;font-weight:700;display:flex;align-items:center;gap:10px;margin:0 0 6px;color:var(--sig-text)}
+.sigem-rep-header p{font-size:16px;color:var(--sig-muted);margin:0}
+.sigem-rep-note{font-size:16px;color:var(--sig-muted);margin:-6px 0 14px}
+.sigem-rep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:14px;margin-bottom:18px}
+.sigem-rep-card{background:var(--sig-surface);border:1px solid var(--sig-border);
+  border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:5px;
+  box-shadow:0 1px 2px rgba(16,24,40,.05);transition:transform .15s, box-shadow .15s}
+.sigem-rep-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.sigem-rep-ico{width:38px;height:38px;border-radius:10px;background:#fdf3d7;
+  display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:6px}
+.sigem-rep-t{font-weight:700;font-size:17.5px;color:var(--sig-text)}
+.sigem-rep-d{font-size:15.5px;color:var(--sig-muted);line-height:1.45;flex:1}
+.sigem-rep-foot{display:flex;align-items:center;justify-content:space-between;
+  gap:8px;margin-top:12px;flex-wrap:wrap}
+
+/* Switch */
+.sigem-sw{display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+  font-size:15.5px;font-weight:600;color:var(--sig-muted);position:relative;user-select:none}
+.sigem-sw input{position:absolute;opacity:0;width:1px;height:1px}
+.sigem-sw-ui{width:34px;height:20px;border-radius:20px;background:var(--sig-border);
+  position:relative;transition:background .15s;flex-shrink:0}
+.sigem-sw-ui::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;
+  border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
+.sigem-sw input:checked + .sigem-sw-ui{background:#059669}
+.sigem-sw input:checked + .sigem-sw-ui::after{transform:translateX(14px)}
+.sigem-sw input:focus-visible + .sigem-sw-ui{outline:2px solid var(--sig-primary);outline-offset:2px}
+.sigem-sw input:checked ~ .sigem-sw-l{color:#059669}
+
+/* Botones reporte */
+.sigem-rep-btn-primary{padding:6px 14px;border-radius:8px;background:var(--sig-primary);color:#fff;
+  font-size:14px;font-weight:600;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.sigem-rep-btn-primary:hover{background:var(--sig-primary-dark);box-shadow:0 3px 9px rgba(27,101,212,.32)}
+.sigem-rep-btn-sec{padding:6px 14px;border-radius:8px;background:var(--sig-surface);color:var(--sig-text);
+  border:1px solid var(--sig-border);font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+.sigem-rep-btn-sec:hover{background:var(--sig-bg);border-color:var(--sig-border-strong)}
+
+/* Visor de reporte */
+.sigem-rep-view{background:var(--sig-surface);border:1px solid var(--sig-border);
+  border-radius:14px;overflow:hidden;margin-bottom:18px}
+.sigem-rep-vh{display:flex;justify-content:space-between;gap:12px;align-items:center;
+  padding:16px 20px;border-bottom:1px solid var(--sig-border);flex-wrap:wrap}
+.sigem-rep-vh h3{font-size:19px;margin:0 0 3px;font-weight:700;color:var(--sig-text)}
+.sigem-rep-vh .sigem-rep-meta{font-size:15.5px;color:var(--sig-muted)}
+.sigem-rep-empty{background:var(--sig-surface);border:1px dashed var(--sig-border);
+  border-radius:14px;padding:36px;text-align:center;color:var(--sig-muted);font-size:16.5px}
+.sigem-rep-table-wrap{width:100%;overflow-x:auto}

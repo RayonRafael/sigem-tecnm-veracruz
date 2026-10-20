@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Resources;
 
+use App\Filament\Pages\ReportesPage;
 use App\Filament\Resources\AreaResource;
 use App\Filament\Resources\DepartamentoResource;
 use App\Filament\Resources\InventarioResource;
@@ -106,5 +107,29 @@ class AdminResourceTest extends TestCase
         $this->actingAs($this->getAdminUser())
             ->get(UserResource::getUrl('index'))
             ->assertSuccessful();
+    }
+
+    public function test_admin_can_access_reportes_page()
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $this->actingAs($this->getAdminUser())
+            ->get(ReportesPage::getUrl())
+            ->assertSuccessful();
+    }
+
+    public function test_admin_can_toggle_and_view_reportes()
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        \Livewire\Livewire::actingAs($this->getAdminUser())
+            ->test(ReportesPage::class)
+            ->assertSee('Reportes')
+            ->assertSee('Genera reportes del inventario')
+            ->call('toggleVisibilidad', 'inventario_categoria')
+            ->assertSet('visibilidadServicioSocial.inventario_categoria', false)
+            ->call('verReporte', 'inventario_categoria')
+            ->assertSet('reporteActivo', 'inventario_categoria')
+            ->assertSee('Inventario por categoría')
+            ->call('cerrarReporte')
+            ->assertSet('reporteActivo', null);
     }
 }
