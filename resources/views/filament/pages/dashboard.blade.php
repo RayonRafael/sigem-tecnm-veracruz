@@ -1,4 +1,3 @@
-<div>
 <x-filament-panels::page>
     <div x-data="sigemDashboard()" class="sigem-professional" x-cloak>
 
@@ -6,166 +5,99 @@
             $user = auth()->user();
             $initial = substr($user->name ?? 'U', 0, 1);
             $role = $user->roles?->first()?->name ?? 'Usuario';
+            $hour = (int) date('H');
+            $saludo = $hour < 12 ? 'Buenos días' : ($hour < 19 ? 'Buenas tardes' : 'Buenas noches');
+            $nombreCorto = explode(' ', $user->name ?? 'Usuario')[0];
+            $porcentajeDisponibles = ($totalActivos ?? 0) > 0 ? round((($inventarioDisponibles ?? 0) / $totalActivos) * 100) : 0;
+            $requierenAtencion = ($materialesStockBajoCount ?? 0) + ($inventarioDanados ?? 0);
         @endphp
 
-        <!-- 1. HEADER -->
-        <header class="top-header">
-            <div class="header-brand">
-                <div class="brand-logo">S</div>
-                <div class="brand-text-container">
-                    <span class="brand-title text-primary-util">SIGEM – TecNM Veracruz</span>
-                    <span class="brand-subtitle text-secondary-util">Sistema de Gestión de Inventario</span>
-                </div>
-            </div>
-            <div class="header-user">
-                <button type="button" class="btn-theme" title="Alternar tema"
-                    x-data="{ 
-                        theme: localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'),
-                        toggle() {
-                            this.theme = this.theme === 'dark' ? 'light' : 'dark';
-                            localStorage.setItem('theme', this.theme);
-                            if (this.theme === 'dark') {
-                                document.documentElement.classList.add('dark');
-                            } else {
-                                document.documentElement.classList.remove('dark');
-                            }
-                        }
-                    }" 
-                    @click="toggle()">
-                    <svg x-show="theme === 'dark'" style="display:none;" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg x-show="theme !== 'dark'" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-                </button>
-                <div class="user-info" x-data="{ open: false }" style="position:relative;">
-                    <div class="user-text">
-                        <div class="user-name text-primary-util">{{ $user->name ?? 'Usuario' }}</div>
-                        <div class="user-role text-secondary-util">{{ $role }}</div>
-                    </div>
-                    <button type="button" class="user-avatar" @click="open = !open" style="border:none; cursor:pointer; outline:none;">
-                        {{ strtoupper($initial) }}
-                    </button>
-                    
-                    <div x-show="open" @click.away="open = false" x-transition.opacity.duration.200ms class="user-dropdown" style="display:none; position:absolute; top:48px; right:0; background:white; border:1px solid var(--slate-200); border-radius:12px; box-shadow:0 10px 15px -3px rgba(0,0,0,0.1); width:200px; z-index:50; overflow:hidden;">
-                        <div style="padding:12px 16px; border-bottom:1px solid var(--slate-100);">
-                            <div class="text-primary-util" style="font-weight:600; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $user->name ?? 'Usuario' }}</div>
-                            <div class="text-secondary-util" style="font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ $user->email ?? '' }}</div>
-                        </div>
-                        <div style="padding:8px;">
-                            <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
-                                @csrf
-                                <button type="submit" style="width:100%; text-align:left; background:transparent; border:none; padding:8px 12px; font-size:13px; font-weight:500; color:var(--red-600); cursor:pointer; display:flex; align-items:center; gap:8px; border-radius:6px; transition:0.18s;" onmouseover="this.style.background='var(--red-50)'" onmouseout="this.style.background='transparent'">
-                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                                    Cerrar sesión
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- 2. BANNER -->
-        <div class="welcome-banner">
+        <!-- 1. HERO -->
+        <div class="sigem-hero">
             <div>
-                <h1 class="banner-greeting text-primary-util"><span x-text="getGreeting()"></span>, {{ explode(' ', $user->name)[0] ?? 'Usuario' }}</h1>
-                <p class="banner-sub text-secondary-util">Tienes <strong>{{ $solicitudesPendientes ?? 0 }} solicitudes</strong> por autorizar y <strong>{{ $mantenimientosPendientes ?? 0 }} mantenimientos</strong> programados.</p>
-            </div>
-            <div class="banner-actions">
-                <button class="btn btn-glass" @click="openCatalog('modulo-solicitudes')">Ver pendientes</button>
-                <a href="{{ url('/admin/inventarios/create') }}" class="btn btn-white">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    Nuevo Inventario
-                </a>
+                <h1 id="sigem-hero-hi">👋 <span x-text="getGreeting()">{{ $saludo }}</span>, {{ $nombreCorto }}</h1>
+                <p>Supervisa las solicitudes de material y autorizaciones de mantenimiento del Centro de Cómputo.</p>
             </div>
         </div>
 
-        <!-- 3. STATS -->
-        <div class="grid-4">
-            <!-- Stat 1 -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-title text-secondary-util">TOTAL ACTIVOS</span>
-                    <div class="stat-icon bg-brand"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg></div>
+        <!-- 2. ACCIONES RÁPIDAS (4 CARDS) -->
+        <div class="sigem-quick-grid">
+            <!-- 1. Autorizar mantenimiento -->
+            <a class="sigem-quick" href="{{ url('/admin/mantenimientos') }}">
+                <div class="arrow">→</div>
+                <div class="sigem-quick-ico sigem-i-warning">🔧</div>
+                <div class="sigem-quick-title">
+                    Autorizar mantenimiento
+                    @if(($mantenimientosPendientes ?? 0) > 0)
+                        <span class="sigem-qbadge">{{ $mantenimientosPendientes }}</span>
+                    @endif
                 </div>
-                <h2 class="stat-val mono-text text-primary-util">{{ $totalActivos ?? 0 }}</h2>
-                <div class="stat-sub text-emerald">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                    +{{ $creadosEsteMes ?? 0 }} este mes
-                </div>
+                <div class="sigem-quick-desc">Hay reportes esperando tu revisión</div>
+            </a>
 
-            </div>
-            
-            <!-- Stat 2 -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-title text-secondary-util">EN BUEN ESTADO</span>
-                    <div class="stat-icon bg-emerald"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+            <!-- 2. Revisar solicitudes -->
+            <a class="sigem-quick" href="{{ url('/admin/solicituds') }}">
+                <div class="arrow">→</div>
+                <div class="sigem-quick-ico sigem-i-primary">📋</div>
+                <div class="sigem-quick-title">
+                    Revisar solicitudes
+                    @if(($solicitudesPendientes ?? 0) > 0)
+                        <span class="sigem-qbadge">{{ $solicitudesPendientes }}</span>
+                    @endif
                 </div>
-                <h2 class="stat-val mono-text text-primary-util">{{ $activosBueno ?? 0 }}</h2>
-                <div class="stat-sub text-secondary-util">{{ $porcentajeBuenEstado ?? 0 }}% del inventario</div>
-                <div class="progress-bar-wrap hidden-mobile">
-                    <div class="progress-bar-fill" style="width: {{ $porcentajeBuenEstado ?? 0 }}%;"></div>
-                </div>
-            </div>
+                <div class="sigem-quick-desc">Solicitudes de material por autorizar</div>
+            </a>
 
-            <!-- Stat 3 -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-title text-secondary-util">MANTENIMIENTOS</span>
-                    <div class="stat-icon bg-amber"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg></div>
-                </div>
-                <h2 class="stat-val mono-text text-primary-util">{{ $mantenimientosTotales ?? 0 }}</h2>
-                <div class="stat-sub text-amber-util">{{ $mantenimientosPendientes ?? 0 }} pendientes/revisión</div>
+            <!-- 3. Registrar activo -->
+            <a class="sigem-quick" href="{{ url('/admin/inventarios/create') }}">
+                <div class="arrow">→</div>
+                <div class="sigem-quick-ico sigem-i-success">＋</div>
+                <div class="sigem-quick-title">Registrar activo</div>
+                <div class="sigem-quick-desc">Alta de nuevo equipo en inventario</div>
+            </a>
 
-            </div>
-
-            <!-- Stat 4 -->
-            <div class="stat-card">
-                <div class="stat-header">
-                    <span class="stat-title text-secondary-util">ALERTAS STOCK</span>
-                    <div class="stat-icon bg-red"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg></div>
-                </div>
-                <h2 class="stat-val mono-text text-primary-util">{{ $materialesStockBajoCount ?? 0 }}</h2>
-                <div class="stat-sub {{ ($materialesStockBajoCount ?? 0) > 0 ? 'text-red' : 'text-emerald' }}">
-                    {{ ($materialesStockBajoCount ?? 0) > 0 ? 'requiere atención' : 'todo en orden' }}
-                </div>
-                <div class="severity-bars hidden-mobile">
-                    @php $sev = min(5, max(0, $materialesStockBajoCount ?? 0)); @endphp
-                    <div class="severity-bar {{ $sev > 0 ? 'active' : '' }}"></div>
-                    <div class="severity-bar {{ $sev > 1 ? 'active' : '' }}"></div>
-                    <div class="severity-bar {{ $sev > 2 ? 'active' : '' }}"></div>
-                    <div class="severity-bar {{ $sev > 3 ? 'active-light' : '' }}"></div>
-                    <div class="severity-bar {{ $sev > 4 ? 'active-light' : '' }}"></div>
-                </div>
-            </div>
+            <!-- 4. Ver bitácora -->
+            {{-- TODO: Enlazar a página/recurso de bitácora cuando exista; actualmente anclado al bloque de Actividad Reciente del dashboard --}}
+            <a class="sigem-quick" href="#actividad-reciente">
+                <div class="arrow">→</div>
+                <div class="sigem-quick-ico sigem-i-info">🕘</div>
+                <div class="sigem-quick-title">Ver bitácora</div>
+                <div class="sigem-quick-desc">Registro de actividad y movimientos</div>
+            </a>
         </div>
 
-        <!-- ACCESOS RÁPIDOS MÓVIL (Cambio 1) -->
-        <div class="mobile-only" style="margin-bottom: 24px;">
-            <div style="display: flex; flex-direction: column; gap: 12px;">
-                <a href="{{ url('/admin/inventarios') }}" class="btn" style="background: var(--brand-500); color: white; min-height: 56px; justify-content: flex-start; padding: 0 20px; font-size: 16px;">
-                    <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 8px; margin-right: 12px;">
-                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
-                    </div>
-                    Inventario
-                    <span style="margin-left: auto; background: white; color: var(--brand-600); padding: 4px 8px; border-radius: 99px; font-size: 12px;">{{ $totalActivos ?? 0 }}</span>
-                </a>
-                <a href="{{ url('/admin/solicituds') }}" class="btn" style="background: var(--amber-500); color: white; min-height: 56px; justify-content: flex-start; padding: 0 20px; font-size: 16px;">
-                    <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 8px; margin-right: 12px;">
-                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                    </div>
-                    Solicitudes
-                    <span style="margin-left: auto; background: white; color: var(--amber-600); padding: 4px 8px; border-radius: 99px; font-size: 12px;">{{ $solicitudesPendientes ?? 0 }}</span>
-                </a>
-                <a href="{{ url('/admin/mantenimientos') }}" class="btn" style="background: var(--red-500); color: white; min-height: 56px; justify-content: flex-start; padding: 0 20px; font-size: 16px;">
-                    <div style="background: rgba(255,255,255,0.2); border-radius: 8px; padding: 8px; margin-right: 12px;">
-                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-                    </div>
-                    Mantenimiento
-                    <span style="margin-left: auto; background: white; color: var(--red-600); padding: 4px 8px; border-radius: 99px; font-size: 12px;">{{ $mantenimientosPendientes ?? 0 }}</span>
-                </a>
-                <a href="{{ url('/admin') }}" class="btn btn-white" style="min-height: 56px; margin-top: 8px; font-size: 16px;">
-                    Ver Catálogos Completos
-                </a>
+        <!-- 3. KPIS (4 MÉTRICAS) -->
+        <div class="sigem-stats-grid">
+            <!-- 1. Equipos registrados -->
+            <div class="sigem-stat">
+                <div class="sigem-stat-ico sigem-i-primary">📦</div>
+                <div class="sigem-stat-val">{{ $totalActivos ?? 0 }}</div>
+                <div class="sigem-stat-label">Equipos registrados</div>
+                <div class="sigem-stat-hint sigem-h-ok">↗ {{ $creadosEsteMes ?? 0 }} nuevos este mes</div>
+            </div>
+
+            <!-- 2. Disponibles -->
+            <div class="sigem-stat">
+                <div class="sigem-stat-ico sigem-i-success">✓</div>
+                <div class="sigem-stat-val">{{ $inventarioDisponibles ?? 0 }}</div>
+                <div class="sigem-stat-label">Disponibles para uso</div>
+                <div class="sigem-stat-hint sigem-h-info">{{ $porcentajeDisponibles }}% del parque</div>
+            </div>
+
+            <!-- 3. En mantenimiento -->
+            <div class="sigem-stat">
+                <div class="sigem-stat-ico sigem-i-warning">🔧</div>
+                <div class="sigem-stat-val">{{ $inventarioEnMantenimiento ?? 0 }}</div>
+                <div class="sigem-stat-label">En mantenimiento</div>
+                <div class="sigem-stat-hint sigem-h-warn">{{ $mantenimientosPendientes ?? 0 }} pendientes de revisión</div>
+            </div>
+
+            <!-- 4. Requieren atención -->
+            <div class="sigem-stat">
+                <div class="sigem-stat-ico sigem-i-danger">⚠</div>
+                <div class="sigem-stat-val">{{ $requierenAtencion }}</div>
+                <div class="sigem-stat-label">Requieren atención</div>
+                <div class="sigem-stat-hint sigem-h-warn">{{ $materialesStockBajoCount ?? 0 }} stock bajo · {{ $inventarioDanados ?? 0 }} dañados</div>
             </div>
         </div>
 
@@ -533,7 +465,7 @@
         </div>
 
         <!-- 6. ACTIVITY -->
-        <div class="section-block">
+        <div class="section-block" id="actividad-reciente">
             <div class="block-header" style="border-bottom: none; padding-bottom: 0;">
                 <h2 class="block-title text-primary-util" style="font-size: 16px;">Actividad Reciente</h2>
             </div>
@@ -721,25 +653,28 @@
                 </div>
             </div>
         </template>
-        
-        <style>
-            .sigem-confirm-overlay { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
-            .sigem-confirm-modal { background: white; border-radius: 0.75rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-width: 24rem; width: 100%; margin: 1rem; padding: 1.5rem; text-align: center; border: 1px solid var(--slate-200); }
-            .dark .sigem-confirm-modal { background: #18181b; border-color: #27272a; }
-            .sigem-confirm-cancel { padding: 0.5rem 1rem; border: 1px solid var(--slate-300); border-radius: 0.5rem; background: white; color: var(--slate-700); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
-            .sigem-confirm-cancel:hover { background: var(--slate-50); }
-            .dark .sigem-confirm-cancel { background: #27272a; border-color: #3f3f46; color: #e4e4e7; }
-            .dark .sigem-confirm-cancel:hover { background: #3f3f46; }
-        </style>
+    </div>
 
-        <!-- Inject data to JS -->
-        <script>
+    @push('styles')
+    <style>
+        .sigem-confirm-overlay { position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+        .sigem-confirm-modal { background: white; border-radius: 0.75rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-width: 24rem; width: 100%; margin: 1rem; padding: 1.5rem; text-align: center; border: 1px solid var(--slate-200); }
+        .dark .sigem-confirm-modal { background: #18181b; border-color: #27272a; }
+        .sigem-confirm-cancel { padding: 0.5rem 1rem; border: 1px solid var(--slate-300); border-radius: 0.5rem; background: white; color: var(--slate-700); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .sigem-confirm-cancel:hover { background: var(--slate-50); }
+        .dark .sigem-confirm-cancel { background: #27272a; border-color: #3f3f46; color: #e4e4e7; }
+        .dark .sigem-confirm-cancel:hover { background: #3f3f46; }
+    </style>
+    @endpush
+
+    @push('scripts')
+    <script>
             const registerSigemDashboard = () => {
                 Alpine.data('sigemDashboard', () => ({
                     getGreeting() {
                         const hour = new Date().getHours();
-                        if (hour >= 6 && hour < 12) return 'Buenos días';
-                        if (hour >= 12 && hour < 18) return 'Buenas tardes';
+                        if (hour < 12) return 'Buenos días';
+                        if (hour < 19) return 'Buenas tardes';
                         return 'Buenas noches';
                     },
                     searchQuery: '',
@@ -1045,6 +980,5 @@
                 document.addEventListener('alpine:init', registerSigemDashboard);
             }
         </script>
-    </div>
+    @endpush
 </x-filament-panels::page>
-</div>

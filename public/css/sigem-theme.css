@@ -473,10 +473,7 @@ body:has(.sigem-professional) .fi-topbar .fi-user-menu button:hover { background
 }
 .dark .fi-simple-main-ctn h2 { color: #e2e8f0 !important; }
 
-/* ===== ELIMINAR ESPACIO DEL SIDEBAR ===== */
-.fi-sidebar-layout { padding-left: 0 !important; }
-.fi-sidebar { display: none !important; width: 0 !important; min-width: 0 !important; }
-.fi-main { width: 100% !important; max-width: 100% !important; margin-left: 0 !important; padding-left: 24px !important; padding-right: 24px !important; }
+/* ===== SIDEBAR RESTAURADO PARA FASE 2.5 ===== */
 
 /* ===== RESPONSIVIDAD (MOBILE & TABLET) ===== */
 .mobile-only { display: none !important; }
@@ -974,3 +971,544 @@ body:has(.sigem-professional) .fi-topbar .fi-user-menu button:hover { background
                 .btn-icon { padding: 8px; }
                 .btn-icon svg { width: 18px; height: 18px; }
             }
+
+/* ==================================================== */
+/* FASE 1: LIENZO GLOBAL "INVGATE STYLE"                */
+/* ==================================================== */
+
+:root {
+  --sig-bg: #f4f6f9;
+  --sig-surface: #ffffff;
+  --sig-border: #e5e7eb;
+  --sig-text: #111827;
+  --sig-muted: #6b7280;
+  --sig-light: #9ca3af;
+  --sig-primary: #1b65d4;
+  --sig-primary-dark: #1557b0;
+  --sig-primary-light: #e8f0fe;
+  --sig-radius: 14px;
+  --sig-radius-sm: 9px;
+  --mod-inv: #7c3aed;   --mod-inv-l: #efe7fd;
+  --mod-sol: #0d9488;   --mod-sol-l: #dcf5f2;
+  --mod-mant: #ea580c;  --mod-mant-l: #fdeadd;
+  --mod-rep: #ca8a04;   --mod-rep-l: #fdf3d7;
+  --mod-cfg: #475569;   --mod-cfg-l: #e8ecf1;
+}
+
+body, main.fi-main {
+  background: var(--sig-bg) !important;
+  color: var(--sig-text);
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+.fi-card, .fi-section {
+  border: 1px solid var(--sig-border) !important;
+  border-radius: var(--sig-radius) !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .05) !important;
+  background: var(--sig-surface) !important;
+}
+
+.fi-sidebar, aside.fi-sidebar {
+  background: var(--sig-surface) !important;
+  border-right: 1px solid var(--sig-border) !important;
+}
+.fi-sidebar-header {
+  background: var(--sig-surface) !important;
+}
+.fi-sidebar-item, .fi-sidebar-item-button {
+  border-radius: var(--sig-radius-sm) !important;
+}
+
+.fi-sidebar-item .fi-icon,
+.fi-sidebar-item .fi-sidebar-item-icon,
+.fi-sidebar-item-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 11px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  padding: 7px !important;
+  border: 1.5px solid transparent !important;
+  transition: all .15s ease-in-out !important;
+}
+.fi-sidebar-item:hover .fi-icon,
+.fi-sidebar-item:hover .fi-sidebar-item-icon {
+  transform: translateY(-1px);
+}
+
+/* Fallback de color para ítems generales del sidebar */
+.fi-sidebar-item a .fi-sidebar-item-icon,
+.fi-sidebar-item a .fi-icon {
+  background: var(--mod-cfg-l);
+  color: var(--mod-cfg);
+  border-color: color-mix(in srgb, var(--mod-cfg) 45%, transparent);
+}
+
+/* Colores por módulo según la URL del ítem de navegación */
+.fi-sidebar-item[href*="inventarios"] .fi-icon,
+.fi-sidebar-item a[href*="inventario"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="inventario"] .fi-icon,
+.fi-sidebar-item:has(a[href*="inventario"]) .fi-sidebar-item-icon {
+  background: var(--mod-inv-l) !important;
+  color: var(--mod-inv) !important;
+  border-color: color-mix(in srgb, var(--mod-inv) 45%, transparent) !important;
+}
+
+.fi-sidebar-item[href*="solicitud"] .fi-icon,
+.fi-sidebar-item a[href*="solicitud"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="solicitud"] .fi-icon,
+.fi-sidebar-item:has(a[href*="solicitud"]) .fi-sidebar-item-icon {
+  background: var(--mod-sol-l) !important;
+  color: var(--mod-sol) !important;
+  border-color: color-mix(in srgb, var(--mod-sol) 45%, transparent) !important;
+}
+
+.fi-sidebar-item[href*="mantenimiento"] .fi-icon,
+.fi-sidebar-item a[href*="mantenimiento"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="mantenimiento"] .fi-icon,
+.fi-sidebar-item:has(a[href*="mantenimiento"]) .fi-sidebar-item-icon {
+  background: var(--mod-mant-l) !important;
+  color: var(--mod-mant) !important;
+  border-color: color-mix(in srgb, var(--mod-mant) 45%, transparent) !important;
+}
+
+.fi-sidebar-item[href*="reporte"] .fi-icon,
+.fi-sidebar-item a[href*="reporte"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="reporte"] .fi-icon,
+.fi-sidebar-item:has(a[href*="reporte"]) .fi-sidebar-item-icon {
+  background: var(--mod-rep-l) !important;
+  color: var(--mod-rep) !important;
+  border-color: color-mix(in srgb, var(--mod-rep) 45%, transparent) !important;
+}
+
+.fi-sidebar-item[href*="catalogo"] .fi-icon,
+.fi-sidebar-item[href*="configuracion"] .fi-icon,
+.fi-sidebar-item a[href*="catalogo"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="configuracion"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="area"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="departamento"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="material"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="proveedor"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="receptor"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="unidad-medida"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="user"] .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="catalogo"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="configuracion"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="area"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="departamento"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="material"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="proveedor"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="receptor"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="unidad-medida"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="user"]) .fi-sidebar-item-icon {
+  background: var(--mod-cfg-l) !important;
+  color: var(--mod-cfg) !important;
+  border-color: color-mix(in srgb, var(--mod-cfg) 45%, transparent) !important;
+}
+
+/* Estado activo del ícono en el sidebar */
+.fi-sidebar-item[aria-current="page"] .fi-icon,
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active .fi-sidebar-item-icon,
+.fi-sidebar-item a[aria-current="page"] .fi-sidebar-item-icon {
+  color: #fff !important;
+}
+
+.fi-sidebar-item[href*="inventarios"][aria-current="page"] .fi-icon,
+.fi-sidebar-item.fi-active a[href*="inventario"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="inventario"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="inventario"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="inventario"]) .fi-sidebar-item-icon {
+  background: var(--mod-inv) !important;
+  border-color: var(--mod-inv) !important;
+}
+
+.fi-sidebar-item[href*="solicitud"][aria-current="page"] .fi-icon,
+.fi-sidebar-item.fi-active a[href*="solicitud"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="solicitud"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="solicitud"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="solicitud"]) .fi-sidebar-item-icon {
+  background: var(--mod-sol) !important;
+  border-color: var(--mod-sol) !important;
+}
+
+.fi-sidebar-item[href*="mantenimiento"][aria-current="page"] .fi-icon,
+.fi-sidebar-item.fi-active a[href*="mantenimiento"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="mantenimiento"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="mantenimiento"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="mantenimiento"]) .fi-sidebar-item-icon {
+  background: var(--mod-mant) !important;
+  border-color: var(--mod-mant) !important;
+}
+
+.fi-sidebar-item[href*="reporte"][aria-current="page"] .fi-icon,
+.fi-sidebar-item.fi-active a[href*="reporte"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="reporte"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="reporte"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="reporte"]) .fi-sidebar-item-icon {
+  background: var(--mod-rep) !important;
+  border-color: var(--mod-rep) !important;
+}
+
+.fi-sidebar-item.fi-active a[href*="catalogo"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a[href*="configuracion"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a[href*="area"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a[href*="departamento"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a[href*="material"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a[href*="proveedor"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a[href*="receptor"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a[href*="unidad-medida"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a[href*="user"] .fi-sidebar-item-icon {
+  background: var(--mod-cfg) !important;
+  border-color: var(--mod-cfg) !important;
+}
+
+/* Badge en items de navegación */
+.fi-sidebar-item .fi-badge {
+  background: #dc2626 !important;
+  color: #fff !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  min-width: 19px !important;
+  height: 19px !important;
+  border-radius: 9px !important;
+  border: 2px solid var(--sig-surface) !important;
+}
+
+/* Topbar y Header */
+.fi-topbar, .fi-topbar nav, .fi-header {
+  background: var(--sig-surface) !important;
+  border-bottom: 1px solid var(--sig-border) !important;
+}
+
+/* Pills de estado del sistema */
+.sig-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 3.5px 10px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+.sig-pill::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.sig-pill.ok { background: #d1fae5; color: #059669; }
+.sig-pill.warn { background: #fef3c7; color: #d97706; }
+.sig-pill.danger { background: #fee2e2; color: #dc2626; }
+.sig-pill.info { background: #cffafe; color: #0891b2; }
+.sig-pill.neutral { background: var(--sig-bg); color: var(--sig-muted); }
+
+/* Encabezados de tablas */
+.fi-ta-header th,
+th.fi-ta-header-cell,
+.fi-ta-table thead th {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .06em !important;
+  color: var(--sig-muted) !important;
+  background: #fafbfc !important;
+}
+th.fi-ta-header-cell span,
+.fi-ta-table thead th span {
+  color: var(--sig-muted) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  letter-spacing: .06em !important;
+}
+
+/* Botones Primarios */
+.fi-btn-primary,
+.fi-btn.fi-color-primary:not(.fi-btn-outlined),
+.fi-btn.fi-btn-color-primary:not(.fi-btn-outlined) {
+  background: var(--sig-primary) !important;
+  border-radius: var(--sig-radius-sm) !important;
+  font-weight: 600 !important;
+}
+.fi-btn-primary:hover,
+.fi-btn.fi-color-primary:not(.fi-btn-outlined):hover,
+.fi-btn.fi-btn-color-primary:not(.fi-btn-outlined):hover {
+  background: var(--sig-primary-dark) !important;
+  box-shadow: 0 4px 12px rgba(27, 101, 212, .35) !important;
+}
+
+/* ==================================================== */
+/* FASE 2: BLOQUE SUPERIOR DEL DASHBOARD "INVGATE STYLE"*/
+/* ==================================================== */
+
+/* Hero del dashboard */
+.sigem-hero{background:linear-gradient(120deg,#1b65d4 0%,#1e40af 100%);
+  border-radius:18px;padding:26px 28px;color:#fff;margin-bottom:22px;
+  display:flex;justify-content:space-between;align-items:center;gap:18px;
+  flex-wrap:wrap;box-shadow:0 10px 30px rgba(27,101,212,.28)}
+.sigem-hero h1{font-size:24px;font-weight:700;margin-bottom:5px;color:#fff !important}
+.sigem-hero p{font-size:16.5px;opacity:.9;max-width:520px;color:#fff !important}
+
+/* Rejillas */
+.sigem-quick-grid,.sigem-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);
+  gap:14px;margin-bottom:22px}
+
+/* Acción rápida */
+.sigem-quick{background:var(--sig-surface);border:1px solid var(--sig-border);
+  border-radius:var(--sig-radius);padding:16px;cursor:pointer;position:relative;
+  transition:all .18s;box-shadow:0 1px 2px rgba(16,24,40,.05);text-decoration:none;display:block;color:inherit}
+.sigem-quick:hover{border-color:var(--sig-primary);box-shadow:0 6px 18px rgba(16,24,40,.09);
+  transform:translateY(-2px);text-decoration:none}
+.sigem-quick:focus-visible{outline:2px solid var(--sig-primary);outline-offset:2px}
+.sigem-quick .arrow{position:absolute;top:14px;right:14px;color:var(--sig-light);
+  font-size:16px;transition:all .18s}
+.sigem-quick:hover .arrow{color:var(--sig-primary);transform:translateX(2px)}
+.sigem-quick-ico{width:38px;height:38px;border-radius:10px;display:flex;
+  align-items:center;justify-content:center;font-size:20px;margin-bottom:11px}
+.sigem-quick-title{font-size:16.5px;font-weight:700;display:flex;align-items:center;gap:6px;color:var(--sig-text)}
+.sigem-quick-desc{font-size:14.5px;color:var(--sig-muted);max-height:0;opacity:0;
+  overflow:hidden;margin-top:0;transition:max-height .25s ease,opacity .2s ease,margin-top .2s ease}
+.sigem-quick:hover .sigem-quick-desc,.sigem-quick:focus-within .sigem-quick-desc{
+  max-height:80px;opacity:1;margin-top:4px}
+@media(hover:none){.sigem-quick-desc{max-height:none;opacity:1;margin-top:4px}}
+
+/* Badge rojo de conteo */
+.sigem-qbadge{display:inline-flex;align-items:center;justify-content:center;
+  min-width:19px;height:19px;border-radius:50%;background:#dc2626;color:#fff;
+  font-size:14px;font-weight:700;padding:0 5px}
+
+/* KPI */
+.sigem-stat{background:var(--sig-surface);border:1px solid var(--sig-border);
+  border-radius:var(--sig-radius);padding:16px 18px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+.sigem-stat-ico{width:36px;height:36px;border-radius:10px;display:flex;
+  align-items:center;justify-content:center;font-size:19px}
+.sigem-stat-val{font-size:29px;font-weight:700;margin-top:10px;line-height:1;
+  font-variant-numeric:tabular-nums;color:var(--sig-text)}
+.sigem-stat-label{font-size:15.5px;color:var(--sig-muted);font-weight:600;margin-top:4px}
+.sigem-stat-hint{font-size:14px;font-weight:600;margin-top:9px;display:inline-flex;
+  align-items:center;gap:5px;padding:3px 9px;border-radius:99px}
+
+/* Variantes de color de íconos y píldoras */
+.sigem-i-primary{background:#e8f0fe;color:#1b65d4}
+.sigem-i-success{background:#d1fae5;color:#059669}
+.sigem-i-warning{background:#fef3c7;color:#d97706}
+.sigem-i-info{background:#cffafe;color:#0891b2}
+.sigem-i-danger{background:#fee2e2;color:#dc2626}
+.sigem-h-ok{background:#d1fae5;color:#059669}
+.sigem-h-warn{background:#fef3c7;color:#d97706}
+.sigem-h-info{background:#cffafe;color:#0891b2}
+
+@media(max-width:1100px){.sigem-quick-grid,.sigem-stats-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ==================================================== */
+/* FASE 2.5: SIDEBAR INVGATE (ICON-ONLY CON TOOLTIPS)    */
+/* ==================================================== */
+.fi-sidebar { width: 64px !important; }
+.fi-sidebar .fi-sidebar-item-label,
+.fi-sidebar .fi-sidebar-nav-item-label,
+.fi-sidebar .fi-sidebar-group-button { display: none !important; }
+.fi-sidebar .fi-sidebar-item {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  height: 44px !important;
+  margin-bottom: 4px !important;
+  border-radius: 9px !important;
+  position: relative !important;
+  width: 100% !important;
+}
+.fi-sidebar .fi-sidebar-item:hover { background: var(--sig-bg); }
+.fi-sidebar .fi-sidebar-item-button {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 44px !important;
+  height: 44px !important;
+  padding: 0 !important;
+  gap: 0 !important;
+  margin: 0 auto !important;
+  background: transparent !important;
+}
+.fi-sidebar .fi-sidebar-item-button:hover { background: var(--sig-bg) !important; }
+
+/* Estructura fija en Desktop */
+@media (min-width: 1024px) {
+  .fi-sidebar,
+  aside.fi-sidebar {
+    width: 64px !important;
+    min-width: 64px !important;
+    max-width: 64px !important;
+    display: flex !important;
+    transform: none !important;
+    position: sticky !important;
+    top: 0 !important;
+    height: 100vh !important;
+    background: var(--sig-surface) !important;
+    border-right: 1px solid var(--sig-border) !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Marca */
+.sigem-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 8px;
+  border-bottom: 1px solid var(--sig-border);
+  text-align: center;
+  width: 100%;
+}
+.sigem-brand-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1b65d4, #1e40af);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 19px;
+  flex-shrink: 0;
+  user-select: none;
+}
+.fi-sidebar-header {
+  padding: 0 !important;
+  height: auto !important;
+  min-height: 64px !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  justify-content: center !important;
+}
+.fi-sidebar-header > div,
+.fi-sidebar-header a,
+.fi-sidebar-header .fi-logo {
+  width: 100% !important;
+  height: auto !important;
+  display: flex !important;
+  justify-content: center !important;
+  text-decoration: none !important;
+}
+.fi-sidebar-header button,
+.fi-sidebar-header .fi-icon-btn { display: none !important; }
+
+/* Tooltip al hover */
+.fi-sidebar-item::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%) scale(.92);
+  background: #0f172a;
+  color: #fff;
+  padding: 6px 11px;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .22);
+  pointer-events: none;
+  opacity: 0;
+  transition: all .15s ease;
+  z-index: 999;
+}
+.fi-sidebar-item:hover::after {
+  opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+.fi-sidebar-item:not([data-tooltip])::after,
+.fi-sidebar-item[data-tooltip=""]::after { display: none !important; }
+
+/* Pie de usuario */
+.sigem-user-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  border-top: 1px solid var(--sig-border);
+  margin-top: auto;
+  background: var(--sig-surface);
+}
+.sigem-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e8f0fe;
+  color: #1b65d4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+  user-select: none;
+}
+.sigem-logout {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sig-surface);
+  border: 1px solid var(--sig-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--sig-muted);
+  text-decoration: none;
+  padding: 0;
+  line-height: 1;
+  outline: none;
+  transition: all .15s ease;
+}
+.sigem-logout:hover {
+  background: var(--sig-bg);
+  color: var(--danger);
+}
+
+/* Los tooltips no deben recortarse */
+.fi-sidebar,
+aside.fi-sidebar,
+.fi-sidebar > div,
+.fi-sidebar .overflow-x-clip,
+.fi-sidebar .fi-sidebar-nav,
+.fi-sidebar-nav-groups,
+.fi-sidebar-group,
+.fi-sidebar-group-items {
+  overflow: visible !important;
+}
+.fi-sidebar .fi-sidebar-nav {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+}
+.fi-sidebar-nav-groups {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  gap: 6px !important;
+}
+.fi-sidebar-group-items {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  list-style: none !important;
+}
+.fi-sidebar .fi-sidebar-item .fi-badge {
+  position: absolute !important;
+  top: 0px !important;
+  right: 0px !important;
+  z-index: 10 !important;
+}
+
+
+
