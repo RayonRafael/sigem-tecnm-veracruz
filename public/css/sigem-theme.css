@@ -1305,7 +1305,7 @@ th.fi-ta-header-cell span,
 @media(max-width:1100px){.sigem-quick-grid,.sigem-stats-grid{grid-template-columns:repeat(2,1fr)}}
 
 /* ==================================================== */
-/* FASE 2.5: SIDEBAR INVGATE (ICON-ONLY CON TOOLTIPS)    */
+/* FASE 4: SIDEBAR INVGATE (ICON-ONLY CON TOOLTIPS)      */
 /* ==================================================== */
 .fi-sidebar { width: 64px !important; }
 .fi-sidebar .fi-sidebar-item-label,
@@ -1470,7 +1470,7 @@ th.fi-ta-header-cell span,
 }
 .sigem-logout:hover {
   background: var(--sig-bg);
-  color: var(--danger);
+  color: #dc2626;
 }
 
 /* Los tooltips no deben recortarse */
@@ -1509,6 +1509,243 @@ aside.fi-sidebar,
   right: 0px !important;
   z-index: 10 !important;
 }
+
+/* ==================================================== */
+/* FASE 5: TABLA DE INVENTARIO ESTILO INVGATE           */
+/* ==================================================== */
+.fi-ta-table thead th,
+.sigem-table thead th {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .06em !important;
+  color: #6b7280 !important;
+  background: #fafbfc !important;
+  padding: 9px 12px !important;
+  white-space: nowrap !important;
+}
+.fi-ta-table thead th *,
+.sigem-table thead th * {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .06em !important;
+  color: #6b7280 !important;
+}
+.fi-ta-table tbody td,
+.sigem-table tbody td {
+  padding: 8px 12px !important;
+  border-bottom: 1px solid var(--sig-border) !important;
+  vertical-align: middle !important;
+  white-space: nowrap !important;
+}
+.fi-ta-table tbody tr:hover,
+.sigem-table tbody tr:hover {
+  background: #f8fafd !important;
+}
+.sigem-td-main,
+.fi-ta-table .fi-ta-text-item-label {
+  font-weight: 600 !important;
+}
+.sigem-td-sub,
+.fi-ta-table .fi-ta-text-item-description {
+  font-size: 14.5px !important;
+  color: var(--sig-muted) !important;
+  margin-top: 1px !important;
+  max-width: 260px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Píldoras de estado (punto + texto) */
+.sigem-pill,
+.fi-ta-table .fi-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  padding: 3.5px 10px !important;
+  border-radius: 99px !important;
+  white-space: nowrap !important;
+  line-height: 1.2 !important;
+}
+.sigem-pill::before,
+.fi-ta-table .fi-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+.fi-ta-table .fi-badge svg {
+  display: none !important;
+}
+.sigem-pill.ok,
+.fi-ta-table .fi-badge.fi-color-success,
+.fi-ta-table .fi-badge-color-success {
+  background: #d1fae5 !important;
+  color: #059669 !important;
+}
+.sigem-pill.warn,
+.fi-ta-table .fi-badge.fi-color-warning,
+.fi-ta-table .fi-badge-color-warning {
+  background: #fef3c7 !important;
+  color: #d97706 !important;
+}
+.sigem-pill.danger,
+.fi-ta-table .fi-badge.fi-color-danger,
+.fi-ta-table .fi-badge-color-danger {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+.sigem-pill.info,
+.fi-ta-table .fi-badge.fi-color-info,
+.fi-ta-table .fi-badge-color-info {
+  background: #cffafe !important;
+  color: #0891b2 !important;
+}
+.sigem-pill.neutral,
+.fi-ta-table .fi-badge.fi-color-gray,
+.fi-ta-table .fi-badge-color-gray {
+  background: var(--sig-bg) !important;
+  color: var(--sig-muted) !important;
+}
+
+/* Filtros por columna */
+.fi-table-filters input,
+.fi-table-filters select,
+.fi-ta-filters input,
+.fi-ta-filters select,
+.sigem-cf-in {
+  width: 100%;
+  min-width: 84px;
+  height: 31px;
+  font: inherit;
+  font-size: 15.5px;
+  padding: 0 8px;
+  border: 1px solid var(--sig-border);
+  border-radius: 7px;
+  background: var(--sig-surface);
+  color: var(--sig-text);
+  box-sizing: border-box;
+}
+.sigem-cf-in::placeholder { color: var(--sig-light); }
+.sigem-cf-in:focus-visible { outline: 2px solid var(--sig-primary); outline-offset: 1px; }
+.sigem-cf-in.on {
+  border-color: var(--sig-primary) !important;
+  background: var(--sig-primary-light) !important;
+  color: var(--sig-primary-dark) !important;
+  font-weight: 600 !important;
+}
+
+/* Panel lateral "Resumen del inventario" */
+.sigem-inv-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 18px;
+  align-items: start;
+}
+.sigem-inv-side {
+  position: sticky;
+  top: 72px;
+  max-height: calc(100vh - 90px);
+  overflow: auto;
+  background: var(--sig-surface);
+  border: 1px solid var(--sig-border);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+.sigem-inv-side-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+/* Dona SVG */
+.sigem-donut {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+}
+.sigem-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+}
+.sigem-donut-center b {
+  font-size: 27px;
+  font-variant-numeric: tabular-nums;
+}
+.sigem-donut-center span {
+  font-size: 13.5px;
+  color: var(--sig-muted);
+  font-weight: 600;
+}
+
+/* Leyenda de estados */
+.sigem-lg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15.5px;
+  padding: 3px 6px;
+  border-radius: 6px;
+}
+.sigem-lg i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.sigem-lg b {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Barras por categoría */
+.sigem-cb {
+  display: grid;
+  grid-template-columns: 116px 1fr 18px;
+  gap: 8px;
+  align-items: center;
+  font-size: 15px;
+  margin: 5px 0;
+}
+.sigem-cb > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sigem-cb div {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--sig-border);
+  overflow: hidden;
+}
+.sigem-cb div span {
+  display: block;
+  height: 100%;
+  background: var(--sig-primary);
+  border-radius: 99px;
+}
+
+@media (max-width: 1099px) {
+  .sigem-inv-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sigem-inv-side {
+    position: static;
+    max-height: none;
+  }
+}
+
 
 
 

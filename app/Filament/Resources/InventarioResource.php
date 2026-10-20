@@ -23,8 +23,6 @@ use Illuminate\Support\Facades\DB;
 
 class InventarioResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
-
     protected static ?string $model = Inventario::class;
 
     protected static ?string $recordTitleAttribute = 'num_serie';
@@ -386,11 +384,13 @@ class InventarioResource extends Resource
                 Tables\Columns\TextColumn::make('num_serie')->wrap(false)->limit(30)->grow(false)
                     ->label('No. serie')
                     ->fontFamily('mono')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('material.nombre')->wrap(false)->limit(30)->grow(false)
-                    ->label('Material')
                     ->searchable()
-                    ->sortable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('material.nombre')->wrap(false)->limit(40)->grow(false)
+                    ->label('Equipo / Material')
+                    ->searchable()
+                    ->sortable()
+                    ->description(fn (Inventario $record): ?string => $record->num_serie ? "S/N: {$record->num_serie}" : null),
                 Tables\Columns\TextColumn::make('material.marca.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Marca')
                     ->searchable()
@@ -409,15 +409,15 @@ class InventarioResource extends Resource
                     ->badge()
                     ->colors([
                         'success' => 'Disponible',
-                        'warning' => 'Asignado',
-                        'gray' => ['En Mantenimiento', 'Baja'],
+                        'warning' => 'En Mantenimiento',
+                        'info' => 'Asignado',
                         'danger' => 'Dañado',
-                        'info' => 'Devuelto a Proveedor',
+                        'gray' => ['Baja', 'Devuelto a Proveedor'],
                     ])
                     ->icons([
                         'heroicon-m-check-circle' => 'Disponible',
-                        'heroicon-m-user' => 'Asignado',
                         'heroicon-m-wrench' => 'En Mantenimiento',
+                        'heroicon-m-user' => 'Asignado',
                         'heroicon-m-exclamation-triangle' => 'Dañado',
                         'heroicon-m-minus-circle' => 'Baja',
                         'heroicon-m-arrow-path' => 'Devuelto a Proveedor',
