@@ -109,10 +109,6 @@ class InventarioResource extends Resource
                                 ->preload()
                                 ->prefixIcon('heroicon-m-user')
                                 ->columnSpanFull(),
-                            Forms\Components\Hidden::make('aprobado')
-                                ->default(false),
-                            Forms\Components\Hidden::make('estado_registro')
-                                ->default('Pendiente'),
                         ])->columns(3),
 
                     Forms\Components\Wizard\Step::make('Factura y proveedor')

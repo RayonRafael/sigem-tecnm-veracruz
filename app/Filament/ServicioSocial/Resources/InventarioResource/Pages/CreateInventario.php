@@ -13,6 +13,15 @@ class CreateInventario extends CreateRecord
 
     protected static string $resource = InventarioResource::class;
 
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['aprobado'] = false;
+        $data['estado_registro'] = 'Pendiente';
+        $data['aprobado_por'] = null;
+
+        return $data;
+    }
+
     protected function getCreatedNotification(): ?Notification
     {
         return Notification::make()
