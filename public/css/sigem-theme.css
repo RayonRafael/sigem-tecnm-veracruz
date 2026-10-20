@@ -1826,3 +1826,62 @@ aside.fi-sidebar,
 .sigem-rep-empty{background:var(--sig-surface);border:1px dashed var(--sig-border);
   border-radius:14px;padding:36px;text-align:center;color:var(--sig-muted);font-size:16.5px}
 .sigem-rep-table-wrap{width:100%;overflow-x:auto}
+
+/* ===== Fase 8: Configuración, Catálogos, Bitácora, Preferencias ===== */
+
+/* Pestañas (línea inferior azul) */
+.sigem-tabs{display:flex;gap:6px;border-bottom:1px solid var(--sig-border);
+  margin-bottom:18px;flex-wrap:wrap}
+.sigem-tab{padding:11px 16px;font-size:16.5px;font-weight:600;color:var(--sig-muted);
+  cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1px;
+  background:transparent;border-top:0;border-left:0;border-right:0;font-family:inherit}
+.sigem-tab:hover{color:var(--sig-text)}
+.sigem-tab.active{color:var(--sig-primary);border-bottom-color:var(--sig-primary)}
+
+/* Franja informativa */
+.sigem-note-strip{display:flex;gap:10px;align-items:flex-start;font-size:15.5px;
+  line-height:1.55;padding:13px 16px;border-radius:var(--sig-radius);
+  background:#cffafe;color:#0e7490;margin-bottom:16px}
+
+/* Chips de catálogo */
+.sigem-cat-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.sigem-cat-tab{display:inline-flex;align-items:center;gap:7px;font-size:15.5px;
+  font-weight:600;padding:8px 13px;border-radius:99px;border:1px solid var(--sig-border);
+  background:var(--sig-surface);cursor:pointer;transition:all .15s;
+  color:var(--sig-muted);font-family:inherit}
+.sigem-cat-tab:hover{border-color:var(--sig-primary);color:var(--sig-primary)}
+.sigem-cat-tab.active{background:var(--sig-primary);border-color:var(--sig-primary);color:#fff}
+.sigem-cat-tab b{font-size:13.5px;background:var(--sig-bg);border:1px solid var(--sig-border);
+  border-radius:99px;padding:1px 6px;color:var(--sig-muted);font-weight:700}
+.sigem-cat-tab.active b{background:rgba(255,255,255,.25);border-color:transparent;color:#fff}
+
+/* Píldora de rol */
+.sigem-rol-pill{font-size:14.5px;font-weight:700;padding:3px 8px;border-radius:7px;white-space:nowrap}
+.sigem-rol-pill.adm{background:#e8f0fe;color:#1b65d4}
+.sigem-rol-pill.ss{background:#cffafe;color:#0891b2}
+
+/* Preferencias */
+.sigem-pref-card{padding:20px 22px;background:var(--sig-surface);border:1px solid var(--sig-border);border-radius:14px}
+.sigem-pref-row{display:flex;gap:20px 32px;align-items:flex-start;
+  justify-content:space-between;flex-wrap:wrap}
+.sigem-pref-t{font-size:17.5px;font-weight:700;margin-bottom:4px;color:var(--sig-text)}
+.sigem-pref-d{font-size:16px;color:var(--sig-muted);max-width:460px;line-height:1.45}
+.sigem-pref-chips{display:flex;gap:6px;flex-wrap:wrap}
+.sigem-pref-chips button{font:inherit;font-size:16px;font-weight:600;height:34px;
+  min-width:48px;padding:0 12px;border-radius:99px;border:1px solid var(--sig-border);
+  background:var(--sig-surface);color:var(--sig-text);cursor:pointer;transition:all .15s}
+.sigem-pref-chips button.on{background:var(--sig-primary-light);border-color:var(--sig-primary);
+  color:var(--sig-primary-dark)}
+.sigem-pref-in{display:flex;gap:8px;align-items:center;font-size:16px;color:var(--sig-muted)}
+.sigem-pref-in input{font:inherit;font-size:17px;width:96px;height:36px;padding:0 10px;
+  border-radius:9px;border:1px solid var(--sig-border);background:var(--sig-surface);color:var(--sig-text)}
+.sigem-pref-msg{font-size:15.5px;min-height:18px}
+.sigem-pref-msg.err{color:#dc2626}
+.sigem-pref-msg.ok{color:#059669}
+
+/* Barra de filtros de Bitácora */
+.sigem-bitacora-filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px;background:var(--sig-surface);padding:12px 14px;border:1px solid var(--sig-border);border-radius:12px}
+.sigem-bitacora-filters input,
+.sigem-bitacora-filters select{height:34px;padding:0 10px;border:1px solid var(--sig-border);border-radius:8px;font-size:14.5px;background:var(--sig-surface);color:var(--sig-text)}
+.sigem-bitacora-filters input:focus,
+.sigem-bitacora-filters select:focus{outline:2px solid var(--sig-primary);outline-offset:1px}

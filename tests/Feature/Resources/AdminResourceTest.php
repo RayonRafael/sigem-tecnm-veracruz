@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Resources;
 
+use App\Filament\Pages\ConfiguracionPage;
 use App\Filament\Pages\ReportesPage;
 use App\Filament\Resources\AreaResource;
 use App\Filament\Resources\DepartamentoResource;
@@ -131,5 +132,35 @@ class AdminResourceTest extends TestCase
             ->assertSee('Inventario por categoría')
             ->call('cerrarReporte')
             ->assertSet('reporteActivo', null);
+    }
+
+    public function test_admin_can_access_configuracion_page()
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $this->actingAs($this->getAdminUser())
+            ->get(ConfiguracionPage::getUrl())
+            ->assertSuccessful();
+    }
+
+    public function test_admin_can_interact_with_configuracion_tabs()
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        \Livewire\Livewire::actingAs($this->getAdminUser())
+            ->test(ConfiguracionPage::class)
+            ->assertSee('Configuración & Catálogos')
+            ->assertSee('Catálogos')
+            ->assertSee('Bitácora')
+            ->assertSee('Preferencias')
+            ->call('setCatalogo', 'areas')
+            ->assertSet('catalogoActivo', 'areas')
+            ->call('setTab', 'bitacora')
+            ->assertSet('tabActiva', 'bitacora')
+            ->assertSee('Bitácora de actividades')
+            ->call('setTab', 'preferencias')
+            ->assertSet('tabActiva', 'preferencias')
+            ->call('seleccionarRegistrosPorHoja', 50)
+            ->assertSet('registrosPorHoja', 50)
+            ->call('guardarPreferencias')
+            ->assertSee('Preferencias guardadas');
     }
 }
