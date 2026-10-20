@@ -39,6 +39,7 @@ class Inventario extends Model
         'fecha_baja', 'fecha_inicio_renta', 'fecha_fin_renta', 'observaciones_renta',
         'observaciones_generales', 'garantia_fecha_fin', 'garantia_estado',
         'aprobado', 'aprobado_por', 'fecha_aprobacion',
+        'tipo_equipo', 'edificio_id', 'departamento_id', 'area_id', 'salon_id',
     ];
 
     // Convertir fechas automáticamente a objetos Carbon
@@ -108,5 +109,94 @@ class Inventario extends Model
     public function scopeDanados($query)
     {
         return $query->whereIn('estado', ['Dañado', 'Baja']);
+    }
+
+    // Accessors / Mutators para campos dinámicos en especificaciones (JSON)
+    public function getTipoEquipoAttribute(): ?string
+    {
+        return $this->especificaciones['tipo_equipo'] ?? null;
+    }
+
+    public function setTipoEquipoAttribute(?string $value): void
+    {
+        $specs = $this->especificaciones ?? [];
+        if ($value !== null && $value !== '') {
+            $specs['tipo_equipo'] = $value;
+        } else {
+            unset($specs['tipo_equipo']);
+        }
+        $this->especificaciones = $specs;
+    }
+
+    public function getEdificioIdAttribute(): ?int
+    {
+        return isset($this->especificaciones['edificio_id']) && $this->especificaciones['edificio_id'] !== ''
+            ? (int) $this->especificaciones['edificio_id']
+            : null;
+    }
+
+    public function setEdificioIdAttribute($value): void
+    {
+        $specs = $this->especificaciones ?? [];
+        if ($value !== null && $value !== '') {
+            $specs['edificio_id'] = (int) $value;
+        } else {
+            unset($specs['edificio_id']);
+        }
+        $this->especificaciones = $specs;
+    }
+
+    public function getDepartamentoIdAttribute(): ?int
+    {
+        return isset($this->especificaciones['departamento_id']) && $this->especificaciones['departamento_id'] !== ''
+            ? (int) $this->especificaciones['departamento_id']
+            : null;
+    }
+
+    public function setDepartamentoIdAttribute($value): void
+    {
+        $specs = $this->especificaciones ?? [];
+        if ($value !== null && $value !== '') {
+            $specs['departamento_id'] = (int) $value;
+        } else {
+            unset($specs['departamento_id']);
+        }
+        $this->especificaciones = $specs;
+    }
+
+    public function getAreaIdAttribute(): ?int
+    {
+        return isset($this->especificaciones['area_id']) && $this->especificaciones['area_id'] !== ''
+            ? (int) $this->especificaciones['area_id']
+            : null;
+    }
+
+    public function setAreaIdAttribute($value): void
+    {
+        $specs = $this->especificaciones ?? [];
+        if ($value !== null && $value !== '') {
+            $specs['area_id'] = (int) $value;
+        } else {
+            unset($specs['area_id']);
+        }
+        $this->especificaciones = $specs;
+    }
+
+    public function getSalonIdAttribute(): ?int
+    {
+        return isset($this->especificaciones['salon_id']) && $this->especificaciones['salon_id'] !== ''
+            ? (int) $this->especificaciones['salon_id']
+            : null;
+    }
+
+    public function setSalonIdAttribute($value): void
+    {
+        $specs = $this->especificaciones ?? [];
+        if ($value !== null && $value !== '') {
+            $specs['salon_id'] = (int) $value;
+        } else {
+            unset($specs['salon_id']);
+        }
+        $this->especificaciones = $specs;
     }
 }

@@ -4,7 +4,11 @@ namespace App\Filament\Resources;
 
 use App\Enums\RoleEnum;
 use App\Filament\Resources\InventarioResource\Pages;
+use App\Models\Area;
+use App\Models\Departamento;
+use App\Models\Edificio;
 use App\Models\Inventario;
+use App\Models\Salon;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
@@ -51,20 +55,181 @@ class InventarioResource extends Resource
                     Forms\Components\Wizard\Step::make('Identificación y ubicación')
                         ->icon('heroicon-m-identification')
                         ->schema([
-                            Forms\Components\TextInput::make('num_serie')
-                                ->label('Número de serie')
-                                ->prefixIcon('heroicon-m-qr-code')
-                                ->placeholder('Ej. SN-12345')
-                                ->maxLength(100)
-                                ->columnSpan(1),
-                            Forms\Components\Select::make('id_producto')->placeholder('Selecciona...')
-                                ->label('Material / equipo')
-                                ->relationship('material', 'nombre')
-                                ->required()
-                                ->searchable()
-                                ->preload()
-                                ->prefixIcon('heroicon-m-cube')
-                                ->columnSpan(2),
+                            Forms\Components\Grid::make(3)
+                                ->schema([
+                                    Forms\Components\TextInput::make('num_serie')
+                                        ->label('Número de serie')
+                                        ->prefixIcon('heroicon-m-qr-code')
+                                        ->placeholder('Ej. SN-12345')
+                                        ->maxLength(100),
+                                    Forms\Components\Select::make('id_producto')
+                                        ->placeholder('Selecciona...')
+                                        ->label('Material / equipo')
+                                        ->relationship('material', 'nombre')
+                                        ->required()
+                                        ->searchable()
+                                        ->preload()
+                                        ->prefixIcon('heroicon-m-cube'),
+                                    Forms\Components\Select::make('tipo_equipo')
+                                        ->label('Tipo de equipo')
+                                        ->placeholder('Selecciona el tipo...')
+                                        ->options([
+                                            'Desktop' => 'Desktop',
+                                            'All in One' => 'All in One',
+                                            'Computadora' => 'Computadora',
+                                            'Laptop' => 'Laptop',
+                                            'Servidor' => 'Servidor',
+                                            'Impresora' => 'Impresora',
+                                            'Switch' => 'Switch / Red',
+                                            'Proyector' => 'Proyector',
+                                            'Otro' => 'Otro',
+                                        ])
+                                        ->live()
+                                        ->searchable()
+                                        ->prefixIcon('heroicon-m-computer-desktop'),
+                                ]),
+
+                            Forms\Components\Section::make('Componentes de la Estación')
+                                ->description('Detalles y periféricos asignados a esta computadora / estación de trabajo')
+                                ->icon('heroicon-m-computer-desktop')
+                                ->collapsible()
+                                ->visible(fn (Forms\Get $get) => in_array($get('tipo_equipo'), ['Desktop', 'All in One', 'Computadora']))
+                                ->schema([
+                                    Forms\Components\Grid::make(2)
+                                        ->schema([
+                                            Forms\Components\TextInput::make('especificaciones.cpu_marca')
+                                                ->label('CPU / Gabinete - Marca')
+                                                ->placeholder('Ej. Dell, HP, Lenovo')
+                                                ->prefixIcon('heroicon-m-cpu-chip'),
+                                            Forms\Components\TextInput::make('especificaciones.cpu_sn')
+                                                ->label('CPU / Gabinete - No. de Serie')
+                                                ->placeholder('Ej. SN-CPU-9876')
+                                                ->prefixIcon('heroicon-m-hashtag'),
+
+                                            Forms\Components\TextInput::make('especificaciones.monitor_marca')
+                                                ->label('Monitor - Marca')
+                                                ->placeholder('Ej. LG, Samsung, Dell')
+                                                ->prefixIcon('heroicon-m-tv'),
+                                            Forms\Components\TextInput::make('especificaciones.monitor_sn')
+                                                ->label('Monitor - No. de Serie')
+                                                ->placeholder('Ej. SN-MON-5432')
+                                                ->prefixIcon('heroicon-m-hashtag'),
+
+                                            Forms\Components\TextInput::make('especificaciones.teclado_marca')
+                                                ->label('Teclado - Marca')
+                                                ->placeholder('Ej. Logitech, Genius, HP')
+                                                ->prefixIcon('heroicon-m-command-line'),
+                                            Forms\Components\TextInput::make('especificaciones.teclado_sn')
+                                                ->label('Teclado - No. de Serie')
+                                                ->placeholder('Ej. SN-KB-1122')
+                                                ->prefixIcon('heroicon-m-hashtag'),
+
+                                            Forms\Components\TextInput::make('especificaciones.mouse_marca')
+                                                ->label('Mouse - Marca')
+                                                ->placeholder('Ej. Logitech, Microsoft')
+                                                ->prefixIcon('heroicon-m-cursor-arrow-rays'),
+                                            Forms\Components\TextInput::make('especificaciones.mouse_sn')
+                                                ->label('Mouse - No. de Serie')
+                                                ->placeholder('Ej. SN-MS-3344')
+                                                ->prefixIcon('heroicon-m-hashtag'),
+                                        ]),
+                                ])
+                                ->columnSpanFull(),
+
+                            Forms\Components\Section::make('Jerarquía de Ubicación')
+                                ->description('Selecciona la ubicación física estructurada del activo')
+                                ->icon('heroicon-m-map-pin')
+                                ->schema([
+                                    Forms\Components\Grid::make(4)
+                                        ->schema([
+                                            Forms\Components\Select::make('edificio_id')
+                                                ->label('Edificio')
+                                                ->placeholder('Selecciona edificio...')
+                                                ->options(fn () => Edificio::orderBy('nombre')->pluck('nombre', 'id'))
+                                                ->searchable()
+                                                ->preload()
+                                                ->live()
+                                                ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                                                    $set('departamento_id', null);
+                                                    $set('area_id', null);
+                                                    $set('salon_id', null);
+                                                    static::actualizarUbicacionFisica($set, $get);
+                                                })
+                                                ->prefixIcon('heroicon-m-building-office-2'),
+
+                                            Forms\Components\Select::make('departamento_id')
+                                                ->label('Departamento')
+                                                ->placeholder(fn (Forms\Get $get) => $get('edificio_id') ? 'Selecciona depto...' : 'Elige edificio primero')
+                                                ->options(function (Forms\Get $get) {
+                                                    $edificioId = $get('edificio_id');
+                                                    if (! $edificioId) {
+                                                        return [];
+                                                    }
+                                                    return Departamento::where('edificio_id', $edificioId)
+                                                        ->orderBy('nombre')
+                                                        ->pluck('nombre', 'id_departamento');
+                                                })
+                                                ->searchable()
+                                                ->live()
+                                                ->disabled(fn (Forms\Get $get) => blank($get('edificio_id')))
+                                                ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                                                    $set('area_id', null);
+                                                    $set('salon_id', null);
+                                                    static::actualizarUbicacionFisica($set, $get);
+                                                })
+                                                ->prefixIcon('heroicon-m-building-office'),
+
+                                            Forms\Components\Select::make('area_id')
+                                                ->label('Área')
+                                                ->placeholder(fn (Forms\Get $get) => $get('departamento_id') ? 'Selecciona área...' : 'Elige depto primero')
+                                                ->options(function (Forms\Get $get) {
+                                                    $deptoId = $get('departamento_id');
+                                                    if (! $deptoId) {
+                                                        return [];
+                                                    }
+                                                    return Area::where('id_departamento', $deptoId)
+                                                        ->orderBy('nombre')
+                                                        ->pluck('nombre', 'id_area');
+                                                })
+                                                ->searchable()
+                                                ->live()
+                                                ->disabled(fn (Forms\Get $get) => blank($get('departamento_id')))
+                                                ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                                                    $set('salon_id', null);
+                                                    static::actualizarUbicacionFisica($set, $get);
+                                                })
+                                                ->prefixIcon('heroicon-m-rectangle-group'),
+
+                                            Forms\Components\Select::make('salon_id')
+                                                ->label('Salón')
+                                                ->placeholder(fn (Forms\Get $get) => $get('area_id') ? 'Selecciona salón...' : 'Elige área primero')
+                                                ->options(function (Forms\Get $get) {
+                                                    $areaId = $get('area_id');
+                                                    if (! $areaId) {
+                                                        return [];
+                                                    }
+                                                    return Salon::where('area_id', $areaId)
+                                                        ->orderBy('nombre')
+                                                        ->pluck('nombre', 'id');
+                                                })
+                                                ->searchable()
+                                                ->live()
+                                                ->disabled(fn (Forms\Get $get) => blank($get('area_id')))
+                                                ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                                                    static::actualizarUbicacionFisica($set, $get);
+                                                })
+                                                ->prefixIcon('heroicon-m-academic-cap'),
+                                        ]),
+
+                                    Forms\Components\TextInput::make('ubicacion_fisica')
+                                        ->label('Ubicación física descriptiva')
+                                        ->placeholder('Se genera automáticamente a partir de la jerarquía o ingresa detalles adicionales...')
+                                        ->prefixIcon('heroicon-m-map-pin')
+                                        ->maxLength(150)
+                                        ->columnSpanFull(),
+                                ])
+                                ->columnSpanFull(),
+
                             Forms\Components\ToggleButtons::make('estado')->label('Estado')
                                 ->options([
                                     'Disponible' => 'Disponible',
@@ -86,36 +251,32 @@ class InventarioResource extends Resource
                                 ->default('Disponible')
                                 ->required()
                                 ->columnSpanFull(),
-                            Forms\Components\TextInput::make('ubicacion_fisica')
-                                ->label('Ubicación física')
-                                ->prefixIcon('heroicon-m-building-office')
-                                ->placeholder('Ej. Laboratorio 1, Edificio B')
-                                ->maxLength(150)
-                                ->columnSpan(2),
-                            Forms\Components\ToggleButtons::make('tipo_propiedad')
-                                ->options([
-                                    'Propio' => 'Propio',
-                                    'Rentado' => 'Rentado',
-                                ])
-                                ->colors([
-                                    'Propio' => 'primary',
-                                    'Rentado' => 'gray',
-                                ])
-                                ->inline()
-                                ->default('Propio')
-                                ->live()
-                                ->required()
-                                ->columnSpan(1),
-                            Forms\Components\Select::make('id_usuario')->placeholder('Selecciona...')
-                                ->label('Registrado por (usuario)')
-                                ->relationship('usuario', 'name')
-                                ->default(auth()->id())
-                                ->required()
-                                ->searchable()
-                                ->preload()
-                                ->prefixIcon('heroicon-m-user')
-                                ->columnSpanFull(),
-                        ])->columns(3),
+
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\ToggleButtons::make('tipo_propiedad')
+                                        ->options([
+                                            'Propio' => 'Propio',
+                                            'Rentado' => 'Rentado',
+                                        ])
+                                        ->colors([
+                                            'Propio' => 'primary',
+                                            'Rentado' => 'gray',
+                                        ])
+                                        ->inline()
+                                        ->default('Propio')
+                                        ->live()
+                                        ->required(),
+                                    Forms\Components\Select::make('id_usuario')->placeholder('Selecciona...')
+                                        ->label('Registrado por (usuario)')
+                                        ->relationship('usuario', 'name')
+                                        ->default(auth()->id())
+                                        ->required()
+                                        ->searchable()
+                                        ->preload()
+                                        ->prefixIcon('heroicon-m-user'),
+                                ]),
+                        ]),
 
                     Forms\Components\Wizard\Step::make('Factura y proveedor')
                         ->icon('heroicon-m-document-text')
@@ -425,5 +586,38 @@ class InventarioResource extends Resource
             'create' => Pages\CreateInventario::route('/create'),
             'edit' => Pages\EditInventario::route('/{record}/edit'),
         ];
+    }
+
+    public static function actualizarUbicacionFisica(Forms\Set $set, Forms\Get $get): void
+    {
+        $partes = [];
+        if ($edificioId = $get('edificio_id')) {
+            $edificio = Edificio::find($edificioId);
+            if ($edificio) {
+                $partes[] = $edificio->letra ? "Edif. {$edificio->letra} ({$edificio->nombre})" : $edificio->nombre;
+            }
+        }
+        if ($deptoId = $get('departamento_id')) {
+            $depto = Departamento::find($deptoId);
+            if ($depto) {
+                $partes[] = $depto->nombre;
+            }
+        }
+        if ($areaId = $get('area_id')) {
+            $area = Area::find($areaId);
+            if ($area) {
+                $partes[] = $area->nombre;
+            }
+        }
+        if ($salonId = $get('salon_id')) {
+            $salon = Salon::find($salonId);
+            if ($salon) {
+                $partes[] = $salon->nombre;
+            }
+        }
+
+        if (! empty($partes)) {
+            $set('ubicacion_fisica', implode(' > ', $partes));
+        }
     }
 }
