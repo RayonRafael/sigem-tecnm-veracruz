@@ -16,6 +16,7 @@ use Filament\Tables;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class InventarioResource extends Resource
 {
@@ -334,8 +335,11 @@ class InventarioResource extends Resource
                     ->color('danger')
                     ->visible(fn (Inventario $record): bool => ! $record->aprobado && auth()->user()->can('aprobaciones.rechazar'))
                     ->action(function (Inventario $record) {
-                        $record->delete();
-                        Notification::make()->title('Registro rechazado y eliminado')->success()->send();
+                        $record->update([
+                            'estado_registro' => 'Rechazado',
+                            'aprobado' => false,
+                        ]);
+                        Notification::make()->title('Registro rechazado exitosamente')->success()->send();
                     })
                     ->requiresConfirmation(),
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
@@ -349,11 +353,13 @@ class InventarioResource extends Resource
                         ->color('success')
                         ->visible(fn (): bool => auth()->user()->can('aprobaciones.aprobar'))
                         ->action(function (Collection $records) {
-                            foreach ($records as $record) {
-                                if (! $record->aprobado) {
-                                    $record->update(['aprobado' => true, 'estado_registro' => 'Aprobado', 'aprobado_por' => auth()->id(), 'fecha_aprobacion' => now()]);
+                            DB::transaction(function () use ($records) {
+                                foreach ($records as $record) {
+                                    if (! $record->aprobado) {
+                                        $record->update(['aprobado' => true, 'estado_registro' => 'Aprobado', 'aprobado_por' => auth()->id(), 'fecha_aprobacion' => now()]);
+                                    }
                                 }
-                            }
+                            });
                             Notification::make()->title('Registros aprobados exitosamente')->success()->send();
                         })
                         ->requiresConfirmation(),
