@@ -16,6 +16,8 @@ use App\Models\UnidadMedida;
 use App\Models\User;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Gate;
 use Spatie\Activitylog\Models\Activity;
 
 class Dashboard extends BaseDashboard
@@ -46,69 +48,126 @@ class Dashboard extends BaseDashboard
 
     public function getViewData(): array
     {
-        // 1. Welcome Card Stats
-        $totalActivos = Inventario::count();
-        $activosBueno = Inventario::whereIn('estado', ['Disponible', 'Asignado'])->count();
+        // 1. Estadísticas de Inventario (1 sola consulta agregada)
+        $startOfMonth = Carbon::now()->startOfMonth();
+        $endOfMonth = Carbon::now()->endOfMonth();
+
+        $inventarioStats = Inventario::toBase()
+            ->whereNull('deleted_at')
+            ->selectRaw("
+                COUNT(*) as total,
+                COUNT(CASE WHEN estado = 'Disponible' THEN 1 END) as disponibles,
+                COUNT(CASE WHEN estado = 'Asignado' THEN 1 END) as asignados,
+                COUNT(CASE WHEN estado = 'En Mantenimiento' THEN 1 END) as en_mantenimiento,
+                COUNT(CASE WHEN estado = 'Dañado' THEN 1 END) as danados,
+                COUNT(CASE WHEN created_at BETWEEN ? AND ? THEN 1 END) as creados_este_mes
+            ", [$startOfMonth, $endOfMonth])
+            ->first();
+
+        $totalActivos = (int) ($inventarioStats->total ?? 0);
+        $inventarioDisponibles = (int) ($inventarioStats->disponibles ?? 0);
+        $inventarioAsignados = (int) ($inventarioStats->asignados ?? 0);
+        $inventarioEnMantenimiento = (int) ($inventarioStats->en_mantenimiento ?? 0);
+        $inventarioDanados = (int) ($inventarioStats->danados ?? 0);
+        $activosBueno = $inventarioDisponibles + $inventarioAsignados;
         $porcentajeBuenEstado = $totalActivos > 0 ? round(($activosBueno / $totalActivos) * 100) : 0;
+        $creadosEsteMes = (int) ($inventarioStats->creados_este_mes ?? 0);
 
-        $mantenimientosPendientes = Mantenimiento::enRevision()->count();
-        $mantenimientosTotales = Mantenimiento::count();
+        // 2. Estadísticas de Mantenimiento (1 sola consulta agregada)
+        $mantenimientoStats = Mantenimiento::toBase()
+            ->selectRaw("
+                COUNT(*) as total,
+                COUNT(CASE WHEN estado IN ('Pendiente Revision Admin', 'Solicitado') THEN 1 END) as en_revision,
+                COUNT(CASE WHEN estado = 'En proceso' THEN 1 END) as en_proceso,
+                COUNT(CASE WHEN estado = 'Completado' THEN 1 END) as completados
+            ")
+            ->first();
 
+        $mantenimientosTotales = (int) ($mantenimientoStats->total ?? 0);
+        $mantenimientosPendientes = (int) ($mantenimientoStats->en_revision ?? 0);
+        $mantenimientoEnRevision = $mantenimientosPendientes;
+        $mantenimientoEnProceso = (int) ($mantenimientoStats->en_proceso ?? 0);
+        $mantenimientoCompletados = (int) ($mantenimientoStats->completados ?? 0);
+
+        // 3. Estadísticas de Solicitudes (1 sola consulta agregada)
+        $solicitudStats = Solicitud::toBase()
+            ->selectRaw("
+                COUNT(CASE WHEN estado = 'Pendiente' THEN 1 END) as pendientes,
+                COUNT(CASE WHEN estado = 'Autorizado' THEN 1 END) as autorizadas,
+                COUNT(CASE WHEN estado = 'Rechazado' THEN 1 END) as rechazadas
+            ")
+            ->first();
+
+        $solicitudesPendientes = (int) ($solicitudStats->pendientes ?? 0);
+        $solicitudesAutorizadas = (int) ($solicitudStats->autorizadas ?? 0);
+        $solicitudesRechazadas = (int) ($solicitudStats->rechazadas ?? 0);
+
+        // 4. Materiales con Stock Bajo (Usa el scope derivado)
         $materialesStockBajoCount = Material::stockBajo()->count();
-        $solicitudesPendientes = Solicitud::pendientes()->count();
 
-        $creadosEsteMes = Inventario::whereMonth('created_at', Carbon::now()->month)
-            ->whereYear('created_at', Carbon::now()->year)->count();
-
-        // 2. Actividad Reciente (5 items)
+        // 5. Actividad Reciente (5 items con eager loading de causer)
         $actividadReciente = Activity::with('causer')->latest()->limit(5)->get();
 
-        // 3. Inventario (completos y limitados)
-        $inventariosCompletos = Inventario::with(['material', 'material.marca', 'material.tipo', 'proveedor', 'usuario'])->latest('created_at')->take(50)->get();
+        // 6. Inventarios Recientes y Completos (con relaciones eager loaded para evitar N+1)
+        $inventariosCompletos = Inventario::with(['material.marca', 'material.tipo', 'proveedor', 'usuario'])
+            ->latest('created_at')
+            ->take(50)
+            ->get();
         $inventariosRecientes = $inventariosCompletos->take(3);
 
-        // 4. Solicitudes (completas y limitadas)
-        $solicitudesCompletas = Solicitud::with('usuario')->latest('created_at')->take(50)->get();
+        // 7. Solicitudes Recientes y Completas (con usuario y receptor eager loaded)
+        $solicitudesCompletas = Solicitud::with(['usuario', 'receptor'])
+            ->latest('created_at')
+            ->take(50)
+            ->get();
         $solicitudesRecientes = $solicitudesCompletas->where('estado', 'Pendiente')->take(3);
         if ($solicitudesRecientes->isEmpty()) {
             $solicitudesRecientes = $solicitudesCompletas->take(3);
         }
 
-        // 5. Mantenimiento (completos y limitados)
-        $mantenimientosCompletos = Mantenimiento::with(['inventario', 'inventario.material', 'usuarioSolicita'])->latest('created_at')->take(50)->get();
-        $mantenimientosRecientes = $mantenimientosCompletos->whereIn('estado', ['Pendiente', 'Solicitado', 'Pendiente Revision Admin', 'En proceso'])->take(3);
+        // 8. Mantenimientos Recientes y Completos (con inventario.material y usuarioSolicita eager loaded)
+        $mantenimientosCompletos = Mantenimiento::with(['inventario.material', 'usuarioSolicita'])
+            ->latest('created_at')
+            ->take(50)
+            ->get();
+        $mantenimientosRecientes = $mantenimientosCompletos
+            ->whereIn('estado', ['Pendiente', 'Solicitado', 'Pendiente Revision Admin', 'En proceso'])
+            ->take(3);
         if ($mantenimientosRecientes->isEmpty()) {
             $mantenimientosRecientes = $mantenimientosCompletos->take(3);
         }
 
-        $inventarioDisponibles = Inventario::disponibles()->count();
-        $inventarioAsignados = Inventario::asignados()->count();
-        $inventarioEnMantenimiento = Inventario::enMantenimiento()->count();
-        $inventarioDanados = Inventario::danados()->count();
+        // 9. Catálogos para Modales (Cacheados por 60 minutos con invalidación reactiva)
+        $catalogosData = Cache::remember('sigem_dashboard_catalogos', now()->addMinutes(60), function () {
+            $departamentosList = Departamento::latest()->take(50)->get();
+            $materialesList = Material::with(['tipo', 'unidad', 'marca'])->latest()->take(50)->get();
+            $areasList = Area::with('departamento')->latest()->take(50)->get();
+            $marcasList = MarcaMaterial::withCount('materiales')->latest()->take(50)->get();
+            $tiposList = TipoMaterial::latest()->take(50)->get();
+            $unidadesList = UnidadMedida::latest()->take(50)->get();
+            $proveedoresList = Proveedor::latest()->take(50)->get();
+            $receptoresList = Receptor::with('area.departamento')->latest()->take(50)->get();
+            $usuariosList = User::with('roles')->latest()->take(50)->get();
 
-        $mantenimientoEnRevision = Mantenimiento::enRevision()->count();
-        $mantenimientoEnProceso = Mantenimiento::enProceso()->count();
-        $mantenimientoCompletados = Mantenimiento::completados()->count();
+            $totalRegistrosCatalogos = $departamentosList->count() + $materialesList->count() + $areasList->count() +
+                                       $marcasList->count() + $tiposList->count() + $unidadesList->count() +
+                                       $proveedoresList->count() + $receptoresList->count() + $usuariosList->count();
 
-        $solicitudesAutorizadas = Solicitud::autorizadas()->count();
-        $solicitudesRechazadas = Solicitud::rechazadas()->count();
+            return compact(
+                'departamentosList',
+                'materialesList',
+                'areasList',
+                'marcasList',
+                'tiposList',
+                'unidadesList',
+                'proveedoresList',
+                'receptoresList',
+                'usuariosList',
+                'totalRegistrosCatalogos'
+            );
+        });
 
-        // 6. Catálogos Completos para los Modales
-        $departamentosList = Departamento::latest()->take(50)->get();
-        $materialesList = Material::with(['tipo', 'unidad', 'marca'])->latest()->take(50)->get();
-        $areasList = Area::with('departamento')->latest()->take(50)->get();
-        $marcasList = MarcaMaterial::withCount('materiales')->latest()->take(50)->get();
-        $tiposList = TipoMaterial::latest()->take(50)->get();
-        $unidadesList = UnidadMedida::latest()->take(50)->get();
-        $proveedoresList = Proveedor::latest()->take(50)->get();
-        $receptoresList = Receptor::with('area.departamento')->latest()->take(50)->get();
-        $usuariosList = User::with('roles')->latest()->take(50)->get();
-
-        $totalRegistrosCatalogos = $departamentosList->count() + $materialesList->count() + $areasList->count() +
-                                   $marcasList->count() + $tiposList->count() + $unidadesList->count() +
-                                   $proveedoresList->count() + $receptoresList->count() + $usuariosList->count();
-
-        return [
+        return array_merge([
             'totalActivos' => $totalActivos,
             'activosBueno' => $activosBueno,
             'porcentajeBuenEstado' => $porcentajeBuenEstado,
@@ -123,7 +182,6 @@ class Dashboard extends BaseDashboard
             'solicitudesRecientes' => $solicitudesRecientes,
             'mantenimientosRecientes' => $mantenimientosRecientes,
 
-            // Variables para módulos
             'inventarioDisponibles' => $inventarioDisponibles,
             'inventarioAsignados' => $inventarioAsignados,
             'inventarioEnMantenimiento' => $inventarioEnMantenimiento,
@@ -136,27 +194,22 @@ class Dashboard extends BaseDashboard
             'solicitudesAutorizadas' => $solicitudesAutorizadas,
             'solicitudesRechazadas' => $solicitudesRechazadas,
 
-            // Variables para modales completos
             'inventariosCompletos' => $inventariosCompletos,
             'solicitudesCompletas' => $solicitudesCompletas,
             'mantenimientosCompletos' => $mantenimientosCompletos,
+        ], $catalogosData);
+    }
 
-            'departamentosList' => $departamentosList,
-            'materialesList' => $materialesList,
-            'areasList' => $areasList,
-            'marcasList' => $marcasList,
-            'tiposList' => $tiposList,
-            'unidadesList' => $unidadesList,
-            'proveedoresList' => $proveedoresList,
-            'receptoresList' => $receptoresList,
-            'usuariosList' => $usuariosList,
-
-            'totalRegistrosCatalogos' => $totalRegistrosCatalogos,
-        ];
+    /**
+     * Invalida la caché de catálogos cuando se realiza una mutación inline.
+     */
+    public function clearCatalogosCache(): void
+    {
+        Cache::forget('sigem_dashboard_catalogos');
     }
 
     // =========================================================================
-    // MÉTODOS LIVEWIRE PARA OPERACIONES INLINE (CRUD) EN SLIDE-OVERS
+    // MÉTODOS LIVEWIRE PARA OPERACIONES INLINE (CRUD) EN SLIDE-OVERS (BLINDADOS)
     // =========================================================================
 
     // DEPARTAMENTO
@@ -167,22 +220,25 @@ class Dashboard extends BaseDashboard
         }
 
         if ($id) {
-            $dep = Departamento::find($id);
-            if ($dep) {
-                $dep->nombre = $nombre;
-                $dep->save();
-            }
+            $dep = Departamento::findOrFail($id);
+            Gate::authorize('update', $dep);
+            $dep->nombre = trim($nombre);
+            $dep->save();
         } else {
-            Departamento::create(['nombre' => $nombre]);
+            Gate::authorize('create', Departamento::class);
+            Departamento::create(['nombre' => trim($nombre)]);
         }
+
+        $this->clearCatalogosCache();
     }
 
     public function deleteDepartamento($id)
     {
-        $dep = Departamento::find($id);
-        if ($dep) {
-            $dep->delete();
-        }
+        $dep = Departamento::findOrFail($id);
+        Gate::authorize('delete', $dep);
+        $dep->delete();
+
+        $this->clearCatalogosCache();
     }
 
     // ÁREA
@@ -193,23 +249,26 @@ class Dashboard extends BaseDashboard
         }
 
         if ($id) {
-            $area = Area::find($id);
-            if ($area) {
-                $area->nombre = $nombre;
-                $area->id_departamento = $id_departamento;
-                $area->save();
-            }
+            $area = Area::findOrFail($id);
+            Gate::authorize('update', $area);
+            $area->nombre = trim($nombre);
+            $area->id_departamento = $id_departamento;
+            $area->save();
         } else {
-            Area::create(['nombre' => $nombre, 'id_departamento' => $id_departamento]);
+            Gate::authorize('create', Area::class);
+            Area::create(['nombre' => trim($nombre), 'id_departamento' => $id_departamento]);
         }
+
+        $this->clearCatalogosCache();
     }
 
     public function deleteArea($id)
     {
-        $area = Area::find($id);
-        if ($area) {
-            $area->delete();
-        }
+        $area = Area::findOrFail($id);
+        Gate::authorize('delete', $area);
+        $area->delete();
+
+        $this->clearCatalogosCache();
     }
 
     // MARCA
@@ -220,22 +279,25 @@ class Dashboard extends BaseDashboard
         }
 
         if ($id) {
-            $marca = MarcaMaterial::find($id);
-            if ($marca) {
-                $marca->nombre = $nombre;
-                $marca->save();
-            }
+            $marca = MarcaMaterial::findOrFail($id);
+            Gate::authorize('update', $marca);
+            $marca->nombre = trim($nombre);
+            $marca->save();
         } else {
-            MarcaMaterial::create(['nombre' => $nombre]);
+            Gate::authorize('create', MarcaMaterial::class);
+            MarcaMaterial::create(['nombre' => trim($nombre)]);
         }
+
+        $this->clearCatalogosCache();
     }
 
     public function deleteMarca($id)
     {
-        $marca = MarcaMaterial::find($id);
-        if ($marca) {
-            $marca->delete();
-        }
+        $marca = MarcaMaterial::findOrFail($id);
+        Gate::authorize('delete', $marca);
+        $marca->delete();
+
+        $this->clearCatalogosCache();
     }
 
     // TIPO MATERIAL
@@ -246,22 +308,25 @@ class Dashboard extends BaseDashboard
         }
 
         if ($id) {
-            $tipo = TipoMaterial::find($id);
-            if ($tipo) {
-                $tipo->nombre = $nombre;
-                $tipo->save();
-            }
+            $tipo = TipoMaterial::findOrFail($id);
+            Gate::authorize('update', $tipo);
+            $tipo->nombre = trim($nombre);
+            $tipo->save();
         } else {
-            TipoMaterial::create(['nombre' => $nombre]);
+            Gate::authorize('create', TipoMaterial::class);
+            TipoMaterial::create(['nombre' => trim($nombre)]);
         }
+
+        $this->clearCatalogosCache();
     }
 
     public function deleteTipo($id)
     {
-        $tipo = TipoMaterial::find($id);
-        if ($tipo) {
-            $tipo->delete();
-        }
+        $tipo = TipoMaterial::findOrFail($id);
+        Gate::authorize('delete', $tipo);
+        $tipo->delete();
+
+        $this->clearCatalogosCache();
     }
 
     // UNIDAD MEDIDA
@@ -272,21 +337,24 @@ class Dashboard extends BaseDashboard
         }
 
         if ($id) {
-            $unidad = UnidadMedida::find($id);
-            if ($unidad) {
-                $unidad->nombre = $nombre;
-                $unidad->save();
-            }
+            $unidad = UnidadMedida::findOrFail($id);
+            Gate::authorize('update', $unidad);
+            $unidad->nombre = trim($nombre);
+            $unidad->save();
         } else {
-            UnidadMedida::create(['nombre' => $nombre]);
+            Gate::authorize('create', UnidadMedida::class);
+            UnidadMedida::create(['nombre' => trim($nombre)]);
         }
+
+        $this->clearCatalogosCache();
     }
 
     public function deleteUnidad($id)
     {
-        $unidad = UnidadMedida::find($id);
-        if ($unidad) {
-            $unidad->delete();
-        }
+        $unidad = UnidadMedida::findOrFail($id);
+        Gate::authorize('delete', $unidad);
+        $unidad->delete();
+
+        $this->clearCatalogosCache();
     }
 }
