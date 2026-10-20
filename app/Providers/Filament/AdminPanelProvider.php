@@ -33,14 +33,8 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(asset('images/sigem-logo.svg'))
             ->brandLogoHeight('2.5rem')
             ->favicon(asset('images/sigem-favicon.svg?v=2'))
-            ->font('DM Sans', 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap')
             ->colors([
-                'primary' => Color::hex('#1b65d4'),
-                'success' => Color::hex('#0f9d58'),
-                'warning' => Color::hex('#f4a623'),
-                'danger' => Color::hex('#d93025'),
-                'info' => Color::hex('#0b1d3a'),
-                'gray' => Color::hex('#6b7280'),
+                'primary' => Color::Blue,
             ])
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
