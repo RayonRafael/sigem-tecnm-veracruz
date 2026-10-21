@@ -2320,3 +2320,20 @@ table{
 .fi-header-actions .sigem-btn-primary:hover{
   background: var(--sig-primary-dark) !important;
 }
+
+/* Slide-over de alta de inventario y formularios laterales */
+.fi-slide-over,
+.fi-modal-slide-over-window {
+  width: 620px !important;
+  max-width: 94vw !important;
+}
+
+.fi-slide-over .fi-fo-component-ctn,
+.fi-modal-slide-over-window .fi-fo-component-ctn {
+  padding: 20px 24px !important;
+}
+
+.fi-modal-slide-over-window .fi-modal-content {
+  overflow-y: auto !important;
+}
+

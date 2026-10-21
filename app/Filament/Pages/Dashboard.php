@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Resources\InventarioResource;
 use App\Models\Area;
 use App\Models\Departamento;
 use App\Models\Inventario;
@@ -14,6 +15,8 @@ use App\Models\Solicitud;
 use App\Models\TipoMaterial;
 use App\Models\UnidadMedida;
 use App\Models\User;
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -33,6 +36,20 @@ class Dashboard extends BaseDashboard
     protected static ?string $title = 'SIGEM - TecNM Veracruz';
 
     protected static string $view = 'filament.pages.dashboard';
+
+    public function registrarEquipoAction(): Action
+    {
+        return CreateAction::make('registrarEquipo')
+            ->label('＋ Registrar equipo')
+            ->model(Inventario::class)
+            ->slideOver()
+            ->steps(InventarioResource::getFormSteps())
+            ->extraAttributes([
+                'class' => 'sigem-btn-primary',
+                'title' => 'Registrar un nuevo equipo en el inventario',
+            ])
+            ->successNotificationTitle('Registro creado exitosamente');
+    }
 
     public function getColumns(): int|string|array
     {

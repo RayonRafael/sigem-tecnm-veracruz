@@ -50,11 +50,23 @@ class ListInventarios extends ListRecords implements HasInfolists
                 ->alpineClickHandler("window.dispatchEvent(new CustomEvent('toggle-inventario-grafica'))"),
             Actions\CreateAction::make()
                 ->label('＋ Registrar equipo')
+                ->slideOver()
+                ->steps(InventarioResource::getFormSteps())
                 ->extraAttributes([
                     'class' => 'sigem-btn-primary',
                     'title' => 'Registrar un nuevo equipo en el inventario',
-                ]),
+                ])
+                ->successNotificationTitle('Registro creado exitosamente'),
         ];
+    }
+
+    protected function configureCreateAction(Actions\CreateAction | \Filament\Tables\Actions\CreateAction $action): void
+    {
+        parent::configureCreateAction($action);
+
+        $action->url(null);
+        $action->slideOver();
+        $action->steps(InventarioResource::getFormSteps());
     }
 
     public function table(Table $table): Table

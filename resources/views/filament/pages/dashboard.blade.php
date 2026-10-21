@@ -49,7 +49,7 @@
             </a>
 
             <!-- 3. Registrar activo -->
-            <a class="sigem-quick" href="{{ url('/admin/inventarios/create') }}">
+            <a class="sigem-quick" href="javascript:void(0)" wire:click="mountAction('registrarEquipo')">
                 <div class="arrow">→</div>
                 <div class="sigem-quick-ico sigem-i-success">＋</div>
                 <div class="sigem-quick-title">Registrar activo</div>
@@ -117,11 +117,12 @@
                             title="Alternar vista de gráfica de dona del inventario">
                         📊 Gráfica
                     </button>
-                    <a href="{{ url('/admin/inventarios/create') }}"
-                       class="sigem-btn-primary"
-                       title="Registrar un nuevo equipo en el inventario">
+                    <button type="button"
+                            wire:click="mountAction('registrarEquipo')"
+                            class="sigem-btn-primary"
+                            title="Registrar un nuevo equipo en el inventario">
                         ＋ Registrar equipo
-                    </a>
+                    </button>
                 </div>
             </div>
 

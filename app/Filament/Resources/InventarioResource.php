@@ -48,11 +48,18 @@ class InventarioResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Wizard::make([
-                    Forms\Components\Wizard\Step::make('Identificación y ubicación')
-                        ->icon('heroicon-m-identification')
-                        ->schema([
-                            Forms\Components\Grid::make(3)
+                Forms\Components\Wizard::make(static::getFormSteps())
+                    ->columnSpanFull(),
+            ]);
+    }
+
+    public static function getFormSteps(): array
+    {
+        return [
+            Forms\Components\Wizard\Step::make('Identificación y ubicación')
+                ->icon('heroicon-m-identification')
+                ->schema([
+                    Forms\Components\Grid::make(3)
                                 ->schema([
                                     Forms\Components\TextInput::make('num_serie')
                                         ->label('Número de serie')
@@ -373,8 +380,7 @@ class InventarioResource extends Resource
                                         ->rows(2),
                                 ]),
                         ]),
-                ])->columnSpanFull(),
-            ]);
+        ];
     }
 
     public static function table(Table $table): Table
