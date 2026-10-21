@@ -6,24 +6,28 @@
 body:has(.sigem-professional) .fi-topbar { display: none !important; height: 0 !important; overflow: hidden !important; position: absolute !important; }
 body:has(.sigem-professional) { padding-top: 0 !important; }
 body:has(.sigem-professional) .fi-main { padding-top: 0 !important; margin-top: 0 !important; height: 100% !important; min-height: 100vh !important; }
-body:has(.sigem-professional) .fi-main-ctn { max-width: 100% !important; padding-left: 2rem !important; padding-right: 2rem !important; }
+body:has(.sigem-professional) .fi-main-ctn { max-width: none !important; width: 100% !important; padding-left: 18px !important; padding-right: 18px !important; margin: 0 !important; }
 body:has(.sigem-professional) .fi-header { margin-bottom: 2rem !important; padding-top: 1.5rem !important; }
 
 /* ===== 1. FONDO GENERAL Y APP ===== */
-main.fi-main, body {
-    background-color: #f8fafc !important;
+body, .fi-body, html {
+    background-color: var(--sig-bg) !important;
+    background: var(--sig-bg) !important;
     background-image: none !important;
 }
-.dark main.fi-main, .dark body {
+.dark body, .dark .fi-body, .dark html {
     background-color: #0f172a !important;
 }
 
 /* ===== 2. CARDS Y CONTENEDORES ===== */
+.fi-main, .fi-main-ctn, .fi-ta-ctn, .fi-fo-component-ctn, .fi-section, .fi-card {
+    background-color: var(--sig-surface) !important;
+    background: var(--sig-surface) !important;
+}
 .fi-ta-ctn, .fi-fo-component-ctn, .fi-section, .fi-card {
-    background-color: #ffffff !important;
     border-radius: 12px !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03) !important;
+    border: 1px solid var(--sig-border) !important;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .05) !important;
 }
 .fi-ta-ctn::before, .fi-fo-component-ctn::before, .fi-section::before, .fi-card::before {
     display: none !important; /* Quitar la barra de gradiente superior anterior */
@@ -48,14 +52,28 @@ h1, .fi-header-heading {
     color: #f1f5f9 !important;
 }
 
+/* Ocultar heading nativo duplicado de Filament en páginas que tienen su propio encabezado InvGate */
+.fi-page:has(.sigem-rep-header) .fi-header-heading {
+    display: none !important;
+}
+.fi-page:has(.sigem-rep-header) .fi-header {
+    margin-bottom: 0.5rem !important;
+    padding-bottom: 0 !important;
+    border-bottom: none !important;
+}
+
 /* ===== 4. TABLAS DE LISTADO ===== */
 .fi-ta table {
     border-collapse: separate !important;
     border-spacing: 0 !important;
 }
-.fi-ta-header, .fi-ta-header-cell, th {
-    background-color: #f8fafc !important;
-    border-bottom: 1px solid #e2e8f0 !important;
+.fi-ta-header {
+    background-color: var(--sig-surface) !important;
+    background: var(--sig-surface) !important;
+}
+.fi-ta-header-cell, th {
+    background-color: #fafbfc !important;
+    border-bottom: 1px solid var(--sig-border) !important;
 }
 .fi-ta-header-cell *, th * {
     color: #475569 !important;
@@ -995,13 +1013,18 @@ body:has(.sigem-professional) .fi-topbar .fi-user-menu button:hover { background
   --mod-cfg: #475569;   --mod-cfg-l: #e8ecf1;
 }
 
-body, main.fi-main {
+body, .fi-body {
   background: var(--sig-bg) !important;
   color: var(--sig-text);
   font-family: 'DM Sans', sans-serif !important;
 }
 
-.fi-card, .fi-section {
+main.fi-main, .fi-main, .fi-main-ctn {
+  background: var(--sig-surface) !important;
+  color: var(--sig-text);
+}
+
+.fi-card, .fi-section, .fi-ta-ctn {
   border: 1px solid var(--sig-border) !important;
   border-radius: var(--sig-radius) !important;
   box-shadow: 0 1px 2px rgba(16, 24, 40, .05) !important;
@@ -1032,10 +1055,27 @@ body, main.fi-main {
   padding: 7px !important;
   border: 1.5px solid transparent !important;
   transition: all .15s ease-in-out !important;
+  overflow: visible !important;
 }
 .fi-sidebar-item:hover .fi-icon,
 .fi-sidebar-item:hover .fi-sidebar-item-icon {
   transform: translateY(-1px);
+}
+
+/* Íconos en estado NO activo */
+.fi-sidebar-item:not(.fi-active):not(.fi-sidebar-item-active) .fi-sidebar-item-icon,
+.fi-sidebar-item:not(.fi-active):not(.fi-sidebar-item-active) .fi-icon,
+.fi-sidebar-item .fi-icon svg,
+.fi-sidebar-item .fi-sidebar-item-icon svg,
+.fi-sidebar-item svg {
+  stroke: currentColor;
+  fill: none;
+}
+.fi-sidebar-item:not(.fi-active):not(.fi-sidebar-item-active) svg path,
+.fi-sidebar-item:not(.fi-active):not(.fi-sidebar-item-active) .fi-icon svg path,
+.fi-sidebar-item:not(.fi-active):not(.fi-sidebar-item-active) .fi-sidebar-item-icon svg path {
+  stroke: currentColor;
+  fill: none;
 }
 
 /* Fallback de color para ítems generales del sidebar */
@@ -1046,7 +1086,18 @@ body, main.fi-main {
   border-color: color-mix(in srgb, var(--mod-cfg) 45%, transparent);
 }
 
-/* Colores por módulo según la URL del ítem de navegación */
+/* Colores por módulo según la URL del ítem de navegación (inactivo) */
+.fi-sidebar-item a[href$="/admin"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href$="/admin/"] .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href$="/admin"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href$="/admin/"]) .fi-sidebar-item-icon,
+.fi-sidebar-item a[href$="/admin"] .fi-icon,
+.fi-sidebar-item a[href$="/admin/"] .fi-icon {
+  background: var(--sig-primary-light) !important;
+  color: var(--sig-primary) !important;
+  border-color: color-mix(in srgb, var(--sig-primary) 45%, transparent) !important;
+}
+
 .fi-sidebar-item[href*="inventarios"] .fi-icon,
 .fi-sidebar-item a[href*="inventario"] .fi-sidebar-item-icon,
 .fi-sidebar-item a[href*="inventario"] .fi-icon,
@@ -1108,48 +1159,64 @@ body, main.fi-main {
   border-color: color-mix(in srgb, var(--mod-cfg) 45%, transparent) !important;
 }
 
-/* Estado activo del ícono en el sidebar */
-.fi-sidebar-item[aria-current="page"] .fi-icon,
-.fi-sidebar-item.fi-active .fi-sidebar-item-icon,
-.fi-sidebar-item.fi-sidebar-item-active .fi-sidebar-item-icon,
-.fi-sidebar-item a[aria-current="page"] .fi-sidebar-item-icon {
-  color: #fff !important;
+/* Estado activo del ícono en el sidebar por módulo (Fondo de color + borde) */
+.fi-sidebar-item.fi-active a[href$="/admin"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href$="/admin"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href$="/admin"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href$="/admin"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href$="/admin"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a[href$="/admin/"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href$="/admin/"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href$="/admin/"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href$="/admin/"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href$="/admin/"]) .fi-sidebar-item-icon {
+  background: var(--sig-primary) !important;
+  border-color: var(--sig-primary) !important;
+  color: #ffffff !important;
 }
 
 .fi-sidebar-item[href*="inventarios"][aria-current="page"] .fi-icon,
 .fi-sidebar-item.fi-active a[href*="inventario"] .fi-sidebar-item-icon,
 .fi-sidebar-item.fi-sidebar-item-active a[href*="inventario"] .fi-sidebar-item-icon,
 .fi-sidebar-item a[href*="inventario"][aria-current="page"] .fi-sidebar-item-icon,
-.fi-sidebar-item.fi-active:has(a[href*="inventario"]) .fi-sidebar-item-icon {
+.fi-sidebar-item.fi-active:has(a[href*="inventario"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="inventario"]) .fi-sidebar-item-icon {
   background: var(--mod-inv) !important;
   border-color: var(--mod-inv) !important;
+  color: #ffffff !important;
 }
 
 .fi-sidebar-item[href*="solicitud"][aria-current="page"] .fi-icon,
 .fi-sidebar-item.fi-active a[href*="solicitud"] .fi-sidebar-item-icon,
 .fi-sidebar-item.fi-sidebar-item-active a[href*="solicitud"] .fi-sidebar-item-icon,
 .fi-sidebar-item a[href*="solicitud"][aria-current="page"] .fi-sidebar-item-icon,
-.fi-sidebar-item.fi-active:has(a[href*="solicitud"]) .fi-sidebar-item-icon {
+.fi-sidebar-item.fi-active:has(a[href*="solicitud"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="solicitud"]) .fi-sidebar-item-icon {
   background: var(--mod-sol) !important;
   border-color: var(--mod-sol) !important;
+  color: #ffffff !important;
 }
 
 .fi-sidebar-item[href*="mantenimiento"][aria-current="page"] .fi-icon,
 .fi-sidebar-item.fi-active a[href*="mantenimiento"] .fi-sidebar-item-icon,
 .fi-sidebar-item.fi-sidebar-item-active a[href*="mantenimiento"] .fi-sidebar-item-icon,
 .fi-sidebar-item a[href*="mantenimiento"][aria-current="page"] .fi-sidebar-item-icon,
-.fi-sidebar-item.fi-active:has(a[href*="mantenimiento"]) .fi-sidebar-item-icon {
+.fi-sidebar-item.fi-active:has(a[href*="mantenimiento"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="mantenimiento"]) .fi-sidebar-item-icon {
   background: var(--mod-mant) !important;
   border-color: var(--mod-mant) !important;
+  color: #ffffff !important;
 }
 
 .fi-sidebar-item[href*="reporte"][aria-current="page"] .fi-icon,
 .fi-sidebar-item.fi-active a[href*="reporte"] .fi-sidebar-item-icon,
 .fi-sidebar-item.fi-sidebar-item-active a[href*="reporte"] .fi-sidebar-item-icon,
 .fi-sidebar-item a[href*="reporte"][aria-current="page"] .fi-sidebar-item-icon,
-.fi-sidebar-item.fi-active:has(a[href*="reporte"]) .fi-sidebar-item-icon {
+.fi-sidebar-item.fi-active:has(a[href*="reporte"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="reporte"]) .fi-sidebar-item-icon {
   background: var(--mod-rep) !important;
   border-color: var(--mod-rep) !important;
+  color: #ffffff !important;
 }
 
 .fi-sidebar-item.fi-active a[href*="catalogo"] .fi-sidebar-item-icon,
@@ -1160,9 +1227,81 @@ body, main.fi-main {
 .fi-sidebar-item.fi-active a[href*="proveedor"] .fi-sidebar-item-icon,
 .fi-sidebar-item.fi-active a[href*="receptor"] .fi-sidebar-item-icon,
 .fi-sidebar-item.fi-active a[href*="unidad-medida"] .fi-sidebar-item-icon,
-.fi-sidebar-item.fi-active a[href*="user"] .fi-sidebar-item-icon {
+.fi-sidebar-item.fi-active a[href*="user"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="catalogo"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="configuracion"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="area"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="departamento"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="material"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="proveedor"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="receptor"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="unidad-medida"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="user"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="catalogo"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="configuracion"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="area"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="departamento"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="material"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="proveedor"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="receptor"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="unidad-medida"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="user"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="catalogo"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="configuracion"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="area"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="departamento"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="material"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="proveedor"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="receptor"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="unidad-medida"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="user"]) .fi-sidebar-item-icon {
   background: var(--mod-cfg) !important;
   border-color: var(--mod-cfg) !important;
+  color: #ffffff !important;
+}
+
+/* Estado activo: ICONO BLANCO VISIBLE universal de máxima especificidad */
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active .fi-sidebar-item-icon,
+.fi-sidebar-item[aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active .fi-icon,
+.fi-sidebar-item.fi-sidebar-item-active .fi-icon,
+.fi-sidebar-item[aria-current="page"] .fi-icon,
+.fi-sidebar-item.fi-active svg,
+.fi-sidebar-item.fi-sidebar-item-active svg,
+.fi-sidebar-item[aria-current="page"] svg,
+.fi-sidebar-item a[aria-current="page"] svg,
+.fi-sidebar-item.fi-active .fi-icon svg,
+.fi-sidebar-item.fi-sidebar-item-active .fi-icon svg,
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon svg,
+.fi-sidebar-item.fi-sidebar-item-active .fi-sidebar-item-icon svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+
+.fi-sidebar-item.fi-active svg path,
+.fi-sidebar-item.fi-sidebar-item-active svg path,
+.fi-sidebar-item[aria-current="page"] svg path,
+.fi-sidebar-item a[aria-current="page"] svg path,
+.fi-sidebar-item.fi-active .fi-icon svg path,
+.fi-sidebar-item.fi-sidebar-item-active .fi-icon svg path,
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon svg path,
+.fi-sidebar-item.fi-sidebar-item-active .fi-sidebar-item-icon svg path,
+.fi-sidebar-item.fi-active svg *,
+.fi-sidebar-item.fi-sidebar-item-active svg *,
+.fi-sidebar-item[aria-current="page"] svg *,
+.fi-sidebar-item a[aria-current="page"] svg *,
+.fi-sidebar-item.fi-active .fi-icon svg *,
+.fi-sidebar-item.fi-sidebar-item-active .fi-icon svg *,
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon svg *,
+.fi-sidebar-item.fi-sidebar-item-active .fi-sidebar-item-icon svg * {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
 }
 
 /* Badge en items de navegación */
@@ -1908,7 +2047,7 @@ aside.fi-sidebar,
 .sigem-pal-t{font-size:16.5px;font-weight:600;color:var(--sig-text)}
 .sigem-pal-s{font-size:14.5px;color:var(--sig-muted)}
 .sigem-pal-foot{display:flex;gap:16px;padding:9px 16px;border-top:1px solid var(--sig-border);
-  background:#fafbfc;font-size:14.5px;color:var(--sig-muted);align-items:center}
+  background:var(--sig-bg);font-size:14.5px;color:var(--sig-muted);align-items:center}
 .sigem-pal-foot kbd{font-size:13.5px;background:var(--sig-surface);border:1px solid var(--sig-border);
   border-radius:5px;padding:1px 6px}
 
@@ -1990,5 +2129,99 @@ textarea:focus-visible,
 .sigem-dash-more a{color:var(--sig-primary);font-weight:600;font-size:15.5px;
   text-decoration:none;display:inline-flex;align-items:center;gap:6px}
 .sigem-dash-more a:hover{text-decoration:underline}
+
+/* ===== Ajuste de ancho: aprovechar toda la pantalla ===== */
+
+/* Contenedor principal de contenido: ancho completo */
+.fi-main,
+.fi-main-ctn,
+main.fi-main{
+  max-width: none !important;
+  width: 100% !important;
+  padding-left: 18px !important;
+  padding-right: 18px !important;
+  margin: 0 !important;
+}
+
+/* Quitar max-width de cualquier contenedor interno de Filament */
+.fi-page,
+.fi-page-ctn,
+.fi-content-ctn{
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Header de página: ancho completo */
+.fi-header,
+.fi-page-header{
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Tablas: ocupar todo el ancho, sin overflow innecesario */
+.fi-ta-ctn,
+.sigem-rep-view,
+.sigem-dash-table{
+  max-width: none !important;
+  width: 100% !important;
+  overflow-x: auto;
+}
+
+.fi-ta-table,
+.sigem-table,
+table{
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Columnas de tabla: contenido flexible */
+.fi-ta-table tbody td,
+.fi-ta-table thead th{
+  white-space: nowrap;
+}
+.fi-ta-table td:nth-child(2),
+.fi-ta-table th:nth-child(2){
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Panel lateral de Inventario (dona): proporción ajustada */
+.sigem-inv-layout{
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 14px;
+  width: 100%;
+}
+
+/* En pantallas grandes: el contenido llena de verdad */
+@media (min-width: 1600px){
+  .fi-main, .fi-main-ctn, main.fi-main{
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+  .sigem-inv-layout{
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+}
+
+/* Hero, quick-grid y stats-grid: ancho completo */
+.sigem-hero,
+.sigem-quick-grid,
+.sigem-stats-grid{
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Responsive: en pantallas medianas */
+@media (max-width: 1200px){
+  .sigem-inv-layout{
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sigem-inv-side{
+    position: static;
+    max-height: none;
+  }
+}
+
 
 
