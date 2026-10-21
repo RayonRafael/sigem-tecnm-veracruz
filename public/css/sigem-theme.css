@@ -1971,4 +1971,24 @@ textarea:focus-visible,
   .sigem-rep-grid{grid-template-columns:repeat(3,1fr)}
 }
 
+/* Encabezado de sección del dashboard */
+.sigem-section-head{margin:8px 0 16px}
+.sigem-section-head h2{font-size:21px;font-weight:700;display:flex;
+  align-items:center;gap:10px;margin:0 0 4px;color:var(--sig-text)}
+.sigem-section-head p{font-size:15px;color:var(--sig-muted);margin:0}
+
+/* Separación entre KPIs y tabla */
+.sigem-dash-spacer{height:8px}
+
+/* Tabla de inventario en dashboard (ancho completo sin panel lateral) */
+.sigem-dash-table .fi-ta-table thead th{background:#fafbfc}
+.sigem-dash-table .fi-ta-table tbody td{padding:8px 12px}
+
+/* Enlace "Ver todo" al pie de la tabla */
+.sigem-dash-more{display:flex;justify-content:center;padding:14px;
+  border-top:1px solid var(--sig-border)}
+.sigem-dash-more a{color:var(--sig-primary);font-weight:600;font-size:15.5px;
+  text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.sigem-dash-more a:hover{text-decoration:underline}
+
 
