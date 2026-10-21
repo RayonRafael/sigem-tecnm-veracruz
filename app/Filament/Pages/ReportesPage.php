@@ -207,9 +207,10 @@ class ReportesPage extends Page
         $rows = [];
 
         foreach ($areas as $area) {
-            $inventarios = Inventario::where('area_id', $area->id_area)
-                ->orWhere('ubicacion_fisica', 'like', '%' . $area->nombre . '%')
-                ->get();
+            $inventarios = Inventario::where(function ($q) use ($area) {
+                $q->where('ubicacion_fisica', 'like', '%' . $area->nombre . '%')
+                    ->orWhere('especificaciones->area_id', (string) $area->id_area);
+            })->get();
 
             $total = $inventarios->count();
             if ($total === 0) {

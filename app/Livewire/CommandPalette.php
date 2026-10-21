@@ -155,7 +155,8 @@ class CommandPalette extends Component
                         ->orWhere('ubicacion_fisica', 'like', "%{$t}%")
                         ->orWhereHas('material', function ($mq) use ($t) {
                             $mq->where('nombre', 'like', "%{$t}%")
-                                ->orWhere('codigo', 'like', "%{$t}%");
+                                ->orWhere('modelo', 'like', "%{$t}%")
+                                ->orWhere('descripcion', 'like', "%{$t}%");
                         });
                 }
             })

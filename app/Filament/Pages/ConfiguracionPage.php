@@ -240,12 +240,13 @@ class ConfiguracionPage extends Page
                 break;
 
             case 'materiales':
-                $headers = ['Código', 'Material / Equipo', 'Marca', 'Tipo', 'Stock', 'Acciones'];
+                $headers = ['Modelo / ID', 'Material / Equipo', 'Marca', 'Tipo', 'Stock', 'Acciones'];
                 $materiales = Material::with(['marca', 'tipo'])->orderBy('nombre')->limit(25)->get();
                 foreach ($materiales as $m) {
                     $editUrl = MaterialResource::getUrl('edit', ['record' => $m]);
+                    $codigo = $m->modelo ?: ('#' . $m->id_producto);
                     $rows[] = [
-                        '<span class="sigem-td-folio">' . e($m->codigo ?? 'S/C') . '</span>',
+                        '<span class="sigem-td-folio">' . e($codigo) . '</span>',
                         '<strong>' . e($m->nombre) . '</strong>',
                         e($m->marca?->nombre ?? 'N/A'),
                         e($m->tipo?->nombre ?? 'N/A'),
@@ -261,7 +262,7 @@ class ConfiguracionPage extends Page
                 foreach ($marcas as $mc) {
                     $editUrl = MarcaMaterialResource::getUrl('edit', ['record' => $mc]);
                     $rows[] = [
-                        '<span class="sigem-td-folio">#' . $mc->id_marcadematerial . '</span>',
+                        '<span class="sigem-td-folio">#' . $mc->id_marca . '</span>',
                         '<strong>' . e($mc->nombre) . '</strong>',
                         '<a href="' . $editUrl . '" class="sigem-rep-btn-sec" style="padding:3px 9px;font-size:13px">Editar</a>',
                     ];
@@ -282,14 +283,13 @@ class ConfiguracionPage extends Page
                 break;
 
             case 'unidades':
-                $headers = ['ID', 'Unidad de medida', 'Abreviatura', 'Acciones'];
+                $headers = ['ID', 'Unidad de medida', 'Acciones'];
                 $unidades = UnidadMedida::orderBy('nombre')->limit(25)->get();
                 foreach ($unidades as $u) {
                     $editUrl = UnidadMedidaResource::getUrl('edit', ['record' => $u]);
                     $rows[] = [
-                        '<span class="sigem-td-folio">#' . $u->id_unidaddemedida . '</span>',
+                        '<span class="sigem-td-folio">#' . $u->id_unidad . '</span>',
                         '<strong>' . e($u->nombre) . '</strong>',
-                        '<span class="sigem-pill neutral">' . e($u->abreviatura ?? '-') . '</span>',
                         '<a href="' . $editUrl . '" class="sigem-rep-btn-sec" style="padding:3px 9px;font-size:13px">Editar</a>',
                     ];
                 }
@@ -297,13 +297,13 @@ class ConfiguracionPage extends Page
 
             case 'proveedores':
                 $headers = ['ID', 'Proveedor', 'RFC', 'Contacto', 'Acciones'];
-                $proveedores = Proveedor::orderBy('nombre')->limit(25)->get();
+                $proveedores = Proveedor::orderBy('nombre_empresa')->limit(25)->get();
                 foreach ($proveedores as $p) {
                     $editUrl = ProveedorResource::getUrl('edit', ['record' => $p]);
-                    $contacto = trim(($p->telefono ?? '') . ' ' . ($p->correo ?? ''));
+                    $contacto = trim(($p->contacto_nombre ? $p->contacto_nombre . ' · ' : '') . ($p->contacto_telefono ?? '') . ' ' . ($p->contacto_email ?? ''));
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $p->id_proveedor . '</span>',
-                        '<strong>' . e($p->nombre) . '</strong>',
+                        '<strong>' . e($p->nombre_empresa) . '</strong>',
                         e($p->rfc ?? 'N/A'),
                         e($contacto ?: 'Sin datos'),
                         '<a href="' . $editUrl . '" class="sigem-rep-btn-sec" style="padding:3px 9px;font-size:13px">Editar</a>',
@@ -312,15 +312,17 @@ class ConfiguracionPage extends Page
                 break;
 
             case 'receptores':
-                $headers = ['ID', 'Receptor', 'Área', 'Cargo', 'Acciones'];
+                $headers = ['ID', 'Receptor', 'Área', 'Contacto', 'Acciones'];
                 $receptores = Receptor::with('area')->orderBy('nombre')->limit(25)->get();
                 foreach ($receptores as $r) {
                     $editUrl = ReceptorResource::getUrl('edit', ['record' => $r]);
+                    $nombreCompleto = trim("{$r->nombre} {$r->apellido_paterno} {$r->apellido_materno}");
+                    $contacto = trim(($r->telefono ?? '') . ' ' . ($r->email ?? ''));
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $r->id_receptor . '</span>',
-                        '<strong>' . e($r->nombre) . '</strong>',
+                        '<strong>' . e($nombreCompleto ?: $r->nombre) . '</strong>',
                         e($r->area?->nombre ?? 'N/A'),
-                        e($r->cargo ?? 'N/A'),
+                        e($contacto ?: 'Sin datos'),
                         '<a href="' . $editUrl . '" class="sigem-rep-btn-sec" style="padding:3px 9px;font-size:13px">Editar</a>',
                     ];
                 }
