@@ -109,7 +109,7 @@
                     <h2>📋 Registros de Inventario</h2>
                     <p>Busca, filtra y gestiona los equipos registrados en el sistema.</p>
                 </div>
-                <div>
+                <div class="sigem-page-actions">
                     <button type="button"
                             class="sigem-rep-btn-sec"
                             x-on:click="showGrafica = !showGrafica"
@@ -125,22 +125,111 @@
                 </div>
             </div>
 
-            <!-- Panel de Gráficas / Dona colapsable -->
-            <div x-show="showGrafica" x-collapse style="margin-top: 14px; margin-bottom: 16px;">
-                @php
-                    $dashTotal = $totalActivos ?? 0;
-                    $circunf = 263.89;
-                    $donutSegs = [
-                        ['label' => 'Disponible', 'cant' => $inventarioDisponibles ?? 0, 'color' => '#10b981'],
-                        ['label' => 'Asignado', 'cant' => $inventarioAsignados ?? 0, 'color' => '#3b82f6'],
-                        ['label' => 'En Mantenimiento', 'cant' => $inventarioEnMantenimiento ?? 0, 'color' => '#f59e0b'],
-                        ['label' => 'Dañado', 'cant' => $inventarioDanados ?? 0, 'color' => '#ef4444'],
-                    ];
-                    $dashOffset = 0;
-                @endphp
-                <div style="background: var(--sig-surface); border: 1px solid var(--sig-border); border-radius: 14px; padding: 20px 24px; display: flex; align-items: center; justify-content: center; gap: 40px; flex-wrap: wrap;">
-                    <!-- Dona SVG -->
-                    <div class="sigem-donut" style="margin: 0;">
+            <div class="sigem-inv-layout" :class="showGrafica ? '' : 'sigem-inv-no-chart'" style="margin-top: 14px;">
+                <div class="sigem-inv-main" style="min-width: 0;">
+                    <div class="sigem-rep-view sigem-dash-table" style="margin-bottom: 0;">
+                        <div class="sigem-rep-table-wrap">
+                            <table class="fi-ta-table">
+                                <thead>
+                                    <tr>
+                                        <th>CÓDIGO</th>
+                                        <th>EQUIPO</th>
+                                        <th>CATEGORÍA</th>
+                                        <th>ESTADO</th>
+                                        <th>ÁREA</th>
+                                        <th style="text-align: right;">ACCIONES</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php
+                                        $inventariosTabla = collect($inventariosCompletos ?? [])->take(10);
+                                    @endphp
+                                    @forelse($inventariosTabla as $inv)
+                                        @php
+                                            $codigo = $inv->num_serie ?: ('#' . $inv->id_inventario);
+                                            $nombreEquipo = $inv->material?->nombre ?? 'Equipo general';
+                                            $serieSub = $inv->num_serie ? 'S/N: ' . $inv->num_serie : 'Sin número de serie';
+                                            $categoria = $inv->material?->tipo?->nombre ?? 'General';
+                                            $areaUbicacion = $inv->ubicacion_fisica ?: 'Sin área asignada';
+                                            $estado = $inv->estado ?? 'Sin estado';
+
+                                            $pillCls = match ($estado) {
+                                                'Disponible' => 'ok',
+                                                'En Mantenimiento' => 'warn',
+                                                'Asignado' => 'info',
+                                                'Dañado', 'Baja' => 'danger',
+                                                default => 'neutral',
+                                            };
+
+                                            $editUrl = \App\Filament\Resources\InventarioResource::getUrl('edit', ['record' => $inv]);
+                                        @endphp
+                                        <tr>
+                                            <td>
+                                                <span class="sigem-td-folio" style="font-weight: 700;">{{ $codigo }}</span>
+                                            </td>
+                                            <td>
+                                                <div style="display: flex; flex-direction: column;">
+                                                    <strong style="color: var(--sig-text);">{{ $nombreEquipo }}</strong>
+                                                    <span style="font-size: 13px; color: var(--sig-muted);">{{ $serieSub }}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="sigem-pill neutral" style="font-weight: 500;">{{ $categoria }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="sigem-pill {{ $pillCls }}">
+                                                    <span class="sigem-dot"></span>{{ $estado }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span style="font-size: 14px; color: var(--sig-muted);">{{ $areaUbicacion }}</span>
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <a href="{{ $editUrl }}" class="sigem-rep-btn-sec fi-icon-btn" title="Ver detalle" aria-label="Ver detalle" style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;">
+                                                        <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+                                                        <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd" />
+                                                    </svg>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" style="text-align: center; padding: 32px; color: var(--sig-muted);">
+                                                No hay equipos registrados en el inventario.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="sigem-dash-more">
+                            <a href="{{ url('/admin/inventarios') }}">
+                                Ver todo el inventario →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel lateral derecho: Gráfica del inventario -->
+                <aside class="sigem-inv-side" x-show="showGrafica">
+                    <div class="sigem-inv-side-title">Resumen del inventario</div>
+
+                    @php
+                        $dashTotal = $totalActivos ?? 0;
+                        $circunf = 263.89;
+                        $donutSegs = [
+                            ['label' => 'Disponible', 'cant' => $inventarioDisponibles ?? 0, 'color' => '#059669'],
+                            ['label' => 'En mantenimiento', 'cant' => $inventarioEnMantenimiento ?? 0, 'color' => '#d97706'],
+                            ['label' => 'Asignado', 'cant' => $inventarioAsignados ?? 0, 'color' => '#0891b2'],
+                            ['label' => 'Dañado', 'cant' => $inventarioDanados ?? 0, 'color' => '#dc2626'],
+                        ];
+                        $dashOffset = 0;
+                    @endphp
+
+                    <!-- 1. Dona SVG -->
+                    <div class="sigem-donut">
                         <svg viewBox="0 0 120 120" width="120" height="120">
                             <circle cx="60" cy="60" r="42" fill="none" stroke="#f1f5f9" stroke-width="16" />
                             @if($dashTotal > 0)
@@ -175,8 +264,8 @@
                         </div>
                     </div>
 
-                    <!-- Leyenda de estados -->
-                    <div style="display: flex; flex-direction: column; gap: 6px; min-width: 200px;">
+                    <!-- 2. Leyenda de estados -->
+                    <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 3px;">
                         @foreach($donutSegs as $seg)
                             <div class="sigem-lg" style="cursor: default;">
                                 <i style="background: {{ $seg['color'] }};"></i>
@@ -185,91 +274,7 @@
                             </div>
                         @endforeach
                     </div>
-                </div>
-            </div>
-
-            <div class="sigem-rep-view sigem-dash-table">
-                <div class="sigem-rep-table-wrap">
-                    <table class="fi-ta-table">
-                        <thead>
-                            <tr>
-                                <th>CÓDIGO</th>
-                                <th>EQUIPO</th>
-                                <th>CATEGORÍA</th>
-                                <th>ESTADO</th>
-                                <th>ÁREA</th>
-                                <th style="text-align: right;">ACCIONES</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php
-                                $inventariosTabla = collect($inventariosCompletos ?? [])->take(10);
-                            @endphp
-                            @forelse($inventariosTabla as $inv)
-                                @php
-                                    $codigo = $inv->num_serie ?: ('#' . $inv->id_inventario);
-                                    $nombreEquipo = $inv->material?->nombre ?? 'Equipo general';
-                                    $serieSub = $inv->num_serie ? 'S/N: ' . $inv->num_serie : 'Sin número de serie';
-                                    $categoria = $inv->material?->tipo?->nombre ?? 'General';
-                                    $areaUbicacion = $inv->ubicacion_fisica ?: 'Sin área asignada';
-                                    $estado = $inv->estado ?? 'Sin estado';
-
-                                    $pillCls = match ($estado) {
-                                        'Disponible' => 'ok',
-                                        'En Mantenimiento' => 'warn',
-                                        'Asignado' => 'info',
-                                        'Dañado', 'Baja' => 'danger',
-                                        default => 'neutral',
-                                    };
-
-                                    $editUrl = \App\Filament\Resources\InventarioResource::getUrl('edit', ['record' => $inv]);
-                                @endphp
-                                <tr>
-                                    <td>
-                                        <span class="sigem-td-folio" style="font-weight: 700;">{{ $codigo }}</span>
-                                    </td>
-                                    <td>
-                                        <div style="display: flex; flex-direction: column;">
-                                            <strong style="color: var(--sig-text);">{{ $nombreEquipo }}</strong>
-                                            <span style="font-size: 13px; color: var(--sig-muted);">{{ $serieSub }}</span>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span class="sigem-pill neutral" style="font-weight: 500;">{{ $categoria }}</span>
-                                    </td>
-                                    <td>
-                                        <span class="sigem-pill {{ $pillCls }}">
-                                            <span class="sigem-dot"></span>{{ $estado }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <span style="font-size: 14px; color: var(--sig-muted);">{{ $areaUbicacion }}</span>
-                                    </td>
-                                    <td style="text-align: right;">
-                                        <a href="{{ $editUrl }}" class="sigem-rep-btn-sec fi-icon-btn" title="Ver detalle" aria-label="Ver detalle" style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;">
-                                                <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
-                                                <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd" />
-                                            </svg>
-                                        </a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" style="text-align: center; padding: 32px; color: var(--sig-muted);">
-                                        No hay equipos registrados en el inventario.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="sigem-dash-more">
-                    <a href="{{ url('/admin/inventarios') }}">
-                        Ver todo el inventario →
-                    </a>
-                </div>
+                </aside>
             </div>
         </div>
 

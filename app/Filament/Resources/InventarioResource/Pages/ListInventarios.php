@@ -26,10 +26,34 @@ class ListInventarios extends ListRecords implements HasInfolists
 
     public ?Inventario $activeRecord = null;
 
+    public function getHeading(): string
+    {
+        return 'Registros de Inventario';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Busca, filtra y gestiona los equipos registrados en el sistema.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\Action::make('toggleGrafica')
+                ->label('📊 Gráfica')
+                ->color('gray')
+                ->extraAttributes([
+                    'class' => 'sigem-rep-btn-sec',
+                    'style' => 'cursor: pointer;',
+                    'title' => 'Alternar panel de resumen del inventario',
+                ])
+                ->alpineClickHandler("window.dispatchEvent(new CustomEvent('toggle-inventario-grafica'))"),
+            Actions\CreateAction::make()
+                ->label('＋ Registrar equipo')
+                ->extraAttributes([
+                    'class' => 'sigem-btn-primary',
+                    'title' => 'Registrar un nuevo equipo en el inventario',
+                ]),
         ];
     }
 

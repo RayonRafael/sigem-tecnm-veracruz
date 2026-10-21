@@ -56,7 +56,10 @@
         }
     @endphp
 
-    <div class="sigem-inv-layout">
+    <div x-data="{ showGrafica: true }"
+         x-on:toggle-inventario-grafica.window="showGrafica = !showGrafica"
+         class="sigem-inv-layout"
+         :class="showGrafica ? '' : 'sigem-inv-no-chart'">
         <!-- Contenido existente de la tabla (Master-detail) INTACTO -->
         <div style="min-width: 0;">
             <div style="display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap;">
@@ -79,7 +82,7 @@
         </div>
 
         <!-- Panel lateral derecho: Resumen del inventario -->
-        <aside class="sigem-inv-side">
+        <aside class="sigem-inv-side" x-show="showGrafica">
             <div class="sigem-inv-side-title">Resumen del inventario</div>
 
             <!-- 1. Dona SVG -->

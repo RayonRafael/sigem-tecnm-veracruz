@@ -2285,5 +2285,38 @@ table{
   background: var(--sig-bg);
 }
 
+/* Acciones de página / encabezado (Fase final) */
+.sigem-page-actions{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
 
+/* Estado sin gráfica para layout de inventario (Dashboard y ListInventarios) */
+.sigem-inv-no-chart{
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+.sigem-inv-no-chart .sigem-inv-side{
+  display: none !important;
+}
 
+/* Consistencia de botones de acción en encabezados de página */
+.fi-header-actions .sigem-rep-btn-sec{
+  background: var(--sig-surface) !important;
+  color: var(--sig-text) !important;
+  border: 1px solid var(--sig-border) !important;
+  box-shadow: none !important;
+}
+.fi-header-actions .sigem-rep-btn-sec:hover{
+  background: var(--sig-bg) !important;
+  border-color: var(--sig-border-strong) !important;
+}
+.fi-header-actions .sigem-btn-primary{
+  background: var(--sig-primary) !important;
+  color: #fff !important;
+  border: none !important;
+}
+.fi-header-actions .sigem-btn-primary:hover{
+  background: var(--sig-primary-dark) !important;
+}
