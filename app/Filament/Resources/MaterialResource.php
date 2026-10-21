@@ -36,9 +36,9 @@ class MaterialResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function hasRecordTitle(): bool
+    public static function getGloballySearchableAttributes(): array
     {
-        return false;
+        return ['nombre', 'descripcion', 'modelo'];
     }
 
     public static function form(Form $form): Form
@@ -187,8 +187,8 @@ class MaterialResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Material actualizado correctamente'),
+                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Material actualizado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

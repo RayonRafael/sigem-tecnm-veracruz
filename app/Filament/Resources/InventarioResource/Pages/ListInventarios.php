@@ -67,7 +67,7 @@ class ListInventarios extends ListRecords implements HasInfolists
                     ->iconButton()
                     ->tooltip('Ver detalle en panel lateral')
                     ->action(fn (Inventario $record) => $this->activeRecord = $record),
-                EditAction::make()->iconButton()->slideOver()->successNotificationTitle('Registro de inventario actualizado correctamente'),
+                EditAction::make()->iconButton()->slideOver()->tooltip('Editar')->successNotificationTitle('Registro de inventario actualizado correctamente'),
             ]);
     }
 

@@ -115,7 +115,7 @@ class CommandPalette extends Component
                 'keywords' => 'reportes metricas graficas estadisticas informes exportar',
             ],
             [
-                'titulo' => 'Configuración & Catálogos',
+                'titulo' => 'Configuración y Catálogos',
                 'subtitulo' => 'Catálogos base, bitácora y preferencias',
                 'icono' => '⚙️',
                 'url' => ConfiguracionPage::getUrl(),

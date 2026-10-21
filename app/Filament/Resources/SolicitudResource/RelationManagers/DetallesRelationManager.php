@@ -66,8 +66,8 @@ class DetallesRelationManager extends RelationManager
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar'),
+                Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

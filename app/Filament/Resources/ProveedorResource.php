@@ -20,7 +20,7 @@ class ProveedorResource extends Resource
 
     protected static ?string $model = Proveedor::class;
 
-    protected static ?string $recordTitleAttribute = 'nombre';
+    protected static ?string $recordTitleAttribute = 'nombre_empresa';
 
     protected static ?string $navigationIcon = 'heroicon-o-building-storefront';
 
@@ -34,9 +34,9 @@ class ProveedorResource extends Resource
 
     protected static ?int $navigationSort = 6;
 
-    public static function hasRecordTitle(): bool
+    public static function getGloballySearchableAttributes(): array
     {
-        return false;
+        return ['nombre_empresa', 'rfc', 'contacto_nombre'];
     }
 
     public static function form(Form $form): Form
@@ -130,8 +130,8 @@ class ProveedorResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Proveedor actualizado correctamente'),
+                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Proveedor actualizado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

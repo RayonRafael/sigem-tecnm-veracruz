@@ -2223,5 +2223,67 @@ table{
   }
 }
 
+/* ===== Pulido Final: Buscador, Header de sección y Acciones de icono ===== */
+/* Ocultar buscador global nativo de Filament */
+.fi-topbar .fi-global-search, [wire\:id*="global-search"] {
+  display: none !important;
+}
+
+/* Header de sección con botones (Dashboard y módulos) */
+.sigem-section-head{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.sigem-section-head > div:first-child{
+  flex: 1;
+  min-width: 0;
+}
+.sigem-section-head > div:last-child{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+/* Botón primario general estilo SIGEM */
+.sigem-btn-primary{
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: var(--sig-primary);
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .15s;
+  text-decoration: none;
+}
+.sigem-btn-primary:hover{
+  background: var(--sig-primary-dark);
+  box-shadow: 0 3px 9px rgba(27,101,212,.32);
+  color: #fff !important;
+}
+
+/* Acciones de tabla como iconos */
+.fi-ta-actions .fi-icon-btn{
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+}
+.fi-ta-actions .fi-icon-btn:hover{
+  background: var(--sig-bg);
+}
+
 
 

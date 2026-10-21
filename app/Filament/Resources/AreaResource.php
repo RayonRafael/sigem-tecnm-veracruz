@@ -34,9 +34,9 @@ class AreaResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function hasRecordTitle(): bool
+    public static function getGloballySearchableAttributes(): array
     {
-        return false;
+        return ['nombre'];
     }
 
     public static function form(Form $form): Form
@@ -95,8 +95,8 @@ class AreaResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Área actualizada correctamente'),
+                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Área actualizada correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

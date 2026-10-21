@@ -34,9 +34,9 @@ class SolicitudResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function hasRecordTitle(): bool
+    public static function getGloballySearchableAttributes(): array
     {
-        return false;
+        return ['observaciones'];
     }
 
     public static function form(Form $form): Form
@@ -316,8 +316,8 @@ class SolicitudResource extends Resource
                         Notification::make()->title('Solicitud rechazada')->success()->send();
                     })
                     ->requiresConfirmation(),
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Solicitud actualizada correctamente'),
+                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Solicitud actualizada correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

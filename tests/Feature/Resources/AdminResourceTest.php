@@ -155,7 +155,7 @@ class AdminResourceTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('admin'));
         \Livewire\Livewire::actingAs($this->getAdminUser())
             ->test(ConfiguracionPage::class)
-            ->assertSee('Configuración & Catálogos')
+            ->assertSee('Configuración y Catálogos')
             ->assertSee('Catálogos')
             ->assertSee('Bitácora')
             ->assertSee('Preferencias')
@@ -182,7 +182,7 @@ class AdminResourceTest extends TestCase
             ->assertSee('Solicitudes')
             ->assertSee('Mantenimiento')
             ->assertSee('Reportes')
-            ->assertSee('Configuración & Catálogos')
+            ->assertSee('Configuración y Catálogos')
             ->assertDontSee('⌘K')
             ->assertDontSee('Ctrl+K');
     }
@@ -207,9 +207,9 @@ class AdminResourceTest extends TestCase
             ->set('q', 'reportes')
             ->assertSee('Reportes')
             ->set('q', 'configuracion')
-            ->assertSee('Configuración & Catálogos')
+            ->assertSee('Configuración y Catálogos')
             ->set('q', 'configuración')
-            ->assertSee('Configuración & Catálogos');
+            ->assertSee('Configuración y Catálogos');
     }
 
     public function test_topbar_contains_search_field_without_shortcut_hints()

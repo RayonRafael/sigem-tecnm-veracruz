@@ -35,9 +35,9 @@ class MantenimientoResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
-    public static function hasRecordTitle(): bool
+    public static function getGloballySearchableAttributes(): array
     {
-        return false;
+        return ['descripcion_falla', 'nombre_tecnico', 'observaciones'];
     }
 
     public static function form(Form $form): Form
@@ -272,14 +272,16 @@ class MantenimientoResource extends Resource
                     ->label('Completar')
                     ->icon('heroicon-m-check-badge')
                     ->color('info')
+                    ->iconButton()
+                    ->tooltip('Completar mantenimiento')
                     ->visible(fn (Mantenimiento $record): bool => $record->estado === 'En proceso')
                     ->action(function (Mantenimiento $record) {
                         $record->update(['estado' => 'Completado', 'fecha_fin' => now()]);
                         Notification::make()->title('Mantenimiento completado')->success()->send();
                     })
                     ->requiresConfirmation(),
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Mantenimiento actualizado correctamente'),
+                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Mantenimiento actualizado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

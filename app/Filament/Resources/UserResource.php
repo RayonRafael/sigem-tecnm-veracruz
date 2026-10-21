@@ -36,9 +36,9 @@ class UserResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function hasRecordTitle(): bool
+    public static function getGloballySearchableAttributes(): array
     {
-        return false;
+        return ['name', 'apellido_paterno', 'apellido_materno', 'email', 'num_control'];
     }
 
     public static function form(Form $form): Form
@@ -177,12 +177,15 @@ class UserResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Usuario actualizado correctamente'),
+                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Usuario actualizado correctamente'),
                 Tables\Actions\DeleteAction::make()->requiresConfirmation()->successNotificationTitle('Usuario eliminado')
                     ->modalHeading('Eliminar usuario')
                     ->modalDescription('¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.')
                     ->modalSubmitActionLabel('Sí, eliminar')
+                    ->icon('heroicon-m-trash')
+                    ->color('danger')
+                    ->tooltip('Eliminar')
                     ->iconButton()
                     ->hidden(fn (User $record): bool => $record->email === 'admin@tecnm.edu.mx'),
             ])

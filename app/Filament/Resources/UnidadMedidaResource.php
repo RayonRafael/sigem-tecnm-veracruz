@@ -34,9 +34,9 @@ class UnidadMedidaResource extends Resource
 
     protected static ?int $navigationSort = 5;
 
-    public static function hasRecordTitle(): bool
+    public static function getGloballySearchableAttributes(): array
     {
-        return false;
+        return ['nombre'];
     }
 
     public static function form(Form $form): Form
@@ -78,8 +78,8 @@ class UnidadMedidaResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Unidad de medida actualizada correctamente'),
+                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Unidad de medida actualizada correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

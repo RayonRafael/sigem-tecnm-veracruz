@@ -39,9 +39,9 @@ class InventarioResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function hasRecordTitle(): bool
+    public static function getGloballySearchableAttributes(): array
     {
-        return false;
+        return ['num_serie', 'num_factura'];
     }
 
     public static function form(Form $form): Form
@@ -508,8 +508,8 @@ class InventarioResource extends Resource
                         Notification::make()->title('Registro rechazado exitosamente')->success()->send();
                     })
                     ->requiresConfirmation(),
-                Tables\Actions\ViewAction::make()->iconButton(),
-                Tables\Actions\EditAction::make()->iconButton()->slideOver()->successNotificationTitle('Registro de inventario actualizado correctamente'),
+                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle'),
+                Tables\Actions\EditAction::make()->iconButton()->slideOver()->tooltip('Editar')->successNotificationTitle('Registro de inventario actualizado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

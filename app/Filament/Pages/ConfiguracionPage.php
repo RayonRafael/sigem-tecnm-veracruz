@@ -37,7 +37,7 @@ class ConfiguracionPage extends Page
 
     protected static ?string $slug = 'configuracion';
 
-    protected static ?string $title = 'Configuración & Catálogos';
+    protected static ?string $title = 'Configuración y Catálogos';
 
     protected static string $view = 'filament.pages.configuracion';
 
@@ -220,7 +220,7 @@ class ConfiguracionPage extends Page
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $d->id_departamento . '</span>',
                         '<strong>' . e($d->nombre) . '</strong>',
-                        '<a href="' . $editUrl . '" class="sigem-rep-btn-sec" style="padding:3px 9px;font-size:13px">Editar</a>',
+                        $this->renderEditIconButton($editUrl),
                     ];
                 }
                 break;
@@ -234,7 +234,7 @@ class ConfiguracionPage extends Page
                         '<span class="sigem-td-folio">#' . $a->id_area . '</span>',
                         '<strong>' . e($a->nombre) . '</strong>',
                         e($a->departamento?->nombre ?? 'N/A'),
-                        '<a href="' . $editUrl . '" class="sigem-rep-btn-sec" style="padding:3px 9px;font-size:13px">Editar</a>',
+                        $this->renderEditIconButton($editUrl),
                     ];
                 }
                 break;
@@ -251,7 +251,7 @@ class ConfiguracionPage extends Page
                         e($m->marca?->nombre ?? 'N/A'),
                         e($m->tipo?->nombre ?? 'N/A'),
                         '<span class="sigem-pill ok">' . $m->stock_actual . '</span>',
-                        '<a href="' . $editUrl . '" class="sigem-rep-btn-sec" style="padding:3px 9px;font-size:13px">Editar</a>',
+                        $this->renderEditIconButton($editUrl),
                     ];
                 }
                 break;
@@ -264,7 +264,7 @@ class ConfiguracionPage extends Page
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $mc->id_marca . '</span>',
                         '<strong>' . e($mc->nombre) . '</strong>',
-                        '<a href="' . $editUrl . '" class="sigem-rep-btn-sec" style="padding:3px 9px;font-size:13px">Editar</a>',
+                        $this->renderEditIconButton($editUrl),
                     ];
                 }
                 break;
@@ -277,7 +277,7 @@ class ConfiguracionPage extends Page
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $t->id_tipodematerial . '</span>',
                         '<strong>' . e($t->nombre) . '</strong>',
-                        '<a href="' . $editUrl . '" class="sigem-rep-btn-sec" style="padding:3px 9px;font-size:13px">Editar</a>',
+                        $this->renderEditIconButton($editUrl),
                     ];
                 }
                 break;
@@ -290,7 +290,7 @@ class ConfiguracionPage extends Page
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $u->id_unidad . '</span>',
                         '<strong>' . e($u->nombre) . '</strong>',
-                        '<a href="' . $editUrl . '" class="sigem-rep-btn-sec" style="padding:3px 9px;font-size:13px">Editar</a>',
+                        $this->renderEditIconButton($editUrl),
                     ];
                 }
                 break;
@@ -306,7 +306,7 @@ class ConfiguracionPage extends Page
                         '<strong>' . e($p->nombre_empresa) . '</strong>',
                         e($p->rfc ?? 'N/A'),
                         e($contacto ?: 'Sin datos'),
-                        '<a href="' . $editUrl . '" class="sigem-rep-btn-sec" style="padding:3px 9px;font-size:13px">Editar</a>',
+                        $this->renderEditIconButton($editUrl),
                     ];
                 }
                 break;
@@ -323,7 +323,7 @@ class ConfiguracionPage extends Page
                         '<strong>' . e($nombreCompleto ?: $r->nombre) . '</strong>',
                         e($r->area?->nombre ?? 'N/A'),
                         e($contacto ?: 'Sin datos'),
-                        '<a href="' . $editUrl . '" class="sigem-rep-btn-sec" style="padding:3px 9px;font-size:13px">Editar</a>',
+                        $this->renderEditIconButton($editUrl),
                     ];
                 }
                 break;
@@ -418,5 +418,10 @@ class ConfiguracionPage extends Page
     public function getBitacoraUsuarios(): array
     {
         return User::orderBy('name')->pluck('name', 'id')->toArray();
+    }
+
+    protected function renderEditIconButton(string $editUrl): string
+    {
+        return '<a href="' . $editUrl . '" class="sigem-rep-btn-sec fi-icon-btn" title="Editar" aria-label="Editar" style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;"><path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z" /><path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z" /></svg></a>';
     }
 }

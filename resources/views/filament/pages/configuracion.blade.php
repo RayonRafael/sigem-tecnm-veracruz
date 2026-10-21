@@ -2,7 +2,7 @@
     <div>
         {{-- Encabezado principal --}}
         <div class="sigem-rep-header">
-            <h1>⚙️ Configuración & Catálogos</h1>
+            <h1>⚙️ Configuración y Catálogos</h1>
             <p>Gestiona los catálogos del sistema, consulta la bitácora de auditoría y ajusta las preferencias del panel.</p>
         </div>
 

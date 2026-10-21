@@ -67,7 +67,7 @@
                 
                 <!-- Panel de Infolist a la derecha (cuando hay registro seleccionado) -->
                 @if($activeRecord)
-                    <div style="flex: 1 1 34%; min-width: 300px; position: sticky; top: 1.5rem; max-height: 85vh; overflow-y: auto;" class="bg-white dark:bg-gray-900 rounded-xl shadow-sm ring-1 ring-gray-950/5 p-4">
+                    <div style="flex: 1 1 34%; min-width: 300px; position: sticky; top: 1.5rem; max-height: 85vh; overflow-y: auto; background: var(--sig-surface); border: 1px solid var(--sig-border);" class="rounded-xl shadow-sm p-4">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="text-lg font-bold">Detalle del Equipo</h3>
                             <x-filament::button color="gray" size="sm" wire:click="$set('activeRecord', null)">Cerrar</x-filament::button>
