@@ -2,10 +2,18 @@
    SIGEM - FILAMENT GLOBAL THEME OVERRIDES
    ========================================= */
 
-/* ===== 0. OCULTAR TOPBAR COMPLETAMENTE ===== */
-body:has(.sigem-professional) .fi-topbar { display: none !important; height: 0 !important; overflow: hidden !important; position: absolute !important; }
-body:has(.sigem-professional) { padding-top: 0 !important; }
-body:has(.sigem-professional) .fi-main { padding-top: 0 !important; margin-top: 0 !important; height: 100% !important; min-height: 100vh !important; }
+/* ===== 0. TOPBAR EN EL DASHBOARD Y PANEL ===== */
+body:has(.sigem-professional) .fi-topbar {
+    display: flex !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 20 !important;
+    background: var(--sig-surface) !important;
+    border-bottom: 1px solid var(--sig-border) !important;
+    height: auto !important;
+    overflow: visible !important;
+}
+body:has(.sigem-professional) .fi-main { padding-top: 0 !important; margin-top: 0 !important; min-height: calc(100vh - 64px) !important; }
 body:has(.sigem-professional) .fi-main-ctn { max-width: none !important; width: 100% !important; padding-left: 18px !important; padding-right: 18px !important; margin: 0 !important; }
 body:has(.sigem-professional) .fi-header { margin-bottom: 2rem !important; padding-top: 1.5rem !important; }
 
@@ -426,29 +434,23 @@ button[role="switch"][aria-checked="true"] {
 .dark .fi-ta-empty-state-icon { color: #475569 !important; }
 
 /* ===== TOPBAR ====== */
-body:has(.sigem-professional) .fi-topbar {
-    background-color: #0b1d3a !important;
-    border-bottom: none !important;
-    box-shadow: none !important;
-    left: 0 !important;
+body:has(.sigem-professional) .fi-topbar nav,
+.fi-topbar nav {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
     width: 100% !important;
-    height: 52px !important;
-    min-height: 52px !important;
-    position: relative !important;
-    z-index: 20 !important;
-}
-body:has(.sigem-professional) .fi-topbar nav {
-    height: 52px !important;
-    min-height: 52px !important;
     padding-top: 0 !important;
     padding-bottom: 0 !important;
 }
-body:has(.sigem-professional).dark .fi-topbar {
-    background-color: #050e1d !important;
+.fi-topbar nav .ms-auto,
+.fi-topbar nav > div:has(.fi-user-menu),
+.fi-topbar nav > div:has(.sigem-topbar-search) {
+    margin-left: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
 }
-body:has(.sigem-professional) .fi-topbar, body:has(.sigem-professional) .fi-topbar * { color: #ffffff !important; }
-body:has(.sigem-professional) .fi-topbar .fi-user-menu button { background: transparent !important; border: none !important; }
-body:has(.sigem-professional) .fi-topbar .fi-user-menu button:hover { background-color: rgba(255,255,255,0.1) !important; }
 
 /* ===== DROPDOWN / MENU DE USUARIO ===== */
 .fi-dropdown-panel, .fi-dropdown-list, .fi-dropdown-list-item, .fi-user-menu { background-color: #ffffff !important; }
@@ -2055,18 +2057,8 @@ aside.fi-sidebar,
 .sigem-topbar-search{display:flex;align-items:center;gap:8px;background:var(--sig-bg);
   border:1px solid var(--sig-border);border-radius:10px;padding:8px 13px;
   color:var(--sig-light);font-size:15px;cursor:pointer;min-width:220px;
-  transition:all .15s;user-select:none}
+  transition:all .15s;user-select:none;margin-left:auto !important;margin-right:8px}
 .sigem-topbar-search:hover{border-color:var(--sig-primary);color:var(--sig-muted)}
-body:has(.sigem-professional) .fi-topbar .sigem-topbar-search{
-  background:rgba(255,255,255,0.12) !important;
-  border-color:rgba(255,255,255,0.2) !important;
-  color:#e2e8f0 !important;
-}
-body:has(.sigem-professional) .fi-topbar .sigem-topbar-search:hover{
-  background:rgba(255,255,255,0.2) !important;
-  border-color:rgba(255,255,255,0.4) !important;
-  color:#ffffff !important;
-}
 @media (max-width:640px){
   .sigem-topbar-search{min-width:auto;padding:6px 10px;font-size:13.5px}
 }
@@ -2321,11 +2313,18 @@ table{
   background: var(--sig-primary-dark) !important;
 }
 
-/* Slide-over de alta de inventario y formularios laterales */
+/* ==========================================================================
+   SLIDE-OVER INVENTARIO & PANELES LATERALES (Corrección 1 y 2)
+   ========================================================================== */
+
+/* 1. Dimensiones, posición y apariencia del panel InvGate */
 .fi-slide-over,
 .fi-modal-slide-over-window {
   width: 620px !important;
   max-width: 94vw !important;
+  box-shadow: -6px 0 18px rgba(15, 23, 42, .08) !important;
+  border-left: 1px solid var(--sig-border) !important;
+  background: #ffffff !important;
 }
 
 .fi-slide-over .fi-fo-component-ctn,
@@ -2336,4 +2335,162 @@ table{
 .fi-modal-slide-over-window .fi-modal-content {
   overflow-y: auto !important;
 }
+
+/* 2. Grids del formulario dentro del slide-over: 1 columna (sin textos encimados) */
+.fi-modal-slide-over-window .fi-fo-component-ctn [style*="--cols"],
+.fi-modal-slide-over-window .fi-fo-grid,
+.fi-modal-slide-over-window .grid,
+.fi-modal-slide-over-window [class*="grid-cols-"] {
+  --cols-default: 1 !important;
+  --cols-sm: 1 !important;
+  --cols-md: 1 !important;
+  --cols-lg: 1 !important;
+  --cols-xl: 1 !important;
+  --cols-2xl: 1 !important;
+  grid-template-columns: 1fr !important;
+  column-gap: 0 !important;
+  row-gap: 12px !important;
+}
+
+/* Los items del grid no deben colapsar */
+.fi-modal-slide-over-window .fi-fo-component-ctn > *,
+.fi-modal-slide-over-window .fi-fo-field,
+.fi-modal-slide-over-window .fi-fo-field-wrp {
+  min-width: 200px !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Etiquetas legibles: sin word-break (causaba texto vertical letra por letra) */
+.fi-modal-slide-over-window label,
+.fi-modal-slide-over-window .fi-fo-field-label,
+.fi-modal-slide-over-window .fi-fo-field-wrp-label {
+  white-space: normal !important;
+  word-break: normal !important;
+  overflow-wrap: break-word !important;
+  line-height: 1.3 !important;
+  margin-bottom: 4px !important;
+  font-size: 13px !important;
+  overflow: visible !important;
+}
+
+/* Inputs y selects al 100% del espacio disponible */
+.fi-modal-slide-over-window input,
+.fi-modal-slide-over-window select,
+.fi-modal-slide-over-window textarea,
+.fi-modal-slide-over-window .fi-input-wrp,
+.fi-modal-slide-over-window .fi-select {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.fi-modal-slide-over-window input::placeholder,
+.fi-modal-slide-over-window .fi-input-wrp input::placeholder,
+.fi-modal-slide-over-window .choices__item--selectable {
+  text-overflow: ellipsis !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+/* Secciones y wizards ocupan ambas columnas */
+.fi-modal-slide-over-window .fi-section,
+.fi-modal-slide-over-window .fi-fo-wizard,
+.fi-modal-slide-over-window [class*="col-span-full"],
+.fi-modal-slide-over-window [class*="col-span-3"],
+.fi-modal-slide-over-window [class*="col-span-4"] {
+  grid-column: 1 / -1 !important;
+}
+
+/* Stepper del wizard adaptado a panel de 620px */
+.fi-modal-slide-over-window .fi-fo-wizard-header {
+  display: flex !important;
+  overflow-x: auto !important;
+  flex-wrap: nowrap !important;
+  scrollbar-width: thin !important;
+}
+.fi-modal-slide-over-window .fi-fo-wizard-header-step {
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+}
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-button {
+  padding: 10px 8px !important;
+  gap: 8px !important;
+}
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-icon-ctn {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+}
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-icon-ctn svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-label {
+  font-size: 12px !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 120px !important;
+}
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-description {
+  display: none !important;
+}
+
+/* 3. Desplazamiento del contenido principal y overlay transparente (Corrección 2) */
+.fi-main,
+.fi-topbar {
+  transition: width .25s cubic-bezier(.4, 0, .2, 1),
+              max-width .25s cubic-bezier(.4, 0, .2, 1),
+              margin-right .25s cubic-bezier(.4, 0, .2, 1);
+}
+
+@media (min-width: 1000px) {
+  /* Cuando el slide-over está abierto: el contenido usa calc para restar el ancho del panel */
+  body.slide-over-open .fi-main,
+  body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-main,
+  body:has(.fi-modal.fi-modal-open .fi-modal-slide-over-window) .fi-main {
+    width: calc(100% - 620px) !important;
+    max-width: calc(100% - 620px) !important;
+    margin-right: 0 !important;
+  }
+
+  body.slide-over-open .fi-topbar,
+  body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar,
+  body:has(.fi-modal.fi-modal-open .fi-modal-slide-over-window) .fi-topbar {
+    width: calc(100% - 620px) !important;
+    max-width: calc(100% - 620px) !important;
+    margin-right: 0 !important;
+  }
+
+  /* Ocultar el overlay oscuro para que el contenido comprimido sea visible */
+  .fi-modal:has(.fi-modal-slide-over-window) .fi-modal-close-overlay,
+  .fi-modal-slide-over-window ~ .fi-modal-close-overlay,
+  body.slide-over-open .fi-modal-close-overlay,
+  body:has(.fi-modal-slide-over-window) .fi-modal-close-overlay {
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    pointer-events: none !important;
+  }
+
+  /* Scroll del contenido principal con el panel abierto:
+     x-trap.noscroll de Filament pone overflow:hidden inline en <html> y los
+     contenedores fixed inset-0 del modal capturan la rueda del mouse. */
+  html:has(.fi-modal-open .fi-modal-slide-over-window),
+  body.slide-over-open {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .fi-modal:has(.fi-modal-slide-over-window) > [role="dialog"] > div:not(.fi-modal-close-overlay),
+  .fi-modal:has(.fi-modal-slide-over-window) [x-ref="modalContainer"] {
+    pointer-events: none !important;
+  }
+  .fi-modal-slide-over-window {
+    pointer-events: auto !important;
+  }
+}
+
 

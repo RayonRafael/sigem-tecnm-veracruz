@@ -59,7 +59,7 @@ class InventarioResource extends Resource
             Forms\Components\Wizard\Step::make('Identificación y ubicación')
                 ->icon('heroicon-m-identification')
                 ->schema([
-                    Forms\Components\Grid::make(3)
+                    Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\TextInput::make('num_serie')
                                         ->label('Número de serie')
@@ -144,7 +144,7 @@ class InventarioResource extends Resource
                                 ->description('Selecciona la ubicación física estructurada del activo')
                                 ->icon('heroicon-m-map-pin')
                                 ->schema([
-                                    Forms\Components\Grid::make(4)
+                                    Forms\Components\Grid::make(2)
                                         ->schema([
                                             Forms\Components\Select::make('edificio_id')
                                                 ->label('Edificio')
@@ -343,7 +343,7 @@ class InventarioResource extends Resource
                         ->icon('heroicon-m-clipboard-document-check')
                         ->schema([
 
-                            Forms\Components\Grid::make(3)
+                            Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\DatePicker::make('fecha_registro')
                                         ->label('Fecha de registro')

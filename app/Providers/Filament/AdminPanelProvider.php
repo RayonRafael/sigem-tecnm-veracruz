@@ -101,7 +101,7 @@ class AdminPanelProvider extends PanelProvider
 ')
             )
             ->renderHook(
-                PanelsRenderHook::GLOBAL_SEARCH_BEFORE,
+                PanelsRenderHook::USER_MENU_BEFORE,
                 fn (): string => Blade::render('
 @if (auth()->check())
 {{-- Campo de búsqueda aparente en el topbar (Fase 9: Buscador global) --}}
@@ -125,20 +125,27 @@ class AdminPanelProvider extends PanelProvider
 @endif
 <script>
     (function () {
+        var isTooltipsUpdating = false;
         function initSidebarTooltips() {
-            document.querySelectorAll(\'.fi-sidebar-item\').forEach(function (item) {
-                var label = item.querySelector(\'.fi-sidebar-item-label, .fi-sidebar-nav-item-label\');
-                var text = label ? label.textContent.trim() : \'\';
-                if (!text) {
-                    var link = item.querySelector(\'a\');
-                    if (link && link.title) {
-                        text = link.title.trim();
+            if (isTooltipsUpdating) return;
+            isTooltipsUpdating = true;
+            try {
+                document.querySelectorAll(\'.fi-sidebar-item\').forEach(function (item) {
+                    var label = item.querySelector(\'.fi-sidebar-item-label, .fi-sidebar-nav-item-label\');
+                    var text = label ? label.textContent.trim() : \'\';
+                    if (!text) {
+                        var link = item.querySelector(\'a\');
+                        if (link && link.title) {
+                            text = link.title.trim();
+                        }
                     }
-                }
-                if (text) {
-                    item.setAttribute(\'data-tooltip\', text);
-                }
-            });
+                    if (text && item.getAttribute(\'data-tooltip\') !== text) {
+                        item.setAttribute(\'data-tooltip\', text);
+                    }
+                });
+            } finally {
+                isTooltipsUpdating = false;
+            }
         }
         if (document.readyState === \'loading\') {
             document.addEventListener(\'DOMContentLoaded\', initSidebarTooltips);
@@ -146,13 +153,52 @@ class AdminPanelProvider extends PanelProvider
             initSidebarTooltips();
         }
         document.addEventListener(\'livewire:navigated\', initSidebarTooltips);
-        var observer = new MutationObserver(function () {
+        var sidebarObserver = new MutationObserver(function () {
             initSidebarTooltips();
         });
         var sidebar = document.querySelector(\'.fi-sidebar\');
         if (sidebar) {
-            observer.observe(sidebar, { childList: true, subtree: true });
+            sidebarObserver.observe(sidebar, { childList: true, subtree: true });
         }
+
+        var isSlideUpdating = false;
+        function updateSlideOverState() {
+            if (isSlideUpdating) return;
+            isSlideUpdating = true;
+            try {
+                var openSlideOver = document.querySelector(\'.fi-modal-open .fi-modal-slide-over-window, .fi-modal.fi-modal-open .fi-modal-slide-over-window\');
+                if (openSlideOver) {
+                    if (!document.body.classList.contains(\'slide-over-open\')) {
+                        document.body.classList.add(\'slide-over-open\');
+                    }
+                } else {
+                    if (document.body.classList.contains(\'slide-over-open\')) {
+                        document.body.classList.remove(\'slide-over-open\');
+                    }
+                }
+            } finally {
+                Promise.resolve().then(function () {
+                    isSlideUpdating = false;
+                });
+            }
+        }
+        window.addEventListener(\'modal-opened\', function () { setTimeout(updateSlideOverState, 30); });
+        window.addEventListener(\'modal-closed\', function () { setTimeout(updateSlideOverState, 30); });
+        window.addEventListener(\'close-modal\', function () { setTimeout(updateSlideOverState, 30); });
+        window.addEventListener(\'open-modal\', function () { setTimeout(updateSlideOverState, 30); });
+        document.addEventListener(\'livewire:navigated\', function () { setTimeout(updateSlideOverState, 30); });
+
+        var slideObserver = new MutationObserver(function (mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+                var target = mutations[i].target;
+                if (target === document.body) continue;
+                if (target && target.classList && (target.classList.contains(\'fi-modal\') || target.classList.contains(\'fi-modal-window\') || (target.closest && target.closest(\'.fi-modal\')))) {
+                    updateSlideOverState();
+                    break;
+                }
+            }
+        });
+        slideObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [\'class\'] });
     })();
 </script>
 ')
