@@ -2842,3 +2842,118 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
   border: 1px solid var(--sig-border, #e2e8f0) !important;
   background: var(--sig-surface, #ffffff) !important;
 }
+
+/* ==========================================================================
+   Mejora de diseño de formularios e infolists en slide-over + Botones catálogo
+   ========================================================================== */
+
+/* Botones de acción en tablas de catálogo (Ver / Editar / Eliminar) */
+.fi-icon-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--sig-muted, #64748b);
+  background: var(--sig-surface, #ffffff);
+  border: 1px solid var(--sig-border, #e2e8f0);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.fi-icon-btn:hover {
+  color: var(--sig-primary, #1b65d4);
+  background: var(--sig-bg, #f8fafc);
+  border-color: var(--sig-border-strong, #cbd5e1);
+}
+.fi-icon-btn-danger {
+  color: var(--sig-muted, #64748b) !important;
+}
+.fi-icon-btn-danger:hover {
+  color: #dc2626 !important;
+  background: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+}
+.dark .fi-icon-btn {
+  background: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+.dark .fi-icon-btn:hover {
+  color: #38bdf8;
+  background: #0f172a;
+}
+.dark .fi-icon-btn-danger:hover {
+  color: #ef4444 !important;
+  background: rgba(220, 38, 38, 0.2) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+/* Reducir contenedores anidados en formularios e infolists del slide-over */
+.fi-modal-slide-over-window .fi-fo-component-ctn .fi-section,
+.fi-modal-slide-over-window .fi-fo-component-ctn .fi-section + .fi-section,
+.fi-modal-slide-over-window .fi-infolist-component-ctn .fi-section,
+.fi-modal-slide-over-window .fi-infolist .fi-section,
+.fi-modal-slide-over-window .fi-section {
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-color: transparent !important;
+  --tw-shadow: 0 0 #0000 !important;
+}
+
+.fi-modal-slide-over-window .fi-section-header {
+  padding: 0 0 10px 0 !important;
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+  margin-bottom: 14px !important;
+}
+
+.fi-modal-slide-over-window .fi-section-header-heading {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: var(--sig-text, #0f172a) !important;
+}
+
+.fi-modal-slide-over-window .fi-fo-component-ctn > .fi-section > .fi-section-content,
+.fi-modal-slide-over-window .fi-infolist-component-ctn > .fi-section > .fi-section-content,
+.fi-modal-slide-over-window .fi-section-content {
+  padding: 0 !important;
+}
+
+/* Los grupos de campos sin doble recuadro */
+.fi-modal-slide-over-window .fi-fo-component-ctn .fi-fieldset,
+.fi-modal-slide-over-window .fi-fo-component-ctn [class*="fieldset"] {
+  border: none !important;
+  padding: 0 !important;
+  margin-bottom: 16px !important;
+}
+
+/* Mejor espaciado de campos */
+.fi-modal-slide-over-window .fi-fo-field-wrp {
+  margin-bottom: 14px !important;
+}
+
+/* Iconos de campo mejor integrados */
+.fi-modal-slide-over-window .fi-input-wrp .fi-input-prefix,
+.fi-modal-slide-over-window .fi-input-wrp .fi-input-wrp-prefix,
+.fi-modal-slide-over-window .fi-input-wrp .fi-input-wrp-icon,
+.fi-modal-slide-over-window .fi-select .fi-select-prefix {
+  color: var(--sig-muted, #64748b) !important;
+  padding-left: 10px !important;
+}
+
+/* Formularios simples: sin espacio extra */
+.fi-modal-slide-over-window .fi-modal-content {
+  padding: 16px 20px !important;
+}
+
+/* Botones con mejor integración */
+.fi-modal-slide-over-window .fi-modal-footer {
+  padding: 16px 20px 20px !important;
+  border-top: 1px solid var(--sig-border, #e2e8f0) !important;
+  margin-top: 8px !important;
+}
+

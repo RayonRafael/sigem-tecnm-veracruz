@@ -22,8 +22,10 @@ use App\Models\UnidadMedida;
 use App\Models\User;
 use Filament\Actions;
 use Filament\Forms\Form;
+use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Activitylog\Models\Activity;
 
@@ -235,7 +237,7 @@ class ConfiguracionPage extends Page
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $d->id_departamento . '</span>',
                         '<strong>' . e($d->nombre) . '</strong>',
-                        $this->renderEditIconButton('editarDepartamento', $d->getKey()),
+                        $this->renderActionButtons('editarDepartamento', 'verDepartamento', 'eliminarDepartamento', $d->getKey()),
                     ];
                 }
                 break;
@@ -248,7 +250,7 @@ class ConfiguracionPage extends Page
                         '<span class="sigem-td-folio">#' . $a->id_area . '</span>',
                         '<strong>' . e($a->nombre) . '</strong>',
                         e($a->departamento?->nombre ?? 'N/A'),
-                        $this->renderEditIconButton('editarArea', $a->getKey()),
+                        $this->renderActionButtons('editarArea', 'verArea', 'eliminarArea', $a->getKey()),
                     ];
                 }
                 break;
@@ -264,7 +266,7 @@ class ConfiguracionPage extends Page
                         e($m->marca?->nombre ?? 'N/A'),
                         e($m->tipo?->nombre ?? 'N/A'),
                         '<span class="sigem-pill ok">' . $m->stock_actual . '</span>',
-                        $this->renderEditIconButton('editarMaterial', $m->getKey()),
+                        $this->renderActionButtons('editarMaterial', 'verMaterial', 'eliminarMaterial', $m->getKey()),
                     ];
                 }
                 break;
@@ -276,7 +278,7 @@ class ConfiguracionPage extends Page
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $mc->id_marca . '</span>',
                         '<strong>' . e($mc->nombre) . '</strong>',
-                        $this->renderEditIconButton('editarMarca', $mc->getKey()),
+                        $this->renderActionButtons('editarMarca', 'verMarca', 'eliminarMarca', $mc->getKey()),
                     ];
                 }
                 break;
@@ -288,7 +290,7 @@ class ConfiguracionPage extends Page
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $t->id_tipodematerial . '</span>',
                         '<strong>' . e($t->nombre) . '</strong>',
-                        $this->renderEditIconButton('editarTipo', $t->getKey()),
+                        $this->renderActionButtons('editarTipo', 'verTipo', 'eliminarTipo', $t->getKey()),
                     ];
                 }
                 break;
@@ -300,7 +302,7 @@ class ConfiguracionPage extends Page
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $u->id_unidad . '</span>',
                         '<strong>' . e($u->nombre) . '</strong>',
-                        $this->renderEditIconButton('editarUnidad', $u->getKey()),
+                        $this->renderActionButtons('editarUnidad', 'verUnidad', 'eliminarUnidad', $u->getKey()),
                     ];
                 }
                 break;
@@ -315,7 +317,7 @@ class ConfiguracionPage extends Page
                         '<strong>' . e($p->nombre_empresa) . '</strong>',
                         e($p->rfc ?? 'N/A'),
                         e($contacto ?: 'Sin datos'),
-                        $this->renderEditIconButton('editarProveedor', $p->getKey()),
+                        $this->renderActionButtons('editarProveedor', 'verProveedor', 'eliminarProveedor', $p->getKey()),
                     ];
                 }
                 break;
@@ -331,7 +333,7 @@ class ConfiguracionPage extends Page
                         '<strong>' . e($nombreCompleto ?: $r->nombre) . '</strong>',
                         e($r->area?->nombre ?? 'N/A'),
                         e($contacto ?: 'Sin datos'),
-                        $this->renderEditIconButton('editarReceptor', $r->getKey()),
+                        $this->renderActionButtons('editarReceptor', 'verReceptor', 'eliminarReceptor', $r->getKey()),
                     ];
                 }
                 break;
@@ -433,42 +435,75 @@ class ConfiguracionPage extends Page
     // El formulario se reutiliza de cada Resource::form(); no se duplican campos.
     // ------------------------------------------------------------------
 
-    public function crearDepartamentoAction(): Actions\CreateAction { return $this->accionCrear('crearDepartamento', DepartamentoResource::class, 'Departamento creado'); }
+    public function crearDepartamentoAction(): Actions\CreateAction { return $this->accionCrear('crearDepartamento', DepartamentoResource::class, 'Departamento creado', 'departamento'); }
 
-    public function editarDepartamentoAction(): Actions\EditAction { return $this->accionEditar('editarDepartamento', DepartamentoResource::class, 'Departamento actualizado'); }
+    public function editarDepartamentoAction(): Actions\EditAction { return $this->accionEditar('editarDepartamento', DepartamentoResource::class, 'Departamento actualizado', 'departamento'); }
 
-    public function crearAreaAction(): Actions\CreateAction { return $this->accionCrear('crearArea', AreaResource::class, 'Área creada'); }
+    public function verDepartamentoAction(): Actions\ViewAction { return $this->accionVer('verDepartamento', DepartamentoResource::class, 'departamento'); }
 
-    public function editarAreaAction(): Actions\EditAction { return $this->accionEditar('editarArea', AreaResource::class, 'Área actualizada'); }
+    public function eliminarDepartamentoAction(): Actions\DeleteAction { return $this->accionEliminar('eliminarDepartamento', DepartamentoResource::class, 'Departamento eliminado', 'departamento'); }
 
-    public function crearMaterialAction(): Actions\CreateAction { return $this->accionCrear('crearMaterial', MaterialResource::class, 'Material creado'); }
+    public function crearAreaAction(): Actions\CreateAction { return $this->accionCrear('crearArea', AreaResource::class, 'Área creada', 'área'); }
 
-    public function editarMaterialAction(): Actions\EditAction { return $this->accionEditar('editarMaterial', MaterialResource::class, 'Material actualizado'); }
+    public function editarAreaAction(): Actions\EditAction { return $this->accionEditar('editarArea', AreaResource::class, 'Área actualizada', 'área'); }
 
-    public function crearMarcaAction(): Actions\CreateAction { return $this->accionCrear('crearMarca', MarcaMaterialResource::class, 'Marca creada'); }
+    public function verAreaAction(): Actions\ViewAction { return $this->accionVer('verArea', AreaResource::class, 'área'); }
 
-    public function editarMarcaAction(): Actions\EditAction { return $this->accionEditar('editarMarca', MarcaMaterialResource::class, 'Marca actualizada'); }
+    public function eliminarAreaAction(): Actions\DeleteAction { return $this->accionEliminar('eliminarArea', AreaResource::class, 'Área eliminada', 'área'); }
 
-    public function crearTipoAction(): Actions\CreateAction { return $this->accionCrear('crearTipo', TipoMaterialResource::class, 'Tipo de material creado'); }
+    public function crearMaterialAction(): Actions\CreateAction { return $this->accionCrear('crearMaterial', MaterialResource::class, 'Material creado', 'material'); }
 
-    public function editarTipoAction(): Actions\EditAction { return $this->accionEditar('editarTipo', TipoMaterialResource::class, 'Tipo de material actualizado'); }
+    public function editarMaterialAction(): Actions\EditAction { return $this->accionEditar('editarMaterial', MaterialResource::class, 'Material actualizado', 'material'); }
 
-    public function crearUnidadAction(): Actions\CreateAction { return $this->accionCrear('crearUnidad', UnidadMedidaResource::class, 'Unidad de medida creada'); }
+    public function verMaterialAction(): Actions\ViewAction { return $this->accionVer('verMaterial', MaterialResource::class, 'material'); }
 
-    public function editarUnidadAction(): Actions\EditAction { return $this->accionEditar('editarUnidad', UnidadMedidaResource::class, 'Unidad de medida actualizada'); }
+    public function eliminarMaterialAction(): Actions\DeleteAction { return $this->accionEliminar('eliminarMaterial', MaterialResource::class, 'Material eliminado', 'material'); }
 
-    public function crearProveedorAction(): Actions\CreateAction { return $this->accionCrear('crearProveedor', ProveedorResource::class, 'Proveedor creado'); }
+    public function crearMarcaAction(): Actions\CreateAction { return $this->accionCrear('crearMarca', MarcaMaterialResource::class, 'Marca creada', 'marca'); }
 
-    public function editarProveedorAction(): Actions\EditAction { return $this->accionEditar('editarProveedor', ProveedorResource::class, 'Proveedor actualizado'); }
+    public function editarMarcaAction(): Actions\EditAction { return $this->accionEditar('editarMarca', MarcaMaterialResource::class, 'Marca actualizada', 'marca'); }
 
-    public function crearReceptorAction(): Actions\CreateAction { return $this->accionCrear('crearReceptor', ReceptorResource::class, 'Receptor creado'); }
+    public function verMarcaAction(): Actions\ViewAction { return $this->accionVer('verMarca', MarcaMaterialResource::class, 'marca'); }
 
-    public function editarReceptorAction(): Actions\EditAction { return $this->accionEditar('editarReceptor', ReceptorResource::class, 'Receptor actualizado'); }
+    public function eliminarMarcaAction(): Actions\DeleteAction { return $this->accionEliminar('eliminarMarca', MarcaMaterialResource::class, 'Marca eliminada', 'marca'); }
 
-    protected function accionCrear(string $nombre, string $resource, string $mensaje): Actions\CreateAction
+    public function crearTipoAction(): Actions\CreateAction { return $this->accionCrear('crearTipo', TipoMaterialResource::class, 'Tipo de material creado', 'tipo de material'); }
+
+    public function editarTipoAction(): Actions\EditAction { return $this->accionEditar('editarTipo', TipoMaterialResource::class, 'Tipo de material actualizado', 'tipo de material'); }
+
+    public function verTipoAction(): Actions\ViewAction { return $this->accionVer('verTipo', TipoMaterialResource::class, 'tipo de material'); }
+
+    public function eliminarTipoAction(): Actions\DeleteAction { return $this->accionEliminar('eliminarTipo', TipoMaterialResource::class, 'Tipo de material eliminado', 'tipo de material'); }
+
+    public function crearUnidadAction(): Actions\CreateAction { return $this->accionCrear('crearUnidad', UnidadMedidaResource::class, 'Unidad de medida creada', 'unidad de medida'); }
+
+    public function editarUnidadAction(): Actions\EditAction { return $this->accionEditar('editarUnidad', UnidadMedidaResource::class, 'Unidad de medida actualizada', 'unidad de medida'); }
+
+    public function verUnidadAction(): Actions\ViewAction { return $this->accionVer('verUnidad', UnidadMedidaResource::class, 'unidad de medida'); }
+
+    public function eliminarUnidadAction(): Actions\DeleteAction { return $this->accionEliminar('eliminarUnidad', UnidadMedidaResource::class, 'Unidad de medida eliminada', 'unidad de medida'); }
+
+    public function crearProveedorAction(): Actions\CreateAction { return $this->accionCrear('crearProveedor', ProveedorResource::class, 'Proveedor creado', 'proveedor'); }
+
+    public function editarProveedorAction(): Actions\EditAction { return $this->accionEditar('editarProveedor', ProveedorResource::class, 'Proveedor actualizado', 'proveedor'); }
+
+    public function verProveedorAction(): Actions\ViewAction { return $this->accionVer('verProveedor', ProveedorResource::class, 'proveedor'); }
+
+    public function eliminarProveedorAction(): Actions\DeleteAction { return $this->accionEliminar('eliminarProveedor', ProveedorResource::class, 'Proveedor eliminado', 'proveedor'); }
+
+    public function crearReceptorAction(): Actions\CreateAction { return $this->accionCrear('crearReceptor', ReceptorResource::class, 'Receptor creado', 'receptor'); }
+
+    public function editarReceptorAction(): Actions\EditAction { return $this->accionEditar('editarReceptor', ReceptorResource::class, 'Receptor actualizado', 'receptor'); }
+
+    public function verReceptorAction(): Actions\ViewAction { return $this->accionVer('verReceptor', ReceptorResource::class, 'receptor'); }
+
+    public function eliminarReceptorAction(): Actions\DeleteAction { return $this->accionEliminar('eliminarReceptor', ReceptorResource::class, 'Receptor eliminado', 'receptor'); }
+
+    protected function accionCrear(string $nombre, string $resource, string $mensaje, string $singular): Actions\CreateAction
     {
         return Actions\CreateAction::make($nombre)
             ->model($resource::getModel())
+            ->modalHeading('Crear ' . $singular)
             ->form(fn (Form $form): Form => $resource::form($form))
             ->slideOver()
             ->createAnother(false)
@@ -476,15 +511,79 @@ class ConfiguracionPage extends Page
             ->after(fn () => $this->refreshCatalogoData());
     }
 
-    protected function accionEditar(string $nombre, string $resource, string $mensaje): Actions\EditAction
+    protected function accionEditar(string $nombre, string $resource, string $mensaje, string $singular): Actions\EditAction
     {
         $model = $resource::getModel();
 
         return Actions\EditAction::make($nombre)
             ->model($model)
+            ->modalHeading('Editar ' . $singular)
             ->record(fn (array $arguments) => $model::find($arguments['record'] ?? null))
             ->form(fn (Form $form): Form => $resource::form($form))
             ->slideOver()
+            ->successNotificationTitle($mensaje)
+            ->after(fn () => $this->refreshCatalogoData());
+    }
+
+    protected function accionVer(string $nombre, string $resource, string $singular): Actions\ViewAction
+    {
+        $model = $resource::getModel();
+
+        $action = Actions\ViewAction::make($nombre)
+            ->model($model)
+            ->modalHeading('Detalle de ' . $singular)
+            ->record(fn (array $arguments) => $model::find($arguments['record'] ?? null))
+            ->slideOver();
+
+        if (method_exists($resource, 'infolist')) {
+            $action->infolist(fn (Infolist $infolist): Infolist => $resource::infolist($infolist));
+        }
+
+        $action->form(fn (Form $form): Form => $resource::form($form));
+
+        return $action;
+    }
+
+    protected function accionEliminar(string $nombre, string $resource, string $mensaje, string $singular): Actions\DeleteAction
+    {
+        $model = $resource::getModel();
+
+        return Actions\DeleteAction::make($nombre)
+            ->model($model)
+            ->modalHeading('Eliminar ' . $singular)
+            ->record(fn (array $arguments) => $model::find($arguments['record'] ?? null))
+            ->hidden(static function (?Model $record = null): bool {
+                if (! $record) {
+                    return false;
+                }
+
+                if (! method_exists($record, 'trashed')) {
+                    return false;
+                }
+
+                return $record->trashed();
+            })
+            ->using(function (?Model $record, Actions\DeleteAction $action, array $arguments = []) use ($model) {
+                $record ??= $model::find($arguments['record'] ?? null);
+
+                if (! $record) {
+                    return false;
+                }
+
+                try {
+                    return $record->delete();
+                } catch (\Throwable $e) {
+                    Notification::make()
+                        ->title('No se puede eliminar el registro')
+                        ->body('El registro está en uso por otros elementos del sistema.')
+                        ->danger()
+                        ->send();
+
+                    $action->halt();
+
+                    return false;
+                }
+            })
             ->successNotificationTitle($mensaje)
             ->after(fn () => $this->refreshCatalogoData());
     }
@@ -499,8 +598,41 @@ class ConfiguracionPage extends Page
         $this->dispatch('catalogo-actualizado');
     }
 
+    protected function renderActionButtons(string $accionEditar, string $accionVer, string $accionEliminar, int|string $id): string
+    {
+        return '
+          <div class="sigem-row-actions" style="display:inline-flex;align-items:center;gap:4px;">
+            <button type="button" wire:click="mountAction(\'' . $accionVer . '\', { record: ' . json_encode($id) . ' })"
+                    class="fi-icon-btn" title="Ver detalle" aria-label="Ver detalle">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;">
+                <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+                <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd" />
+              </svg>
+            </button>
+            <button type="button" wire:click="mountAction(\'' . $accionEditar . '\', { record: ' . json_encode($id) . ' })"
+                    class="fi-icon-btn" title="Editar" aria-label="Editar">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;">
+                <path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z" />
+                <path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z" />
+              </svg>
+            </button>
+            <button type="button" wire:click="mountAction(\'' . $accionEliminar . '\', { record: ' . json_encode($id) . ' })"
+                    class="fi-icon-btn fi-icon-btn-danger" title="Eliminar" aria-label="Eliminar">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;">
+                <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        ';
+    }
+
     protected function renderEditIconButton(string $accion, int|string $id): string
     {
-        return '<button type="button" wire:click="mountAction(\'' . $accion . '\', { record: ' . json_encode($id) . ' })" class="sigem-rep-btn-sec fi-icon-btn" title="Editar" aria-label="Editar" style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;"><path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z" /><path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z" /></svg></button>';
+        return $this->renderActionButtons(
+            $accion,
+            str_replace('editar', 'ver', $accion),
+            str_replace('editar', 'eliminar', $accion),
+            $id
+        );
     }
 }
