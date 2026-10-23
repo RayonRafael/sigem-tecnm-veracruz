@@ -1013,6 +1013,8 @@ body:has(.sigem-professional) .fi-topbar nav,
   --mod-mant: #ea580c;  --mod-mant-l: #fdeadd;
   --mod-rep: #ca8a04;   --mod-rep-l: #fdf3d7;
   --mod-cfg: #475569;   --mod-cfg-l: #e8ecf1;
+  --mod-cat: #c026d3;   --mod-cat-l: #fae8ff;
+  --sig-info: #0284c7;  --sig-info-light: #e0f2fe;
 }
 
 body, .fi-body {
@@ -3016,5 +3018,195 @@ button.fi-icon-btn[x-on\:click*="sidebar"] {
 .fi-sidebar .sigem-logout {
     display: flex !important;
 }
+
+/* ==================================================== */
+/* DISEÑO INVGATE: PANEL SERVICIO SOCIAL                */
+/* ==================================================== */
+
+/* Banner de rol en topbar */
+.sigem-role-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--sig-info-light);
+  color: var(--sig-info);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+/* Role pill en avatar del sidebar */
+.sigem-role-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--sig-info-light);
+  color: var(--sig-info);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Píldora solo lectura */
+.sigem-pill.ro {
+  background: var(--sig-info-light);
+  color: var(--sig-info);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 99px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Sidebar colores Servicio Social: Dashboard */
+.fi-sidebar-item a[href$="/servicio-social"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href$="/servicio-social/"] .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href$="/servicio-social"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href$="/servicio-social/"]) .fi-sidebar-item-icon {
+  background: var(--sig-primary-light) !important;
+  color: var(--sig-primary) !important;
+  border-color: color-mix(in srgb, var(--sig-primary) 45%, transparent) !important;
+}
+
+.fi-sidebar-item.fi-active a[href$="/servicio-social"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href$="/servicio-social"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href$="/servicio-social"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href$="/servicio-social"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href$="/servicio-social"]) .fi-sidebar-item-icon {
+  background: var(--sig-primary) !important;
+  border-color: var(--sig-primary) !important;
+  color: #ffffff !important;
+}
+
+/* Solicitudes SS: #0d9488 (verde agua) */
+.fi-sidebar-item a[href*="/servicio-social/solicitud"] .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="/servicio-social/solicitud"]) .fi-sidebar-item-icon {
+  background: var(--mod-sol-l) !important;
+  color: var(--mod-sol) !important;
+  border-color: color-mix(in srgb, var(--mod-sol) 45%, transparent) !important;
+}
+
+.fi-sidebar-item.fi-active a[href*="/servicio-social/solicitud"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="/servicio-social/solicitud"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/solicitud"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="/servicio-social/solicitud"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="/servicio-social/solicitud"]) .fi-sidebar-item-icon {
+  background: var(--mod-sol) !important;
+  border-color: var(--mod-sol) !important;
+  color: #ffffff !important;
+}
+
+/* Mantenimiento SS: #ea580c (naranja) */
+.fi-sidebar-item a[href*="/servicio-social/mantenimiento"] .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="/servicio-social/mantenimiento"]) .fi-sidebar-item-icon {
+  background: var(--mod-mant-l) !important;
+  color: var(--mod-mant) !important;
+  border-color: color-mix(in srgb, var(--mod-mant) 45%, transparent) !important;
+}
+
+.fi-sidebar-item.fi-active a[href*="/servicio-social/mantenimiento"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="/servicio-social/mantenimiento"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/mantenimiento"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="/servicio-social/mantenimiento"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="/servicio-social/mantenimiento"]) .fi-sidebar-item-icon {
+  background: var(--mod-mant) !important;
+  border-color: var(--mod-mant) !important;
+  color: #ffffff !important;
+}
+
+/* Inventario SS: #7c3aed (morado) */
+.fi-sidebar-item a[href*="/servicio-social/inventario"] .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="/servicio-social/inventario"]) .fi-sidebar-item-icon {
+  background: var(--mod-inv-l) !important;
+  color: var(--mod-inv) !important;
+  border-color: color-mix(in srgb, var(--mod-inv) 45%, transparent) !important;
+}
+
+.fi-sidebar-item.fi-active a[href*="/servicio-social/inventario"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="/servicio-social/inventario"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/inventario"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="/servicio-social/inventario"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="/servicio-social/inventario"]) .fi-sidebar-item-icon {
+  background: var(--mod-inv) !important;
+  border-color: var(--mod-inv) !important;
+  color: #ffffff !important;
+}
+
+/* Catálogos SS: #c026d3 (magenta) */
+.fi-sidebar-item a[href*="/servicio-social/materials"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/areas"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/receptors"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/marca-materials"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/tipo-materials"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/unidad-medidas"] .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="/servicio-social/materials"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="/servicio-social/areas"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="/servicio-social/receptors"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="/servicio-social/marca-materials"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="/servicio-social/tipo-materials"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="/servicio-social/unidad-medidas"]) .fi-sidebar-item-icon {
+  background: var(--mod-cat-l) !important;
+  color: var(--mod-cat) !important;
+  border-color: color-mix(in srgb, var(--mod-cat) 45%, transparent) !important;
+}
+
+.fi-sidebar-item.fi-active a[href*="/servicio-social/materials"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a[href*="/servicio-social/areas"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a[href*="/servicio-social/receptors"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a[href*="/servicio-social/marca-materials"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a[href*="/servicio-social/tipo-materials"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active a[href*="/servicio-social/unidad-medidas"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="/servicio-social/materials"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="/servicio-social/areas"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="/servicio-social/receptors"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="/servicio-social/marca-materials"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="/servicio-social/tipo-materials"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="/servicio-social/unidad-medidas"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/materials"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/areas"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/receptors"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/marca-materials"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/tipo-materials"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/unidad-medidas"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="/servicio-social/materials"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="/servicio-social/areas"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="/servicio-social/receptors"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="/servicio-social/marca-materials"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="/servicio-social/tipo-materials"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="/servicio-social/unidad-medidas"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="/servicio-social/materials"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="/servicio-social/areas"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="/servicio-social/receptors"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="/servicio-social/marca-materials"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="/servicio-social/tipo-materials"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="/servicio-social/unidad-medidas"]) .fi-sidebar-item-icon {
+  background: var(--mod-cat) !important;
+  border-color: var(--mod-cat) !important;
+  color: #ffffff !important;
+}
+
+/* Reportes SS: #ca8a04 (ámbar) */
+.fi-sidebar-item a[href*="/servicio-social/reporte"] .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="/servicio-social/reporte"]) .fi-sidebar-item-icon {
+  background: var(--mod-rep-l) !important;
+  color: var(--mod-rep) !important;
+  border-color: color-mix(in srgb, var(--mod-rep) 45%, transparent) !important;
+}
+
+.fi-sidebar-item.fi-active a[href*="/servicio-social/reporte"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="/servicio-social/reporte"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/reporte"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="/servicio-social/reporte"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="/servicio-social/reporte"]) .fi-sidebar-item-icon {
+  background: var(--mod-rep) !important;
+  border-color: var(--mod-rep) !important;
+  color: #ffffff !important;
+}
+
+
 
 

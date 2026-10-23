@@ -16,8 +16,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 class SolicitudResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
-
     protected static ?string $model = Solicitud::class;
 
     protected static ?string $recordTitleAttribute = 'observaciones';
@@ -30,7 +28,7 @@ class SolicitudResource extends Resource
 
     protected static ?string $pluralModelLabel = 'solicitudes';
 
-    protected static ?string $navigationGroup = 'Inventario';
+    protected static ?string $navigationGroup = 'Gestión de inventario';
 
     protected static ?int $navigationSort = 2;
 
@@ -193,7 +191,7 @@ class SolicitudResource extends Resource
             ->recordAction(null)
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Solicitud actualizada correctamente'),
+                Tables\Actions\EditAction::make()->iconButton()->slideOver()->successNotificationTitle('Solicitud actualizada correctamente'),
             ])
             ->bulkActions([]);
     }

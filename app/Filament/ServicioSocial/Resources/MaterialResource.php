@@ -18,8 +18,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 class MaterialResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
-
     protected static ?string $model = Material::class;
 
     protected static ?string $recordTitleAttribute = 'nombre';
@@ -159,7 +157,7 @@ class MaterialResource extends Resource
             ->recordAction(null)
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton()->slideOver(),
             ])
             ->bulkActions([]);
     }

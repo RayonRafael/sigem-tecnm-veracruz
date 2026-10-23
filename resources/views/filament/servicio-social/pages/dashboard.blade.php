@@ -288,7 +288,10 @@
                 <div class="block-title-wrap">
                     <div class="block-icon"><svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
                     <div>
-                        <h2 class="block-title">Catálogos del sistema</h2>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <h2 class="block-title">Catálogos del sistema</h2>
+                            <span class="sigem-pill ro">👁 Solo lectura</span>
+                        </div>
                         <p class="block-subtitle">Modo sólo lectura · {{ $totalRegistrosCatalogos ?? 0 }} registros</p>
                     </div>
                 </div>
@@ -545,7 +548,10 @@
                             <div class="slide-header">
                                 <div class="slide-title-area">
                                     <div>
-                                        <h2 id="slide-over-title" class="slide-title" x-text="getCatalogTitle()">Catálogo</h2>
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <h2 id="slide-over-title" class="slide-title" x-text="getCatalogTitle()">Catálogo</h2>
+                                            <span class="sigem-pill ro">👁 Solo lectura</span>
+                                        </div>
                                         <p class="slide-subtitle">Consulta de registros (Solo Lectura)</p>
                                     </div>
                                 </div>

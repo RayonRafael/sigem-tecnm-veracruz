@@ -19,13 +19,13 @@ use Spatie\Activitylog\Models\Activity;
 
 class Dashboard extends BaseDashboard
 {
-    protected static bool $shouldRegisterNavigation = false;
-
     protected static ?string $navigationIcon = 'heroicon-o-home';
 
-    protected static ?string $navigationLabel = 'Panel';
+    protected static ?string $navigationLabel = 'Panel principal';
 
-    protected static ?string $navigationGroup = 'Panel';
+    protected static ?string $navigationGroup = 'Panel principal';
+
+    protected static ?int $navigationSort = -2;
 
     protected static ?string $title = 'SIGEM - Servicio Social';
 

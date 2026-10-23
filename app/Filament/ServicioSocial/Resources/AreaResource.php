@@ -17,8 +17,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class AreaResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
-
     protected static ?string $model = Area::class;
 
     protected static ?string $recordTitleAttribute = 'nombre';

@@ -83,8 +83,46 @@ class CommandPalette extends Component
         return array_values(array_unique(array_filter($terms)));
     }
 
+    protected function isServicioSocial(): bool
+    {
+        return filament()->getCurrentPanel()?->getId() === 'servicio-social' || request()->is('servicio-social*');
+    }
+
     public function getSecciones(): array
     {
+        if ($this->isServicioSocial()) {
+            return [
+                [
+                    'titulo' => 'Inventario general',
+                    'subtitulo' => 'Consulta de activos del instituto',
+                    'icono' => '📦',
+                    'url' => \App\Filament\ServicioSocial\Resources\InventarioResource::getUrl('index'),
+                    'keywords' => 'inventario general activos equipos productos stock series',
+                ],
+                [
+                    'titulo' => 'Solicitudes',
+                    'subtitulo' => 'Mis peticiones de material y asignaciones',
+                    'icono' => '📋',
+                    'url' => \App\Filament\ServicioSocial\Resources\SolicitudResource::getUrl('index'),
+                    'keywords' => 'solicitudes pedidos peticiones asignacion folios',
+                ],
+                [
+                    'titulo' => 'Mantenimiento',
+                    'subtitulo' => 'Mis órdenes de servicio y reparación',
+                    'icono' => '🔧',
+                    'url' => \App\Filament\ServicioSocial\Resources\MantenimientoResource::getUrl('index'),
+                    'keywords' => 'mantenimiento servicio reparacion falla preventivo correctivo tecnico',
+                ],
+                [
+                    'titulo' => 'Materiales y Catálogos',
+                    'subtitulo' => 'Consulta de materiales y catálogos en modo lectura',
+                    'icono' => '🏷️',
+                    'url' => \App\Filament\ServicioSocial\Resources\MaterialResource::getUrl('index'),
+                    'keywords' => 'catalogos materiales areas receptores solo lectura',
+                ],
+            ];
+        }
+
         return [
             [
                 'titulo' => 'Inventario general',
@@ -164,23 +202,28 @@ class CommandPalette extends Component
             ->get();
 
         if ($equipos->isNotEmpty()) {
-            $grupos['EQUIPOS'] = $equipos->map(function ($i) {
+            $isSS = $this->isServicioSocial();
+            $grupos['EQUIPOS'] = $equipos->map(function ($i) use ($isSS) {
                 $codigo = $i->num_serie ?: 'S/N';
                 $nombre = $i->material?->nombre ?? 'Equipo';
                 $estado = $i->estado ?? 'Sin estado';
                 $area = $i->ubicacion_fisica ?: 'Sin área asignada';
 
+                $url = $isSS
+                    ? \App\Filament\ServicioSocial\Resources\InventarioResource::getUrl('index') . '?tableSearch=' . urlencode($codigo)
+                    : InventarioResource::getUrl('edit', ['record' => $i]);
+
                 return [
                     'titulo' => "{$codigo} · {$nombre}",
                     'subtitulo' => "{$estado} · {$area}",
                     'icono' => '💻',
-                    'url' => InventarioResource::getUrl('edit', ['record' => $i]),
+                    'url' => $url,
                 ];
             })->all();
         }
 
         // 3. Grupo SOLICITUDES
-        $solicitudes = Solicitud::with(['usuario', 'receptor'])
+        $solicitudesQuery = Solicitud::with(['usuario', 'receptor'])
             ->where(function ($sub) use ($terms) {
                 foreach ($terms as $t) {
                     $sub->orWhere('id_solicitud', 'like', "%{$t}%")
@@ -193,29 +236,38 @@ class CommandPalette extends Component
                             $rq->where('nombre', 'like', "%{$t}%");
                         });
                 }
-            })
-            ->limit(6)
-            ->get();
+            });
+
+        if ($this->isServicioSocial()) {
+            $solicitudesQuery->where('id_usuario', auth()->id());
+        }
+
+        $solicitudes = $solicitudesQuery->limit(6)->get();
 
         if ($solicitudes->isNotEmpty()) {
-            $grupos['SOLICITUDES'] = $solicitudes->map(function ($s) {
+            $isSS = $this->isServicioSocial();
+            $grupos['SOLICITUDES'] = $solicitudes->map(function ($s) use ($isSS) {
                 $folio = 'FOLIO-' . str_pad($s->id_solicitud, 5, '0', STR_PAD_LEFT);
                 $tipo = $s->tipo_movimiento ?? 'Solicitud';
                 $estado = $s->estado ?? 'Pendiente';
                 $fecha = $s->fecha_solicitud ? $s->fecha_solicitud->format('d/m/Y') : '';
                 $sub = "{$tipo} · {$estado}" . ($fecha ? " · {$fecha}" : '');
 
+                $url = $isSS
+                    ? \App\Filament\ServicioSocial\Resources\SolicitudResource::getUrl('index') . '?tableSearch=' . urlencode($folio)
+                    : SolicitudResource::getUrl('edit', ['record' => $s]);
+
                 return [
                     'titulo' => $folio,
                     'subtitulo' => $sub,
                     'icono' => '📄',
-                    'url' => SolicitudResource::getUrl('edit', ['record' => $s]),
+                    'url' => $url,
                 ];
             })->all();
         }
 
         // 4. Grupo MANTENIMIENTOS
-        $mantenimientos = Mantenimiento::with(['inventario.material'])
+        $mantenimientosQuery = Mantenimiento::with(['inventario.material'])
             ->where(function ($sub) use ($terms) {
                 foreach ($terms as $t) {
                     $sub->orWhere('id_mantenimiento', 'like', "%{$t}%")
@@ -230,22 +282,31 @@ class CommandPalette extends Component
                                 });
                         });
                 }
-            })
-            ->limit(6)
-            ->get();
+            });
+
+        if ($this->isServicioSocial()) {
+            $mantenimientosQuery->where('id_usuario_solicita', auth()->id());
+        }
+
+        $mantenimientos = $mantenimientosQuery->limit(6)->get();
 
         if ($mantenimientos->isNotEmpty()) {
-            $grupos['MANTENIMIENTOS'] = $mantenimientos->map(function ($m) {
+            $isSS = $this->isServicioSocial();
+            $grupos['MANTENIMIENTOS'] = $mantenimientos->map(function ($m) use ($isSS) {
                 $equipo = $m->inventario?->material?->nombre ?? ($m->inventario?->num_serie ?? 'Equipo');
                 $folio = "#{$m->id_mantenimiento} · {$equipo}";
                 $tipo = $m->tipo_mantenimiento ?? 'Mantenimiento';
                 $estado = $m->estado === 'Pendiente Revision Admin' ? 'En revisión' : ($m->estado ?? 'Solicitado');
 
+                $url = $isSS
+                    ? \App\Filament\ServicioSocial\Resources\MantenimientoResource::getUrl('index')
+                    : MantenimientoResource::getUrl('edit', ['record' => $m]);
+
                 return [
                     'titulo' => $folio,
                     'subtitulo' => "{$tipo} · {$estado}",
                     'icono' => '🛠️',
-                    'url' => MantenimientoResource::getUrl('edit', ['record' => $m]),
+                    'url' => $url,
                 ];
             })->all();
         }

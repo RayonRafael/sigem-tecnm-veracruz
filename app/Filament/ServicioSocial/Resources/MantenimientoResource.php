@@ -17,8 +17,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 class MantenimientoResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
-
     protected static ?string $model = Mantenimiento::class;
 
     protected static ?string $recordTitleAttribute = 'descripcion_falla';
@@ -31,7 +29,7 @@ class MantenimientoResource extends Resource
 
     protected static ?string $pluralModelLabel = 'mantenimientos';
 
-    protected static ?string $navigationGroup = 'Inventario';
+    protected static ?string $navigationGroup = 'Gestión de inventario';
 
     protected static ?int $navigationSort = 1;
 
@@ -208,7 +206,7 @@ class MantenimientoResource extends Resource
             ->recordAction(null)
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Mantenimiento actualizado correctamente'),
+                Tables\Actions\EditAction::make()->iconButton()->slideOver()->successNotificationTitle('Mantenimiento actualizado correctamente'),
             ])
             ->bulkActions([]);
     }

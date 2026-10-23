@@ -17,21 +17,19 @@ use Illuminate\Database\Eloquent\Builder;
 
 class InventarioResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
-
     protected static ?string $model = Inventario::class;
 
     protected static ?string $recordTitleAttribute = 'num_serie';
 
     protected static ?string $navigationIcon = 'heroicon-o-cube';
 
-    protected static ?string $navigationLabel = 'Inventario (Servicio Social)';
+    protected static ?string $navigationLabel = 'Inventario';
 
     protected static ?string $modelLabel = 'activo';
 
     protected static ?string $pluralModelLabel = 'activos';
 
-    protected static ?string $navigationGroup = 'Inventario';
+    protected static ?string $navigationGroup = 'Gestión de inventario';
 
     protected static ?int $navigationSort = 1;
 
@@ -198,18 +196,19 @@ class InventarioResource extends Resource
                 Tables\Columns\TextColumn::make('ubicacion_fisica')->wrap(false)->limit(30)->grow(false)
                     ->label('Ubicación')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)
+                Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)->label('Estado')
                     ->badge()
                     ->colors([
                         'success' => 'Disponible',
-                        'warning' => 'Asignado',
-                        'gray' => 'En Mantenimiento',
+                        'warning' => 'En Mantenimiento',
+                        'info' => 'Asignado',
                         'danger' => 'Dañado',
+                        'gray' => ['Baja', 'Devuelto a Proveedor'],
                     ])
                     ->icons([
                         'heroicon-m-check-circle' => 'Disponible',
-                        'heroicon-m-user' => 'Asignado',
                         'heroicon-m-wrench' => 'En Mantenimiento',
+                        'heroicon-m-user' => 'Asignado',
                         'heroicon-m-exclamation-triangle' => 'Dañado',
                     ]),
                 Tables\Columns\TextColumn::make('aprobado')->wrap(false)->limit(30)->grow(false)
@@ -242,7 +241,7 @@ class InventarioResource extends Resource
             ->recordAction(null)
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->successNotificationTitle('Registro de inventario actualizado correctamente'),
+                Tables\Actions\EditAction::make()->iconButton()->slideOver()->successNotificationTitle('Registro de inventario actualizado correctamente'),
             ])
             ->bulkActions([]);
     }
@@ -262,8 +261,8 @@ class InventarioResource extends Resource
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 'Disponible' => 'success',
-                                'Asignado' => 'warning',
-                                'En Mantenimiento' => 'gray',
+                                'Asignado' => 'info',
+                                'En Mantenimiento' => 'warning',
                                 'Dañado' => 'danger',
                                 default => 'gray',
                             })

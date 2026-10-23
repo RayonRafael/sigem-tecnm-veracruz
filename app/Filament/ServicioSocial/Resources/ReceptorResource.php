@@ -17,15 +17,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReceptorResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
-
     protected static ?string $model = Receptor::class;
 
     protected static ?string $recordTitleAttribute = 'nombre';
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = 'Gestión de inventario';
+    protected static ?string $navigationGroup = 'Catálogos';
 
     protected static ?string $navigationLabel = 'Receptores';
 
@@ -127,7 +125,7 @@ class ReceptorResource extends Resource
             ->recordAction(null)
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton(),
+                Tables\Actions\EditAction::make()->iconButton()->slideOver(),
             ])
             ->bulkActions([]);
     }

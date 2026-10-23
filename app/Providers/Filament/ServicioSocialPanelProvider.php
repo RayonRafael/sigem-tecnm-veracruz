@@ -18,6 +18,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\HtmlString;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class ServicioSocialPanelProvider extends PanelProvider
@@ -29,17 +30,17 @@ class ServicioSocialPanelProvider extends PanelProvider
             ->path('servicio-social')
             ->login()
             ->brandName('SIGEM - Servicio Social')
-            ->brandLogo(asset('images/sigem-logo.svg'))
-            ->brandLogoHeight('2.5rem')
+            ->brandLogo(new HtmlString('<div class="sigem-brand"><div class="sigem-brand-logo">S</div></div>'))
+            ->brandLogoHeight('auto')
             ->favicon(asset('images/sigem-favicon.svg?v=2'))
-            ->font('DM Sans', 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap')
+            ->font('DM Sans')
+            ->globalSearch(false)
             ->colors([
                 'primary' => Color::hex('#1b65d4'),
-                'success' => Color::hex('#0f9d58'),
-                'warning' => Color::hex('#f4a623'),
-                'danger' => Color::hex('#d93025'),
-                'info' => Color::hex('#0b1d3a'),
-                'gray' => Color::hex('#6b7280'),
+                'success' => Color::hex('#059669'),
+                'warning' => Color::hex('#d97706'),
+                'danger'  => Color::hex('#dc2626'),
+                'info'    => Color::hex('#0891b2'),
             ])
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
@@ -57,6 +58,23 @@ class ServicioSocialPanelProvider extends PanelProvider
     <img src="{{ asset(\'images/sigem-logo.svg\') }}" alt="SIGEM" class="h-8">
     <span class="font-bold text-lg hidden sm:block">SIGEM - Servicio Social</span>
 </div>
+')
+            )
+            ->renderHook(
+                PanelsRenderHook::USER_MENU_BEFORE,
+                fn (): string => Blade::render('
+@if (auth()->check())
+<span class="sigem-role-banner">🎓 Servicio Social</span>
+<div class="sigem-topbar-search"
+     role="button"
+     tabindex="0"
+     aria-label="Buscar en SIGEM"
+     onclick="window.dispatchEvent(new CustomEvent(\'abrir-command-palette\'))"
+     onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.dispatchEvent(new CustomEvent(\'abrir-command-palette\'));}">
+    <span>🔍</span>
+    <span>Buscar en SIGEM…</span>
+</div>
+@endif
 ')
             )
             ->renderHook(
@@ -82,19 +100,121 @@ class ServicioSocialPanelProvider extends PanelProvider
 </div>
 ')
             )
+            ->renderHook(
+                PanelsRenderHook::SIDEBAR_FOOTER,
+                fn (): string => Blade::render('
+<div class="sigem-user-card">
+    <div class="sigem-avatar" title="{{ auth()->user()?->name ?? \'Usuario\' }}">
+        {{ mb_strtoupper(mb_substr(auth()->user()?->name ?? \'U\', 0, 1)) }}
+    </div>
+    <span class="sigem-role-pill">SS</span>
+    <form method="POST" action="{{ route(\'filament.servicio-social.auth.logout\') }}" class="m-0 p-0 flex items-center justify-center">
+        @csrf
+        <button type="submit" class="sigem-logout" title="Cerrar sesión" aria-label="Cerrar sesión">
+            &#x23FB;
+        </button>
+    </form>
+</div>
+')
+            )
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn (): string => Blade::render('
+@if (auth()->check())
+    @livewire(\App\Livewire\CommandPalette::class)
+@endif
+<script>
+    (function () {
+        var isTooltipsUpdating = false;
+        function initSidebarTooltips() {
+            if (isTooltipsUpdating) return;
+            isTooltipsUpdating = true;
+            try {
+                document.querySelectorAll(\'.fi-sidebar-item\').forEach(function (item) {
+                    var label = item.querySelector(\'.fi-sidebar-item-label, .fi-sidebar-nav-item-label\');
+                    var text = label ? label.textContent.trim() : \'\';
+                    if (!text) {
+                        var link = item.querySelector(\'a\');
+                        if (link && link.title) {
+                            text = link.title.trim();
+                        }
+                    }
+                    if (text && item.getAttribute(\'data-tooltip\') !== text) {
+                        item.setAttribute(\'data-tooltip\', text);
+                    }
+                });
+            } finally {
+                isTooltipsUpdating = false;
+            }
+        }
+        if (document.readyState === \'loading\') {
+            document.addEventListener(\'DOMContentLoaded\', initSidebarTooltips);
+        } else {
+            initSidebarTooltips();
+        }
+        document.addEventListener(\'livewire:navigated\', initSidebarTooltips);
+        var sidebarObserver = new MutationObserver(function () {
+            initSidebarTooltips();
+        });
+        var sidebar = document.querySelector(\'.fi-sidebar\');
+        if (sidebar) {
+            sidebarObserver.observe(sidebar, { childList: true, subtree: true });
+        }
 
+        var isSlideUpdating = false;
+        function updateSlideOverState() {
+            if (isSlideUpdating) return;
+            isSlideUpdating = true;
+            try {
+                var openSlideOver = document.querySelector(\'.fi-modal-open .fi-modal-slide-over-window, .fi-modal.fi-modal-open .fi-modal-slide-over-window\');
+                if (openSlideOver) {
+                    if (!document.body.classList.contains(\'slide-over-open\')) {
+                        document.body.classList.add(\'slide-over-open\');
+                    }
+                } else {
+                    if (document.body.classList.contains(\'slide-over-open\')) {
+                        document.body.classList.remove(\'slide-over-open\');
+                    }
+                }
+            } finally {
+                Promise.resolve().then(function () {
+                    isSlideUpdating = false;
+                });
+            }
+        }
+        window.addEventListener(\'modal-opened\', function () { setTimeout(updateSlideOverState, 30); });
+        window.addEventListener(\'modal-closed\', function () { setTimeout(updateSlideOverState, 30); });
+        window.addEventListener(\'close-modal\', function () { setTimeout(updateSlideOverState, 30); });
+        window.addEventListener(\'open-modal\', function () { setTimeout(updateSlideOverState, 30); });
+        document.addEventListener(\'livewire:navigated\', function () { setTimeout(updateSlideOverState, 30); });
+
+        var slideObserver = new MutationObserver(function (mutations) {
+            for (var i = 0; i < mutations.length; i++) {
+                var target = mutations[i].target;
+                if (target === document.body) continue;
+                if (target && target.classList && (target.classList.contains(\'fi-modal\') || target.classList.contains(\'fi-modal-window\') || (target.closest && target.closest(\'.fi-modal\')))) {
+                    updateSlideOverState();
+                    break;
+                }
+            }
+        });
+        slideObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [\'class\'] });
+    })();
+</script>
+')
+            )
             ->navigationGroups([
                 NavigationGroup::make()
-                    ->label('Panel')
-                    ->collapsible(true),
+                    ->label('Panel principal')
+                    ->collapsible(false),
                 NavigationGroup::make()
-                    ->label('Inventario')
-                    ->collapsible(true),
+                    ->label('Gestión de inventario')
+                    ->collapsible(false),
                 NavigationGroup::make()
                     ->label('Catálogos')
-                    ->collapsible(true),
+                    ->collapsible(false),
             ])
-            ->sidebarWidth('20rem')
+            ->sidebarWidth('64px')
             ->discoverResources(in: app_path('Filament/ServicioSocial/Resources'), for: 'App\\Filament\\ServicioSocial\\Resources')
             ->discoverPages(in: app_path('Filament/ServicioSocial/Pages'), for: 'App\\Filament\\ServicioSocial\\Pages')
             ->pages([
