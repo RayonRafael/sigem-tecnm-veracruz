@@ -163,7 +163,7 @@ class SolicitudResource extends Resource
                                                 ->maxLength(20),
                                             Forms\Components\Select::make('id_area')->placeholder('Selecciona...')
                                                 ->label('Área')
-                                                ->options(\App\Models\Area::pluck('nombre', 'id'))
+                                                ->options(\App\Models\Area::pluck('nombre', 'id_area'))
                                                 ->required()
                                                 ->searchable()
                                                 ->preload(),

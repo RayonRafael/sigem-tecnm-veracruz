@@ -115,13 +115,13 @@
                             x-on:click="showGrafica = !showGrafica"
                             :style="showGrafica ? 'background: var(--sig-border);' : ''"
                             title="Alternar vista de gráfica de dona del inventario">
-                        📊 Gráfica
+                        &#x1F4CA; Gráfica
                     </button>
                     <button type="button"
                             wire:click="mountAction('registrarEquipo')"
                             class="sigem-btn-primary"
                             title="Registrar un nuevo equipo en el inventario">
-                        ＋ Registrar equipo
+                        &#xFF0B; Registrar equipo
                     </button>
                 </div>
             </div>

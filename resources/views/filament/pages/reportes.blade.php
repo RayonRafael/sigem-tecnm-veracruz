@@ -1,5 +1,6 @@
 <x-filament-panels::page>
-    <div>
+    <div x-data
+         x-on:scroll-to-report.window="$nextTick(() => document.getElementById('sigem-reporte-visor')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))">
         {{-- Encabezado de la sección --}}
         <div class="sigem-rep-header">
             <h1>📊 Reportes</h1>
@@ -16,9 +17,37 @@
             {{ $totalVisibles }} de {{ count($reportes) }} reportes visibles para Servicio Social
         </div>
 
-        {{-- Visor de reporte activo --}}
+        {{-- Rejilla de tarjetas de reporte --}}
+        <div class="sigem-rep-grid">
+            @foreach ($reportes as $rep)
+                @php
+                    $esVisible = $this->visibilidadServicioSocial[$rep['id']] ?? false;
+                @endphp
+                <div class="sigem-rep-card">
+                    <div class="sigem-rep-ico">{{ $rep['emoji'] }}</div>
+                    <div class="sigem-rep-t">{{ $rep['titulo'] }}</div>
+                    <div class="sigem-rep-d">{{ $rep['descripcion'] }}</div>
+                    <div class="sigem-rep-foot">
+                        <label class="sigem-sw" title="Activar o desactivar visibilidad para Servicio Social">
+                            <input type="checkbox"
+                                   wire:click="toggleVisibilidad('{{ $rep['id'] }}')"
+                                   @checked($esVisible)>
+                            <span class="sigem-sw-ui"></span>
+                            <span class="sigem-sw-l">Visible para Servicio Social</span>
+                        </label>
+                        <button type="button"
+                                wire:click="verReporte('{{ $rep['id'] }}')"
+                                class="sigem-rep-btn-primary">
+                            Ver reporte
+                        </button>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+
+        {{-- Visor de reporte activo (debajo de la rejilla) --}}
         @if ($reporteActual)
-            <div class="sigem-rep-view">
+            <div class="sigem-rep-view" id="sigem-reporte-visor" style="margin-top: 20px; scroll-margin-top: 80px;">
                 <div class="sigem-rep-vh">
                     <div>
                         <h3>{{ $reporteActual['emoji'] }} {{ $reporteActual['titulo'] }}</h3>
@@ -70,33 +99,5 @@
                 @endif
             </div>
         @endif
-
-        {{-- Rejilla de tarjetas de reporte --}}
-        <div class="sigem-rep-grid">
-            @foreach ($reportes as $rep)
-                @php
-                    $esVisible = $this->visibilidadServicioSocial[$rep['id']] ?? false;
-                @endphp
-                <div class="sigem-rep-card">
-                    <div class="sigem-rep-ico">{{ $rep['emoji'] }}</div>
-                    <div class="sigem-rep-t">{{ $rep['titulo'] }}</div>
-                    <div class="sigem-rep-d">{{ $rep['descripcion'] }}</div>
-                    <div class="sigem-rep-foot">
-                        <label class="sigem-sw" title="Activar o desactivar visibilidad para Servicio Social">
-                            <input type="checkbox"
-                                   wire:click="toggleVisibilidad('{{ $rep['id'] }}')"
-                                   @checked($esVisible)>
-                            <span class="sigem-sw-ui"></span>
-                            <span class="sigem-sw-l">Visible para Servicio Social</span>
-                        </label>
-                        <button type="button"
-                                wire:click="verReporte('{{ $rep['id'] }}')"
-                                class="sigem-rep-btn-primary">
-                            Ver reporte
-                        </button>
-                    </div>
-                </div>
-            @endforeach
-        </div>
     </div>
 </x-filament-panels::page>

@@ -69,6 +69,7 @@ class ReportesPage extends Page
     public function verReporte(string $reportId): void
     {
         $this->reporteActivo = $reportId;
+        $this->dispatch('scrollToReport');
     }
 
     public function cerrarReporte(): void

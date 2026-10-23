@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\InventarioResource\Pages;
 
 use App\Filament\Concerns\ConDashboardBreadcrumb;
+use App\Filament\Concerns\ConSlideOver;
 use App\Filament\Resources\InventarioResource;
 use App\Models\Inventario;
 use Filament\Actions;
@@ -18,6 +19,7 @@ use Filament\Tables\Table;
 class ListInventarios extends ListRecords implements HasInfolists
 {
     use ConDashboardBreadcrumb;
+    use ConSlideOver;
     use InteractsWithInfolists;
 
     protected static string $resource = InventarioResource::class;
@@ -40,7 +42,7 @@ class ListInventarios extends ListRecords implements HasInfolists
     {
         return [
             Actions\Action::make('toggleGrafica')
-                ->label('📊 Gráfica')
+                ->label("\u{1F4CA} Gráfica")
                 ->color('gray')
                 ->extraAttributes([
                     'class' => 'sigem-rep-btn-sec',
@@ -49,7 +51,7 @@ class ListInventarios extends ListRecords implements HasInfolists
                 ])
                 ->alpineClickHandler("window.dispatchEvent(new CustomEvent('toggle-inventario-grafica'))"),
             Actions\CreateAction::make()
-                ->label('＋ Registrar equipo')
+                ->label("\u{FF0B} Registrar equipo")
                 ->slideOver()
                 ->steps(InventarioResource::getFormSteps())
                 ->extraAttributes([

@@ -40,9 +40,10 @@ class Dashboard extends BaseDashboard
     public function registrarEquipoAction(): Action
     {
         return CreateAction::make('registrarEquipo')
-            ->label('＋ Registrar equipo')
+            ->label("\u{FF0B} Registrar equipo")
             ->model(Inventario::class)
             ->slideOver()
+            ->createAnother(false)
             ->steps(InventarioResource::getFormSteps())
             ->extraAttributes([
                 'class' => 'sigem-btn-primary',

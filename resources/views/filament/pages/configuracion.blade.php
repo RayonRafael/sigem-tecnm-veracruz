@@ -64,11 +64,12 @@
                         </div>
                     </div>
                     <div style="display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-                        <a href="{{ $catActivo['createUrl'] }}"
-                           class="sigem-rep-btn-primary"
-                           title="Crear nuevo registro en este catálogo">
+                        <button type="button"
+                                wire:click="mountAction('{{ $catActivo['crearAccion'] }}')"
+                                class="sigem-rep-btn-primary"
+                                title="Crear nuevo registro en este catálogo">
                             ＋ Nuevo {{ $catActivo['singular'] }}
-                        </a>
+                        </button>
                         <a href="{{ $catActivo['indexUrl'] }}"
                            class="sigem-rep-btn-sec"
                            title="Abrir la gestión completa con filtros y paginado">

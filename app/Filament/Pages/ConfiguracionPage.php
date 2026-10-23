@@ -20,6 +20,8 @@ use App\Models\Receptor;
 use App\Models\TipoMaterial;
 use App\Models\UnidadMedida;
 use App\Models\User;
+use Filament\Actions;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Cache;
@@ -40,6 +42,20 @@ class ConfiguracionPage extends Page
     protected static ?string $title = 'Configuración y Catálogos';
 
     protected static string $view = 'filament.pages.configuracion';
+
+    /**
+     * id de catálogo => sufijo de las acciones de página (crear{X}Action / editar{X}Action).
+     */
+    protected const ENTIDADES_CATALOGO = [
+        'departamentos' => 'Departamento',
+        'areas' => 'Area',
+        'materiales' => 'Material',
+        'marcas' => 'Marca',
+        'tipos' => 'Tipo',
+        'unidades' => 'Unidad',
+        'proveedores' => 'Proveedor',
+        'receptores' => 'Receptor',
+    ];
 
     public string $tabActiva = 'catalogos';
 
@@ -207,7 +223,7 @@ class ConfiguracionPage extends Page
 
         $headers = [];
         $rows = [];
-        $createUrl = $cat['resource']::getUrl('create');
+        $crearAccion = 'crear' . self::ENTIDADES_CATALOGO[$cat['id']];
         $indexUrl = $cat['resource']::getUrl('index');
 
         // TODO [Fase 10 - Documentado]: Vista previa embebida en pestaña Catálogos; cada catálogo redirige a su ListRecords nativo completo al hacer clic.
@@ -216,11 +232,10 @@ class ConfiguracionPage extends Page
                 $headers = ['ID', 'Nombre del departamento', 'Acciones'];
                 $deptos = Departamento::orderBy('nombre')->limit(25)->get();
                 foreach ($deptos as $d) {
-                    $editUrl = DepartamentoResource::getUrl('edit', ['record' => $d]);
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $d->id_departamento . '</span>',
                         '<strong>' . e($d->nombre) . '</strong>',
-                        $this->renderEditIconButton($editUrl),
+                        $this->renderEditIconButton('editarDepartamento', $d->getKey()),
                     ];
                 }
                 break;
@@ -229,12 +244,11 @@ class ConfiguracionPage extends Page
                 $headers = ['ID', 'Área', 'Departamento', 'Acciones'];
                 $areas = Area::with('departamento')->orderBy('nombre')->limit(25)->get();
                 foreach ($areas as $a) {
-                    $editUrl = AreaResource::getUrl('edit', ['record' => $a]);
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $a->id_area . '</span>',
                         '<strong>' . e($a->nombre) . '</strong>',
                         e($a->departamento?->nombre ?? 'N/A'),
-                        $this->renderEditIconButton($editUrl),
+                        $this->renderEditIconButton('editarArea', $a->getKey()),
                     ];
                 }
                 break;
@@ -243,7 +257,6 @@ class ConfiguracionPage extends Page
                 $headers = ['Modelo / ID', 'Material / Equipo', 'Marca', 'Tipo', 'Stock', 'Acciones'];
                 $materiales = Material::with(['marca', 'tipo'])->orderBy('nombre')->limit(25)->get();
                 foreach ($materiales as $m) {
-                    $editUrl = MaterialResource::getUrl('edit', ['record' => $m]);
                     $codigo = $m->modelo ?: ('#' . $m->id_producto);
                     $rows[] = [
                         '<span class="sigem-td-folio">' . e($codigo) . '</span>',
@@ -251,7 +264,7 @@ class ConfiguracionPage extends Page
                         e($m->marca?->nombre ?? 'N/A'),
                         e($m->tipo?->nombre ?? 'N/A'),
                         '<span class="sigem-pill ok">' . $m->stock_actual . '</span>',
-                        $this->renderEditIconButton($editUrl),
+                        $this->renderEditIconButton('editarMaterial', $m->getKey()),
                     ];
                 }
                 break;
@@ -260,11 +273,10 @@ class ConfiguracionPage extends Page
                 $headers = ['ID', 'Marca de material', 'Acciones'];
                 $marcas = MarcaMaterial::orderBy('nombre')->limit(25)->get();
                 foreach ($marcas as $mc) {
-                    $editUrl = MarcaMaterialResource::getUrl('edit', ['record' => $mc]);
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $mc->id_marca . '</span>',
                         '<strong>' . e($mc->nombre) . '</strong>',
-                        $this->renderEditIconButton($editUrl),
+                        $this->renderEditIconButton('editarMarca', $mc->getKey()),
                     ];
                 }
                 break;
@@ -273,11 +285,10 @@ class ConfiguracionPage extends Page
                 $headers = ['ID', 'Tipo de material', 'Acciones'];
                 $tipos = TipoMaterial::orderBy('nombre')->limit(25)->get();
                 foreach ($tipos as $t) {
-                    $editUrl = TipoMaterialResource::getUrl('edit', ['record' => $t]);
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $t->id_tipodematerial . '</span>',
                         '<strong>' . e($t->nombre) . '</strong>',
-                        $this->renderEditIconButton($editUrl),
+                        $this->renderEditIconButton('editarTipo', $t->getKey()),
                     ];
                 }
                 break;
@@ -286,11 +297,10 @@ class ConfiguracionPage extends Page
                 $headers = ['ID', 'Unidad de medida', 'Acciones'];
                 $unidades = UnidadMedida::orderBy('nombre')->limit(25)->get();
                 foreach ($unidades as $u) {
-                    $editUrl = UnidadMedidaResource::getUrl('edit', ['record' => $u]);
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $u->id_unidad . '</span>',
                         '<strong>' . e($u->nombre) . '</strong>',
-                        $this->renderEditIconButton($editUrl),
+                        $this->renderEditIconButton('editarUnidad', $u->getKey()),
                     ];
                 }
                 break;
@@ -299,14 +309,13 @@ class ConfiguracionPage extends Page
                 $headers = ['ID', 'Proveedor', 'RFC', 'Contacto', 'Acciones'];
                 $proveedores = Proveedor::orderBy('nombre_empresa')->limit(25)->get();
                 foreach ($proveedores as $p) {
-                    $editUrl = ProveedorResource::getUrl('edit', ['record' => $p]);
                     $contacto = trim(($p->contacto_nombre ? $p->contacto_nombre . ' · ' : '') . ($p->contacto_telefono ?? '') . ' ' . ($p->contacto_email ?? ''));
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $p->id_proveedor . '</span>',
                         '<strong>' . e($p->nombre_empresa) . '</strong>',
                         e($p->rfc ?? 'N/A'),
                         e($contacto ?: 'Sin datos'),
-                        $this->renderEditIconButton($editUrl),
+                        $this->renderEditIconButton('editarProveedor', $p->getKey()),
                     ];
                 }
                 break;
@@ -315,7 +324,6 @@ class ConfiguracionPage extends Page
                 $headers = ['ID', 'Receptor', 'Área', 'Contacto', 'Acciones'];
                 $receptores = Receptor::with('area')->orderBy('nombre')->limit(25)->get();
                 foreach ($receptores as $r) {
-                    $editUrl = ReceptorResource::getUrl('edit', ['record' => $r]);
                     $nombreCompleto = trim("{$r->nombre} {$r->apellido_paterno} {$r->apellido_materno}");
                     $contacto = trim(($r->telefono ?? '') . ' ' . ($r->email ?? ''));
                     $rows[] = [
@@ -323,7 +331,7 @@ class ConfiguracionPage extends Page
                         '<strong>' . e($nombreCompleto ?: $r->nombre) . '</strong>',
                         e($r->area?->nombre ?? 'N/A'),
                         e($contacto ?: 'Sin datos'),
-                        $this->renderEditIconButton($editUrl),
+                        $this->renderEditIconButton('editarReceptor', $r->getKey()),
                     ];
                 }
                 break;
@@ -335,7 +343,7 @@ class ConfiguracionPage extends Page
             'nombre' => $cat['nombre'],
             'singular' => $cat['singular'],
             'total' => $cat['total'],
-            'createUrl' => $createUrl,
+            'crearAccion' => $crearAccion,
             'indexUrl' => $indexUrl,
             'headers' => $headers,
             'rows' => $rows,
@@ -420,8 +428,79 @@ class ConfiguracionPage extends Page
         return User::orderBy('name')->pluck('name', 'id')->toArray();
     }
 
-    protected function renderEditIconButton(string $editUrl): string
+    // ------------------------------------------------------------------
+    // Acciones de página (slide-over) para los catálogos embebidos.
+    // El formulario se reutiliza de cada Resource::form(); no se duplican campos.
+    // ------------------------------------------------------------------
+
+    public function crearDepartamentoAction(): Actions\CreateAction { return $this->accionCrear('crearDepartamento', DepartamentoResource::class, 'Departamento creado'); }
+
+    public function editarDepartamentoAction(): Actions\EditAction { return $this->accionEditar('editarDepartamento', DepartamentoResource::class, 'Departamento actualizado'); }
+
+    public function crearAreaAction(): Actions\CreateAction { return $this->accionCrear('crearArea', AreaResource::class, 'Área creada'); }
+
+    public function editarAreaAction(): Actions\EditAction { return $this->accionEditar('editarArea', AreaResource::class, 'Área actualizada'); }
+
+    public function crearMaterialAction(): Actions\CreateAction { return $this->accionCrear('crearMaterial', MaterialResource::class, 'Material creado'); }
+
+    public function editarMaterialAction(): Actions\EditAction { return $this->accionEditar('editarMaterial', MaterialResource::class, 'Material actualizado'); }
+
+    public function crearMarcaAction(): Actions\CreateAction { return $this->accionCrear('crearMarca', MarcaMaterialResource::class, 'Marca creada'); }
+
+    public function editarMarcaAction(): Actions\EditAction { return $this->accionEditar('editarMarca', MarcaMaterialResource::class, 'Marca actualizada'); }
+
+    public function crearTipoAction(): Actions\CreateAction { return $this->accionCrear('crearTipo', TipoMaterialResource::class, 'Tipo de material creado'); }
+
+    public function editarTipoAction(): Actions\EditAction { return $this->accionEditar('editarTipo', TipoMaterialResource::class, 'Tipo de material actualizado'); }
+
+    public function crearUnidadAction(): Actions\CreateAction { return $this->accionCrear('crearUnidad', UnidadMedidaResource::class, 'Unidad de medida creada'); }
+
+    public function editarUnidadAction(): Actions\EditAction { return $this->accionEditar('editarUnidad', UnidadMedidaResource::class, 'Unidad de medida actualizada'); }
+
+    public function crearProveedorAction(): Actions\CreateAction { return $this->accionCrear('crearProveedor', ProveedorResource::class, 'Proveedor creado'); }
+
+    public function editarProveedorAction(): Actions\EditAction { return $this->accionEditar('editarProveedor', ProveedorResource::class, 'Proveedor actualizado'); }
+
+    public function crearReceptorAction(): Actions\CreateAction { return $this->accionCrear('crearReceptor', ReceptorResource::class, 'Receptor creado'); }
+
+    public function editarReceptorAction(): Actions\EditAction { return $this->accionEditar('editarReceptor', ReceptorResource::class, 'Receptor actualizado'); }
+
+    protected function accionCrear(string $nombre, string $resource, string $mensaje): Actions\CreateAction
     {
-        return '<a href="' . $editUrl . '" class="sigem-rep-btn-sec fi-icon-btn" title="Editar" aria-label="Editar" style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;"><path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z" /><path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z" /></svg></a>';
+        return Actions\CreateAction::make($nombre)
+            ->model($resource::getModel())
+            ->form(fn (Form $form): Form => $resource::form($form))
+            ->slideOver()
+            ->createAnother(false)
+            ->successNotificationTitle($mensaje)
+            ->after(fn () => $this->refreshCatalogoData());
+    }
+
+    protected function accionEditar(string $nombre, string $resource, string $mensaje): Actions\EditAction
+    {
+        $model = $resource::getModel();
+
+        return Actions\EditAction::make($nombre)
+            ->model($model)
+            ->record(fn (array $arguments) => $model::find($arguments['record'] ?? null))
+            ->form(fn (Form $form): Form => $resource::form($form))
+            ->slideOver()
+            ->successNotificationTitle($mensaje)
+            ->after(fn () => $this->refreshCatalogoData());
+    }
+
+    /**
+     * Las filas y totales de la tabla embebida se calculan en cada render
+     * (getDatosCatalogoActivo / getCatalogosList); al terminar una acción Livewire
+     * vuelve a renderizar la página, por lo que este método solo avisa del cambio.
+     */
+    public function refreshCatalogoData(): void
+    {
+        $this->dispatch('catalogo-actualizado');
+    }
+
+    protected function renderEditIconButton(string $accion, int|string $id): string
+    {
+        return '<button type="button" wire:click="mountAction(\'' . $accion . '\', { record: ' . json_encode($id) . ' })" class="sigem-rep-btn-sec fi-icon-btn" title="Editar" aria-label="Editar" style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;"><path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z" /><path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z" /></svg></button>';
     }
 }

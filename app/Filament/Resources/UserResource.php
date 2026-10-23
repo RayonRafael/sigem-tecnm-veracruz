@@ -48,78 +48,71 @@ class UserResource extends Resource
                 Forms\Components\Wizard::make([
                     Forms\Components\Wizard\Step::make('Datos personales y acceso')
                         ->icon('heroicon-m-user-circle')
-                    ->schema([
-                        Forms\Components\TextInput::make('name')->label('Nombre')
-                            ->label('Nombre(s)')
-                            ->required()
-                            ->prefixIcon('heroicon-m-user')
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('apellido_paterno')
-                            ->label('Apellido paterno')
-                            ->prefixIcon('heroicon-m-user')
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('apellido_materno')
-                            ->label('Apellido materno')
-                            ->prefixIcon('heroicon-m-user')
-                            ->maxLength(255),
-                        Forms\Components\Grid::make(2)
-                            ->schema([
-                        Forms\Components\TextInput::make('email')->label('Correo electrónico')
-                            ->label('Correo electrónico')
-                            ->email()
-                            ->required()
-                            ->prefixIcon('heroicon-m-envelope')
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('password')->label('Contraseña')
-                            ->label('Contraseña')
-                            ->password()
-                            ->prefixIcon('heroicon-m-key')
-                            ->required(fn (string $operation): bool => $operation === 'create')
-                            ->dehydrated(fn (?string $state): bool => filled($state))
-                            ->maxLength(255),
-                    ])->columns(3),
+                        ->schema([
+                            Forms\Components\TextInput::make('name')
+                                ->label('Nombre(s)')
+                                ->required()
+                                ->prefixIcon('heroicon-m-user')
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('apellido_paterno')
+                                ->label('Apellido paterno')
+                                ->prefixIcon('heroicon-m-user')
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('apellido_materno')
+                                ->label('Apellido materno')
+                                ->prefixIcon('heroicon-m-user')
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('email')
+                                ->label('Correo electrónico')
+                                ->email()
+                                ->required()
+                                ->prefixIcon('heroicon-m-envelope')
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('password')
+                                ->label('Contraseña')
+                                ->password()
+                                ->prefixIcon('heroicon-m-key')
+                                ->required(fn (string $operation): bool => $operation === 'create')
+                                ->dehydrated(fn (?string $state): bool => filled($state))
+                                ->maxLength(255),
+                        ]),
 
                     Forms\Components\Wizard\Step::make('Datos institucionales y rol')
                         ->icon('heroicon-m-academic-cap')
-                    ->schema([
-                        Forms\Components\TextInput::make('num_control')
-                            ->label('Número de control')
-                            ->prefixIcon('heroicon-m-identification')
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('carrera')
-                            ->label('Carrera / área')
-                            ->prefixIcon('heroicon-m-academic-cap')
-                            ->maxLength(255),
-                        Forms\Components\TextInput::make('RFC')
-                            ->label('Rfc (opcional)')
-                            ->prefixIcon('heroicon-m-identification')
-                            ->maxLength(13),
-                    ])->columns(3),
-
-                        Forms\Components\Grid::make(2)
-                            ->schema([
-                                Forms\Components\Select::make('roles')
-                                    ->placeholder('Selecciona...')
-                                    ->label('Rol (Spatie)')
-                                    ->relationship('roles', 'name')
-                                    ->preload()
-                                    ->prefixIcon('heroicon-m-key')
-                                    ->searchable()
-                                    ->live()
-                                    ->afterStateUpdated(function (Forms\Set $set, ?string $state) {
-                                        $set('tipo_usuario', static::mapRoleToTipoUsuario($state));
-                                    }),
-                                Forms\Components\Hidden::make('tipo_usuario')
-                                    ->default('Pendiente')
-                                    ->dehydrated(),
-                                Forms\Components\ToggleButtons::make('activo')
-                                    ->label('Usuario activo')
-                                    ->boolean(trueLabel: 'Sí', falseLabel: 'No')
-                                    ->inline()
-                                    ->default(true)
-                                    ->required(),
-                            ])->columns(2),
-                    ])->columnSpanFull(),
+                        ->schema([
+                            Forms\Components\TextInput::make('num_control')
+                                ->label('Número de control')
+                                ->prefixIcon('heroicon-m-identification')
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('carrera')
+                                ->label('Carrera / área')
+                                ->prefixIcon('heroicon-m-academic-cap')
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('RFC')
+                                ->label('Rfc (opcional)')
+                                ->prefixIcon('heroicon-m-identification')
+                                ->maxLength(13),
+                            Forms\Components\Select::make('roles')
+                                ->placeholder('Selecciona...')
+                                ->label('Rol (Spatie)')
+                                ->relationship('roles', 'name')
+                                ->preload()
+                                ->prefixIcon('heroicon-m-key')
+                                ->searchable()
+                                ->live()
+                                ->afterStateUpdated(function (Forms\Set $set, ?string $state) {
+                                    $set('tipo_usuario', static::mapRoleToTipoUsuario($state));
+                                }),
+                            Forms\Components\Hidden::make('tipo_usuario')
+                                ->default('Pendiente')
+                                ->dehydrated(),
+                            Forms\Components\ToggleButtons::make('activo')
+                                ->label('Usuario activo')
+                                ->boolean(trueLabel: 'Sí', falseLabel: 'No')
+                                ->inline()
+                                ->default(true)
+                                ->required(),
+                        ]),
                 ])->columnSpanFull(),
             ]);
     }

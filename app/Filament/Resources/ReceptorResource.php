@@ -87,7 +87,7 @@ class ReceptorResource extends Resource
                                     ->maxLength(100),
                                 Forms\Components\Select::make('id_departamento')->placeholder('Selecciona...')
                                     ->label('Departamento')
-                                    ->options(\App\Models\Departamento::pluck('nombre', 'id'))
+                                    ->options(\App\Models\Departamento::pluck('nombre', 'id_departamento'))
                                     ->searchable()
                                     ->preload()
                                     ->required(),

@@ -2337,10 +2337,10 @@ table{
 }
 
 /* 2. Grids del formulario dentro del slide-over: 1 columna (sin textos encimados) */
-.fi-modal-slide-over-window .fi-fo-component-ctn [style*="--cols"],
-.fi-modal-slide-over-window .fi-fo-grid,
-.fi-modal-slide-over-window .grid,
-.fi-modal-slide-over-window [class*="grid-cols-"] {
+.fi-modal-slide-over-window [class*="grid"],
+.fi-modal-slide-over-window [style*="--cols"],
+.fi-modal .fi-fo-component-ctn [class*="grid"],
+.fi-modal .fi-fo-component-ctn [style*="--cols"] {
   --cols-default: 1 !important;
   --cols-sm: 1 !important;
   --cols-md: 1 !important;
@@ -2356,7 +2356,7 @@ table{
 .fi-modal-slide-over-window .fi-fo-component-ctn > *,
 .fi-modal-slide-over-window .fi-fo-field,
 .fi-modal-slide-over-window .fi-fo-field-wrp {
-  min-width: 200px !important;
+  min-width: 0 !important;
   max-width: 100% !important;
   width: 100% !important;
 }
@@ -2375,7 +2375,7 @@ table{
 }
 
 /* Inputs y selects al 100% del espacio disponible */
-.fi-modal-slide-over-window input,
+.fi-modal-slide-over-window input:not([type="checkbox"]):not([type="radio"]),
 .fi-modal-slide-over-window select,
 .fi-modal-slide-over-window textarea,
 .fi-modal-slide-over-window .fi-input-wrp,
@@ -2445,6 +2445,11 @@ table{
               margin-right .25s cubic-bezier(.4, 0, .2, 1);
 }
 
+html,
+body {
+  overflow-x: hidden !important;
+}
+
 @media (min-width: 1000px) {
   /* Cuando el slide-over está abierto: el contenido usa calc para restar el ancho del panel */
   body.slide-over-open .fi-main,
@@ -2453,6 +2458,7 @@ table{
     width: calc(100% - 620px) !important;
     max-width: calc(100% - 620px) !important;
     margin-right: 0 !important;
+    overflow-x: hidden !important;
   }
 
   body.slide-over-open .fi-topbar,
@@ -2461,6 +2467,7 @@ table{
     width: calc(100% - 620px) !important;
     max-width: calc(100% - 620px) !important;
     margin-right: 0 !important;
+    overflow-x: hidden !important;
   }
 
   /* Ocultar el overlay oscuro para que el contenido comprimido sea visible */
@@ -2494,3 +2501,344 @@ table{
 }
 
 
+
+/* ==========================================================================
+   Slide-over: sin scroll horizontal (todo el contenido cabe en el panel)
+   ========================================================================== */
+.fi-modal-slide-over-window {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.fi-modal-slide-over-window .fi-modal-content {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+.fi-modal-slide-over-window .fi-fo-component-ctn {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+}
+
+/* Contenedores internos no deben desbordar.
+   Nota: no se usa overflow-x:hidden aqui para no recortar los desplegables
+   de los selects (overflow-x distinto de visible fuerza overflow-y:auto). */
+.fi-modal-slide-over-window .fi-fo-component-ctn > *,
+.fi-modal-slide-over-window .fi-fo-grid,
+.fi-modal-slide-over-window .grid,
+.fi-modal-slide-over-window .fi-section,
+.fi-modal-slide-over-window .fi-fo-wizard {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.fi-modal-slide-over-window .fi-fo-field,
+.fi-modal-slide-over-window .fi-fo-field-wrp {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Stepper del wizard: scroll horizontal contenido solo en el stepper */
+.fi-modal-slide-over-window .fi-fo-wizard-header {
+  overflow-x: auto !important;
+  max-width: 100% !important;
+  scrollbar-width: thin !important;
+}
+
+/* El padding interno no debe causar overflow */
+.fi-modal-slide-over-window .fi-modal-content > *,
+.fi-modal-slide-over-window .fi-modal-content > * > * {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+}
+
+/* ==========================================================================
+   Slide-over universal: campos que no colapsan, un solo scroll vertical
+   ========================================================================== */
+.fi-modal-slide-over-window [class*="fi-fo-field"],
+.fi-modal-slide-over-window [class*="fi-select"],
+.fi-modal-slide-over-window [class*="fi-textarea"] {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Un solo scroll vertical: el del panel. El contenido interno crece con su
+   altura natural (clip en X, visible en Y para no crear scrolls anidados).
+   No se fuerza max-height:none global para no romper las listas desplegables. */
+.fi-modal-slide-over-window .fi-modal-content,
+.fi-modal-slide-over-window .fi-fo-component-ctn {
+  overflow-x: clip !important;
+  overflow-y: visible !important;
+  max-height: none !important;
+}
+.fi-modal-slide-over-window {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* Scrollbar discreta solo en el panel (el stepper conserva la suya) */
+.fi-modal-slide-over-window *:not(.fi-fo-wizard-header)::-webkit-scrollbar { display: none !important; }
+.fi-modal-slide-over-window *:not(.fi-fo-wizard-header) { scrollbar-width: none; }
+.fi-modal-slide-over-window { scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent; }
+.fi-modal-slide-over-window::-webkit-scrollbar { width: 6px !important; }
+.fi-modal-slide-over-window::-webkit-scrollbar-thumb {
+  background: #cbd5e1 !important;
+  border-radius: 3px !important;
+}
+
+/* ==========================================================================
+   ToggleButtons: Estados claro / seleccionado / hover (Problema 3)
+   - NO seleccionado: borde gris, texto gris, fondo blanco
+   - SELECCIONADO: fondo azul, texto blanco, borde azul
+   - HOVER (no seleccionado): borde azul suave, fondo azul claro
+   ========================================================================== */
+.fi-fo-toggle-buttons label.fi-btn,
+.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option,
+.fi-fo-toggle-buttons input:not(:checked) + label.fi-btn,
+.fi-fo-toggle-buttons div:not(:has(input:checked)) > label.fi-btn {
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background-color: var(--sig-surface, #ffffff) !important;
+  background: var(--sig-surface, #ffffff) !important;
+  color: var(--sig-muted, #64748b) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  opacity: 1 !important;
+  transition: all 0.15s ease !important;
+}
+
+.fi-fo-toggle-buttons label.fi-btn *,
+.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option *,
+.fi-fo-toggle-buttons input:not(:checked) + label.fi-btn *,
+.fi-fo-toggle-buttons div:not(:has(input:checked)) > label.fi-btn * {
+  color: var(--sig-muted, #64748b) !important;
+}
+
+/* HOVER en NO seleccionado */
+.fi-fo-toggle-buttons input:not(:checked) + label.fi-btn:hover,
+.fi-fo-toggle-buttons div:not(:has(input:checked)) > label.fi-btn:hover,
+.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option:not(.fi-active):not(:has(input:checked)):hover {
+  border-color: #93c5fd !important;
+  background-color: #eff6ff !important;
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  box-shadow: none !important;
+}
+
+.fi-fo-toggle-buttons input:not(:checked) + label.fi-btn:hover *,
+.fi-fo-toggle-buttons div:not(:has(input:checked)) > label.fi-btn:hover *,
+.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option:not(.fi-active):not(:has(input:checked)):hover * {
+  color: #1d4ed8 !important;
+}
+
+/* SELECCIONADO */
+.fi-fo-toggle-buttons input:checked + label.fi-btn,
+.fi-fo-toggle-buttons div:has(input:checked) > label.fi-btn,
+.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option.fi-active,
+.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option[aria-pressed="true"],
+.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option:has(input:checked) {
+  background-color: var(--sig-primary, #002855) !important;
+  background: var(--sig-primary, #002855) !important;
+  border: 1px solid var(--sig-primary, #002855) !important;
+  border-color: var(--sig-primary, #002855) !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.fi-fo-toggle-buttons input:checked + label.fi-btn *,
+.fi-fo-toggle-buttons div:has(input:checked) > label.fi-btn *,
+.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option.fi-active *,
+.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option[aria-pressed="true"] *,
+.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option:has(input:checked) * {
+  color: #ffffff !important;
+}
+
+/* Modo oscuro: ToggleButtons */
+.dark .fi-fo-toggle-buttons label.fi-btn,
+.dark .fi-fo-toggle-buttons input:not(:checked) + label.fi-btn,
+.dark .fi-fo-toggle-buttons div:not(:has(input:checked)) > label.fi-btn {
+  border-color: #334155 !important;
+  background-color: #1e293b !important;
+  background: #1e293b !important;
+  color: #94a3b8 !important;
+}
+.dark .fi-fo-toggle-buttons label.fi-btn *,
+.dark .fi-fo-toggle-buttons input:not(:checked) + label.fi-btn *,
+.dark .fi-fo-toggle-buttons div:not(:has(input:checked)) > label.fi-btn * {
+  color: #94a3b8 !important;
+}
+.dark .fi-fo-toggle-buttons input:not(:checked) + label.fi-btn:hover,
+.dark .fi-fo-toggle-buttons div:not(:has(input:checked)) > label.fi-btn:hover {
+  border-color: #3b82f6 !important;
+  background-color: #1e3a5f !important;
+  background: #1e3a5f !important;
+  color: #93c5fd !important;
+}
+.dark .fi-fo-toggle-buttons input:not(:checked) + label.fi-btn:hover *,
+.dark .fi-fo-toggle-buttons div:not(:has(input:checked)) > label.fi-btn:hover * {
+  color: #93c5fd !important;
+}
+.dark .fi-fo-toggle-buttons input:checked + label.fi-btn,
+.dark .fi-fo-toggle-buttons div:has(input:checked) > label.fi-btn {
+  background-color: #2563eb !important;
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+  color: #ffffff !important;
+}
+.dark .fi-fo-toggle-buttons input:checked + label.fi-btn *,
+.dark .fi-fo-toggle-buttons div:has(input:checked) > label.fi-btn * {
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   Slide-over: Acciones / Footer integrados al contenido (Problema 4)
+   - Separación con respecto al último campo (margin-top, padding, border-top)
+   - Alineados a la izquierda: [Primario] [Secundario] [Ghost/Cancelar]
+   - Botones estilizados con border-radius 8px y padding 9px 20px
+   ========================================================================== */
+.fi-modal-slide-over-window .fi-modal-footer {
+  position: static !important;
+  margin-top: 24px !important;
+  padding: 20px 24px 28px !important;
+  border-top: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.fi-modal-slide-over-window .fi-modal-footer-actions,
+.fi-modal-slide-over-window .fi-modal-actions,
+.fi-modal-slide-over-window .fi-form-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+/* Botones dentro del footer de slide-over */
+.fi-modal-slide-over-window .fi-modal-footer .fi-btn,
+.fi-modal-slide-over-window .fi-modal-actions .fi-btn,
+.fi-modal-slide-over-window .fi-form-actions .fi-btn {
+  border-radius: 8px !important;
+  padding: 9px 20px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  cursor: pointer !important;
+}
+
+/* Botón primario */
+.fi-modal-slide-over-window .fi-modal-footer .fi-btn-color-primary,
+.fi-modal-slide-over-window .fi-modal-footer .fi-color-primary,
+.fi-modal-slide-over-window .fi-modal-footer .fi-btn-primary,
+.fi-modal-slide-over-window .fi-form-actions .fi-btn-primary,
+.fi-modal-slide-over-window .fi-form-actions .fi-btn-color-primary {
+  background-color: var(--sig-primary, #002855) !important;
+  border: 1px solid var(--sig-primary, #002855) !important;
+  color: #ffffff !important;
+}
+.fi-modal-slide-over-window .fi-modal-footer .fi-btn-color-primary:hover,
+.fi-modal-slide-over-window .fi-modal-footer .fi-color-primary:hover,
+.fi-modal-slide-over-window .fi-modal-footer .fi-btn-primary:hover,
+.fi-modal-slide-over-window .fi-form-actions .fi-btn-primary:hover {
+  background-color: #001f42 !important;
+}
+
+/* Botones secundarios / cancelar (gris) */
+.fi-modal-slide-over-window .fi-modal-footer .fi-btn-color-gray,
+.fi-modal-slide-over-window .fi-modal-footer .fi-color-gray,
+.fi-modal-slide-over-window .fi-form-actions .fi-btn-color-gray {
+  background-color: #ffffff !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  color: #334155 !important;
+}
+.fi-modal-slide-over-window .fi-modal-footer .fi-btn-color-gray:hover,
+.fi-modal-slide-over-window .fi-modal-footer .fi-color-gray:hover,
+.fi-modal-slide-over-window .fi-form-actions .fi-btn-color-gray:hover {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Navegación al final de wizards dentro de slide-over */
+.fi-modal-slide-over-window .fi-fo-wizard > div:last-child {
+  margin-top: 24px !important;
+  padding-top: 16px !important;
+  border-top: 1px solid var(--sig-border, #e2e8f0) !important;
+}
+
+/* Modo oscuro para footer de slide-over */
+.dark .fi-modal-slide-over-window .fi-modal-footer,
+.dark .fi-modal-slide-over-window .fi-fo-wizard > div:last-child {
+  border-top-color: #334155 !important;
+}
+.dark .fi-modal-slide-over-window .fi-modal-footer .fi-btn-color-gray,
+.dark .fi-modal-slide-over-window .fi-modal-footer .fi-color-gray {
+  background-color: #1e293b !important;
+  border-color: #475569 !important;
+  color: #e2e8f0 !important;
+}
+
+/* ==========================================================================
+   FIX 1: Sin scroll horizontal en el topbar con el slide-over abierto
+   ========================================================================== */
+html,
+body {
+  overflow-x: hidden !important;
+}
+body.slide-over-open .fi-topbar,
+body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar {
+  overflow-x: hidden !important;
+}
+body.slide-over-open .fi-topbar nav,
+body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+}
+.fi-topbar * {
+  max-width: 100% !important;
+}
+.fi-topbar .sigem-topbar-search {
+  min-width: 120px !important;
+  flex-shrink: 1 !important;
+}
+
+/* ==========================================================================
+   FIX 2: Botones de accion DENTRO del contenido del panel (no pegados al borde)
+   En Filament v3 el pie del modal es .fi-modal-footer > .fi-modal-footer-actions
+   ========================================================================== */
+.fi-modal-slide-over-window .fi-modal-content {
+  flex: 0 0 auto !important;           /* el contenido no empuja el pie al fondo */
+}
+.fi-modal-slide-over-window .fi-modal-footer {
+  position: relative !important;
+  bottom: auto !important;
+  margin-top: 0 !important;
+  background: var(--sig-surface, #ffffff) !important;
+}
+.fi-modal-slide-over-window .fi-modal-footer-actions,
+.fi-modal-slide-over-window .fi-modal-actions,
+.fi-modal-slide-over-window .fi-form-actions {
+  padding: 0 !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  position: relative !important;
+  bottom: auto !important;
+}
+.fi-modal-slide-over-window .fi-modal-footer .fi-btn,
+.fi-modal-slide-over-window .fi-modal-actions .fi-btn,
+.fi-modal-slide-over-window .fi-form-actions .fi-btn {
+  border-radius: 8px !important;
+  padding: 9px 20px !important;
+  font-weight: 600 !important;
+}
+.fi-modal-slide-over-window .fi-modal-footer .fi-btn-gray,
+.fi-modal-slide-over-window .fi-form-actions .fi-btn-gray {
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: var(--sig-surface, #ffffff) !important;
+}

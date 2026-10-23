@@ -13,7 +13,7 @@ trait ConDashboardBreadcrumb
             : url('/admin');
 
         return array_merge(
-            [$dashboardUrl => 'Dashboard'],
+            [$dashboardUrl => 'Panel principal'],
             $breadcrumbs
         );
     }
