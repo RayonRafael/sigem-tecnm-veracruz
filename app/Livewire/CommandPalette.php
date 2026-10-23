@@ -114,11 +114,18 @@ class CommandPalette extends Component
                     'keywords' => 'mantenimiento servicio reparacion falla preventivo correctivo tecnico',
                 ],
                 [
-                    'titulo' => 'Materiales y Catálogos',
-                    'subtitulo' => 'Consulta de materiales y catálogos en modo lectura',
-                    'icono' => '🏷️',
-                    'url' => \App\Filament\ServicioSocial\Resources\MaterialResource::getUrl('index'),
-                    'keywords' => 'catalogos materiales areas receptores solo lectura',
+                    'titulo' => 'Reportes',
+                    'subtitulo' => 'Métricas, estadísticas y reportes autorizados',
+                    'icono' => '📊',
+                    'url' => \App\Filament\ServicioSocial\Pages\ReportesPage::getUrl(),
+                    'keywords' => 'reportes metricas graficas estadisticas autorizados',
+                ],
+                [
+                    'titulo' => 'Catálogos',
+                    'subtitulo' => 'Consulta de catálogos base en modo lectura',
+                    'icono' => '📁',
+                    'url' => \App\Filament\ServicioSocial\Pages\CatalogosPage::getUrl(),
+                    'keywords' => 'catalogos departamentos areas materiales proveedores marcas tipos unidades receptores solo lectura',
                 ],
             ];
         }

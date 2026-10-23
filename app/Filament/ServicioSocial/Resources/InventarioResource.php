@@ -31,7 +31,7 @@ class InventarioResource extends Resource
 
     protected static ?string $navigationGroup = 'Gestión de inventario';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 3;
 
     public static function hasRecordTitle(): bool
     {

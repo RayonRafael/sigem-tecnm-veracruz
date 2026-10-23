@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class MaterialResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = Material::class;
 
     protected static ?string $recordTitleAttribute = 'nombre';

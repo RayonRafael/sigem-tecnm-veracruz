@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReceptorResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = Receptor::class;
 
     protected static ?string $recordTitleAttribute = 'nombre';

@@ -104,6 +104,8 @@ class AdminPanelProvider extends PanelProvider
                 PanelsRenderHook::USER_MENU_BEFORE,
                 fn (): string => Blade::render('
 @if (auth()->check())
+<span class="sigem-role-banner sigem-role-admin"
+      title="Acceso completo de administración">👑 Administrador</span>
 {{-- Campo de búsqueda aparente en el topbar (Fase 9: Buscador global) --}}
 <div class="sigem-topbar-search"
      role="button"

@@ -210,9 +210,6 @@ class ServicioSocialPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Gestión de inventario')
                     ->collapsible(false),
-                NavigationGroup::make()
-                    ->label('Catálogos')
-                    ->collapsible(false),
             ])
             ->sidebarWidth('64px')
             ->discoverResources(in: app_path('Filament/ServicioSocial/Resources'), for: 'App\\Filament\\ServicioSocial\\Resources')

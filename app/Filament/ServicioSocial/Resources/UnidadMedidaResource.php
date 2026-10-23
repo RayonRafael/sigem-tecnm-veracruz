@@ -17,6 +17,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class UnidadMedidaResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $model = UnidadMedida::class;
 
     protected static ?string $recordTitleAttribute = 'nombre';

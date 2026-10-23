@@ -25,7 +25,7 @@ class Dashboard extends BaseDashboard
 
     protected static ?string $navigationGroup = 'Panel principal';
 
-    protected static ?int $navigationSort = -2;
+    protected static ?int $navigationSort = 0;
 
     protected static ?string $title = 'SIGEM - Servicio Social';
 

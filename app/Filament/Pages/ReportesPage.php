@@ -43,9 +43,9 @@ class ReportesPage extends Page
             'inventario_categoria'     => true,
             'equipos_area'             => true,
             'equipos_mantenimiento'    => true,
-            'equipos_baja_danados'     => false,
-            'solicitudes_tipo_estado'  => false,
-            'movimientos_recientes'    => false,
+            'equipos_baja_danados'     => true,
+            'solicitudes_tipo_estado'  => true,
+            'movimientos_recientes'    => true,
         ];
 
         $cached = Cache::get('sigem_reportes_visibilidad_ss', []);

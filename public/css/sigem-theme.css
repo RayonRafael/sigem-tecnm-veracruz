@@ -3137,6 +3137,8 @@ button.fi-icon-btn[x-on\:click*="sidebar"] {
 }
 
 /* Catálogos SS: #c026d3 (magenta) */
+.fi-sidebar-item a[href*="/servicio-social/catalogo"] .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href*="/servicio-social/catalogo"]) .fi-sidebar-item-icon,
 .fi-sidebar-item a[href*="/servicio-social/materials"] .fi-sidebar-item-icon,
 .fi-sidebar-item a[href*="/servicio-social/areas"] .fi-sidebar-item-icon,
 .fi-sidebar-item a[href*="/servicio-social/receptors"] .fi-sidebar-item-icon,
@@ -3154,6 +3156,11 @@ button.fi-icon-btn[x-on\:click*="sidebar"] {
   border-color: color-mix(in srgb, var(--mod-cat) 45%, transparent) !important;
 }
 
+.fi-sidebar-item.fi-active a[href*="/servicio-social/catalogo"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href*="/servicio-social/catalogo"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href*="/servicio-social/catalogo"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href*="/servicio-social/catalogo"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href*="/servicio-social/catalogo"]) .fi-sidebar-item-icon,
 .fi-sidebar-item.fi-active a[href*="/servicio-social/materials"] .fi-sidebar-item-icon,
 .fi-sidebar-item.fi-active a[href*="/servicio-social/areas"] .fi-sidebar-item-icon,
 .fi-sidebar-item.fi-active a[href*="/servicio-social/receptors"] .fi-sidebar-item-icon,
@@ -3206,6 +3213,209 @@ button.fi-icon-btn[x-on\:click*="sidebar"] {
   border-color: var(--mod-rep) !important;
   color: #ffffff !important;
 }
+
+/* FIX 1: Quitar topbar duplicado en Servicio Social */
+body:has(.sigem-role-banner) .top-header,
+.sigem-professional .top-header,
+header.top-header {
+  display: none !important;
+}
+
+body:has(.sigem-role-banner) .sigem-topbar-brand {
+  display: none !important;
+}
+
+body:has(.sigem-role-banner) .fi-topbar:first-of-type .sigem-topbar-brand {
+  display: none !important;
+}
+
+/* FIX B: Logout compacto — diagnóstico real (intento 2) */
+.fi-sidebar,
+aside.fi-sidebar {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+.fi-sidebar nav,
+.fi-sidebar .fi-sidebar-nav {
+  flex: 1 1 auto !important;
+  overflow: visible !important;
+  min-height: 0 !important;
+}
+.fi-sidebar-footer,
+.fi-sidebar .fi-sidebar-footer,
+.sidebar-foot {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: max-content !important;
+  padding: 6px 6px !important;
+  margin-top: auto !important;
+}
+.sigem-user-card {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: max-content !important;
+  padding: 6px 4px !important;
+  gap: 3px !important;
+  margin-top: auto !important;
+  justify-content: center !important;
+}
+.sigem-avatar {
+  width: 30px !important;
+  height: 30px !important;
+  font-size: 14px !important;
+  flex: 0 0 auto !important;
+}
+.sigem-role-pill {
+  font-size: 10px !important;
+  padding: 1px 4px !important;
+  line-height: 1.2 !important;
+  flex: 0 0 auto !important;
+}
+.sigem-logout {
+  width: 20px !important;
+  height: 20px !important;
+  font-size: 12px !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  flex: 0 0 auto !important;
+}
+.sigem-user-card form {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: auto !important;
+  flex: 0 0 auto !important;
+}
+
+/* FIX 3: Dashboard SS y Admin — 4 acciones + 4 KPIs en 2 filas de 4 */
+.sigem-quick-grid,
+.sigem-stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 14px !important;
+  margin-bottom: 22px !important;
+}
+@media (max-width: 1200px) {
+  .sigem-quick-grid,
+  .sigem-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+@media (max-width: 640px) {
+  .sigem-quick-grid,
+  .sigem-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* FIX 4: Topbar sticky (permanece al hacer scroll en ambos paneles) */
+.fi-topbar {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 40 !important;
+  background: var(--sig-surface) !important;
+  border-bottom: 1px solid var(--sig-border) !important;
+}
+.fi-layout,
+.fi-main-ctn {
+  overflow: visible !important;
+}
+
+/* FIX 5: Banner de rol en Admin */
+.sigem-role-admin {
+  background: var(--sig-primary-light);
+  color: var(--sig-primary);
+}
+
+/* ===== FIX: Desbordamiento de Menú de Usuario y Sidebar ===== */
+
+/* 1. Restringir el ancho del menú desplegable superior (Logout/Tema) */
+.fi-topbar .fi-dropdown-panel {
+    max-width: 240px !important;
+    width: max-content !important;
+    left: auto !important;
+    right: 16px !important; /* Alineación segura a la derecha */
+}
+
+/* Revertir reglas globales previas que deforman el contenido del menú */
+.fi-topbar .fi-dropdown-panel * {
+    max-width: none !important; 
+}
+
+/* 2. Eliminar barra de desplazamiento horizontal en el sidebar y su footer */
+.fi-sidebar,
+.fi-sidebar-footer,
+.sidebar-foot {
+    overflow-x: hidden !important;
+}
+
+/* 3. Asegurar que la tarjeta de usuario encaje perfectamente en los 64px */
+.sigem-user-card {
+    width: 100% !important;
+    max-width: 64px !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    padding-left: 2px !important;
+    padding-right: 2px !important;
+}
+
+/* ===== FIX: Barras de desplazamiento redundantes ===== */
+
+/* 1. Eliminar doble scroll vertical en la página */
+html, body {
+    overflow: hidden !important; /* Bloquea el scroll nativo del navegador */
+}
+
+.fi-layout {
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+/* El scroll vertical debe existir ÚNICAMENTE en el contenido principal */
+.fi-main {
+    height: 100vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+}
+
+/* 2. Eliminar scroll horizontal en el menú lateral y proteger tooltips */
+/* En CSS, si usas overflow-y: auto, el navegador fuerza overflow-x: auto. 
+   Debemos forzar 'visible' para evitar barras y no recortar los tooltips. */
+.fi-sidebar nav,
+.fi-sidebar .fi-sidebar-nav {
+    overflow: visible !important;
+    flex: 1 1 auto !important;
+}
+
+/* Asegurar que los ítems no empujen el contenedor más allá de los 64px */
+.fi-sidebar .fi-sidebar-item {
+    max-width: 64px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Ocultar visualmente cualquier barra de scroll residual en el sidebar */
+.fi-sidebar::-webkit-scrollbar,
+.fi-sidebar nav::-webkit-scrollbar,
+.fi-sidebar .fi-sidebar-nav::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+.fi-sidebar, .fi-sidebar nav {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+
+
 
 
 
