@@ -19,7 +19,7 @@
         {{-- 2. FILA 1 — 4 TARJETAS DE ACCIÓN --}}
         <div class="sigem-quick-grid">
             {{-- 1. Crear solicitud --}}
-            <a class="sigem-quick" href="{{ url('/servicio-social/solicituds/create') }}">
+            <a class="sigem-quick" href="{{ url('/servicio-social/solicituds?abrir=create') }}">
                 <div class="arrow">→</div>
                 <div class="sigem-quick-ico sigem-i-primary">📋</div>
                 <div class="sigem-quick-title">Crear solicitud</div>
@@ -27,7 +27,7 @@
             </a>
 
             {{-- 2. Reportar mantenimiento --}}
-            <a class="sigem-quick" href="{{ url('/servicio-social/mantenimientos/create') }}">
+            <a class="sigem-quick" href="{{ url('/servicio-social/mantenimientos?abrir=create') }}">
                 <div class="arrow">→</div>
                 <div class="sigem-quick-ico sigem-i-warning">🔧</div>
                 <div class="sigem-quick-title">Reportar mantenimiento</div>
@@ -35,7 +35,7 @@
             </a>
 
             {{-- 3. Registrar equipo --}}
-            <a class="sigem-quick" href="{{ url('/servicio-social/inventarios/create') }}">
+            <a class="sigem-quick" href="javascript:void(0)" wire:click="mountAction('registrarEquipo')">
                 <div class="arrow">→</div>
                 <div class="sigem-quick-ico sigem-i-success">＋</div>
                 <div class="sigem-quick-title">Registrar equipo</div>
@@ -106,11 +106,12 @@
                             title="Alternar vista de gráfica de dona del inventario">
                         &#x1F4CA; Gráfica
                     </button>
-                    <a href="{{ url('/servicio-social/inventarios/create') }}"
-                       class="sigem-btn-primary"
-                       title="Registrar un nuevo equipo en el inventario">
+                    <button type="button"
+                            wire:click="mountAction('registrarEquipo')"
+                            class="sigem-btn-primary"
+                            title="Registrar un nuevo equipo en el inventario">
                         &#xFF0B; Registrar equipo
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -150,7 +151,7 @@
                                                 default => 'neutral',
                                             };
 
-                                            $viewUrl = \App\Filament\ServicioSocial\Resources\InventarioResource::getUrl('edit', ['record' => $inv]);
+                                            $viewUrl = url('/servicio-social/inventarios?abrir=edit&registro=' . $inv->id_inventario);
                                         @endphp
                                         <tr>
                                             <td>

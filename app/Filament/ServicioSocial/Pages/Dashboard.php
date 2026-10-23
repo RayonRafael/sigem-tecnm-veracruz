@@ -2,6 +2,7 @@
 
 namespace App\Filament\ServicioSocial\Pages;
 
+use App\Filament\ServicioSocial\Resources\InventarioResource;
 use App\Models\Area;
 use App\Models\Departamento;
 use App\Models\Inventario;
@@ -14,6 +15,8 @@ use App\Models\Solicitud;
 use App\Models\TipoMaterial;
 use App\Models\UnidadMedida;
 use App\Models\User;
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Spatie\Activitylog\Models\Activity;
 
@@ -30,6 +33,29 @@ class Dashboard extends BaseDashboard
     protected static ?string $title = 'SIGEM - Servicio Social';
 
     protected static string $view = 'filament.servicio-social.pages.dashboard';
+
+    public function registrarEquipoAction(): Action
+    {
+        return CreateAction::make('registrarEquipo')
+            ->label("\u{FF0B} Registrar equipo")
+            ->model(Inventario::class)
+            ->slideOver()
+            ->createAnother(false)
+            ->steps(InventarioResource::getFormSteps())
+            ->mutateFormDataUsing(function (array $data): array {
+                $data['aprobado'] = false;
+                $data['estado_registro'] = 'Pendiente';
+                $data['aprobado_por'] = null;
+                $data['id_usuario'] = auth()->id();
+
+                return $data;
+            })
+            ->extraAttributes([
+                'class' => 'sigem-btn-primary',
+                'title' => 'Registrar un nuevo equipo en el inventario',
+            ])
+            ->successNotificationTitle('Registro creado exitosamente');
+    }
 
     public function getColumns(): int|string|array
     {

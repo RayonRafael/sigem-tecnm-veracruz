@@ -21,4 +21,14 @@ class ListInventarios extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
+    protected function mutateSlideOverData(array $data): array
+    {
+        $data['aprobado'] = false;
+        $data['estado_registro'] = 'Pendiente';
+        $data['aprobado_por'] = null;
+        $data['id_usuario'] = auth()->id();
+
+        return $data;
+    }
 }
