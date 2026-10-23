@@ -18,6 +18,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -91,6 +92,13 @@ class InventarioResource extends Resource
                                         ->live()
                                         ->searchable()
                                         ->prefixIcon('heroicon-m-computer-desktop'),
+                                    // TODO: Convertir en Select con opciones dependientes de tipo_equipo (ej. Computadora -> Escritorio / Portátil)
+                                    Forms\Components\TextInput::make('subtipo')
+                                        ->label('Subtipo')
+                                        ->placeholder('Ej. Escritorio, Portátil, Alámbrico...')
+                                        ->required()
+                                        ->maxLength(100)
+                                        ->prefixIcon('heroicon-m-tag'),
                                 ]),
 
                             Forms\Components\Section::make('Componentes de la Estación')
@@ -136,6 +144,46 @@ class InventarioResource extends Resource
                                                 ->label('Mouse - No. de Serie')
                                                 ->placeholder('Ej. SN-MS-3344')
                                                 ->prefixIcon('heroicon-m-hashtag'),
+                                        ]),
+                                ])
+                                ->columnSpanFull(),
+
+                            // TODO: Hacer dependientes del tipo Computadora según el requerimiento del cliente
+                            Forms\Components\Section::make('Especificaciones Técnicas y Red')
+                                ->description('Hardware principal y conectividad de red')
+                                ->icon('heroicon-m-cpu-chip')
+                                ->collapsible()
+                                ->schema([
+                                    Forms\Components\Grid::make(3)
+                                        ->schema([
+                                            Forms\Components\TextInput::make('procesador')
+                                                ->label('Procesador')
+                                                ->placeholder('Ej. Intel Core i5')
+                                                ->prefixIcon('heroicon-m-cpu-chip')
+                                                ->maxLength(100),
+                                            Forms\Components\TextInput::make('ram')
+                                                ->label('Memoria RAM')
+                                                ->placeholder('Ej. 8 GB DDR4')
+                                                ->prefixIcon('heroicon-m-circle-stack')
+                                                ->maxLength(100),
+                                            Forms\Components\TextInput::make('disco')
+                                                ->label('Disco duro')
+                                                ->placeholder('Ej. 512GB SSD')
+                                                ->prefixIcon('heroicon-m-circle-stack')
+                                                ->maxLength(100),
+                                        ]),
+                                    Forms\Components\Grid::make(2)
+                                        ->schema([
+                                            Forms\Components\TextInput::make('mac_address')
+                                                ->label('Dirección MAC')
+                                                ->placeholder('Ej. AA:BB:CC:DD:EE:FF')
+                                                ->prefixIcon('heroicon-m-signal')
+                                                ->maxLength(50),
+                                            Forms\Components\TextInput::make('ip_address')
+                                                ->label('Dirección IP')
+                                                ->placeholder('Ej. 192.168.1.100')
+                                                ->prefixIcon('heroicon-m-globe-alt')
+                                                ->maxLength(50),
                                         ]),
                                 ])
                                 ->columnSpanFull(),
@@ -234,26 +282,44 @@ class InventarioResource extends Resource
                                 ])
                                 ->columnSpanFull(),
 
+                            // TODO: En el historial del equipo, registrar automáticamente el estado 'Reasignado' al cambiar de área o persona.
                             Forms\Components\ToggleButtons::make('estado')->label('Estado')
                                 ->options([
                                     'Disponible' => 'Disponible',
                                     'Asignado' => 'Asignado',
+                                    'Reasignado' => 'Reasignado',
                                     'En Mantenimiento' => 'En Mantenimiento',
                                     'Dañado' => 'Dañado',
                                     'Baja' => 'Baja',
-                                    'Devuelto a Proveedor' => 'Devuelto a Proveedor',
                                 ])
                                 ->colors([
                                     'Disponible' => 'success',
-                                    'Asignado' => 'warning',
-                                    'En Mantenimiento' => 'gray',
+                                    'Asignado' => 'info',
+                                    'Reasignado' => 'reassign',
+                                    'En Mantenimiento' => 'warning',
                                     'Dañado' => 'danger',
                                     'Baja' => 'gray',
-                                    'Devuelto a Proveedor' => 'info',
                                 ])
                                 ->inline()
                                 ->default('Disponible')
+                                ->live()
                                 ->required()
+                                ->columnSpanFull(),
+
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\DatePicker::make('fecha_asignacion')
+                                        ->label('Fecha de asignación / entrega')
+                                        ->prefixIcon('heroicon-m-calendar')
+                                        ->visible(fn (Forms\Get $get) => $get('estado') === 'Asignado')
+                                        ->required(fn (Forms\Get $get) => $get('estado') === 'Asignado'),
+                                    Forms\Components\DatePicker::make('fecha_cambio_area')
+                                        ->label('Fecha de cambio de área')
+                                        ->prefixIcon('heroicon-m-calendar-days')
+                                        ->visible(fn (Forms\Get $get) => $get('estado') === 'Reasignado')
+                                        ->required(fn (Forms\Get $get) => $get('estado') === 'Reasignado'),
+                                ])
+                                ->visible(fn (Forms\Get $get) => in_array($get('estado'), ['Asignado', 'Reasignado']))
                                 ->columnSpanFull(),
 
                             Forms\Components\Grid::make(2)
@@ -397,6 +463,11 @@ class InventarioResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->description(fn (Inventario $record): ?string => $record->num_serie ? "S/N: {$record->num_serie}" : null),
+                Tables\Columns\TextColumn::make('subtipo')->wrap(false)->limit(30)->grow(false)
+                    ->label('Subtipo')
+                    ->searchable()
+                    ->sortable()
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('material.marca.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Marca')
                     ->searchable()
@@ -415,19 +486,40 @@ class InventarioResource extends Resource
                     ->badge()
                     ->colors([
                         'success' => 'Disponible',
-                        'warning' => 'En Mantenimiento',
                         'info' => 'Asignado',
+                        'reassign' => 'Reasignado',
+                        'warning' => 'En Mantenimiento',
                         'danger' => 'Dañado',
                         'gray' => ['Baja', 'Devuelto a Proveedor'],
                     ])
                     ->icons([
                         'heroicon-m-check-circle' => 'Disponible',
-                        'heroicon-m-wrench' => 'En Mantenimiento',
                         'heroicon-m-user' => 'Asignado',
+                        'heroicon-m-arrows-right-left' => 'Reasignado',
+                        'heroicon-m-wrench' => 'En Mantenimiento',
                         'heroicon-m-exclamation-triangle' => 'Dañado',
                         'heroicon-m-minus-circle' => 'Baja',
-                        'heroicon-m-arrow-path' => 'Devuelto a Proveedor',
                     ]),
+                Tables\Columns\TextColumn::make('procesador')->wrap(false)->limit(30)->grow(false)
+                    ->label('Procesador')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('ram')->wrap(false)->limit(30)->grow(false)
+                    ->label('RAM')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('disco')->wrap(false)->limit(30)->grow(false)
+                    ->label('Disco')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('mac_address')->wrap(false)->limit(30)->grow(false)
+                    ->label('MAC')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('ip_address')->wrap(false)->limit(30)->grow(false)
+                    ->label('IP')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('tipo_propiedad')->wrap(false)->limit(30)->grow(false)
                     ->label('Propiedad')
                     ->badge()
@@ -473,16 +565,38 @@ class InventarioResource extends Resource
                     ->options([
                         'Disponible' => 'Disponible',
                         'Asignado' => 'Asignado',
+                        'Reasignado' => 'Reasignado',
                         'En Mantenimiento' => 'En Mantenimiento',
                         'Dañado' => 'Dañado',
                         'Baja' => 'Baja',
-                        'Devuelto a Proveedor' => 'Devuelto a Proveedor',
                     ]),
                 Tables\Filters\SelectFilter::make('tipo_propiedad')
                     ->options([
                         'Propio' => 'Propio',
                         'Rentado' => 'Rentado',
                     ]),
+                Tables\Filters\Filter::make('red')
+                    ->form([
+                        Forms\Components\TextInput::make('mac_address')->label('Dirección MAC')->placeholder('Ej. AA:BB:CC...'),
+                        Forms\Components\TextInput::make('ip_address')->label('Dirección IP')->placeholder('Ej. 192.168...'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when($data['mac_address'], fn (Builder $q, $mac) => $q->where('mac_address', 'like', "%{$mac}%"))
+                            ->when($data['ip_address'], fn (Builder $q, $ip) => $q->where('ip_address', 'like', "%{$ip}%"));
+                    }),
+                Tables\Filters\Filter::make('especificaciones')
+                    ->form([
+                        Forms\Components\TextInput::make('procesador')->label('Procesador')->placeholder('Ej. i5, Ryzen...'),
+                        Forms\Components\TextInput::make('ram')->label('Memoria RAM')->placeholder('Ej. 8 GB, 16 GB...'),
+                        Forms\Components\TextInput::make('disco')->label('Disco Duro')->placeholder('Ej. 512GB SSD...'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when($data['procesador'], fn (Builder $q, $val) => $q->where('procesador', 'like', "%{$val}%"))
+                            ->when($data['ram'], fn (Builder $q, $val) => $q->where('ram', 'like', "%{$val}%"))
+                            ->when($data['disco'], fn (Builder $q, $val) => $q->where('disco', 'like', "%{$val}%"));
+                    }),
             ])
 
             ->emptyStateHeading('No hay registros')
@@ -551,6 +665,9 @@ class InventarioResource extends Resource
                             ->badge()
                             ->color('primary')
                             ->placeholder('No definido'),
+                        Infolists\Components\TextEntry::make('subtipo')
+                            ->label('Subtipo')
+                            ->placeholder('No definido'),
                         Infolists\Components\TextEntry::make('num_serie')
                             ->label('Número de serie')
                             ->fontFamily('mono')
@@ -564,9 +681,10 @@ class InventarioResource extends Resource
                             ->badge()
                             ->color(fn (string $state): string => match ($state) {
                                 'Disponible' => 'success',
-                                'Asignado' => 'warning',
+                                'Asignado' => 'info',
+                                'Reasignado' => 'reassign',
+                                'En Mantenimiento' => 'warning',
                                 'Dañado' => 'danger',
-                                'Devuelto a Proveedor' => 'info',
                                 default => 'gray',
                             }),
                         Infolists\Components\TextEntry::make('tipo_propiedad')
@@ -582,14 +700,49 @@ class InventarioResource extends Resource
                             ->icon('heroicon-m-user'),
                     ])->columns(2),
 
-                Infolists\Components\Section::make('Ubicación Física')
+                Infolists\Components\Section::make('Ubicación y Asignación')
                     ->schema([
                         Infolists\Components\TextEntry::make('ubicacion_fisica')
                             ->label('Ubicación física descriptiva')
                             ->icon('heroicon-m-map-pin')
                             ->placeholder('No especificada')
                             ->columnSpanFull(),
-                    ]),
+                        Infolists\Components\TextEntry::make('fecha_asignacion')
+                            ->label('Fecha de asignación')
+                            ->date('d/m/Y')
+                            ->icon('heroicon-m-calendar')
+                            ->placeholder('Sin fecha de asignación'),
+                        Infolists\Components\TextEntry::make('fecha_cambio_area')
+                            ->label('Fecha de cambio de área')
+                            ->date('d/m/Y')
+                            ->icon('heroicon-m-calendar-days')
+                            ->placeholder('Sin cambio de área'),
+                    ])->columns(2),
+
+                Infolists\Components\Section::make('Red y Conectividad')
+                    ->schema([
+                        Infolists\Components\TextEntry::make('ip_address')
+                            ->label('Dirección IP')
+                            ->fontFamily('mono')
+                            ->icon('heroicon-m-globe-alt')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('mac_address')
+                            ->label('Dirección MAC')
+                            ->fontFamily('mono')
+                            ->icon('heroicon-m-signal')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('procesador')
+                            ->label('Procesador')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('ram')
+                            ->label('Memoria RAM')
+                            ->placeholder('—'),
+                        Infolists\Components\TextEntry::make('disco')
+                            ->label('Disco duro')
+                            ->placeholder('—'),
+                    ])
+                    ->columns(3)
+                    ->collapsible(),
 
                 Infolists\Components\Section::make('Componentes de la Estación')
                     ->schema([

@@ -42,6 +42,7 @@ class AdminPanelProvider extends PanelProvider
                 'warning' => Color::hex('#d97706'),
                 'danger'  => Color::hex('#dc2626'),
                 'info'    => Color::hex('#0891b2'),
+                'reassign'=> Color::hex('#8b5cf6'),
             ])
             ->renderHook(
                 PanelsRenderHook::HEAD_END,

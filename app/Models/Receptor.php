@@ -14,7 +14,7 @@ class Receptor extends Model
 
     protected $primaryKey = 'id_receptor';
 
-    protected $fillable = ['nombre', 'apellido_paterno', 'apellido_materno', 'email', 'telefono', 'id_area'];
+    protected $fillable = ['nombre', 'apellido_paterno', 'apellido_materno', 'cargo', 'email', 'telefono', 'id_area'];
 
     public function area()
     {

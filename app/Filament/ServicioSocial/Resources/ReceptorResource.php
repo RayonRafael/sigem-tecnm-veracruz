@@ -65,6 +65,11 @@ class ReceptorResource extends Resource
                             ->required()
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
+                        Forms\Components\TextInput::make('cargo')
+                            ->label('Cargo / Puesto')
+                            ->placeholder('Ej. Ing. de Sistemas')
+                            ->maxLength(100)
+                            ->prefixIcon('heroicon-m-briefcase'),
                         Forms\Components\TextInput::make('email')
                             ->label('Correo electrónico')
                             ->email()
@@ -94,7 +99,12 @@ class ReceptorResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
+                    ->description(fn (Receptor $record): ?string => $record->cargo)
                     ->searchable(),
+                Tables\Columns\TextColumn::make('cargo')->wrap(false)->limit(30)->grow(false)
+                    ->label('Cargo / Puesto')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('apellido_paterno')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Apellido paterno')
                     ->searchable(),
@@ -141,6 +151,7 @@ class ReceptorResource extends Resource
                         TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-user'),
                         TextEntry::make('apellido_paterno')->label('Apellido paterno')->icon('heroicon-m-user'),
                         TextEntry::make('apellido_materno')->label('Apellido materno')->icon('heroicon-m-user'),
+                        TextEntry::make('cargo')->label('Cargo / Puesto')->icon('heroicon-m-briefcase')->placeholder('—'),
                         TextEntry::make('email')->label('Email')->icon('heroicon-m-envelope'),
                         TextEntry::make('telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
                         TextEntry::make('area.nombre')->label('Área')->icon('heroicon-m-building-office'),

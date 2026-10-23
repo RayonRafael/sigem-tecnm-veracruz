@@ -1749,6 +1749,13 @@ aside.fi-sidebar,
   background: #cffafe !important;
   color: #0891b2 !important;
 }
+.sigem-pill.reassign,
+.fi-badge.fi-color-reassign,
+.fi-ta-table .fi-badge.fi-color-reassign,
+.fi-ta-table .fi-badge-color-reassign {
+  background: #ede9fe !important;
+  color: #8b5cf6 !important;
+}
 .sigem-pill.neutral,
 .fi-ta-table .fi-badge.fi-color-gray,
 .fi-ta-table .fi-badge-color-gray {
@@ -3413,6 +3420,23 @@ html, body {
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
 }
+
+/* ITEM 4: Estado Reasignado */
+.sigem-pill.reassign{background:#ede9fe;color:#8b5cf6}
+.fi-badge.fi-color-reassign,
+.fi-ta-table .fi-badge.fi-color-reassign,
+.fi-ta-table .fi-badge-color-reassign {
+  background: #ede9fe !important;
+  color: #8b5cf6 !important;
+}
+.fi-fo-toggle-buttons [data-color="reassign"],
+.fi-fo-toggle-buttons .fi-color-reassign {
+  --color-50: 237, 233, 254;
+  --color-100: 237, 233, 254;
+  --color-500: 139, 92, 246;
+  --color-600: 124, 58, 237;
+}
+
 
 
 

@@ -12,12 +12,13 @@
         // Estados y colores aprobados por el cliente
         $estadosDef = [
             'Disponible'       => ['label' => 'Disponible',       'color' => '#059669', 'cant' => $resumenEstados['Disponible'] ?? 0],
-            'En Mantenimiento' => ['label' => 'En mantenimiento', 'color' => '#d97706', 'cant' => $resumenEstados['En Mantenimiento'] ?? 0],
             'Asignado'         => ['label' => 'Asignado',         'color' => '#0891b2', 'cant' => $resumenEstados['Asignado'] ?? 0],
+            'Reasignado'       => ['label' => 'Reasignado',       'color' => '#8b5cf6', 'cant' => $resumenEstados['Reasignado'] ?? 0],
+            'En Mantenimiento' => ['label' => 'En mantenimiento', 'color' => '#d97706', 'cant' => $resumenEstados['En Mantenimiento'] ?? 0],
             'Dañado'           => ['label' => 'Dañado',           'color' => '#dc2626', 'cant' => $resumenEstados['Dañado'] ?? 0],
         ];
 
-        // Otros estados (Baja, Devuelto a Proveedor u otros)
+        // Otros estados (Baja u otros)
         $otrosCount = 0;
         foreach ($resumenEstados as $est => $cant) {
             if (!array_key_exists($est, $estadosDef)) {

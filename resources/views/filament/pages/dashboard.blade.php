@@ -156,9 +156,10 @@
 
                                             $pillCls = match ($estado) {
                                                 'Disponible' => 'ok',
-                                                'En Mantenimiento' => 'warn',
                                                 'Asignado' => 'info',
-                                                'Dañado', 'Baja' => 'danger',
+                                                'Reasignado' => 'reassign',
+                                                'En Mantenimiento' => 'warn',
+                                                'Dañado' => 'danger',
                                                 default => 'neutral',
                                             };
 
