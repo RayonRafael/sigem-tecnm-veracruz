@@ -2957,3 +2957,64 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
   margin-top: 8px !important;
 }
 
+/* ===== TAREA: Sidebar Fijo Flexbox ===== */
+/* Evita scroll en el contenedor maestro */
+.fi-layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden !important; 
+}
+
+/* Fijar el sidebar a la izquierda usando sticky sobre flex */
+.fi-sidebar {
+    width: 64px !important;
+    height: 100vh !important;
+    position: sticky !important; 
+    top: 0;
+    flex-shrink: 0;
+    overflow-y: visible !important; /* Permitir que los tooltips salgan del borde */
+}
+
+/* Contenedor que agrupa topbar y main en flexbox */
+.fi-main-ctn {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    min-height: 0;
+    overflow: hidden !important;
+    margin-left: 0 !important;
+}
+
+/* Permitir scroll SÓLO en el contenido principal */
+.fi-main {
+    flex-grow: 1;
+    height: 100vh;
+    overflow-y: auto !important; 
+    margin-left: 0 !important;
+}
+
+/* Mantener el Topbar fijo sobre el contenido que hace scroll */
+.fi-topbar {
+    position: sticky !important;
+    top: 0;
+    z-index: 40;
+    margin-left: 0 !important;
+}
+
+/* Fallback: Ocultar el botón ☰ nativo si persiste por alguna clase residual */
+.fi-sidebar-collapse-btn,
+.fi-sidebar-collapse-button,
+.fi-sidebar-group-collapse-button,
+button.fi-icon-btn[x-on\:click="isSidebarOpen = ! isSidebarOpen"],
+button.fi-icon-btn[x-on\:click*="sidebar"] {
+    display: none !important;
+}
+
+/* Garantizar visibilidad de avatar y logout */
+.fi-sidebar .sigem-user-card,
+.fi-sidebar .sigem-avatar,
+.fi-sidebar .sigem-logout {
+    display: flex !important;
+}
+
+

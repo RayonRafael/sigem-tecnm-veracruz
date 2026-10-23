@@ -207,16 +207,16 @@ class AdminPanelProvider extends PanelProvider
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label('Panel principal')
-                    ->collapsible(true),
+                    ->collapsible(false),
                 NavigationGroup::make()
                     ->label('Gestión de inventario')
-                    ->collapsible(true),
+                    ->collapsible(false),
                 NavigationGroup::make()
                     ->label('Catálogos')
-                    ->collapsible(true),
+                    ->collapsible(false),
                 NavigationGroup::make()
                     ->label('Administración')
-                    ->collapsible(true),
+                    ->collapsible(false),
             ])
             ->sidebarWidth('64px')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
