@@ -26,3 +26,6 @@ Thumbs.db
 !/storage/logs/.gitignore
 /bootstrap/cache/*.php
 !/bootstrap/cache/.gitignore
+/public/js/filament/
+/public/css/filament/
+database/*.sqlite
