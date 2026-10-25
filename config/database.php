@@ -35,7 +35,13 @@ return [
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
+            'database' => env('DB_DATABASE') === ':memory:'
+                ? ':memory:'
+                : (in_array(env('DB_DATABASE'), [null, '', 'database/database.sqlite', 'sigem_tecnm', 'laravel'], true)
+                    ? database_path('database.sqlite')
+                    : (str_starts_with((string) env('DB_DATABASE'), '/') || str_contains((string) env('DB_DATABASE'), ':')
+                        ? env('DB_DATABASE')
+                        : base_path((string) env('DB_DATABASE')))),
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
             'busy_timeout' => null,

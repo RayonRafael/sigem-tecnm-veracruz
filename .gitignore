@@ -29,3 +29,4 @@ Thumbs.db
 /public/js/filament/
 /public/css/filament/
 database/*.sqlite
+!database/database.sqlite
