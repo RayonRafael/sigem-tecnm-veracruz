@@ -24,18 +24,11 @@ El proyecto incluye un archivo [`render.yaml`](file:///render.yaml) configurado 
 ### Opción B: Despliegue Manual como Web Service
 Si prefieres crearlo manualmente en Render:
 - **Service Type**: Web Service
-- **Runtime**: `PHP`
+- **Runtime**: `Docker`
 - **Region**: Oregon (USA) o Frankfurt (EU)
 - **Branch**: `deploy-render`
 - **Plan**: `Free`
-- **Build Command**:
-  ```bash
-  composer install --no-dev --optimize-autoloader && php artisan filament:assets && php artisan config:cache && php artisan route:cache && php artisan view:cache
-  ```
-- **Start Command**:
-  ```bash
-  php artisan serve --host=0.0.0.0 --port=$PORT
-  ```
+- **Dockerfile Path**: `Dockerfile` (Render lo detecta automáticamente en la raíz)
 - **Environment Variables**:
   | Variable | Valor |
   |---|---|

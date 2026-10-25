@@ -1,13 +1,10 @@
 services:
   - type: web
     name: sigem-tecnm-veracruz
-    runtime: php
+    runtime: docker
     plan: free
-    buildCommand: composer install --no-dev --optimize-autoloader && php artisan filament:assets && php artisan config:cache && php artisan route:cache && php artisan view:cache
-    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+
     envVars:
-      - key: PHP_VERSION
-        value: "8.4"
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
