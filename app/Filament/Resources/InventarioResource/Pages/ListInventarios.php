@@ -28,6 +28,14 @@ class ListInventarios extends ListRecords implements HasInfolists
 
     public ?Inventario $activeRecord = null;
 
+    public function getBreadcrumbs(): array
+    {
+        return [
+            '/' => 'SIGEM',
+            '' => 'Inventario general',
+        ];
+    }
+
     public function getHeading(): string
     {
         return 'Registros de Inventario';
@@ -101,11 +109,11 @@ class ListInventarios extends ListRecords implements HasInfolists
                     ->requiresConfirmation(),
                 Action::make('ver_detalle')
                     ->label('Detalle')
-                    ->icon('heroicon-m-eye')
+                    ->icon('👁')
                     ->iconButton()
                     ->tooltip('Ver detalle en panel lateral')
                     ->action(fn (Inventario $record) => $this->activeRecord = $record),
-                EditAction::make()->iconButton()->slideOver()->tooltip('Editar')->successNotificationTitle('Registro de inventario actualizado correctamente'),
+                EditAction::make()->icon('✏️')->iconButton()->slideOver()->tooltip('Editar')->successNotificationTitle('Registro de inventario actualizado correctamente'),
             ]);
     }
 

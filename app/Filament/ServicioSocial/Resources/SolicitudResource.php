@@ -45,7 +45,7 @@ class SolicitudResource extends Resource
                     Forms\Components\Wizard\Step::make('Datos de la solicitud')
                         ->icon('heroicon-m-document-text')
                         ->schema([
-                            Forms\Components\Grid::make(3)
+                            Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\DatePicker::make('fecha_solicitud')
                                         ->default(now())
@@ -65,7 +65,7 @@ class SolicitudResource extends Resource
                                         ->default('Asignacion Temporal')
                                         ->required()
                                         ->live()
-                                        ->columnSpan(2),
+                                        ->columnSpan(1),
                                 ]),
                             Forms\Components\ToggleButtons::make('estado')
                                 ->options([
@@ -190,8 +190,8 @@ class SolicitudResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->slideOver()->successNotificationTitle('Solicitud actualizada correctamente'),
+                Tables\Actions\ViewAction::make()->icon('👁')->iconButton()->slideOver(),
+                Tables\Actions\EditAction::make()->icon('✏️')->iconButton()->slideOver()->successNotificationTitle('Solicitud actualizada correctamente'),
             ])
             ->bulkActions([]);
     }

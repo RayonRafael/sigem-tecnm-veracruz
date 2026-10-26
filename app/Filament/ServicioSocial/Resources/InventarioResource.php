@@ -182,8 +182,8 @@ class InventarioResource extends Resource
                         ->searchable()
                         ->preload()
                         ->prefixIcon('heroicon-m-user')
-                        ->columnSpanFull(),
-                ])->columns(3),
+                        ->columnSpan(1),
+                ])->columns(2),
 
             Forms\Components\Wizard\Step::make('Factura y proveedor')
                 ->icon('heroicon-m-document-text')
@@ -226,7 +226,7 @@ class InventarioResource extends Resource
                 ->icon('heroicon-m-clipboard-document-check')
                 ->schema([
 
-                    Forms\Components\Grid::make(3)
+                    Forms\Components\Grid::make(2)
                         ->schema([
                             Forms\Components\DatePicker::make('fecha_registro')
                                 ->label('Fecha de registro')
@@ -243,7 +243,8 @@ class InventarioResource extends Resource
                                     'vencida' => 'Vencida',
                                     'sin_garantia' => 'Sin Garantía',
                                 ])
-                                ->default('sin_garantia'),
+                                ->default('sin_garantia')
+                                ->columnSpanFull(),
                         ]),
 
                     Forms\Components\Grid::make(1)
@@ -367,8 +368,8 @@ class InventarioResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->slideOver()->successNotificationTitle('Registro de inventario actualizado correctamente'),
+                Tables\Actions\ViewAction::make()->icon('👁')->iconButton()->slideOver(),
+                Tables\Actions\EditAction::make()->icon('✏️')->iconButton()->slideOver()->successNotificationTitle('Registro de inventario actualizado correctamente'),
             ])
             ->bulkActions([]);
     }

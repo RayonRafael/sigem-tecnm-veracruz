@@ -63,7 +63,7 @@ class MaterialResource extends Resource
                                         ->rows(3)
                                         ->columnSpanFull(),
                                 ]),
-                            Forms\Components\Grid::make(3)
+                            Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\Select::make('id_marca')->placeholder('Selecciona...')
                                         ->label('Marca')
@@ -98,6 +98,7 @@ class MaterialResource extends Resource
                                         ->searchable()
                                         ->preload()
                                         ->prefixIcon('heroicon-m-scale')
+                                        ->columnSpanFull()
                                         ->createOptionForm([
                                             Forms\Components\TextInput::make('nombre')
                                                 ->label('Nombre de la unidad de medida')

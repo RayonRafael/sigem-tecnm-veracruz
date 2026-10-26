@@ -15,6 +15,14 @@ class ListMantenimientos extends ListRecords
 
     protected static string $resource = MantenimientoResource::class;
 
+    public function getBreadcrumbs(): array
+    {
+        return [
+            '/' => 'SIGEM',
+            '' => 'Mantenimiento',
+        ];
+    }
+
     protected function getHeaderActions(): array
     {
         return [

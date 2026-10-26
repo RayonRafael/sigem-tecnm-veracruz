@@ -15,6 +15,14 @@ class ListSolicituds extends ListRecords
 
     protected static string $resource = SolicitudResource::class;
 
+    public function getBreadcrumbs(): array
+    {
+        return [
+            '/' => 'SIGEM',
+            '' => 'Solicitud de Material/Equipo',
+        ];
+    }
+
     protected function getHeaderActions(): array
     {
         return [

@@ -47,7 +47,7 @@ class SolicitudResource extends Resource
                     Forms\Components\Wizard\Step::make('Datos de la solicitud')
                         ->icon('heroicon-m-document-text')
                         ->schema([
-                            Forms\Components\Grid::make(3)
+                            Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\DatePicker::make('fecha_solicitud')->label('Fecha de solicitud')
                                         ->default(now())
@@ -69,7 +69,7 @@ class SolicitudResource extends Resource
                                         ->default('Asignacion Temporal')
                                         ->required()
                                         ->live()
-                                        ->columnSpan(2),
+                                        ->columnSpan(1),
                                 ]),
                             Forms\Components\ToggleButtons::make('estado')->label('Estado')
                                 ->options([
@@ -123,7 +123,7 @@ class SolicitudResource extends Resource
                     Forms\Components\Wizard\Step::make('Participantes y detalles')
                         ->icon('heroicon-m-users')
                         ->schema([
-                            Forms\Components\Grid::make(3)
+                            Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\Select::make('id_usuario')->placeholder('Selecciona...')
                                         ->label('Solicitante (usuario)')
@@ -170,6 +170,7 @@ class SolicitudResource extends Resource
                                         ]),
                                     Forms\Components\Placeholder::make('departamento')
                                         ->label('Departamento')
+                                        ->columnSpanFull()
                                         ->content(function (callable $get) {
                                             $receptorId = $get('id_receptor');
                                             if ($receptorId) {
@@ -181,14 +182,15 @@ class SolicitudResource extends Resource
                                             return 'Seleccione un receptor';
                                         }),
                                 ]),
-                            Forms\Components\Grid::make(3)
+                            Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\Select::make('autorizado_por')->placeholder('Selecciona...')
                                         ->label('Autorizado por')
                                         ->relationship('autorizadoPor', 'name')
                                         ->searchable()
                                         ->preload()
-                                        ->prefixIcon('heroicon-m-shield-check'),
+                                        ->prefixIcon('heroicon-m-shield-check')
+                                        ->columnSpanFull(),
                                     Forms\Components\DatePicker::make('fecha_devolucion_estimada')
                                         ->label('Devolución estimada')
                                         ->prefixIcon('heroicon-m-calendar-days')
@@ -316,8 +318,8 @@ class SolicitudResource extends Resource
                         Notification::make()->title('Solicitud rechazada')->success()->send();
                     })
                     ->requiresConfirmation(),
-                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Solicitud actualizada correctamente'),
+                Tables\Actions\ViewAction::make()->icon('👁')->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\EditAction::make()->icon('✏️')->iconButton()->tooltip('Editar')->successNotificationTitle('Solicitud actualizada correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

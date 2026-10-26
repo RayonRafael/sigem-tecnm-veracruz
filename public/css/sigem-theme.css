@@ -28,14 +28,14 @@ body, .fi-body, html {
 }
 
 /* ===== 2. CARDS Y CONTENEDORES ===== */
-.fi-main, .fi-main-ctn, .fi-ta-ctn, .fi-fo-component-ctn, .fi-section, .fi-card {
+.fi-ta-ctn, .fi-fo-component-ctn, .fi-section, .fi-card {
     background-color: var(--sig-surface) !important;
     background: var(--sig-surface) !important;
 }
-.fi-ta-ctn, .fi-fo-component-ctn, .fi-section, .fi-card {
+.fi-fo-component-ctn, .fi-card {
     border-radius: 12px !important;
     border: 1px solid var(--sig-border) !important;
-    box-shadow: 0 1px 2px rgba(16, 24, 40, .05) !important;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04) !important;
 }
 .fi-ta-ctn::before, .fi-fo-component-ctn::before, .fi-section::before, .fi-card::before {
     display: none !important; /* Quitar la barra de gradiente superior anterior */
@@ -81,7 +81,6 @@ h1, .fi-header-heading {
 }
 .fi-ta-header-cell, th {
     background-color: #fafbfc !important;
-    border-bottom: 1px solid var(--sig-border) !important;
 }
 .fi-ta-header-cell *, th * {
     color: #475569 !important;
@@ -310,13 +309,7 @@ button[role="switch"][aria-checked="true"] {
     background-color: #334155 !important;
 }
 
-/* ===== 8. BADGES Y ETIQUETAS ===== */
-.fi-badge { border-radius: 999px !important; font-weight: 500 !important; }
-.fi-badge-color-success { background-color: #d1fae5 !important; color: #059669 !important; }
-.fi-badge-color-warning { background-color: #fef3c7 !important; color: #d97706 !important; }
-.fi-badge-color-danger { background-color: #fee2e2 !important; color: #dc2626 !important; }
-.fi-badge-color-info { background-color: #dbeafe !important; color: #2563eb !important; }
-.fi-badge-color-gray { background-color: #f1f5f9 !important; color: #475569 !important; }
+/* ===== 8. BADGES Y ETIQUETAS (Consolidado al final en Ajuste de Diseño Visual) ===== */
 
 .dark .fi-badge-color-success { background-color: rgba(16,185,129,0.2) !important; color: #34d399 !important; }
 .dark .fi-badge-color-warning { background-color: rgba(245,158,11,0.2) !important; color: #fbbf24 !important; }
@@ -333,12 +326,7 @@ button[role="switch"][aria-checked="true"] {
 .dark .fi-breadcrumbs-item:last-child .fi-breadcrumbs-item-label { color: #e2e8f0 !important; }
 .dark .fi-breadcrumbs-separator { color: #334155 !important; }
 
-/* ===== 10. PAGINACIÓN ===== */
-.fi-pagination-item { border-radius: 8px !important; margin: 0 2px !important; }
-.fi-pagination-item-active, .fi-pagination-item-active button { background-color: #2563eb !important; color: #ffffff !important; }
-.fi-pagination-item-active * { color: #ffffff !important; }
-.fi-pagination-item:not(.fi-pagination-item-active), .fi-pagination-item:not(.fi-pagination-item-active) button { background-color: #ffffff !important; color: #475569 !important; }
-.fi-pagination-item:not(.fi-pagination-item-active):hover { background-color: #f8fafc !important; }
+/* ===== 10. PAGINACIÓN (Consolidado al final en Ajuste de Diseño Visual) ===== */
 .dark .fi-pagination-item-active, .dark .fi-pagination-item-active button { background-color: #3b82f6 !important; }
 .dark .fi-pagination-item:not(.fi-pagination-item-active), .dark .fi-pagination-item:not(.fi-pagination-item-active) button { background-color: #1e293b !important; color: #94a3b8 !important; }
 .dark .fi-pagination-item:not(.fi-pagination-item-active):hover { background-color: #334155 !important; }
@@ -387,13 +375,7 @@ button[role="switch"][aria-checked="true"] {
     border-bottom-color: #334155 !important;
 }
 
-/* ===== 14. BOTONES DE ACCIÓN EN TABLAS ===== */
-.fi-ta-actions .fi-icon-btn {
-    border-radius: 8px !important;
-    transition: background-color 0.2s !important;
-}
-.fi-ta-actions .fi-icon-btn-color-primary:hover { background-color: rgba(37,99,235,0.1) !important; }
-.fi-ta-actions .fi-icon-btn-color-danger:hover { background-color: rgba(239,68,68,0.1) !important; }
+/* ===== 14. BOTONES DE ACCIÓN EN TABLAS (Consolidado al final en Ajuste de Diseño Visual) ===== */
 
 /* ===== 15. WIZARD ===== */
 .fi-wizard {
@@ -662,11 +644,8 @@ body:has(.sigem-professional) .fi-topbar nav,
             .user-role { font-size: 12px; color: var(--slate-600); }
             .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--slate-700), var(--slate-900)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; }
 
-            /* Section 2: Banner */
-            .welcome-banner { background: linear-gradient(to left, var(--brand-700), var(--brand-600)); border-radius: 20px; padding: 32px 40px; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2); display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; color: white !important; }
-            .banner-greeting { font-size: 28px; font-weight: 600; margin: 0 0 8px 0; color: white !important; }
-            .banner-sub { color: white !important; font-size: 15px; margin: 0; }
-            .banner-sub strong { color: white !important; font-weight: 700; }
+            /* Section 2: Banner (Consolidado al final en Ajuste de Diseño Visual) */
+            .welcome-banner { display: flex; justify-content: space-between; align-items: center; }
             .banner-actions { display: flex; gap: 12px; }
             .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; font-weight: 600; padding: 10px 20px; border-radius: 10px; transition: all 0.18s; border: none; cursor: pointer; text-decoration: none; }
             .btn-glass { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); color: white !important; }
@@ -1024,16 +1003,9 @@ body, .fi-body {
 }
 
 main.fi-main, .fi-main, .fi-main-ctn {
-  background: var(--sig-surface) !important;
   color: var(--sig-text);
 }
 
-.fi-card, .fi-section, .fi-ta-ctn {
-  border: 1px solid var(--sig-border) !important;
-  border-radius: var(--sig-radius) !important;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, .05) !important;
-  background: var(--sig-surface) !important;
-}
 
 .fi-sidebar, aside.fi-sidebar {
   background: var(--sig-surface) !important;
@@ -1350,70 +1322,34 @@ main.fi-main, .fi-main, .fi-main-ctn {
 .sig-pill.info { background: #cffafe; color: #0891b2; }
 .sig-pill.neutral { background: var(--sig-bg); color: var(--sig-muted); }
 
-/* Encabezados de tablas */
+/* Encabezados de tablas (Fondo base) */
 .fi-ta-header th,
 th.fi-ta-header-cell,
 .fi-ta-table thead th {
-  font-size: 14px !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: .06em !important;
-  color: var(--sig-muted) !important;
   background: #fafbfc !important;
 }
-th.fi-ta-header-cell span,
-.fi-ta-table thead th span {
-  color: var(--sig-muted) !important;
-  font-size: 14px !important;
-  font-weight: 700 !important;
-  letter-spacing: .06em !important;
-}
 
-/* Botones Primarios */
-.fi-btn-primary,
-.fi-btn.fi-color-primary:not(.fi-btn-outlined),
-.fi-btn.fi-btn-color-primary:not(.fi-btn-outlined) {
-  background: var(--sig-primary) !important;
-  border-radius: var(--sig-radius-sm) !important;
-  font-weight: 600 !important;
-}
-.fi-btn-primary:hover,
-.fi-btn.fi-color-primary:not(.fi-btn-outlined):hover,
-.fi-btn.fi-btn-color-primary:not(.fi-btn-outlined):hover {
-  background: var(--sig-primary-dark) !important;
-  box-shadow: 0 4px 12px rgba(27, 101, 212, .35) !important;
-}
 
 /* ==================================================== */
 /* FASE 2: BLOQUE SUPERIOR DEL DASHBOARD "INVGATE STYLE"*/
 /* ==================================================== */
 
 /* Hero del dashboard */
-.sigem-hero{background:linear-gradient(120deg,#1b65d4 0%,#1e40af 100%);
-  border-radius:18px;padding:26px 28px;color:#fff;margin-bottom:22px;
-  display:flex;justify-content:space-between;align-items:center;gap:18px;
-  flex-wrap:wrap;box-shadow:0 10px 30px rgba(27,101,212,.28)}
-.sigem-hero h1{font-size:24px;font-weight:700;margin-bottom:5px;color:#fff !important}
-.sigem-hero p{font-size:16.5px;opacity:.9;max-width:520px;color:#fff !important}
+.sigem-hero{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;}
+.sigem-hero p{max-width:520px;}
 
 /* Rejillas */
-.sigem-quick-grid,.sigem-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);
-  gap:14px;margin-bottom:22px}
+.sigem-quick-grid,.sigem-stats-grid{display:grid;grid-template-columns:repeat(4,1fr);}
 
 /* Acción rápida */
-.sigem-quick{background:var(--sig-surface);border:1px solid var(--sig-border);
-  border-radius:var(--sig-radius);padding:16px;cursor:pointer;position:relative;
-  transition:all .18s;box-shadow:0 1px 2px rgba(16,24,40,.05);text-decoration:none;display:block;color:inherit}
-.sigem-quick:hover{border-color:var(--sig-primary);box-shadow:0 6px 18px rgba(16,24,40,.09);
-  transform:translateY(-2px);text-decoration:none}
+.sigem-quick{background:var(--sig-surface);cursor:pointer;position:relative;text-decoration:none;display:block;color:inherit}
 .sigem-quick:focus-visible{outline:2px solid var(--sig-primary);outline-offset:2px}
 .sigem-quick .arrow{position:absolute;top:14px;right:14px;color:var(--sig-light);
   font-size:16px;transition:all .18s}
 .sigem-quick:hover .arrow{color:var(--sig-primary);transform:translateX(2px)}
-.sigem-quick-ico{width:38px;height:38px;border-radius:10px;display:flex;
-  align-items:center;justify-content:center;font-size:20px;margin-bottom:11px}
-.sigem-quick-title{font-size:16.5px;font-weight:700;display:flex;align-items:center;gap:6px;color:var(--sig-text)}
-.sigem-quick-desc{font-size:14.5px;color:var(--sig-muted);max-height:0;opacity:0;
+.sigem-quick-ico{display:flex;align-items:center;justify-content:center;}
+.sigem-quick-title{display:flex;align-items:center;gap:6px;color:var(--sig-text)}
+.sigem-quick-desc{max-height:0;opacity:0;
   overflow:hidden;margin-top:0;transition:max-height .25s ease,opacity .2s ease,margin-top .2s ease}
 .sigem-quick:hover .sigem-quick-desc,.sigem-quick:focus-within .sigem-quick-desc{
   max-height:80px;opacity:1;margin-top:4px}
@@ -1425,25 +1361,11 @@ th.fi-ta-header-cell span,
   font-size:14px;font-weight:700;padding:0 5px}
 
 /* KPI */
-.sigem-stat{background:var(--sig-surface);border:1px solid var(--sig-border);
-  border-radius:var(--sig-radius);padding:16px 18px;box-shadow:0 1px 2px rgba(16,24,40,.05)}
-.sigem-stat-ico{width:36px;height:36px;border-radius:10px;display:flex;
-  align-items:center;justify-content:center;font-size:19px}
-.sigem-stat-val{font-size:29px;font-weight:700;margin-top:10px;line-height:1;
-  font-variant-numeric:tabular-nums;color:var(--sig-text)}
-.sigem-stat-label{font-size:15.5px;color:var(--sig-muted);font-weight:600;margin-top:4px}
-.sigem-stat-hint{font-size:14px;font-weight:600;margin-top:9px;display:inline-flex;
-  align-items:center;gap:5px;padding:3px 9px;border-radius:99px}
-
-/* Variantes de color de íconos y píldoras */
-.sigem-i-primary{background:#e8f0fe;color:#1b65d4}
-.sigem-i-success{background:#d1fae5;color:#059669}
-.sigem-i-warning{background:#fef3c7;color:#d97706}
-.sigem-i-info{background:#cffafe;color:#0891b2}
-.sigem-i-danger{background:#fee2e2;color:#dc2626}
-.sigem-h-ok{background:#d1fae5;color:#059669}
-.sigem-h-warn{background:#fef3c7;color:#d97706}
-.sigem-h-info{background:#cffafe;color:#0891b2}
+.sigem-stat{background:var(--sig-surface);}
+.sigem-stat-ico{display:flex;align-items:center;justify-content:center;}
+.sigem-stat-val{font-variant-numeric:tabular-nums;color:var(--sig-text)}
+.sigem-stat-label{font-weight:600;}
+.sigem-stat-hint{display:inline-flex;align-items:center;gap:5px;}
 
 @media(max-width:1100px){.sigem-quick-grid,.sigem-stats-grid{grid-template-columns:repeat(2,1fr)}}
 
@@ -1658,27 +1580,10 @@ aside.fi-sidebar,
 /* ==================================================== */
 .fi-ta-table thead th,
 .sigem-table thead th {
-  font-size: 14px !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: .06em !important;
-  color: #6b7280 !important;
-  background: #fafbfc !important;
-  padding: 9px 12px !important;
   white-space: nowrap !important;
-}
-.fi-ta-table thead th *,
-.sigem-table thead th * {
-  font-size: 14px !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: .06em !important;
-  color: #6b7280 !important;
 }
 .fi-ta-table tbody td,
 .sigem-table tbody td {
-  padding: 8px 12px !important;
-  border-bottom: 1px solid var(--sig-border) !important;
   vertical-align: middle !important;
   white-space: nowrap !important;
 }
@@ -1692,9 +1597,6 @@ aside.fi-sidebar,
 }
 .sigem-td-sub,
 .fi-ta-table .fi-ta-text-item-description {
-  font-size: 14.5px !important;
-  color: var(--sig-muted) !important;
-  margin-top: 1px !important;
   max-width: 260px !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
@@ -1706,9 +1608,6 @@ aside.fi-sidebar,
   display: inline-flex !important;
   align-items: center !important;
   gap: 6px !important;
-  font-size: 15px !important;
-  font-weight: 600 !important;
-  padding: 3.5px 10px !important;
   border-radius: 99px !important;
   white-space: nowrap !important;
   line-height: 1.2 !important;
@@ -1724,43 +1623,6 @@ aside.fi-sidebar,
 }
 .fi-ta-table .fi-badge svg {
   display: none !important;
-}
-.sigem-pill.ok,
-.fi-ta-table .fi-badge.fi-color-success,
-.fi-ta-table .fi-badge-color-success {
-  background: #d1fae5 !important;
-  color: #059669 !important;
-}
-.sigem-pill.warn,
-.fi-ta-table .fi-badge.fi-color-warning,
-.fi-ta-table .fi-badge-color-warning {
-  background: #fef3c7 !important;
-  color: #d97706 !important;
-}
-.sigem-pill.danger,
-.fi-ta-table .fi-badge.fi-color-danger,
-.fi-ta-table .fi-badge-color-danger {
-  background: #fee2e2 !important;
-  color: #dc2626 !important;
-}
-.sigem-pill.info,
-.fi-ta-table .fi-badge.fi-color-info,
-.fi-ta-table .fi-badge-color-info {
-  background: #cffafe !important;
-  color: #0891b2 !important;
-}
-.sigem-pill.reassign,
-.fi-badge.fi-color-reassign,
-.fi-ta-table .fi-badge.fi-color-reassign,
-.fi-ta-table .fi-badge-color-reassign {
-  background: #ede9fe !important;
-  color: #8b5cf6 !important;
-}
-.sigem-pill.neutral,
-.fi-ta-table .fi-badge.fi-color-gray,
-.fi-ta-table .fi-badge-color-gray {
-  background: var(--sig-bg) !important;
-  color: var(--sig-muted) !important;
 }
 
 /* Filtros por columna */
@@ -1803,8 +1665,6 @@ aside.fi-sidebar,
   max-height: calc(100vh - 90px);
   overflow: auto;
   background: var(--sig-surface);
-  border: 1px solid var(--sig-border);
-  border-radius: 14px;
   padding: 16px 18px;
 }
 .sigem-inv-side-title {
@@ -1816,8 +1676,6 @@ aside.fi-sidebar,
 /* Dona SVG */
 .sigem-donut {
   position: relative;
-  width: 120px;
-  height: 120px;
   margin: 0 auto;
 }
 .sigem-donut-center {
@@ -1830,12 +1688,9 @@ aside.fi-sidebar,
   line-height: 1.1;
 }
 .sigem-donut-center b {
-  font-size: 27px;
   font-variant-numeric: tabular-nums;
 }
 .sigem-donut-center span {
-  font-size: 13.5px;
-  color: var(--sig-muted);
   font-weight: 600;
 }
 
@@ -1843,15 +1698,10 @@ aside.fi-sidebar,
 .sigem-lg {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 15.5px;
   padding: 3px 6px;
   border-radius: 6px;
 }
 .sigem-lg i {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
   flex-shrink: 0;
 }
 .sigem-lg b {
@@ -1874,16 +1724,10 @@ aside.fi-sidebar,
   white-space: nowrap;
 }
 .sigem-cb div {
-  height: 8px;
-  border-radius: 99px;
   background: var(--sig-border);
-  overflow: hidden;
 }
 .sigem-cb div span {
   display: block;
-  height: 100%;
-  background: var(--sig-primary);
-  border-radius: 99px;
 }
 
 @media (max-width: 1099px) {
@@ -1962,9 +1806,7 @@ aside.fi-sidebar,
 .sigem-rep-btn-primary{padding:6px 14px;border-radius:8px;background:var(--sig-primary);color:#fff;
   font-size:14px;font-weight:600;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
 .sigem-rep-btn-primary:hover{background:var(--sig-primary-dark);box-shadow:0 3px 9px rgba(27,101,212,.32)}
-.sigem-rep-btn-sec{padding:6px 14px;border-radius:8px;background:var(--sig-surface);color:var(--sig-text);
-  border:1px solid var(--sig-border);font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
-.sigem-rep-btn-sec:hover{background:var(--sig-bg);border-color:var(--sig-border-strong)}
+.sigem-rep-btn-sec{cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:14px}
 
 /* Visor de reporte */
 .sigem-rep-view{background:var(--sig-surface);border:1px solid var(--sig-border);
@@ -2122,7 +1964,6 @@ textarea:focus-visible,
 
 /* Tabla de inventario en dashboard (ancho completo sin panel lateral) */
 .sigem-dash-table .fi-ta-table thead th{background:#fafbfc}
-.sigem-dash-table .fi-ta-table tbody td{padding:8px 12px}
 
 /* Enlace "Ver todo" al pie de la tabla */
 .sigem-dash-more{display:flex;justify-content:center;padding:14px;
@@ -2252,39 +2093,13 @@ table{
 
 /* Botón primario general estilo SIGEM */
 .sigem-btn-primary{
-  padding: 6px 14px;
-  border-radius: 8px;
-  background: var(--sig-primary);
-  color: #fff !important;
-  font-size: 14px;
-  font-weight: 600;
-  border: none;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: all .15s;
   text-decoration: none;
 }
-.sigem-btn-primary:hover{
-  background: var(--sig-primary-dark);
-  box-shadow: 0 3px 9px rgba(27,101,212,.32);
-  color: #fff !important;
-}
 
-/* Acciones de tabla como iconos */
-.fi-ta-actions .fi-icon-btn{
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .15s;
-}
-.fi-ta-actions .fi-icon-btn:hover{
-  background: var(--sig-bg);
-}
 
 /* Acciones de página / encabezado (Fase final) */
 .sigem-page-actions{
@@ -2345,19 +2160,12 @@ table{
   overflow-y: auto !important;
 }
 
-/* 2. Grids del formulario dentro del slide-over: 1 columna (sin textos encimados) */
+/* 2. Grids del formulario dentro del slide-over: gap 16px horizontal, 12px vertical */
 .fi-modal-slide-over-window [class*="grid"],
 .fi-modal-slide-over-window [style*="--cols"],
 .fi-modal .fi-fo-component-ctn [class*="grid"],
 .fi-modal .fi-fo-component-ctn [style*="--cols"] {
-  --cols-default: 1 !important;
-  --cols-sm: 1 !important;
-  --cols-md: 1 !important;
-  --cols-lg: 1 !important;
-  --cols-xl: 1 !important;
-  --cols-2xl: 1 !important;
-  grid-template-columns: 1fr !important;
-  column-gap: 0 !important;
+  column-gap: 16px !important;
   row-gap: 12px !important;
 }
 
@@ -2379,7 +2187,6 @@ table{
   overflow-wrap: break-word !important;
   line-height: 1.3 !important;
   margin-bottom: 4px !important;
-  font-size: 13px !important;
   overflow: visible !important;
 }
 
@@ -2712,8 +2519,6 @@ body {
 .fi-modal-slide-over-window .fi-modal-footer {
   position: static !important;
   margin-top: 24px !important;
-  padding: 20px 24px 28px !important;
-  border-top: 1px solid var(--sig-border, #e2e8f0) !important;
   background: transparent !important;
   box-shadow: none !important;
 }
@@ -2723,56 +2528,11 @@ body {
 .fi-modal-slide-over-window .fi-form-actions {
   display: flex !important;
   flex-direction: row !important;
-  justify-content: flex-start !important;
   align-items: center !important;
   gap: 12px !important;
-  padding: 0 !important;
   width: 100% !important;
 }
 
-/* Botones dentro del footer de slide-over */
-.fi-modal-slide-over-window .fi-modal-footer .fi-btn,
-.fi-modal-slide-over-window .fi-modal-actions .fi-btn,
-.fi-modal-slide-over-window .fi-form-actions .fi-btn {
-  border-radius: 8px !important;
-  padding: 9px 20px !important;
-  font-size: 14px !important;
-  font-weight: 500 !important;
-  line-height: 1.4 !important;
-  cursor: pointer !important;
-}
-
-/* Botón primario */
-.fi-modal-slide-over-window .fi-modal-footer .fi-btn-color-primary,
-.fi-modal-slide-over-window .fi-modal-footer .fi-color-primary,
-.fi-modal-slide-over-window .fi-modal-footer .fi-btn-primary,
-.fi-modal-slide-over-window .fi-form-actions .fi-btn-primary,
-.fi-modal-slide-over-window .fi-form-actions .fi-btn-color-primary {
-  background-color: var(--sig-primary, #002855) !important;
-  border: 1px solid var(--sig-primary, #002855) !important;
-  color: #ffffff !important;
-}
-.fi-modal-slide-over-window .fi-modal-footer .fi-btn-color-primary:hover,
-.fi-modal-slide-over-window .fi-modal-footer .fi-color-primary:hover,
-.fi-modal-slide-over-window .fi-modal-footer .fi-btn-primary:hover,
-.fi-modal-slide-over-window .fi-form-actions .fi-btn-primary:hover {
-  background-color: #001f42 !important;
-}
-
-/* Botones secundarios / cancelar (gris) */
-.fi-modal-slide-over-window .fi-modal-footer .fi-btn-color-gray,
-.fi-modal-slide-over-window .fi-modal-footer .fi-color-gray,
-.fi-modal-slide-over-window .fi-form-actions .fi-btn-color-gray {
-  background-color: #ffffff !important;
-  border: 1px solid var(--sig-border, #e2e8f0) !important;
-  color: #334155 !important;
-}
-.fi-modal-slide-over-window .fi-modal-footer .fi-btn-color-gray:hover,
-.fi-modal-slide-over-window .fi-modal-footer .fi-color-gray:hover,
-.fi-modal-slide-over-window .fi-form-actions .fi-btn-color-gray:hover {
-  background-color: #f8fafc !important;
-  border-color: #cbd5e1 !important;
-}
 
 /* Navegación al final de wizards dentro de slide-over */
 .fi-modal-slide-over-window .fi-fo-wizard > div:last-child {
@@ -2833,18 +2593,9 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
 .fi-modal-slide-over-window .fi-modal-footer-actions,
 .fi-modal-slide-over-window .fi-modal-actions,
 .fi-modal-slide-over-window .fi-form-actions {
-  padding: 0 !important;
-  justify-content: flex-start !important;
   gap: 10px !important;
   position: relative !important;
   bottom: auto !important;
-}
-.fi-modal-slide-over-window .fi-modal-footer .fi-btn,
-.fi-modal-slide-over-window .fi-modal-actions .fi-btn,
-.fi-modal-slide-over-window .fi-form-actions .fi-btn {
-  border-radius: 8px !important;
-  padding: 9px 20px !important;
-  font-weight: 600 !important;
 }
 .fi-modal-slide-over-window .fi-modal-footer .fi-btn-gray,
 .fi-modal-slide-over-window .fi-form-actions .fi-btn-gray {
@@ -2856,69 +2607,8 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
    Mejora de diseño de formularios e infolists en slide-over + Botones catálogo
    ========================================================================== */
 
-/* Botones de acción en tablas de catálogo (Ver / Editar / Eliminar) */
-.fi-icon-btn {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  color: var(--sig-muted, #64748b);
-  background: var(--sig-surface, #ffffff);
-  border: 1px solid var(--sig-border, #e2e8f0);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.fi-icon-btn:hover {
-  color: var(--sig-primary, #1b65d4);
-  background: var(--sig-bg, #f8fafc);
-  border-color: var(--sig-border-strong, #cbd5e1);
-}
-.fi-icon-btn-danger {
-  color: var(--sig-muted, #64748b) !important;
-}
-.fi-icon-btn-danger:hover {
-  color: #dc2626 !important;
-  background: #fee2e2 !important;
-  border-color: #fca5a5 !important;
-}
-.dark .fi-icon-btn {
-  background: #1e293b;
-  border-color: #334155;
-  color: #94a3b8;
-}
-.dark .fi-icon-btn:hover {
-  color: #38bdf8;
-  background: #0f172a;
-}
-.dark .fi-icon-btn-danger:hover {
-  color: #ef4444 !important;
-  background: rgba(220, 38, 38, 0.2) !important;
-  border-color: rgba(239, 68, 68, 0.4) !important;
-}
 
 /* Reducir contenedores anidados en formularios e infolists del slide-over */
-.fi-modal-slide-over-window .fi-fo-component-ctn .fi-section,
-.fi-modal-slide-over-window .fi-fo-component-ctn .fi-section + .fi-section,
-.fi-modal-slide-over-window .fi-infolist-component-ctn .fi-section,
-.fi-modal-slide-over-window .fi-infolist .fi-section,
-.fi-modal-slide-over-window .fi-section {
-  border: none !important;
-  background: transparent !important;
-  padding: 0 !important;
-  box-shadow: none !important;
-  --tw-ring-shadow: 0 0 #0000 !important;
-  --tw-ring-color: transparent !important;
-  --tw-shadow: 0 0 #0000 !important;
-}
-
-.fi-modal-slide-over-window .fi-section-header {
-  padding: 0 0 10px 0 !important;
-  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
-  margin-bottom: 14px !important;
-}
 
 .fi-modal-slide-over-window .fi-section-header-heading {
   font-size: 15px !important;
@@ -2954,17 +2644,6 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
   padding-left: 10px !important;
 }
 
-/* Formularios simples: sin espacio extra */
-.fi-modal-slide-over-window .fi-modal-content {
-  padding: 16px 20px !important;
-}
-
-/* Botones con mejor integración */
-.fi-modal-slide-over-window .fi-modal-footer {
-  padding: 16px 20px 20px !important;
-  border-top: 1px solid var(--sig-border, #e2e8f0) !important;
-  margin-top: 8px !important;
-}
 
 /* ===== TAREA: Sidebar Fijo Flexbox ===== */
 /* Evita scroll en el contenedor maestro */
@@ -3304,8 +2983,6 @@ aside.fi-sidebar {
 .sigem-stats-grid {
   display: grid !important;
   grid-template-columns: repeat(4, 1fr) !important;
-  gap: 14px !important;
-  margin-bottom: 22px !important;
 }
 @media (max-width: 1200px) {
   .sigem-quick-grid,
@@ -3421,14 +3098,7 @@ html, body {
     -ms-overflow-style: none !important;
 }
 
-/* ITEM 4: Estado Reasignado */
-.sigem-pill.reassign{background:#ede9fe;color:#8b5cf6}
-.fi-badge.fi-color-reassign,
-.fi-ta-table .fi-badge.fi-color-reassign,
-.fi-ta-table .fi-badge-color-reassign {
-  background: #ede9fe !important;
-  color: #8b5cf6 !important;
-}
+/* ITEM 4: Variables de paleta para Estado Reasignado */
 .fi-fo-toggle-buttons [data-color="reassign"],
 .fi-fo-toggle-buttons .fi-color-reassign {
   --color-50: 237, 233, 254;
@@ -3437,10 +3107,641 @@ html, body {
   --color-600: 124, 58, 237;
 }
 
+/* ==========================================================================
+   AJUSTE DE DISEÑO VISUAL AL MOCKUP (Densidad, Colores, Iconos, Tipografía)
+   ========================================================================== */
 
+/* --------------------------------------------------------------------------
+   CAMBIO 1: DENSIDAD / ESPACIADO GENERAL (REDUCIR AIRE)
+   -------------------------------------------------------------------------- */
+/* Hero (banner azul de bienvenida): padding vertical 18px 22px, margin-bottom 14px */
+.sigem-hero,
+.hero,
+.welcome-banner {
+  padding: 18px 22px !important;
+  margin-bottom: 14px !important;
+  background: linear-gradient(120deg, #1b65d4 0%, #1e40af 100%) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 16px rgba(27, 101, 212, 0.18) !important;
+}
 
+.sigem-hero h1,
+.welcome-banner .banner-greeting,
+#sigem-hero-hi {
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  margin-bottom: 4px !important;
+  color: #ffffff !important;
+  line-height: 1.25 !important;
+}
 
+.sigem-hero p,
+.welcome-banner .banner-sub {
+  font-size: 14.5px !important;
+  margin-bottom: 0 !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  line-height: 1.35 !important;
+}
 
+/* Quick cards grid y tarjetas */
+.sigem-quick-grid {
+  gap: 12px !important;
+  margin-bottom: 14px !important;
+}
 
+.sigem-quick {
+  padding: 14px !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04) !important;
+  transition: all 0.16s ease-in-out !important;
+}
 
+.sigem-quick:hover {
+  border-color: var(--sig-primary, #1b65d4) !important;
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.07) !important;
+  transform: translateY(-1.5px) !important;
+}
 
+.sigem-quick-ico {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  border-radius: 10px !important;
+  font-size: 18px !important;
+  margin-bottom: 9px !important;
+}
+
+.sigem-quick-title {
+  font-size: 15.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+}
+
+.sigem-quick-desc {
+  font-size: 13.5px !important;
+  color: var(--sig-muted, #5f6b7c) !important;
+  line-height: 1.35 !important;
+}
+
+/* KPI cards grid y tarjetas */
+.sigem-stats-grid {
+  gap: 12px !important;
+  margin-bottom: 14px !important;
+}
+
+.sigem-stat {
+  padding: 14px 16px !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04) !important;
+}
+
+.sigem-stat-ico {
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  border-radius: 10px !important;
+  font-size: 18px !important;
+}
+
+.sigem-stat-val {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  margin-top: 8px !important;
+  line-height: 1.1 !important;
+}
+
+.sigem-stat-label {
+  font-size: 15.5px !important;
+  color: var(--sig-muted, #5f6b7c) !important;
+  margin-top: 3px !important;
+}
+
+.sigem-stat-hint {
+  margin-top: 7px !important;
+  padding: 3px 8px !important;
+  font-size: 13px !important;
+  border-radius: 99px !important;
+  font-weight: 600 !important;
+}
+
+/* Espacio entre secciones del dashboard */
+.sigem-section-head,
+.sigem-quick-desc-none,
+.sigem-section {
+  margin-bottom: 14px !important;
+}
+
+/* --------------------------------------------------------------------------
+   CAMBIO 2: FILAS DE TABLA MÁS COMPACTAS (~40px)
+   -------------------------------------------------------------------------- */
+/* Encabezados de tabla */
+.fi-ta-table thead th,
+.fi-ta-header-cell,
+.fi-ta-header-cell button,
+.fi-ta-header-cell span {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: var(--sig-muted, #5f6b7c) !important;
+}
+
+.fi-ta-table thead th,
+.fi-ta-header-cell,
+.sigem-tbl th {
+  padding: 8px 12px !important;
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+}
+
+/* Filas y celdas compactas (padding 6px 12px para alcanzar ~40px de alto) */
+.fi-ta-table tbody tr.fi-ta-row td,
+.fi-ta-table tbody td,
+.fi-ta-cell,
+.sigem-tbl td {
+  padding: 6px 12px !important;
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+}
+
+.fi-ta-table tbody tr.fi-ta-row,
+.sigem-tbl tbody tr {
+  min-height: 40px !important;
+}
+
+/* Hover en filas */
+.fi-ta-table tbody tr.fi-ta-row:hover,
+.fi-ta-table tbody tr:hover td,
+.sigem-tbl tbody tr:hover td {
+  background-color: #f8fafd !important;
+}
+
+/* Texto principal de fila */
+.fi-ta-table tbody td .fi-ta-text-item-label,
+.fi-ta-table tbody td span.font-medium,
+.fi-ta-table tbody td strong,
+.sigem-tbl td strong {
+  font-weight: 600 !important;
+  line-height: 1.25 !important;
+}
+
+/* Texto secundario (descripción/S/N) */
+.fi-ta-table tbody td .fi-ta-text-item-description,
+.fi-ta-table tbody td .fi-ta-text-column-description,
+.fi-ta-table tbody td .text-gray-500,
+.fi-ta-table tbody td .fi-ta-text-description,
+.td-sub,
+.sigem-tbl td span[style*="font-size: 13px"] {
+  font-size: 13px !important;
+  line-height: 1.2 !important;
+  margin-top: 1px !important;
+  color: var(--sig-muted, #5f6b7c) !important;
+}
+
+/* --------------------------------------------------------------------------
+   CAMBIO 3 & CAMBIO 8: ICONOS DE ACCIONES POR FILA (👁 VER + ✏️ EDITAR)
+   -------------------------------------------------------------------------- */
+/* Contenedor de acciones: gap 4px */
+.fi-ta-actions,
+.fi-ta-actions-cell .fi-ta-actions {
+  gap: 4px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+}
+
+/* Iconos de acciones planos: 28x28px, border-radius 8px, sin borde visible, sin background */
+.fi-ta-actions button,
+.fi-ta-actions a,
+.fi-ta-actions .fi-icon-btn,
+.fi-icon-btn,
+.sigem-rep-btn-sec.fi-icon-btn,
+.sigem-tbl td a.fi-icon-btn {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  border-radius: 8px !important;
+  color: var(--sig-muted, #5f6b7c) !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.15s ease-in-out !important;
+}
+
+.fi-ta-actions button:hover,
+.fi-ta-actions a:hover,
+.fi-ta-actions .fi-icon-btn:hover,
+.fi-icon-btn:hover,
+.sigem-rep-btn-sec.fi-icon-btn:hover,
+.sigem-tbl td a.fi-icon-btn:hover {
+  background: var(--sig-bg, #f4f6f8) !important;
+  color: var(--sig-text, #111827) !important;
+}
+
+.fi-ta-actions button svg,
+.fi-ta-actions a svg,
+.fi-icon-btn svg,
+.sigem-rep-btn-sec.fi-icon-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* --------------------------------------------------------------------------
+   CAMBIO 4: COLORES MÁS SATURADOS (COMO EL MOCKUP)
+   -------------------------------------------------------------------------- */
+/* Fondos de iconos de Quick Cards y KPIs (colores más vivos) */
+/* Amarillo (Autorizar / Warning) */
+.sigem-i-warning,
+.sigem-stat-ico.sigem-i-warning,
+.sigem-quick-ico.sigem-i-warning,
+.sigem-h-warn {
+  background: #fde68a !important;
+  color: #b45309 !important;
+}
+
+/* Azul (Revisar / Primary) */
+.sigem-i-primary,
+.sigem-stat-ico.sigem-i-primary,
+.sigem-quick-ico.sigem-i-primary {
+  background: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
+/* Verde (Registrar / Success) */
+.sigem-i-success,
+.sigem-stat-ico.sigem-i-success,
+.sigem-quick-ico.sigem-i-success,
+.sigem-h-ok {
+  background: #a7f3d0 !important;
+  color: #047857 !important;
+}
+
+/* Celeste (Bitácora / Info) */
+.sigem-i-info,
+.sigem-stat-ico.sigem-i-info,
+.sigem-quick-ico.sigem-i-info,
+.sigem-h-info {
+  background: #a5f3fc !important;
+  color: #0e7490 !important;
+}
+
+/* Rojo (Danger) */
+.sigem-i-danger,
+.sigem-stat-ico.sigem-i-danger,
+.sigem-quick-ico.sigem-i-danger {
+  background: #fecaca !important;
+  color: #b91c1c !important;
+}
+
+/* Badges / Píldoras de estado con colores vivos */
+/* Disponible: verde (#059669, fondo #dcfce7) */
+.sigem-pill.ok,
+.sigem-pill.disponible,
+.fi-badge.fi-color-success,
+.fi-badge-color-success,
+.fi-ta-table .fi-badge.fi-color-success,
+[data-color="success"] .fi-badge {
+  background-color: #dcfce7 !important;
+  color: #059669 !important;
+  border: 1px solid transparent !important;
+  border-radius: 99px !important;
+}
+
+/* Asignado: celeste (#0891b2, fondo #cffafe) */
+.sigem-pill.info,
+.sigem-pill.asignado,
+.fi-badge.fi-color-info,
+.fi-badge-color-info,
+.fi-ta-table .fi-badge.fi-color-info,
+[data-color="info"] .fi-badge {
+  background-color: #cffafe !important;
+  color: #0891b2 !important;
+  border: 1px solid transparent !important;
+  border-radius: 99px !important;
+}
+
+/* Reasignado: violeta (#8b5cf6, fondo #ede9fe) */
+.sigem-pill.reassign,
+.sigem-pill.reasignado,
+.fi-badge.fi-color-reassign,
+.fi-badge-color-reassign,
+.fi-ta-table .fi-badge.fi-color-reassign,
+[data-color="reassign"] .fi-badge {
+  background-color: #ede9fe !important;
+  color: #8b5cf6 !important;
+  border: 1px solid transparent !important;
+  border-radius: 99px !important;
+}
+
+/* En Mantenimiento: ámbar (#d97706, fondo #fef3c7) */
+.sigem-pill.warn,
+.sigem-pill.mantenimiento,
+.fi-badge.fi-color-warning,
+.fi-badge-color-warning,
+.fi-ta-table .fi-badge.fi-color-warning,
+[data-color="warning"] .fi-badge {
+  background-color: #fef3c7 !important;
+  color: #d97706 !important;
+  border: 1px solid transparent !important;
+  border-radius: 99px !important;
+}
+
+/* Dañado / Rechazado: rojo (#dc2626, fondo #fee2e2) */
+.sigem-pill.danger,
+.sigem-pill.danado,
+.fi-badge.fi-color-danger,
+.fi-badge-color-danger,
+.fi-ta-table .fi-badge.fi-color-danger,
+[data-color="danger"] .fi-badge {
+  background-color: #fee2e2 !important;
+  color: #dc2626 !important;
+  border: 1px solid transparent !important;
+  border-radius: 99px !important;
+}
+
+/* Baja: gris (#6b7280, fondo #f3f4f6) */
+.sigem-pill.neutral,
+.sigem-pill.baja,
+.fi-badge.fi-color-gray,
+.fi-badge-color-gray,
+.fi-ta-table .fi-badge.fi-color-gray,
+[data-color="gray"] .fi-badge {
+  background-color: #f3f4f6 !important;
+  color: #6b7280 !important;
+  border: 1px solid transparent !important;
+  border-radius: 99px !important;
+}
+
+/* Badges de tipo de movimiento (Solicitudes) -> TODOS en gris/neutral */
+.fi-ta-cell-tipo-movimiento .fi-badge,
+[class*="cell-tipo-movimiento"] .fi-badge,
+.fi-table-cell-tipo-movimiento .fi-badge {
+  background-color: var(--sig-bg, #f4f6f8) !important;
+  color: var(--sig-muted, #5f6b7c) !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  border-radius: 99px !important;
+}
+
+/* Badges de servicio (Mantenimiento) */
+/* Correctivo: rojo (#dc2626, fondo #fee2e2) */
+.fi-ta-cell-tipo-mantenimiento .fi-badge.fi-color-danger,
+.fi-ta-cell-tipo-servicio .fi-badge.fi-color-danger,
+.fi-table-cell-tipo-mantenimiento .fi-badge.fi-color-danger,
+.fi-table-cell-tipo-servicio .fi-badge.fi-color-danger {
+  background-color: #fee2e2 !important;
+  color: #dc2626 !important;
+  border: 1px solid transparent !important;
+  border-radius: 99px !important;
+}
+
+/* Preventivo: gris neutral */
+.fi-ta-cell-tipo-mantenimiento .fi-badge.fi-color-success,
+.fi-ta-cell-tipo-servicio .fi-badge.fi-color-success,
+.fi-table-cell-tipo-mantenimiento .fi-badge.fi-color-success,
+.fi-table-cell-tipo-servicio .fi-badge.fi-color-success {
+  background-color: var(--sig-bg, #f4f6f8) !important;
+  color: var(--sig-muted, #5f6b7c) !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  border-radius: 99px !important;
+}
+
+/* --------------------------------------------------------------------------
+   CAMBIO 6: BORDES Y SOMBRAS MÁS SUTILES
+   -------------------------------------------------------------------------- */
+.sigem-quick,
+.sigem-stat,
+.sigem-card,
+.fi-ta-ctn,
+.fi-section,
+.sigem-inv-side {
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04) !important;
+  border-radius: 14px !important;
+}
+
+/* --------------------------------------------------------------------------
+   CAMBIO 7: CHECKBOX DE SELECCIÓN EN TABLA
+   -------------------------------------------------------------------------- */
+.fi-ta-selection-cell,
+.fi-ta-table th.fi-ta-selection-cell,
+.fi-ta-table td.fi-ta-selection-cell,
+.fi-ta-checkbox-cell {
+  width: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  padding: 6px 10px !important;
+}
+
+.fi-ta-selection-cell input[type="checkbox"],
+.fi-ta-checkbox-cell input[type="checkbox"],
+.fi-ta-table input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  accent-color: var(--sig-primary, #1b65d4) !important;
+  cursor: pointer !important;
+}
+
+/* --------------------------------------------------------------------------
+   FORMULARIOS, SLIDE-OVER, DONUT, BOTONES Y PAGINACIÓN
+   -------------------------------------------------------------------------- */
+/* Formularios */
+.fi-fo-field-wrp-label label,
+.fi-fo-field-wrp-label span,
+.fi-fo-field-label,
+label.fi-fo-field-wrp-label {
+  font-size: 15.5px !important;
+  font-weight: 600 !important;
+  color: var(--sig-text, #111827) !important;
+}
+
+.fi-input-wrp,
+.fi-fo-text-input input,
+.fi-fo-select select,
+.fi-fo-textarea textarea {
+  border-radius: 10px !important;
+}
+
+.fi-input-wrp input,
+.fi-input-wrp select,
+.fi-input-wrp textarea,
+.fi-fo-text-input input,
+.fi-fo-select select,
+.fi-fo-textarea textarea {
+  padding: 10px 13px !important;
+}
+
+.fi-fo-component-ctn,
+.fi-fo-wizard-step .fi-fo-component-ctn,
+.fi-modal-slide-over-window .fi-fo-component-ctn {
+  column-gap: 16px !important;
+  row-gap: 12px !important;
+}
+
+/* Slide-over */
+.fi-modal-slide-over-window .fi-modal-content,
+.fi-slide-over .fi-modal-content {
+  padding: 20px 24px !important;
+}
+
+.fi-modal-slide-over-window .fi-section,
+.fi-slide-over .fi-section {
+  border-radius: 12px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  margin-bottom: 16px !important;
+  overflow: hidden !important;
+}
+
+.fi-modal-slide-over-window .fi-section-header,
+.fi-slide-over .fi-section-header {
+  font-size: 15px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: var(--sig-muted, #5f6b7c) !important;
+  background-color: #fafbfc !important;
+  padding: 12px 18px !important;
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+}
+
+.fi-modal-slide-over-window .fi-section-header .fi-section-header-title {
+  font-size: 15px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: var(--sig-muted, #5f6b7c) !important;
+  font-weight: 700 !important;
+}
+
+.fi-modal-slide-over-window .fi-modal-footer,
+.fi-modal-slide-over-window .fi-modal-footer-actions,
+.fi-slide-over .fi-modal-footer {
+  border-top: 1px solid var(--sig-border, #e2e8f0) !important;
+  padding: 16px 24px !important;
+  justify-content: flex-start !important;
+}
+
+.fi-modal-slide-over-window .fi-modal-footer button,
+.fi-modal-slide-over-window .fi-modal-footer-actions button,
+.fi-modal-slide-over-window .fi-modal-footer .fi-btn {
+  border-radius: 8px !important;
+  padding: 9px 20px !important;
+  font-weight: 600 !important;
+}
+
+/* Donut y barras */
+.sigem-donut { width: 120px !important; height: 120px !important; }
+.sigem-donut svg { width: 120px !important; height: 120px !important; }
+.sigem-donut circle { stroke-width: 16 !important; }
+.sigem-donut-center b { font-size: 27px !important; font-weight: 700 !important; }
+.sigem-donut-center span { font-size: 13.5px !important; color: var(--sig-muted, #5f6b7c) !important; }
+.sigem-lg { font-size: 15.5px !important; gap: 8px !important; }
+.sigem-lg i { width: 9px !important; height: 9px !important; min-width: 9px !important; min-height: 9px !important; border-radius: 50% !important; }
+.sigem-cb div { height: 8px !important; border-radius: 99px !important; background-color: var(--sig-border, #e2e8f0) !important; overflow: hidden !important; }
+.sigem-cb div span { height: 8px !important; border-radius: 99px !important; background-color: var(--sig-primary, #1b65d4) !important; }
+
+/* Botones */
+.sigem-btn-primary, .fi-btn-primary, .fi-btn.fi-color-primary, button.fi-btn-primary {
+  background-color: var(--sig-primary, #1b65d4) !important;
+  color: #ffffff !important;
+  border: 1px solid transparent !important;
+  border-radius: 8px !important;
+  padding: 9px 20px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05) !important;
+  transition: all 0.18s ease-in-out !important;
+}
+.sigem-btn-primary:hover, .fi-btn-primary:hover, .fi-btn.fi-color-primary:hover, button.fi-btn-primary:hover {
+  background-color: var(--sig-primary-dark, #1551aa) !important;
+  color: #ffffff !important;
+}
+.sigem-btn-secondary, .sigem-rep-btn-sec, .fi-btn-secondary, .fi-btn.fi-color-gray, button.fi-btn-secondary {
+  background-color: #ffffff !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  color: var(--sig-text, #111827) !important;
+  border-radius: 8px !important;
+  padding: 9px 16px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05) !important;
+  transition: all 0.18s ease-in-out !important;
+}
+.sigem-btn-secondary:hover, .sigem-rep-btn-sec:hover, .fi-btn-secondary:hover, .fi-btn.fi-color-gray:hover, button.fi-btn-secondary:hover {
+  background-color: var(--sig-bg, #f4f6f8) !important;
+  color: var(--sig-text, #111827) !important;
+}
+
+/* Paginación */
+.fi-ta-pagination .fi-pagination-records-overview,
+.fi-ta-pagination-records-text,
+.fi-pagination-overview,
+.sigem-pagination-info,
+.fi-ta-pagination span {
+  font-size: 15px !important;
+  color: var(--sig-muted, #5f6b7c) !important;
+}
+.fi-pagination-item button, .fi-pagination-item a, .fi-pagination button, .fi-pagination a, .fi-ta-pagination button, .fi-pagination-item {
+  min-width: 30px !important;
+  height: 30px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.15s ease-in-out !important;
+}
+.fi-pagination-item-active, .fi-pagination-item-active button, .fi-pagination-item.fi-active, .fi-pagination-item.fi-active button, .fi-pagination-item[aria-current="page"], .fi-pagination-item[aria-current="page"] button {
+  background-color: var(--sig-primary, #1b65d4) !important;
+  color: #ffffff !important;
+  border-color: var(--sig-primary, #1b65d4) !important;
+}
+.fi-pagination-item-active *, .fi-pagination-item.fi-active * {
+  color: #ffffff !important;
+}
+
+/* --------------------------------------------------------------------------
+   AJUSTES VISUALES: FONDO GRIS, CARDS BLANCAS, HERO COMPACTO Y EMOJIS
+   -------------------------------------------------------------------------- */
+/* Fondo gris solo en el área de contenido */
+.fi-main, .fi-main-ctn, main.fi-main {
+  background-color: #f4f6f8 !important;
+}
+
+/* Sidebar y topbar se mantienen blancos */
+.fi-sidebar, .fi-topbar {
+  background-color: #ffffff !important;
+  border-right: 1px solid #e5e7eb;
+}
+
+/* Tarjetas blancas sobre el gris */
+.fi-ta-ctn, .fi-section, .sigem-quick, .sigem-stat, .sigem-card {
+  background-color: #ffffff !important;
+  border-radius: 14px !important;
+}
+
+/* Hero mantiene degradado azul */
+.sigem-hero, .hero, .welcome-banner {
+  background: linear-gradient(120deg, #1b65d4 0%, #1e40af 100%) !important;
+  padding: 14px 20px !important;
+  margin-bottom: 12px !important;
+}
+.sigem-hero h1 { font-size: 20px !important; margin-bottom: 2px !important; }
+.sigem-hero p { font-size: 13.5px !important; line-height: 1.3 !important; }
+
+/* Buscador más redondeado */
+.fi-table-search input, .fi-ta-table input[type="text"] {
+  border-radius: 10px !important;
+}
+
+/* Quick cards y KPIs: tamaño y visualización emoji */
+.sigem-quick-ico, .sigem-stat-ico {
+  font-size: 20px !important;
+}
+.sigem-quick-ico svg, .sigem-stat-ico svg {
+  display: none !important;
+}

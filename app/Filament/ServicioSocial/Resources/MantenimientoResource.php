@@ -128,7 +128,8 @@ class MantenimientoResource extends Resource
                             Forms\Components\DatePicker::make('fecha_solicitud')
                                 ->default(now())
                                 ->required()
-                                ->prefixIcon('heroicon-m-calendar'),
+                                ->prefixIcon('heroicon-m-calendar')
+                                ->columnSpanFull(),
                             Forms\Components\Textarea::make('descripcion_falla')
                                 ->label('Descripción de la falla')
                                 ->rows(3)
@@ -205,8 +206,8 @@ class MantenimientoResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->slideOver()->successNotificationTitle('Mantenimiento actualizado correctamente'),
+                Tables\Actions\ViewAction::make()->icon('👁')->iconButton()->slideOver(),
+                Tables\Actions\EditAction::make()->icon('✏️')->iconButton()->slideOver()->successNotificationTitle('Mantenimiento actualizado correctamente'),
             ])
             ->bulkActions([]);
     }

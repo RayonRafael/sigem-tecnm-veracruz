@@ -61,8 +61,9 @@ class ProveedorResource extends Resource
                             ->boolean(trueLabel: 'Sí', falseLabel: 'No')
                             ->inline()
                             ->default(true)
-                            ->required(),
-                    ])->columns(3),
+                            ->required()
+                            ->columnSpanFull(),
+                    ])->columns(2),
 
                 Forms\Components\Section::make('Información de contacto')
                     ->icon('heroicon-m-phone')
@@ -83,8 +84,9 @@ class ProveedorResource extends Resource
                             ->email()
                             ->prefixIcon('heroicon-m-envelope')
                             ->maxLength(100)
-                            ->default(null),
-                    ])->columns(3),
+                            ->default(null)
+                            ->columnSpanFull(),
+                    ])->columns(2),
             ]);
     }
 

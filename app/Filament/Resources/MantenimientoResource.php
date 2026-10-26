@@ -133,12 +133,13 @@ class MantenimientoResource extends Resource
                                 ->required()
                                 ->columnSpanFull(),
 
-                            Forms\Components\Grid::make(3)
+                            Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\DatePicker::make('fecha_solicitud')->label('Fecha de solicitud')
                                         ->default(now())
                                         ->prefixIcon('heroicon-m-calendar')
-                                        ->required(),
+                                        ->required()
+                                        ->columnSpanFull(),
                                     Forms\Components\DatePicker::make('fecha_inicio')->label('Fecha de inicio')
                                         ->prefixIcon('heroicon-m-calendar')
                                         ->label('Fecha inicio'),
@@ -280,8 +281,8 @@ class MantenimientoResource extends Resource
                         Notification::make()->title('Mantenimiento completado')->success()->send();
                     })
                     ->requiresConfirmation(),
-                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Mantenimiento actualizado correctamente'),
+                Tables\Actions\ViewAction::make()->icon('👁')->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\EditAction::make()->icon('✏️')->iconButton()->tooltip('Editar')->successNotificationTitle('Mantenimiento actualizado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

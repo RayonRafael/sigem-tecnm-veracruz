@@ -154,7 +154,7 @@ class InventarioResource extends Resource
                                 ->icon('heroicon-m-cpu-chip')
                                 ->collapsible()
                                 ->schema([
-                                    Forms\Components\Grid::make(3)
+                                    Forms\Components\Grid::make(2)
                                         ->schema([
                                             Forms\Components\TextInput::make('procesador')
                                                 ->label('Procesador')
@@ -170,7 +170,8 @@ class InventarioResource extends Resource
                                                 ->label('Disco duro')
                                                 ->placeholder('Ej. 512GB SSD')
                                                 ->prefixIcon('heroicon-m-circle-stack')
-                                                ->maxLength(100),
+                                                ->maxLength(100)
+                                                ->columnSpanFull(),
                                         ]),
                                     Forms\Components\Grid::make(2)
                                         ->schema([
@@ -628,8 +629,8 @@ class InventarioResource extends Resource
                         Notification::make()->title('Registro rechazado exitosamente')->success()->send();
                     })
                     ->requiresConfirmation(),
-                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle'),
-                Tables\Actions\EditAction::make()->iconButton()->slideOver()->tooltip('Editar')->successNotificationTitle('Registro de inventario actualizado correctamente'),
+                Tables\Actions\ViewAction::make()->icon('👁')->iconButton()->tooltip('Ver detalle'),
+                Tables\Actions\EditAction::make()->icon('✏️')->iconButton()->slideOver()->tooltip('Editar')->successNotificationTitle('Registro de inventario actualizado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
