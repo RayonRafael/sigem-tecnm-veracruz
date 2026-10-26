@@ -17,6 +17,8 @@ use App\Models\UnidadMedida;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
+use Filament\Actions\ViewAction;
+use Filament\Infolists\Infolist;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -50,6 +52,35 @@ class Dashboard extends BaseDashboard
                 'title' => 'Registrar un nuevo equipo en el inventario',
             ])
             ->successNotificationTitle('Registro creado exitosamente');
+    }
+
+    public function verEquipoAction(): Action
+    {
+        return ViewAction::make('verEquipo')
+            ->label('Ver equipo')
+            ->modalHeading('Detalle de equipo')
+            ->model(Inventario::class)
+            ->record(function (array $arguments) {
+                $id = $arguments['id'] ?? $arguments['record'] ?? null;
+                if ($id instanceof Inventario) {
+                    return $id;
+                }
+
+                return Inventario::with([
+                    'material.marca',
+                    'material.tipo',
+                    'proveedor',
+                    'usuario',
+                ])->find($id);
+            })
+            ->slideOver()
+            ->infolist(fn (Infolist $infolist): Infolist => InventarioResource::infolist($infolist))
+            ->modalCancelActionLabel('Cerrar');
+    }
+
+    public function verEquipo($id): void
+    {
+        $this->mountAction('verEquipo', ['id' => $id, 'record' => $id]);
     }
 
     public function getColumns(): int|string|array

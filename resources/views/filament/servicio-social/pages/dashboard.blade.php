@@ -152,8 +152,6 @@
                                                 'Baja' => 'neutral',
                                                 default => 'neutral',
                                             };
-
-                                            $viewUrl = url('/servicio-social/inventarios?abrir=edit&registro=' . $inv->id_inventario);
                                         @endphp
                                         <tr>
                                             <td>
@@ -175,9 +173,9 @@
                                                 <span style="font-size: 14.5px; color: var(--sig-muted);">{{ $areaUbicacion }}</span>
                                             </td>
                                             <td style="text-align: right;">
-                                                <a href="{{ $viewUrl }}" class="sigem-btn-icon" title="Ver equipo">
+                                                <button type="button" wire:click="verEquipo({{ $inv->id_inventario }})" class="sigem-btn-icon" title="Ver equipo" style="cursor:pointer;background:none;border:none;">
                                                     👁
-                                                </a>
+                                                </button>
                                             </td>
                                         </tr>
                                     @empty
