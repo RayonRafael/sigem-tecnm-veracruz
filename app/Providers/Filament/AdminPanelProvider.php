@@ -105,6 +105,34 @@ class AdminPanelProvider extends PanelProvider
                 PanelsRenderHook::USER_MENU_BEFORE,
                 fn (): string => Blade::render('
 @if (auth()->check())
+@php
+    $path = trim(request()->path(), \'/ \');
+    $sectionName = match (true) {
+        str_contains($path, \'inventarios\') => \'Inventario general\',
+        str_contains($path, \'solicituds\') => \'Solicitud de Material/Equipo\',
+        str_contains($path, \'mantenimientos\') => \'Mantenimiento\',
+        str_contains($path, \'configuracion\') => \'Configuración y Catálogos\',
+        str_contains($path, \'reportes\') => \'Reportes\',
+        str_contains($path, \'users\') => \'Usuarios\',
+        str_contains($path, \'materials\') => \'Materiales\',
+        str_contains($path, \'receptors\') => \'Receptores\',
+        str_contains($path, \'proveedors\') => \'Proveedores\',
+        str_contains($path, \'areas\') => \'Áreas\',
+        str_contains($path, \'departamentos\') => \'Departamentos\',
+        str_contains($path, \'marca-materials\') => \'Marcas\',
+        str_contains($path, \'tipo-materials\') => \'Tipos de Material\',
+        str_contains($path, \'unidad-medidas\') => \'Unidades de Medida\',
+        $path === \'admin\' => \'Panel principal\',
+        default => null,
+    };
+@endphp
+<span class="sigem-topbar-crumb" id="sigem-crumb">
+    @if ($sectionName)
+        SIGEM › <b>{{ $sectionName }}</b>
+    @else
+        <b>SIGEM</b>
+    @endif
+</span>
 <span class="sigem-role-banner sigem-role-admin"
       title="Acceso completo de administración">👑 Administrador</span>
 {{-- Campo de búsqueda aparente en el topbar (Fase 9: Buscador global) --}}
@@ -128,6 +156,57 @@ class AdminPanelProvider extends PanelProvider
 @endif
 <script>
     (function () {
+        function updateTopCrumb() {
+            var crumb = document.getElementById(\'sigem-crumb\');
+            if (!crumb) return;
+            var path = window.location.pathname.replace(/\\/+$/, \'\') || \'/\';
+            var section = \'\';
+            if (path.indexOf(\'inventarios\') !== -1) {
+                section = \'Inventario general\';
+            } else if (path.indexOf(\'solicituds\') !== -1) {
+                section = \'Solicitud de Material/Equipo\';
+            } else if (path.indexOf(\'mantenimientos\') !== -1) {
+                section = \'Mantenimiento\';
+            } else if (path.indexOf(\'configuracion\') !== -1) {
+                section = \'Configuración y Catálogos\';
+            } else if (path.indexOf(\'reportes\') !== -1) {
+                section = \'Reportes\';
+            } else if (path.indexOf(\'users\') !== -1) {
+                section = \'Usuarios\';
+            } else if (path.indexOf(\'materials\') !== -1) {
+                section = \'Materiales\';
+            } else if (path.indexOf(\'receptors\') !== -1) {
+                section = \'Receptores\';
+            } else if (path.indexOf(\'proveedors\') !== -1) {
+                section = \'Proveedores\';
+            } else if (path.indexOf(\'areas\') !== -1) {
+                section = \'Áreas\';
+            } else if (path.indexOf(\'departamentos\') !== -1) {
+                section = \'Departamentos\';
+            } else if (path.indexOf(\'marca-materials\') !== -1) {
+                section = \'Marcas\';
+            } else if (path.indexOf(\'tipo-materials\') !== -1) {
+                section = \'Tipos de Material\';
+            } else if (path.indexOf(\'unidad-medidas\') !== -1) {
+                section = \'Unidades de Medida\';
+            } else if (path.endsWith(\'/admin\') || path === \'/admin\') {
+                section = \'Panel principal\';
+            }
+
+            if (section) {
+                crumb.innerHTML = \'SIGEM \\u203A <b>\' + section + \'</b>\';
+            } else {
+                crumb.innerHTML = \'SIGEM \\u203A <b>Inventario general</b>\';
+            }
+        }
+        document.addEventListener(\'livewire:navigated\', updateTopCrumb);
+        window.addEventListener(\'popstate\', updateTopCrumb);
+        if (document.readyState === \'loading\') {
+            document.addEventListener(\'DOMContentLoaded\', updateTopCrumb);
+        } else {
+            updateTopCrumb();
+        }
+
         var isTooltipsUpdating = false;
         function initSidebarTooltips() {
             if (isTooltipsUpdating) return;

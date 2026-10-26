@@ -119,8 +119,14 @@ class ListInventarios extends ListRecords implements HasInfolists
 
     public function infolist(Infolist $infolist): Infolist
     {
+        $record = $this->activeRecord ?? $infolist->getRecord();
+
+        if (! $record) {
+            return $infolist->schema([]);
+        }
+
         return InventarioResource::infolist($infolist)
-            ->record($this->activeRecord);
+            ->record($record);
     }
 
     public function filtrarPorEstado(?string $estado = null): void

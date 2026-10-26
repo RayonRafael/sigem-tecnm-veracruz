@@ -368,7 +368,11 @@ class InventarioResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->icon('👁')->iconButton()->slideOver(),
+                Tables\Actions\ViewAction::make()
+                    ->icon('👁')
+                    ->iconButton()
+                    ->slideOver()
+                    ->infolist(fn (Infolist $infolist, Inventario $record): Infolist => static::infolist($infolist)->record($record)),
                 Tables\Actions\EditAction::make()->icon('✏️')->iconButton()->slideOver()->successNotificationTitle('Registro de inventario actualizado correctamente'),
             ])
             ->bulkActions([]);
@@ -388,7 +392,7 @@ class InventarioResource extends Resource
                         TextEntry::make('subtipo')->label('Subtipo')->placeholder('No definido'),
                         TextEntry::make('estado')
                             ->badge()
-                            ->color(fn (string $state): string => match ($state) {
+                            ->color(fn (?string $state): string => match ($state) {
                                 'Disponible' => 'success',
                                 'Asignado' => 'info',
                                 'Reasignado' => 'reassign',
@@ -396,7 +400,7 @@ class InventarioResource extends Resource
                                 'Dañado' => 'danger',
                                 default => 'gray',
                             })
-                            ->icon(fn (string $state): string => match ($state) {
+                            ->icon(fn (?string $state): string => match ($state) {
                                 'Disponible' => 'heroicon-m-check-circle',
                                 'Asignado' => 'heroicon-m-user',
                                 'Reasignado' => 'heroicon-m-arrows-right-left',
@@ -404,7 +408,8 @@ class InventarioResource extends Resource
                                 'Dañado' => 'heroicon-m-exclamation-triangle',
                                 default => 'heroicon-m-minus-circle',
                             }),
-                    ])->columns(4),
+                    ])->columns(4)
+                    ->visible(fn ($record) => filled($record)),
                 Section::make('Ubicación y asignación')
                     ->schema([
                         TextEntry::make('ubicacion_fisica')->label('Ubicación')
@@ -421,14 +426,15 @@ class InventarioResource extends Resource
                             ->placeholder('Sin cambio de área'),
                         TextEntry::make('tipo_propiedad')->label('Propiedad')
                             ->badge()
-                            ->color(fn (string $state): string => match ($state) {
+                            ->color(fn (?string $state): string => match ($state) {
                                 'Propio' => 'primary',
                                 'Rentado' => 'gray',
                                 default => 'gray',
                             }),
                         TextEntry::make('usuario.name')->label('Registrado por')
                             ->icon('heroicon-m-user'),
-                    ])->columns(3),
+                    ])->columns(3)
+                    ->visible(fn ($record) => filled($record)),
                 Section::make('Red y Conectividad')
                     ->schema([
                         TextEntry::make('ip_address')
@@ -450,14 +456,16 @@ class InventarioResource extends Resource
                         TextEntry::make('disco')
                             ->label('Disco duro')
                             ->placeholder('—'),
-                    ])->columns(3)->collapsible(),
+                    ])->columns(3)->collapsible()
+                    ->visible(fn ($record) => filled($record)),
                 Section::make('Detalles adicionales')
                     ->schema([
                         TextEntry::make('proveedor.nombre_empresa')->label('Proveedor'),
                         TextEntry::make('num_factura')->label('Factura'),
                         TextEntry::make('garantia_estado')->label('Garantía'),
                         TextEntry::make('observaciones_generales')->label('Observaciones')->columnSpanFull(),
-                    ])->columns(3),
+                    ])->columns(3)
+                    ->visible(fn ($record) => filled($record)),
             ]);
     }
 

@@ -14,7 +14,7 @@ body:has(.sigem-professional) .fi-topbar {
     overflow: visible !important;
 }
 body:has(.sigem-professional) .fi-main { padding-top: 0 !important; margin-top: 0 !important; min-height: calc(100vh - 64px) !important; }
-body:has(.sigem-professional) .fi-main-ctn { max-width: none !important; width: 100% !important; padding-left: 18px !important; padding-right: 18px !important; margin: 0 !important; }
+body:has(.sigem-professional) .fi-main-ctn { max-width: none !important; width: 100% !important; padding-left: 0 !important; padding-right: 0 !important; margin: 0 !important; }
 body:has(.sigem-professional) .fi-header { margin-bottom: 2rem !important; padding-top: 1.5rem !important; }
 
 /* ===== 1. FONDO GENERAL Y APP ===== */
@@ -1976,12 +1976,19 @@ textarea:focus-visible,
 
 /* Contenedor principal de contenido: ancho completo */
 .fi-main,
-.fi-main-ctn,
 main.fi-main{
   max-width: none !important;
   width: 100% !important;
   padding-left: 18px !important;
   padding-right: 18px !important;
+  margin: 0 !important;
+}
+
+.fi-main-ctn{
+  max-width: none !important;
+  width: 100% !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
   margin: 0 !important;
 }
 
@@ -2037,7 +2044,7 @@ table{
 
 /* En pantallas grandes: el contenido llena de verdad */
 @media (min-width: 1600px){
-  .fi-main, .fi-main-ctn, main.fi-main{
+  .fi-main, main.fi-main{
     padding-left: 24px !important;
     padding-right: 24px !important;
   }
@@ -3712,10 +3719,18 @@ label.fi-fo-field-wrp-label {
   background-color: #f4f6f8 !important;
 }
 
-/* Sidebar y topbar se mantienen blancos */
-.fi-sidebar, .fi-topbar {
+/* Sidebar blanco con borde derecho */
+.fi-sidebar {
   background-color: #ffffff !important;
-  border-right: 1px solid #e5e7eb;
+  border-right: 1px solid #e5e7eb !important;
+}
+
+/* Topbar blanco con borde inferior */
+.fi-topbar {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-right: none !important;
+  border-left: none !important;
 }
 
 /* Tarjetas blancas sobre el gris */
@@ -3744,4 +3759,112 @@ label.fi-fo-field-wrp-label {
 }
 .sigem-quick-ico svg, .sigem-stat-ico svg {
   display: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   FIX 1: BREADCRUMBS EN EL TOPBAR (.sigem-topbar-crumb)
+   -------------------------------------------------------------------------- */
+.fi-breadcrumbs {
+  display: none !important;
+}
+
+.fi-topbar nav,
+body:has(.sigem-professional) .fi-topbar nav {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.fi-topbar nav .ms-auto,
+.fi-topbar nav > div:has(.sigem-topbar-crumb) {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  gap: 14px !important;
+}
+
+.sigem-topbar-crumb {
+  font-size: 15px !important;
+  color: var(--sig-muted, #5f6b7c) !important;
+  margin-right: auto !important; /* empuja el buscador a la derecha */
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  white-space: nowrap !important;
+  user-select: none !important;
+  letter-spacing: -0.01em !important;
+}
+
+.sigem-topbar-crumb b {
+  color: var(--sig-text, #111827) !important;
+  font-weight: 700 !important;
+}
+
+.sigem-topbar-crumb a {
+  color: inherit !important;
+  text-decoration: none !important;
+  transition: color 0.15s ease !important;
+}
+
+.sigem-topbar-crumb a:hover {
+  color: var(--sig-primary, #1b65d4) !important;
+}
+
+.dark .sigem-topbar-crumb {
+  color: #94a3b8 !important;
+}
+
+.dark .sigem-topbar-crumb b {
+  color: #f1f5f9 !important;
+}
+
+.fi-topbar .sigem-topbar-search {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* --------------------------------------------------------------------------
+   FIX 2: TOPBAR DELGADO (~50px)
+   -------------------------------------------------------------------------- */
+.fi-topbar,
+header.fi-topbar,
+body:has(.sigem-professional) .fi-topbar {
+  min-height: 50px !important;
+  height: 50px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.fi-topbar > * {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.fi-topbar nav,
+body:has(.sigem-professional) .fi-topbar nav {
+  min-height: 50px !important;
+  height: 50px !important;
+  padding: 0 20px !important;
+  box-shadow: none !important;
+  border-bottom: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   FIX 3: SIN GAP ENTRE SIDEBAR Y TOPBAR
+   -------------------------------------------------------------------------- */
+.fi-topbar,
+.fi-topbar-wrap,
+.fi-topbar-ctn,
+header.fi-topbar {
+  margin-left: 0 !important;
+  border-left: none !important;
+}
+
+.fi-main-ctn,
+body:has(.sigem-professional) .fi-main-ctn {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }

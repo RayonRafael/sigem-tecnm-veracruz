@@ -629,7 +629,12 @@ class InventarioResource extends Resource
                         Notification::make()->title('Registro rechazado exitosamente')->success()->send();
                     })
                     ->requiresConfirmation(),
-                Tables\Actions\ViewAction::make()->icon('👁')->iconButton()->tooltip('Ver detalle'),
+                Tables\Actions\ViewAction::make()
+                    ->icon('👁')
+                    ->iconButton()
+                    ->tooltip('Ver detalle')
+                    ->slideOver()
+                    ->infolist(fn (Infolist $infolist, Inventario $record): Infolist => static::infolist($infolist)->record($record)),
                 Tables\Actions\EditAction::make()->icon('✏️')->iconButton()->slideOver()->tooltip('Editar')->successNotificationTitle('Registro de inventario actualizado correctamente'),
             ])
             ->bulkActions([
@@ -680,7 +685,7 @@ class InventarioResource extends Resource
                         Infolists\Components\TextEntry::make('estado')
                             ->label('Estado')
                             ->badge()
-                            ->color(fn (string $state): string => match ($state) {
+                            ->color(fn (?string $state): string => match ($state) {
                                 'Disponible' => 'success',
                                 'Asignado' => 'info',
                                 'Reasignado' => 'reassign',
@@ -691,7 +696,7 @@ class InventarioResource extends Resource
                         Infolists\Components\TextEntry::make('tipo_propiedad')
                             ->label('Propiedad')
                             ->badge()
-                            ->color(fn (string $state): string => match ($state) {
+                            ->color(fn (?string $state): string => match ($state) {
                                 'Propio' => 'primary',
                                 'Rentado' => 'gray',
                                 default => 'gray',
@@ -699,7 +704,8 @@ class InventarioResource extends Resource
                         Infolists\Components\TextEntry::make('usuario.name')
                             ->label('Registrado por')
                             ->icon('heroicon-m-user'),
-                    ])->columns(2),
+                    ])->columns(2)
+                    ->visible(fn ($record) => filled($record)),
 
                 Infolists\Components\Section::make('Ubicación y Asignación')
                     ->schema([
@@ -718,7 +724,8 @@ class InventarioResource extends Resource
                             ->date('d/m/Y')
                             ->icon('heroicon-m-calendar-days')
                             ->placeholder('Sin cambio de área'),
-                    ])->columns(2),
+                    ])->columns(2)
+                    ->visible(fn ($record) => filled($record)),
 
                 Infolists\Components\Section::make('Red y Conectividad')
                     ->schema([
@@ -743,7 +750,8 @@ class InventarioResource extends Resource
                             ->placeholder('—'),
                     ])
                     ->columns(3)
-                    ->collapsible(),
+                    ->collapsible()
+                    ->visible(fn ($record) => filled($record)),
 
                 Infolists\Components\Section::make('Componentes de la Estación')
                     ->schema([
@@ -757,7 +765,7 @@ class InventarioResource extends Resource
                         Infolists\Components\TextEntry::make('especificaciones.mouse_sn')->label('S/N Mouse')->placeholder('—'),
                     ])
                     ->columns(4)
-                    ->visible(fn ($record) => in_array($record->tipo_equipo, ['Desktop', 'All in One', 'Computadora'])),
+                    ->visible(fn ($record) => filled($record) && in_array($record?->tipo_equipo, ['Desktop', 'All in One', 'Computadora'])),
 
                 Infolists\Components\Section::make('Detalles adicionales')
                     ->schema([
@@ -765,7 +773,8 @@ class InventarioResource extends Resource
                         Infolists\Components\TextEntry::make('num_factura')->label('Factura')->placeholder('—'),
                         Infolists\Components\TextEntry::make('garantia_estado')->label('Garantía')->badge(),
                         Infolists\Components\TextEntry::make('observaciones_generales')->label('Observaciones')->placeholder('Sin observaciones')->columnSpanFull(),
-                    ])->columns(3)->collapsible(),
+                    ])->columns(3)->collapsible()
+                    ->visible(fn ($record) => filled($record)),
             ]);
     }
 

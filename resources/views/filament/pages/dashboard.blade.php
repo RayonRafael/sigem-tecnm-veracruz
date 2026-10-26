@@ -163,7 +163,7 @@
                                                 default => 'neutral',
                                             };
 
-                                            $editUrl = \App\Filament\Resources\InventarioResource::getUrl('edit', ['record' => $inv]);
+                                            $editUrl = \App\Filament\Resources\InventarioResource::getUrl('index') . '?abrir=view&registro=' . $inv->id_inventario;
                                         @endphp
                                         <tr>
                                             <td>

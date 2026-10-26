@@ -220,14 +220,14 @@ class MaterialResource extends Resource
                         TextEntry::make('stock_minimo')->label('Stock mínimo')->icon('heroicon-m-bell-alert'),
                         TextEntry::make('estado_stock')
                             ->label('Estado')
-                            ->getStateUsing(fn ($record) => $record->stock_actual < $record->stock_minimo ? 'Stock bajo' : 'Normal')
+                            ->getStateUsing(fn ($record) => ($record?->stock_actual ?? 0) < ($record?->stock_minimo ?? 0) ? 'Stock bajo' : 'Normal')
                             ->badge()
-                            ->color(fn (string $state): string => match ($state) {
+                            ->color(fn (?string $state): string => match ($state) {
                                 'Stock bajo' => 'danger',
                                 'Normal' => 'success',
                                 default => 'gray',
                             })
-                            ->icon(fn (string $state): string => match ($state) {
+                            ->icon(fn (?string $state): string => match ($state) {
                                 'Stock bajo' => 'heroicon-m-exclamation-triangle',
                                 'Normal' => 'heroicon-m-check-circle',
                                 default => 'heroicon-m-minus',

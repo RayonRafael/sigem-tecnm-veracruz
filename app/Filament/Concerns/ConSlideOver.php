@@ -32,7 +32,7 @@ trait ConSlideOver
      */
     public function mountConSlideOver(): void
     {
-        $this->abrirSlideOverPendiente = in_array(request()->query('abrir'), ['create', 'edit'], true);
+        $this->abrirSlideOverPendiente = in_array(request()->query('abrir'), ['create', 'edit', 'view'], true);
     }
 
     /**
@@ -51,7 +51,8 @@ trait ConSlideOver
         if (request()->query('abrir') === 'create') {
             $this->mountAction('create');
         } elseif (filled($registro = request()->query('registro'))) {
-            $this->mountTableAction('edit', (string) $registro);
+            $action = request()->query('abrir') === 'view' ? 'view' : 'edit';
+            $this->mountTableAction($action, (string) $registro);
         }
     }
 

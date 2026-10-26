@@ -65,6 +65,26 @@ class ServicioSocialPanelProvider extends PanelProvider
                 PanelsRenderHook::USER_MENU_BEFORE,
                 fn (): string => Blade::render('
 @if (auth()->check())
+@php
+    $path = trim(request()->path(), \'/ \');
+    $sectionName = match (true) {
+        str_contains($path, \'inventarios\') => \'Inventario general\',
+        str_contains($path, \'solicituds\') => \'Solicitudes\',
+        str_contains($path, \'mantenimientos\') => \'Mantenimientos\',
+        str_contains($path, \'reportes\') => \'Reportes\',
+        str_contains($path, \'materials\') => \'Materiales\',
+        str_contains($path, \'receptors\') => \'Receptores\',
+        $path === \'servicio-social\' => \'Panel principal\',
+        default => null,
+    };
+@endphp
+<span class="sigem-topbar-crumb" id="sigem-crumb">
+    @if ($sectionName)
+        SIGEM › <b>{{ $sectionName }}</b>
+    @else
+        <b>SIGEM</b>
+    @endif
+</span>
 <span class="sigem-role-banner">🎓 Servicio Social</span>
 <div class="sigem-topbar-search"
      role="button"
@@ -126,6 +146,41 @@ class ServicioSocialPanelProvider extends PanelProvider
 @endif
 <script>
     (function () {
+        function updateTopCrumb() {
+            var crumb = document.getElementById(\'sigem-crumb\');
+            if (!crumb) return;
+            var path = window.location.pathname.replace(/\\/+$/, \'\') || \'/\';
+            var section = \'\';
+            if (path.indexOf(\'inventarios\') !== -1) {
+                section = \'Inventario general\';
+            } else if (path.indexOf(\'solicituds\') !== -1) {
+                section = \'Solicitudes\';
+            } else if (path.indexOf(\'mantenimientos\') !== -1) {
+                section = \'Mantenimientos\';
+            } else if (path.indexOf(\'reportes\') !== -1) {
+                section = \'Reportes\';
+            } else if (path.indexOf(\'materials\') !== -1) {
+                section = \'Materiales\';
+            } else if (path.indexOf(\'receptors\') !== -1) {
+                section = \'Receptores\';
+            } else if (path.endsWith(\'/servicio-social\') || path === \'/servicio-social\') {
+                section = \'Panel principal\';
+            }
+
+            if (section) {
+                crumb.innerHTML = \'SIGEM \\u203A <b>\' + section + \'</b>\';
+            } else {
+                crumb.innerHTML = \'SIGEM \\u203A <b>Inventario general</b>\';
+            }
+        }
+        document.addEventListener(\'livewire:navigated\', updateTopCrumb);
+        window.addEventListener(\'popstate\', updateTopCrumb);
+        if (document.readyState === \'loading\') {
+            document.addEventListener(\'DOMContentLoaded\', updateTopCrumb);
+        } else {
+            updateTopCrumb();
+        }
+
         var isTooltipsUpdating = false;
         function initSidebarTooltips() {
             if (isTooltipsUpdating) return;
