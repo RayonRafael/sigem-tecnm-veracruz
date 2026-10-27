@@ -118,8 +118,6 @@ class AdminPanelProvider extends PanelProvider
     };
 @endphp
 <span class="sigem-crumb">SIGEM › <b>{{ $section }}</b></span>
-<span class="sigem-role-banner sigem-role-admin"
-      title="Acceso completo de administración">👑 Administrador</span>
 {{-- Campo de búsqueda aparente en el topbar (Fase 9: Buscador global) --}}
 <div class="sigem-topbar-search"
      role="button"
@@ -130,6 +128,8 @@ class AdminPanelProvider extends PanelProvider
     <span>🔍</span>
     <span>Buscar en SIGEM…</span>
 </div>
+<span class="sigem-role-banner sigem-role-admin"
+      title="Acceso completo de administración">👑 Administrador</span>
 @endif
 ')
             )

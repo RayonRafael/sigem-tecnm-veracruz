@@ -3694,6 +3694,200 @@ header.fi-topbar nav > div.ms-auto,
   font-weight: 700 !important;
 }
 
+/* ============================================
+   PASO 4a: Checkboxes de selección en tabla
+   ============================================ */
+.fi-ta-selection-cell {
+  width: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  padding: 5px 10px !important;
+}
+.fi-ta-selection-cell input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  accent-color: var(--sig-primary) !important;
+}
+
+/* ============================================
+   PASO 4b: Filtros de Filament como fila
+   ============================================ */
+.fi-ta-ctn .fi-ta-filters {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  gap: 8px !important;
+  padding: 6px 12px !important;
+  background: var(--sig-bg, #f4f6f8) !important;
+  border-bottom: 1px solid var(--sig-border, #e5e7eb) !important;
+}
+
+/* ============================================
+   PASO 4c: Barra de acciones de tabla
+   ============================================ */
+.fi-ta-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+.fi-ta-search {
+  flex: 1 1 300px !important;
+}
+.fi-ta-search input {
+  border-radius: 10px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  padding: 8px 12px !important;
+}
+
+/* ============================================
+   FIX: Quitar pill del centro + densidad excesiva
+   ============================================ */
+
+/* FIX 1: Pill "👑 Administrador" fuera del centro */
+.sigem-crumb {
+  margin-right: auto !important;
+}
+
+/* FIX 2: Hero aún más compacto */
+.sigem-hero, .hero, .welcome-banner {
+  padding: 10px 16px !important;
+  margin-bottom: 10px !important;
+  border-radius: 12px !important;
+}
+.sigem-hero h1 {
+  font-size: 18px !important;
+  margin-bottom: 1px !important;
+}
+.sigem-hero p {
+  font-size: 12.5px !important;
+  line-height: 1.25 !important;
+}
+
+/* FIX 3: Quick cards y KPIs aún más compactos */
+.sigem-quick-grid, .sigem-stats-grid {
+  gap: 10px !important;
+  margin-bottom: 10px !important;
+}
+.sigem-quick {
+  padding: 10px 12px !important;
+}
+.sigem-quick-ico {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  min-height: 30px !important;
+  margin-bottom: 5px !important;
+}
+.sigem-quick-title {
+  font-size: 14px !important;
+}
+.sigem-stat {
+  padding: 10px 12px !important;
+}
+.sigem-stat-val {
+  font-size: 24px !important;
+  margin-top: 4px !important;
+}
+.sigem-stat-label {
+  font-size: 14px !important;
+}
+.sigem-stat-hint {
+  margin-top: 4px !important;
+  padding: 2px 6px !important;
+  font-size: 11.5px !important;
+}
+
+/* ============================================
+   FIX: Topbar pegado al sidebar, sidebar a borde, KPIs lado derecho, sombras
+   ============================================ */
+
+/* FIX 1+2: Unir Topbar, Sidebar y Contenido (sin huecos) */
+.fi-layout {
+  gap: 0 !important;
+  padding: 0 !important;
+}
+.fi-sidebar {
+  border-right: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border-left: none !important;
+}
+.fi-topbar {
+  margin: 0 !important;
+  padding: 0 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+}
+.fi-topbar > nav {
+  border-radius: 0 !important;
+}
+body:has(.sigem-professional) .fi-main-ctn,
+.fi-main-ctn {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+  margin: 0 !important;
+}
+body:has(.sigem-professional) .fi-main,
+.fi-main {
+  padding: 14px 20px !important;
+}
+
+/* FIX 3: Números KPI a la derecha del contenido */
+.sigem-stat,
+.fi-wi-stats-overview-stat {
+  display: grid !important;
+  grid-template-columns: auto 1fr auto !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  column-gap: 10px !important;
+  row-gap: 6px !important;
+}
+.sigem-stat-ico,
+.fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-icon {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  margin: 0 !important;
+}
+.sigem-stat-label,
+.fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-label {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+.sigem-stat-val,
+.fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-value {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  text-align: right !important;
+  line-height: 1 !important;
+}
+.sigem-stat-hint,
+.fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-description {
+  grid-column: 1 / -1 !important;
+  grid-row: 2 !important;
+  margin-top: 4px !important;
+  justify-self: start !important;
+  width: fit-content !important;
+}
+
+/* FIX 4: Elementos más prominentes (más "al frente") */
+.sigem-quick, .sigem-stat, .sigem-card, .fi-ta-ctn, .fi-section {
+  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.08) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+.sigem-hero {
+  box-shadow: 0 4px 12px rgba(27, 101, 212, 0.2) !important;
+}
+
+
+
 
 
 

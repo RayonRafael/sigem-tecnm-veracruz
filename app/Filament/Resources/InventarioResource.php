@@ -604,6 +604,12 @@ class InventarioResource extends Resource
             ->emptyStateIcon('heroicon-o-document-text')
             ->recordUrl(null)
             ->recordAction(null)
+            ->headerActions([
+                Tables\Actions\Action::make('export')
+                    ->label('Exportar')
+                    ->icon('heroicon-s-arrow-down-tray')
+                    ->action(fn () => null),
+            ])
             ->actions([
                 Tables\Actions\Action::make('aprobar')
                     ->label('Aprobar')
