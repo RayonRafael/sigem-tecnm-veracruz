@@ -4136,6 +4136,206 @@ header.fi-header p.fi-header-subheading,
   row-gap: 8px !important;
 }
 
+/* ============================================
+   DISEÑO INVENTARIO: Toolbar compacta y acciones emoji
+   ============================================ */
+
+/* 1. Toolbar compacta */
+.fi-ta-header, .fi-ta-header-toolbar {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  min-height: auto !important;
+  gap: 8px !important;
+}
+
+/* 2. Emojis en acciones de fila (Aprobar, Rechazar, Detalle, Editar) */
+.fi-ta-actions button[title*="Aprobar"]::before,
+.fi-ta-actions a[title*="Aprobar"]::before {
+  content: "✅" !important;
+  font-size: 14px !important;
+}
+.fi-ta-actions button[title*="Rechazar"]::before,
+.fi-ta-actions a[title*="Rechazar"]::before {
+  content: "❌" !important;
+  font-size: 14px !important;
+}
+.fi-ta-actions button[title*="Ver detalle"]::before,
+.fi-ta-actions button[title*="Detalle"]::before,
+.fi-ta-actions a[title*="Ver detalle"]::before,
+.fi-ta-actions a[title*="Detalle"]::before {
+  content: "👁" !important;
+  font-size: 14px !important;
+}
+.fi-ta-actions button[title*="Editar"]::before,
+.fi-ta-actions a[title*="Editar"]::before {
+  content: "✏️" !important;
+  font-size: 14px !important;
+}
+.fi-ta-actions button[title*="Eliminar"]::before,
+.fi-ta-actions a[title*="Eliminar"]::before {
+  content: "🗑️" !important;
+  font-size: 14px !important;
+}
+
+/* Ocultar iconos SVG dentro de botones de acción para dejar ver el emoji limpio */
+.fi-ta-actions button[title*="Aprobar"] svg,
+.fi-ta-actions button[title*="Rechazar"] svg,
+.fi-ta-actions button[title*="Ver detalle"] svg,
+.fi-ta-actions button[title*="Detalle"] svg,
+.fi-ta-actions button[title*="Editar"] svg,
+.fi-ta-actions button[title*="Eliminar"] svg,
+.fi-ta-actions a[title*="Eliminar"] svg {
+  display: none !important;
+}
+
+/* ============================================
+   Tabla Inventario Lista = Tabla Dashboard
+   ============================================ */
+
+/* Headers compactos */
+.fi-ta-table thead th,
+.fi-ta-header-cell {
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: var(--sig-muted) !important;
+  padding: 5px 10px !important;
+  background: var(--sig-bg, #f4f6f8) !important;
+}
+
+.fi-ta-table thead th button,
+.fi-ta-table thead th .fi-ta-header-cell-label {
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: var(--sig-muted) !important;
+  padding: 0 !important;
+}
+
+/* Header de la columna acciones */
+.fi-ta-table thead th:last-child:empty::after,
+.fi-ta-table thead th.fi-ta-actions-cell:empty::after,
+.fi-ta-table thead th.fi-ta-actions-header-cell:empty::after {
+  content: 'ACCIONES' !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: var(--sig-muted) !important;
+  display: block !important;
+  text-align: center !important;
+}
+
+/* Filas ultra compactas */
+.fi-ta-table tbody td {
+  padding: 4px 10px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  vertical-align: middle !important;
+}
+
+/* Anular padding interno excesivo de celdas en Filament */
+.fi-ta-table thead th.fi-ta-selection-cell,
+.fi-ta-table thead th.fi-ta-selection-cell > div,
+.fi-ta-table thead th > div,
+.fi-ta-table tbody td.fi-ta-selection-cell,
+.fi-ta-table tbody td.fi-ta-selection-cell > div,
+.fi-ta-table tbody td .fi-ta-text,
+.fi-ta-table tbody td .fi-ta-col-wrp > div,
+.fi-ta-table tbody td.fi-ta-actions-cell > div {
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+/* Columna EQUIPO: gap mínimo entre título y S/N */
+.fi-ta-table tbody td .fi-ta-text {
+  gap: 0 !important;
+  row-gap: 0 !important;
+}
+
+/* Columna CÓDIGO — texto bold, tamaño normal */
+.fi-ta-table tbody td.fi-table-cell-num-serie,
+.fi-ta-table tbody td.fi-table-cell-num-serie *,
+.fi-ta-table tbody td:nth-child(2),
+.fi-ta-table tbody td:nth-child(2) * {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--sig-text, #0f172a) !important;
+}
+
+/* EQUIPO: nombre bold arriba + S/N debajo */
+.fi-ta-table tbody td .fi-ta-text-item-label,
+.fi-ta-table tbody td.fi-table-cell-material\.nombre .fi-ta-text-item-label,
+.fi-ta-table tbody td:nth-child(3) .fi-ta-text-item-label {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  color: var(--sig-text, #0f172a) !important;
+}
+.fi-ta-table tbody td .fi-ta-text-description,
+.fi-ta-table tbody td .fi-ta-text p,
+.fi-ta-table tbody td.fi-table-cell-material\.nombre p,
+.fi-ta-table tbody td:nth-child(3) p {
+  font-size: 11.5px !important;
+  color: var(--sig-muted, #64748b) !important;
+  line-height: 1.15 !important;
+  margin-top: 1px !important;
+  margin-bottom: 0 !important;
+  font-weight: 400 !important;
+}
+
+/* Badges compactos (CATEGORÍA y ESTADO) */
+.fi-ta-table tbody td .fi-badge {
+  font-size: 11px !important;
+  padding: 2px 8px !important;
+  border-radius: 99px !important;
+  font-weight: 600 !important;
+}
+
+/* ÁREA: texto normal gris */
+.fi-ta-table tbody td.fi-table-cell-ubicacion-fisica,
+.fi-ta-table tbody td.fi-table-cell-ubicacion-fisica *,
+.fi-ta-table tbody td:nth-child(6),
+.fi-ta-table tbody td:nth-child(6) * {
+  color: var(--sig-muted, #64748b) !important;
+  font-weight: 400 !important;
+  font-size: 13px !important;
+}
+
+/* Acciones: icono pequeño en cuadro */
+.fi-ta-table .fi-ta-actions button,
+.fi-ta-actions-cell button {
+  width: 28px !important;
+  height: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  background: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+.fi-ta-actions-cell .fi-ta-actions {
+  gap: 4px !important;
+}
+
+/* Toolbar: compactar Exportar + Buscar + Filtros */
+.fi-ta-header, .fi-ta-header-toolbar {
+  padding: 4px 10px !important;
+  min-height: 34px !important;
+  gap: 6px !important;
+}
+
+
+
 
 
 

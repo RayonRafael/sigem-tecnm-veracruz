@@ -453,36 +453,25 @@ class InventarioResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('num_serie')->wrap(false)->limit(30)->grow(false)
-                    ->label('No. serie')
-                    ->fontFamily('mono')
+                Tables\Columns\TextColumn::make('num_serie')
+                    ->label('CÓDIGO')
                     ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('material.nombre')->wrap(false)->limit(40)->grow(false)
-                    ->label('Equipo / Material')
+                    ->weight('bold')
+                    ->width('130px'),
+                Tables\Columns\TextColumn::make('material.nombre')
+                    ->label('EQUIPO')
                     ->searchable()
                     ->sortable()
+                    ->grow()
                     ->description(fn (Inventario $record): ?string => $record->num_serie ? "S/N: {$record->num_serie}" : null),
-                Tables\Columns\TextColumn::make('subtipo')->wrap(false)->limit(30)->grow(false)
-                    ->label('Subtipo')
+                Tables\Columns\TextColumn::make('material.tipo.nombre')
+                    ->label('CATEGORÍA')
+                    ->badge()
+                    ->color('gray')
                     ->searchable()
                     ->sortable()
-                    ->placeholder('—'),
-                Tables\Columns\TextColumn::make('material.marca.nombre')->wrap(false)->limit(30)->grow(false)
-                    ->label('Marca')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('material.tipo.nombre')->wrap(false)->limit(30)->grow(false)
-                    ->label('Tipo')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('ubicacion_fisica')->wrap(false)->limit(30)->grow(false)
-                    ->label('Ubicación')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)->label('Estado')
+                    ->width('130px'),
+                Tables\Columns\TextColumn::make('estado')->label('ESTADO')
                     ->badge()
                     ->colors([
                         'success' => 'Disponible',
@@ -499,7 +488,18 @@ class InventarioResource extends Resource
                         'heroicon-m-wrench' => 'En Mantenimiento',
                         'heroicon-m-exclamation-triangle' => 'Dañado',
                         'heroicon-m-minus-circle' => 'Baja',
-                    ]),
+                    ])
+                    ->width('140px'),
+                Tables\Columns\TextColumn::make('ubicacion_fisica')
+                    ->label('ÁREA')
+                    ->searchable()
+                    ->placeholder('—')
+                    ->width('120px'),
+                Tables\Columns\TextColumn::make('material.marca.nombre')->wrap(false)->limit(30)->grow(false)
+                    ->label('Marca')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('procesador')->wrap(false)->limit(30)->grow(false)
                     ->label('Procesador')
                     ->searchable()
@@ -606,36 +606,27 @@ class InventarioResource extends Resource
             ->recordAction(null)
             ->headerActions([
                 Tables\Actions\Action::make('export')
-                    ->label('Exportar')
-                    ->icon('heroicon-s-arrow-down-tray')
+                    ->label('↓ Exportar')
+                    ->color('gray')
                     ->action(fn () => null),
             ])
             ->actions([
-                Tables\Actions\Action::make('aprobar')
-                    ->label('Aprobar')
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->visible(fn (Inventario $record): bool => ! $record->aprobado && auth()->user()->can('aprobaciones.aprobar'))
-                    ->action(function (Inventario $record) {
-                        $record->update(['aprobado' => true, 'estado_registro' => 'Aprobado', 'aprobado_por' => auth()->id(), 'fecha_aprobacion' => now()]);
-                        Notification::make()->title('Registro aprobado exitosamente')->success()->send();
-                    })
-                    ->requiresConfirmation(),
-                Tables\Actions\Action::make('rechazar')
-                    ->label('Rechazar')
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->visible(fn (Inventario $record): bool => ! $record->aprobado && auth()->user()->can('aprobaciones.rechazar'))
-                    ->action(function (Inventario $record) {
-                        $record->update([
-                            'estado_registro' => 'Rechazado',
-                            'aprobado' => false,
-                        ]);
-                        Notification::make()->title('Registro rechazado exitosamente')->success()->send();
-                    })
-                    ->requiresConfirmation(),
-                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle'),
-                Tables\Actions\EditAction::make()->iconButton()->slideOver()->tooltip('Editar')->successNotificationTitle('Registro de inventario actualizado correctamente'),
+                Tables\Actions\ViewAction::make()
+                    ->iconButton()
+                    ->tooltip('Ver detalle')
+                    ->extraAttributes(['title' => 'Ver detalle'])
+                    ->slideOver(),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Editar')
+                    ->extraAttributes(['title' => 'Editar'])
+                    ->slideOver()
+                    ->successNotificationTitle('Registro actualizado correctamente'),
+                Tables\Actions\DeleteAction::make()
+                    ->iconButton()
+                    ->tooltip('Eliminar')
+                    ->extraAttributes(['title' => 'Eliminar'])
+                    ->successNotificationTitle('Registro eliminado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

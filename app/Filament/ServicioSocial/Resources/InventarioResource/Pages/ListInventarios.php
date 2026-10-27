@@ -15,6 +15,16 @@ class ListInventarios extends ListRecords
 
     protected static string $resource = InventarioResource::class;
 
+    public function getTitle(): string
+    {
+        return '💻 Inventario general';
+    }
+
+    public function getBreadcrumbs(): array
+    {
+        return [];
+    }
+
     protected function getHeaderActions(): array
     {
         return [
