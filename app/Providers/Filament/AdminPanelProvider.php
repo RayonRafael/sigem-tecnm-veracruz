@@ -105,6 +105,19 @@ class AdminPanelProvider extends PanelProvider
                 PanelsRenderHook::USER_MENU_BEFORE,
                 fn (): string => Blade::render('
 @if (auth()->check())
+@php
+    $path = request()->path();
+    $section = match(true) {
+        str_contains($path, "inventarios") => "Inventario general",
+        str_contains($path, "solicituds") => "Solicitud de Material/Equipo",
+        str_contains($path, "mantenimientos") => "Mantenimiento",
+        str_contains($path, "configuracion") => "Configuración y Catálogos",
+        str_contains($path, "reportes") => "Reportes",
+        str_contains($path, "users") => "Usuarios",
+        default => "Panel principal",
+    };
+@endphp
+<span class="sigem-crumb">SIGEM › <b>{{ $section }}</b></span>
 <span class="sigem-role-banner sigem-role-admin"
       title="Acceso completo de administración">👑 Administrador</span>
 {{-- Campo de búsqueda aparente en el topbar (Fase 9: Buscador global) --}}

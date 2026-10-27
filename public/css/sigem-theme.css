@@ -3617,6 +3617,84 @@ button[title*="Editar"]::before,
   font-size: 16px !important;
 }
 
+/* ============================================
+   PASO 5: Badges, bordes y breadcrumb
+   ============================================ */
+
+/* Badges de estado */
+.fi-badge, .sigem-pill {
+  border-radius: 99px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 3px 10px !important;
+}
+/* Disponible — verde */
+.fi-badge.fi-color-success, .sigem-pill.ok {
+  background-color: #dcfce7 !important;
+  color: #059669 !important;
+}
+/* Asignado — celeste */
+.fi-badge.fi-color-info, .sigem-pill.info {
+  background-color: #cffafe !important;
+  color: #0891b2 !important;
+}
+/* Reasignado — violeta */
+.fi-badge.fi-color-reassign, .sigem-pill.reassign {
+  background-color: #ede9fe !important;
+  color: #8b5cf6 !important;
+}
+/* En Mantenimiento — ámbar */
+.fi-badge.fi-color-warning, .sigem-pill.warn {
+  background-color: #fef3c7 !important;
+  color: #d97706 !important;
+}
+/* Dañado — rojo */
+.fi-badge.fi-color-danger, .sigem-pill.danger {
+  background-color: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+/* Baja — gris */
+.fi-badge.fi-color-gray, .sigem-pill.neutral {
+  background-color: #f3f4f6 !important;
+  color: #6b7280 !important;
+}
+
+/* Tarjetas con sombra sutil */
+.sigem-quick, .sigem-stat, .sigem-card,
+.fi-ta-ctn, .fi-section {
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04) !important;
+  border-radius: 12px !important;
+}
+
+/* Hover sutil en quick cards */
+.sigem-quick:hover {
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.07) !important;
+  transform: translateY(-1px) !important;
+  transition: all 0.15s ease !important;
+}
+
+/* Breadcrumb en topbar */
+.fi-topbar nav > div.ms-auto,
+header.fi-topbar nav > div.ms-auto,
+.fi-topbar nav > div:has(.sigem-crumb),
+.fi-topbar-ctn > div:last-child {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  justify-content: flex-end !important;
+}
+.sigem-crumb {
+  font-size: 15px !important;
+  color: var(--sig-muted) !important;
+  margin-right: auto !important;
+  white-space: nowrap !important;
+}
+.sigem-crumb b {
+  color: var(--sig-text) !important;
+  font-weight: 700 !important;
+}
+
+
 
 
 
