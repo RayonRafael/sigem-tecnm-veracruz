@@ -184,14 +184,30 @@
                                             <td>
                                                 <span style="font-size: 14px; color: var(--sig-muted);">{{ $areaUbicacion }}</span>
                                             </td>
-                                            <td style="text-align: right;">
-                                                <button type="button"
-                                                        wire:click="verEquipo({{ $inv->id_inventario }})"
-                                                        class="sigem-rep-btn-sec fi-icon-btn"
-                                                        title="Ver detalle"
-                                                        aria-label="Ver detalle"
-                                                        style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;">
-                                                </button>
+                                            <td style="text-align: right; white-space: nowrap;">
+                                                <div style="display: inline-flex; align-items: center; justify-content: flex-end; gap: 4px;">
+                                                    <button type="button"
+                                                            wire:click="verEquipo({{ $inv->id_inventario }})"
+                                                            class="sigem-rep-btn-sec fi-icon-btn"
+                                                            title="Ver detalle"
+                                                            aria-label="Ver detalle"
+                                                            style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;">
+                                                    </button>
+                                                    <button type="button"
+                                                            wire:click="editarEquipo({{ $inv->id_inventario }})"
+                                                            class="sigem-rep-btn-sec fi-icon-btn"
+                                                            title="Editar"
+                                                            aria-label="Editar"
+                                                            style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;">
+                                                    </button>
+                                                    <button type="button"
+                                                            wire:click="eliminarEquipo({{ $inv->id_inventario }})"
+                                                            class="sigem-rep-btn-sec fi-icon-btn"
+                                                            title="Eliminar"
+                                                            aria-label="Eliminar"
+                                                            style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;">
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     @empty

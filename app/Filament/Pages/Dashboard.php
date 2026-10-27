@@ -17,6 +17,8 @@ use App\Models\UnidadMedida;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Infolist;
 use Filament\Pages\Dashboard as BaseDashboard;
@@ -81,6 +83,41 @@ class Dashboard extends BaseDashboard
     public function verEquipo($id): void
     {
         $this->mountAction('verEquipo', ['id' => $id, 'record' => $id]);
+    }
+
+    public function editarEquipoAction(): Action
+    {
+        return EditAction::make('editarEquipo')
+            ->label('Editar equipo')
+            ->modalHeading('Editar equipo')
+            ->model(Inventario::class)
+            ->record(function (array $arguments) {
+                return Inventario::find($arguments['id'] ?? $arguments['record']);
+            })
+            ->steps(InventarioResource::getFormSteps())
+            ->slideOver()
+            ->successNotificationTitle('Registro actualizado correctamente');
+    }
+
+    public function editarEquipo($id): void
+    {
+        $this->mountAction('editarEquipo', ['id' => $id]);
+    }
+
+    public function eliminarEquipoAction(): Action
+    {
+        return DeleteAction::make('eliminarEquipo')
+            ->label('Eliminar equipo')
+            ->model(Inventario::class)
+            ->record(function (array $arguments) {
+                return Inventario::find($arguments['id'] ?? $arguments['record']);
+            })
+            ->successNotificationTitle('Registro eliminado correctamente');
+    }
+
+    public function eliminarEquipo($id): void
+    {
+        $this->mountAction('eliminarEquipo', ['id' => $id]);
     }
 
     public function getColumns(): int|string|array

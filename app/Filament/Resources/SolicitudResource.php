@@ -283,9 +283,10 @@ class SolicitudResource extends Resource
             ->recordAction(null)
             ->actions([
                 Tables\Actions\Action::make('autorizar')
-                    ->label('Autorizar')
-                    ->icon('heroicon-m-check-circle')
+                    ->iconButton()
                     ->color('success')
+                    ->tooltip('Autorizar')
+                    ->extraAttributes(['title' => 'Autorizar'])
                     ->visible(fn (Solicitud $record): bool => $record->estado === 'Pendiente')
                     ->action(function (Solicitud $record) {
                         $record->update([
@@ -297,9 +298,10 @@ class SolicitudResource extends Resource
                     })
                     ->requiresConfirmation(),
                 Tables\Actions\Action::make('rechazar')
-                    ->label('Rechazar')
-                    ->icon('heroicon-m-x-circle')
+                    ->iconButton()
                     ->color('danger')
+                    ->tooltip('Rechazar')
+                    ->extraAttributes(['title' => 'Rechazar'])
                     ->visible(fn (Solicitud $record): bool => $record->estado === 'Pendiente')
                     ->form([
                         Forms\Components\Textarea::make('motivo_rechazo')

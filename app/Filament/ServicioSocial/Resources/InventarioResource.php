@@ -476,6 +476,8 @@ class InventarioResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('id_usuario', auth()->id());
+        return parent::getEloquentQuery();
+        // Sin filtro por usuario — SS ve todo el inventario
+        // Los permisos de edición los controla InventarioPolicy
     }
 }

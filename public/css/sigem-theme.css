@@ -3956,12 +3956,20 @@ header.fi-topbar {
 .fi-ta-table tbody .fi-ta-actions button svg,
 .fi-ta-table tbody .fi-icon-btn svg,
 .fi-ta-actions-cell button svg,
-.fi-ta-actions-cell .fi-icon-btn svg {
+.fi-ta-actions-cell .fi-icon-btn svg,
+.sigem-row-actions button svg,
+.fi-icon-btn[title*="Ver"] svg,
+.fi-icon-btn[title*="Editar"] svg,
+.fi-icon-btn[title*="Eliminar"] svg,
+button[title*="Ver detalle"] svg,
+button[title*="Editar"] svg,
+button[title*="Eliminar"] svg {
   display: none !important;
 }
 .fi-ta-actions button[title*="Ver"]::before,
 .fi-icon-btn[title*="Ver"]::before,
 button[title*="Ver detalle"]::before,
+button[title*="Ver equipo"]::before,
 .fi-ta-actions button[x-tooltip*="Ver"]::before,
 .fi-ta-actions button[x-tooltip*="Detalle"]::before,
 .fi-icon-btn[x-tooltip*="Ver"]::before,
@@ -3974,6 +3982,7 @@ button[title*="Ver detalle"]::before,
 .fi-ta-actions button[title*="Edit"]::before,
 .fi-ta-actions button[title*="Editar"]::before,
 .fi-icon-btn[title*="Edit"]::before,
+.fi-icon-btn[title*="Editar"]::before,
 button[title*="Editar"]::before,
 .fi-ta-actions button[x-tooltip*="Edit"]::before,
 .fi-ta-actions button[x-tooltip*="Editar"]::before,
@@ -3981,6 +3990,15 @@ button[title*="Editar"]::before,
 .fi-icon-btn[x-tooltip*="Editar"]::before,
 .fi-ta-actions button[wire\:click*="edit"]::before {
   content: "✏️" !important;
+  font-size: 16px !important;
+}
+.fi-ta-actions button[title*="Eliminar"]::before,
+.fi-icon-btn[title*="Eliminar"]::before,
+button[title*="Eliminar"]::before,
+.fi-ta-actions button[x-tooltip*="Eliminar"]::before,
+.fi-icon-btn[x-tooltip*="Eliminar"]::before,
+.fi-ta-actions button[wire\:click*="delete"]::before {
+  content: "🗑️" !important;
   font-size: 16px !important;
 }
 
@@ -4515,30 +4533,47 @@ header.fi-header p.fi-header-subheading,
   gap: 8px !important;
 }
 
-/* 2. Emojis en acciones de fila (Aprobar, Rechazar, Detalle, Editar) */
+/* 2. Emojis en acciones de fila (Aprobar, Autorizar, Rechazar, Completar, Detalle, Editar, Eliminar) */
 .fi-ta-actions-cell button[title*="Aprobar"]::before,
-.fi-ta-actions-cell a[title*="Aprobar"]::before {
+.fi-ta-actions-cell button[title*="Autorizar"]::before,
+.fi-ta-actions-cell button[x-tooltip*="Aprobar"]::before,
+.fi-ta-actions-cell button[x-tooltip*="Autorizar"]::before,
+.fi-ta-actions-cell a[title*="Aprobar"]::before,
+.fi-ta-actions-cell a[title*="Autorizar"]::before {
   content: "✅" !important;
   font-size: 14px !important;
 }
 .fi-ta-actions-cell button[title*="Rechazar"]::before,
+.fi-ta-actions-cell button[x-tooltip*="Rechazar"]::before,
 .fi-ta-actions-cell a[title*="Rechazar"]::before {
   content: "❌" !important;
   font-size: 14px !important;
 }
+.fi-ta-actions-cell button[title*="Completar"]::before,
+.fi-ta-actions-cell button[x-tooltip*="Completar"]::before,
+.fi-ta-actions-cell a[title*="Completar"]::before {
+  content: "🏁" !important;
+  font-size: 14px !important;
+}
 .fi-ta-actions-cell button[title*="Ver detalle"]::before,
 .fi-ta-actions-cell button[title*="Detalle"]::before,
+.fi-ta-actions-cell button[x-tooltip*="Ver"]::before,
+.fi-ta-actions-cell button[x-tooltip*="Detalle"]::before,
 .fi-ta-actions-cell a[title*="Ver detalle"]::before,
 .fi-ta-actions-cell a[title*="Detalle"]::before {
   content: "👁" !important;
   font-size: 14px !important;
 }
 .fi-ta-actions-cell button[title*="Editar"]::before,
+.fi-ta-actions-cell button[x-tooltip*="Editar"]::before,
+.fi-ta-actions-cell button[x-tooltip*="Edit"]::before,
 .fi-ta-actions-cell a[title*="Editar"]::before {
   content: "✏️" !important;
   font-size: 14px !important;
 }
 .fi-ta-actions-cell button[title*="Eliminar"]::before,
+.fi-ta-actions-cell button[x-tooltip*="Eliminar"]::before,
+.fi-ta-actions-cell button[wire\:click*="delete"]::before,
 .fi-ta-actions-cell a[title*="Eliminar"]::before {
   content: "🗑️" !important;
   font-size: 14px !important;
@@ -4546,11 +4581,22 @@ header.fi-header p.fi-header-subheading,
 
 /* Ocultar iconos SVG dentro de botones de acción para dejar ver el emoji limpio */
 .fi-ta-actions-cell button[title*="Aprobar"] svg,
+.fi-ta-actions-cell button[title*="Autorizar"] svg,
+.fi-ta-actions-cell button[x-tooltip*="Aprobar"] svg,
+.fi-ta-actions-cell button[x-tooltip*="Autorizar"] svg,
 .fi-ta-actions-cell button[title*="Rechazar"] svg,
+.fi-ta-actions-cell button[x-tooltip*="Rechazar"] svg,
+.fi-ta-actions-cell button[title*="Completar"] svg,
+.fi-ta-actions-cell button[x-tooltip*="Completar"] svg,
 .fi-ta-actions-cell button[title*="Ver detalle"] svg,
 .fi-ta-actions-cell button[title*="Detalle"] svg,
+.fi-ta-actions-cell button[x-tooltip*="Ver"] svg,
+.fi-ta-actions-cell button[x-tooltip*="Detalle"] svg,
 .fi-ta-actions-cell button[title*="Editar"] svg,
+.fi-ta-actions-cell button[x-tooltip*="Editar"] svg,
+.fi-ta-actions-cell button[x-tooltip*="Edit"] svg,
 .fi-ta-actions-cell button[title*="Eliminar"] svg,
+.fi-ta-actions-cell button[x-tooltip*="Eliminar"] svg,
 .fi-ta-actions-cell a[title*="Eliminar"] svg {
   display: none !important;
 }

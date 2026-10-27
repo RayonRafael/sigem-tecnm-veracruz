@@ -257,11 +257,10 @@ class MantenimientoResource extends Resource
             ->recordAction(null)
             ->actions([
                 Tables\Actions\Action::make('autorizar')
-                    ->label('✓ Autorizar')
-                    ->button()
-                    ->size(ActionSize::Small)
-                    ->color('primary')
-                    ->extraAttributes(['class' => 'sigem-btn-inline'])
+                    ->iconButton()
+                    ->color('success')
+                    ->tooltip('Autorizar')
+                    ->extraAttributes(['title' => 'Autorizar'])
                     ->visible(fn (Mantenimiento $record): bool => in_array($record->estado, ['Pendiente Revision Admin', 'En revisión']))
                     ->action(function (Mantenimiento $record) {
                         $record->update(['estado' => 'En proceso']);
@@ -269,11 +268,10 @@ class MantenimientoResource extends Resource
                     })
                     ->requiresConfirmation(),
                 Tables\Actions\Action::make('completar')
-                    ->label('Completar')
-                    ->icon('heroicon-m-check-badge')
-                    ->color('info')
                     ->iconButton()
-                    ->tooltip('Completar mantenimiento')
+                    ->color('info')
+                    ->tooltip('Completar')
+                    ->extraAttributes(['title' => 'Completar'])
                     ->visible(fn (Mantenimiento $record): bool => $record->estado === 'En proceso')
                     ->action(function (Mantenimiento $record) {
                         $record->update(['estado' => 'Completado', 'fecha_fin' => now()]);

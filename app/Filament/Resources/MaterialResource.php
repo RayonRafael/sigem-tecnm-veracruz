@@ -189,6 +189,7 @@ class MaterialResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Material actualizado correctamente'),
+                Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
