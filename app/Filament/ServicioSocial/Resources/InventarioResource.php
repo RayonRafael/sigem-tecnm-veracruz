@@ -367,8 +367,8 @@ class InventarioResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->slideOver()->successNotificationTitle('Registro de inventario actualizado correctamente'),
+                Tables\Actions\ViewAction::make()->iconButton()->slideOver()->tooltip('Ver detalle'),
+                Tables\Actions\EditAction::make()->iconButton()->slideOver()->tooltip('Editar')->successNotificationTitle('Registro de inventario actualizado correctamente'),
             ])
             ->bulkActions([]);
     }
