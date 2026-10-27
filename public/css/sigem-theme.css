@@ -3587,9 +3587,11 @@ header.fi-topbar {
   display: none !important;
 }
 
-/* Reemplazar iconos SVG de acciones por emojis */
-.fi-ta-actions button svg,
-.fi-icon-btn svg {
+/* Reemplazar iconos SVG de acciones por emojis (solo en celdas y filas de tabla) */
+.fi-ta-table tbody .fi-ta-actions button svg,
+.fi-ta-table tbody .fi-icon-btn svg,
+.fi-ta-actions-cell button svg,
+.fi-ta-actions-cell .fi-icon-btn svg {
   display: none !important;
 }
 .fi-ta-actions button[title*="Ver"]::before,
@@ -4497,21 +4499,22 @@ header.fi-header p.fi-header-subheading,
   flex-shrink: 0 !important;
 }
 
+/* Ocultar badge flotante de filtros activos en la toolbar */
+.fi-ta-filters-dropdown .fi-icon-btn-badge-ctn,
+.fi-ta-filters-dropdown .fi-badge,
+.fi-ta-filters-trigger .fi-badge,
+.fi-ta-header-toolbar .fi-ta-filters-indicator-count,
+.fi-ta-header .fi-ta-filters-dropdown .fi-icon-btn-badge-ctn,
+.fi-ta-header-toolbar .fi-ac-btn-group .fi-badge {
+  display: none !important;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* Restaurar iconos SVG en botones de la toolbar (Filtros, Alternar columnas, etc.) */
+.fi-ta-header-toolbar .fi-icon-btn svg,
+.fi-ta-header-toolbar button svg,
+.fi-ta-header-ctn .fi-icon-btn svg,
+.fi-ta-header-ctn .fi-ta-filters-dropdown svg,
+.fi-ta-header-ctn .fi-ta-col-toggle svg {
+  display: block !important;
+  visibility: visible !important;
+}
