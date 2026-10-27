@@ -3437,6 +3437,49 @@ html, body {
   --color-600: 124, 58, 237;
 }
 
+/* ============================================
+   PASO 1: Fondo gris + topbar mockup
+   ============================================ */
+
+/* 1. Fondo gris en el contenido */
+.fi-main, .fi-main-ctn, main.fi-main {
+  background-color: #f4f6f8 !important;
+}
+
+/* 2. Sidebar y topbar blancos */
+.fi-sidebar {
+  background-color: #ffffff !important;
+}
+.fi-topbar {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* 3. Topbar delgado (~50px) */
+.fi-topbar,
+header.fi-topbar {
+  min-height: 50px !important;
+  height: 50px !important;
+  padding: 0 16px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* 4. Sin gap entre sidebar y topbar */
+.fi-topbar,
+.fi-topbar-wrap,
+.fi-topbar-ctn {
+  margin-left: 0 !important;
+  border-left: none !important;
+}
+
+/* 5. Tarjetas blancas sobre el gris */
+.sigem-quick, .sigem-stat, .sigem-card,
+.fi-ta-ctn, .fi-section {
+  background-color: #ffffff !important;
+}
+
+
 
 
 
