@@ -3886,6 +3886,238 @@ body:has(.sigem-professional) .fi-main,
   box-shadow: 0 4px 12px rgba(27, 101, 212, 0.2) !important;
 }
 
+/* ============================================
+   DISEÑO SOLICITUDES: Badges y Densidad
+   ============================================ */
+.fi-ta-table tbody td { padding: 5px 12px !important; }
+.fi-ta-table thead th { font-size: 13px !important; padding: 7px 12px !important; }
+
+/* En Solicitudes: badge tipo sin punto, badge estado usa el punto ● de PHP */
+.fi-table-cell-tipo-movimiento .fi-badge::before,
+.fi-table-cell-estado .fi-badge::before {
+  display: none !important;
+}
+
+/* ============================================
+   Encabezado global transparente y compacto
+   ============================================ */
+/* Encabezado sin fondo blanco ni contenedor */
+body:has(.sigem-professional) .fi-header,
+header.fi-header,
+.fi-header {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-bottom: none !important;
+  padding: 8px 16px !important;
+  margin-bottom: 8px !important;
+}
+
+/* Título de la página */
+header.fi-header h1,
+header.fi-header h1.fi-header-heading,
+.fi-header h1,
+.fi-header h1.fi-header-heading {
+  font-size: 20px !important;
+  margin-bottom: 2px !important;
+  line-height: 1.25 !important;
+}
+
+/* Subtítulo de la página */
+header.fi-header p,
+header.fi-header p.fi-header-subheading,
+.fi-header p,
+.fi-header p.fi-header-subheading {
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+  margin-top: 0 !important;
+  color: var(--sig-muted, #6b7280) !important;
+}
+
+/* ============================================
+   Espacio compacto: topbar → título → tabla
+   ============================================ */
+
+/* Reducir padding general del área de trabajo manteniendo topbar pegado */
+.fi-main-ctn {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.fi-main, main.fi-main, body:has(.sigem-professional) .fi-main {
+  padding: 12px 16px !important;
+}
+
+/* Anular la separación (gap) nativa entre encabezado y tabla */
+.fi-page {
+  gap: 8px !important;
+}
+
+/* Encabezado compacto */
+header.fi-header,
+.fi-header {
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+}
+header.fi-header h1,
+header.fi-header h1.fi-header-heading,
+.fi-header h1,
+.fi-header h1.fi-header-heading {
+  font-size: 17px !important;
+  margin-bottom: 0 !important;
+}
+header.fi-header p,
+header.fi-header p.fi-header-subheading,
+.fi-header p,
+.fi-header p.fi-header-subheading {
+  font-size: 12.5px !important;
+  line-height: 1.2 !important;
+  margin-top: 2px !important;
+}
+
+/* ============================================
+   ESCALA TIPOGRÁFICA COMPLETA DEL SISTEMA
+   ============================================ */
+
+/* Títulos de página */
+header.fi-header h1.fi-header-heading,
+.fi-header h1.fi-header-heading {
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  margin-bottom: 0 !important;
+}
+
+/* Subtítulos de página */
+header.fi-header p.fi-header-subheading,
+.fi-header p.fi-header-subheading {
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.3 !important;
+}
+
+/* Títulos de sección (clases seguras, NO h2 global) */
+.sigem-section-head h2,
+.fi-section-header-heading {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+}
+
+/* Títulos de tarjetas */
+.sigem-quick-title {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+}
+
+/* Descripciones de tarjetas */
+.sigem-quick-desc {
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 1.3 !important;
+}
+
+/* KPIs */
+.sigem-stat-val {
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  line-height: 1.1 !important;
+}
+.sigem-stat-label {
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  line-height: 1.3 !important;
+}
+.sigem-stat-hint {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+}
+
+/* Tablas — headers */
+.fi-ta-table thead th,
+.fi-ta-header-cell {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  line-height: 1.2 !important;
+}
+
+/* Tablas — celdas (peso balanceado, NO 600) */
+.fi-ta-table tbody td {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  line-height: 1.3 !important;
+}
+
+/* Tablas — texto secundario */
+.td-sub,
+.fi-ta-table tbody td .fi-ta-text-description {
+  font-size: 12.5px !important;
+  font-weight: 400 !important;
+  line-height: 1.2 !important;
+}
+
+/* Badges */
+.fi-badge, .sigem-pill {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+}
+
+/* Botones */
+.fi-btn, .sigem-btn-primary, .sigem-btn-secondary {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+/* Breadcrumb del topbar */
+.sigem-crumb {
+  font-size: 15px !important;
+  font-weight: 500 !important;
+}
+.sigem-crumb b {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+}
+
+/* Inputs y búsqueda (clases de Filament, NO tags globales) */
+.fi-ta-search input,
+.fi-global-search-input,
+.fi-input,
+.fi-select,
+.fi-textarea {
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+
+/* Labels de formularios (clases de Filament v3) */
+.fi-fo-field-wrp-label,
+.fi-fo-field-wrp-label span,
+.fg label {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+/* Hero */
+.sigem-hero h1, .welcome-banner .banner-greeting {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+}
+.sigem-hero p, .welcome-banner .banner-sub {
+  font-size: 13px !important;
+  font-weight: 400 !important;
+}
+
+/* Sidebar labels */
+.fi-sidebar-item-label {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+}
+
+
 
 
 

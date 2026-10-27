@@ -15,6 +15,21 @@ class ListSolicituds extends ListRecords
 
     protected static string $resource = SolicitudResource::class;
 
+    public function getTitle(): string
+    {
+        return '📋 Solicitud de Material/Equipo';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Peticiones de salida de material. Clic en el ojo 👁 o en la fila para desplegar el detalle en el panel lateral.';
+    }
+
+    public function getBreadcrumbs(): array
+    {
+        return [];
+    }
+
     protected function getHeaderActions(): array
     {
         return [

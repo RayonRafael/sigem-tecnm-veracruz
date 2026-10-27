@@ -149,6 +149,7 @@ class SolicitudResource extends Resource
                 Tables\Columns\TextColumn::make('tipo_movimiento')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo de movimiento')
                     ->badge()
+                    ->color('gray')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('receptor.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Receptor')
@@ -159,20 +160,14 @@ class SolicitudResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)
                     ->badge()
-                    ->colors([
-                        'warning' => 'Pendiente',
-                        'primary' => 'Autorizado',
-                        'success' => 'Completado',
-                        'danger' => 'Rechazado',
-                        'gray' => 'Cancelado',
-                    ])
-                    ->icons([
-                        'heroicon-m-clock' => 'Pendiente',
-                        'heroicon-m-check-circle' => 'Autorizado',
-                        'heroicon-m-check-badge' => 'Completado',
-                        'heroicon-m-x-circle' => 'Rechazado',
-                        'heroicon-m-no-symbol' => 'Cancelado',
-                    ]),
+                    ->formatStateUsing(fn (string $state): string => '● ' . $state)
+                    ->color(fn (string $state): string => match ($state) {
+                        'Pendiente' => 'warning',
+                        'Autorizado' => 'success',
+                        'Rechazado' => 'danger',
+                        'Entregado' => 'info',
+                        default => 'gray',
+                    }),
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
@@ -190,8 +185,7 @@ class SolicitudResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->slideOver()->successNotificationTitle('Solicitud actualizada correctamente'),
+                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
             ])
             ->bulkActions([]);
     }

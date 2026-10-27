@@ -217,6 +217,7 @@ class SolicitudResource extends Resource
                 Tables\Columns\TextColumn::make('tipo_movimiento')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo de movimiento')
                     ->badge()
+                    ->color('gray')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('usuario.name')->wrap(false)->limit(30)->grow(false)
                     ->label('Solicitante')
@@ -234,13 +235,14 @@ class SolicitudResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)->label('Estado')
                     ->badge()
-                    ->colors([
-                        'success' => 'Autorizado',
-                        'warning' => 'Pendiente',
-                        'info'    => 'Entregado',
-                        'danger'  => 'Rechazado',
-                        'gray'    => ['Completado', 'Cancelado'],
-                    ]),
+                    ->formatStateUsing(fn (string $state): string => '● ' . $state)
+                    ->color(fn (string $state): string => match ($state) {
+                        'Pendiente' => 'warning',
+                        'Autorizado' => 'success',
+                        'Rechazado' => 'danger',
+                        'Entregado' => 'info',
+                        default => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('fecha_devolucion_estimada')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Devolución estimada')
                     ->date('d/m/Y')
@@ -317,7 +319,6 @@ class SolicitudResource extends Resource
                     })
                     ->requiresConfirmation(),
                 Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Solicitud actualizada correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
