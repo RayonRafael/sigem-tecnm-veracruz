@@ -1928,113 +1928,478 @@ aside.fi-sidebar,
 .fi-ta-actions .sigem-btn-inline:focus-visible{outline:2px solid var(--sig-primary) !important;outline-offset:2px}
 
 /* ===== Fase 7: Reportes ===== */
-.sigem-rep-header{margin-bottom:16px}
-.sigem-rep-header h1{font-size:24px;font-weight:700;display:flex;align-items:center;gap:10px;margin:0 0 6px;color:var(--sig-text)}
-.sigem-rep-header p{font-size:16px;color:var(--sig-muted);margin:0}
-.sigem-rep-note{font-size:16px;color:var(--sig-muted);margin:-6px 0 14px}
-.sigem-rep-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
-  gap:14px;margin-bottom:18px}
-.sigem-rep-card{background:var(--sig-surface);border:1px solid var(--sig-border);
-  border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:5px;
-  box-shadow:0 1px 2px rgba(16,24,40,.05);transition:transform .15s, box-shadow .15s}
-.sigem-rep-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.06)}
-.sigem-rep-ico{width:38px;height:38px;border-radius:10px;background:#fdf3d7;
-  display:flex;align-items:center;justify-content:center;font-size:21px;margin-bottom:6px}
-.sigem-rep-t{font-weight:700;font-size:17.5px;color:var(--sig-text)}
-.sigem-rep-d{font-size:15.5px;color:var(--sig-muted);line-height:1.45;flex:1}
-.sigem-rep-foot{display:flex;align-items:center;justify-content:space-between;
-  gap:8px;margin-top:12px;flex-wrap:wrap}
+.sigem-rep-header {
+  margin-bottom: 14px;
+}
+.sigem-rep-header h1 {
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  color: var(--sig-text, #0f172a) !important;
+  line-height: 1.25 !important;
+}
+.sigem-rep-header p {
+  font-size: 13px !important;
+  color: var(--sig-muted);
+  margin: 0;
+  line-height: 1.4 !important;
+}
+.sigem-rep-note {
+  font-size: 13px !important;
+  color: var(--sig-muted);
+  margin: -4px 0 14px;
+}
+.sigem-rep-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.sigem-rep-card {
+  background: var(--sig-surface);
+  border: 1px solid var(--sig-border);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .05);
+  transition: transform .15s, box-shadow .15s;
+}
+.sigem-rep-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .06);
+}
+.sigem-rep-ico {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #fdf3d7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+.sigem-rep-t {
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  color: var(--sig-text);
+  line-height: 1.3 !important;
+}
+.sigem-rep-d {
+  font-size: 13px !important;
+  color: var(--sig-muted);
+  line-height: 1.45;
+  flex: 1;
+}
+.sigem-rep-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
 
 /* Switch */
-.sigem-sw{display:inline-flex;align-items:center;gap:8px;cursor:pointer;
-  font-size:15.5px;font-weight:600;color:var(--sig-muted);position:relative;user-select:none}
-.sigem-sw input{position:absolute;opacity:0;width:1px;height:1px}
-.sigem-sw-ui{width:34px;height:20px;border-radius:20px;background:var(--sig-border);
-  position:relative;transition:background .15s;flex-shrink:0}
-.sigem-sw-ui::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;
-  border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .15s}
-.sigem-sw input:checked + .sigem-sw-ui{background:#059669}
-.sigem-sw input:checked + .sigem-sw-ui::after{transform:translateX(14px)}
-.sigem-sw input:focus-visible + .sigem-sw-ui{outline:2px solid var(--sig-primary);outline-offset:2px}
-.sigem-sw input:checked ~ .sigem-sw-l{color:#059669}
+.sigem-sw {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 12.5px !important;
+  font-weight: 600;
+  color: var(--sig-muted);
+  position: relative;
+  user-select: none;
+}
+.sigem-sw input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.sigem-sw-ui {
+  width: 32px;
+  height: 18px;
+  border-radius: 20px;
+  background: var(--sig-border);
+  position: relative;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+.sigem-sw-ui::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+  transition: transform .15s;
+}
+.sigem-sw input:checked + .sigem-sw-ui {
+  background: #059669;
+}
+.sigem-sw input:checked + .sigem-sw-ui::after {
+  transform: translateX(14px);
+}
+.sigem-sw input:focus-visible + .sigem-sw-ui {
+  outline: 2px solid var(--sig-primary);
+  outline-offset: 2px;
+}
+.sigem-sw input:checked ~ .sigem-sw-l {
+  color: #059669;
+}
+.sigem-sw-l {
+  font-size: 12.5px !important;
+  font-weight: 600;
+}
 
 /* Botones reporte */
-.sigem-rep-btn-primary{padding:6px 14px;border-radius:8px;background:var(--sig-primary);color:#fff;
-  font-size:14px;font-weight:600;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
-.sigem-rep-btn-primary:hover{background:var(--sig-primary-dark);box-shadow:0 3px 9px rgba(27,101,212,.32)}
-.sigem-rep-btn-sec{padding:6px 14px;border-radius:8px;background:var(--sig-surface);color:var(--sig-text);
-  border:1px solid var(--sig-border);font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
-.sigem-rep-btn-sec:hover{background:var(--sig-bg);border-color:var(--sig-border-strong)}
+.sigem-rep-btn-primary {
+  padding: 5px 12px !important;
+  border-radius: 6px !important;
+  background: var(--sig-primary);
+  color: #fff;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .15s;
+}
+.sigem-rep-btn-primary:hover {
+  background: var(--sig-primary-dark);
+  box-shadow: 0 3px 9px rgba(27, 101, 212, .32);
+}
+.sigem-rep-btn-sec {
+  padding: 5px 12px !important;
+  border-radius: 6px !important;
+  background: var(--sig-surface);
+  color: var(--sig-text);
+  border: 1px solid var(--sig-border);
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .15s;
+}
+.sigem-rep-btn-sec:hover {
+  background: var(--sig-bg);
+  border-color: var(--sig-border-strong);
+}
 
 /* Visor de reporte */
-.sigem-rep-view{background:var(--sig-surface);border:1px solid var(--sig-border);
-  border-radius:14px;overflow:hidden;margin-bottom:18px}
-.sigem-rep-vh{display:flex;justify-content:space-between;gap:12px;align-items:center;
-  padding:16px 20px;border-bottom:1px solid var(--sig-border);flex-wrap:wrap}
-.sigem-rep-vh h3{font-size:19px;margin:0 0 3px;font-weight:700;color:var(--sig-text)}
-.sigem-rep-vh .sigem-rep-meta{font-size:15.5px;color:var(--sig-muted)}
-.sigem-rep-empty{background:var(--sig-surface);border:1px dashed var(--sig-border);
-  border-radius:14px;padding:36px;text-align:center;color:var(--sig-muted);font-size:16.5px}
-.sigem-rep-table-wrap{width:100%;overflow-x:auto}
+.sigem-rep-view {
+  background: var(--sig-surface);
+  border: 1px solid var(--sig-border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.sigem-rep-vh {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--sig-border);
+  flex-wrap: wrap;
+}
+.sigem-rep-vh h3 {
+  font-size: 15px !important;
+  margin: 0 0 3px;
+  font-weight: 700 !important;
+  color: var(--sig-text);
+  line-height: 1.3 !important;
+}
+.sigem-rep-vh .sigem-rep-meta {
+  font-size: 12.5px !important;
+  color: var(--sig-muted);
+}
+.sigem-rep-empty {
+  background: var(--sig-surface);
+  border: 1px dashed var(--sig-border);
+  border-radius: 12px;
+  padding: 28px;
+  text-align: center;
+  color: var(--sig-muted);
+  font-size: 14px !important;
+}
+.sigem-rep-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Tablas en visor de reporte y catálogos */
+.sigem-rep-table-wrap thead th,
+.sigem-rep-view thead th,
+.sigem-rep-table-wrap .fi-ta-table thead th {
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .05em !important;
+  color: var(--sig-muted, #64748b) !important;
+  background: var(--sig-bg, #f4f6f8) !important;
+  padding: 6px 10px !important;
+}
+.sigem-rep-table-wrap thead th *,
+.sigem-rep-view thead th * {
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+}
+.sigem-rep-table-wrap tbody td,
+.sigem-rep-view tbody td,
+.sigem-rep-table-wrap .fi-ta-table tbody td {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  padding: 6px 10px !important;
+  line-height: 1.35 !important;
+}
 
 /* ===== Fase 8: Configuración, Catálogos, Bitácora, Preferencias ===== */
 
-/* Pestañas (línea inferior azul) */
-.sigem-tabs{display:flex;gap:6px;border-bottom:1px solid var(--sig-border);
-  margin-bottom:18px;flex-wrap:wrap}
-.sigem-tab{padding:11px 16px;font-size:16.5px;font-weight:600;color:var(--sig-muted);
-  cursor:pointer;border-bottom:2.5px solid transparent;margin-bottom:-1px;
-  background:transparent;border-top:0;border-left:0;border-right:0;font-family:inherit}
-.sigem-tab:hover{color:var(--sig-text)}
-.sigem-tab.active{color:var(--sig-primary);border-bottom-color:var(--sig-primary)}
+/* Pestañas (Tabs principales) */
+.sigem-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--sig-border);
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.sigem-tab {
+  padding: 9px 14px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: var(--sig-muted);
+  cursor: pointer;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -1px;
+  background: transparent;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
+  font-family: inherit;
+  transition: all .15s;
+}
+.sigem-tab:hover {
+  color: var(--sig-text);
+}
+.sigem-tab.active {
+  color: var(--sig-primary);
+  border-bottom-color: var(--sig-primary);
+}
 
 /* Franja informativa */
-.sigem-note-strip{display:flex;gap:10px;align-items:flex-start;font-size:15.5px;
-  line-height:1.55;padding:13px 16px;border-radius:var(--sig-radius);
-  background:#cffafe;color:#0e7490;margin-bottom:16px}
+.sigem-note-strip {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px !important;
+  line-height: 1.5;
+  padding: 10px 14px;
+  border-radius: var(--sig-radius, 8px);
+  background: #cffafe;
+  color: #0e7490;
+  margin-bottom: 14px;
+}
 
 /* Chips de catálogo */
-.sigem-cat-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-.sigem-cat-tab{display:inline-flex;align-items:center;gap:7px;font-size:15.5px;
-  font-weight:600;padding:8px 13px;border-radius:99px;border:1px solid var(--sig-border);
-  background:var(--sig-surface);cursor:pointer;transition:all .15s;
-  color:var(--sig-muted);font-family:inherit}
-.sigem-cat-tab:hover{border-color:var(--sig-primary);color:var(--sig-primary)}
-.sigem-cat-tab.active{background:var(--sig-primary);border-color:var(--sig-primary);color:#fff}
-.sigem-cat-tab b{font-size:13.5px;background:var(--sig-bg);border:1px solid var(--sig-border);
-  border-radius:99px;padding:1px 6px;color:var(--sig-muted);font-weight:700}
-.sigem-cat-tab.active b{background:rgba(255,255,255,.25);border-color:transparent;color:#fff}
+.sigem-cat-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.sigem-cat-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 5px 11px !important;
+  border-radius: 99px;
+  border: 1px solid var(--sig-border);
+  background: var(--sig-surface);
+  cursor: pointer;
+  transition: all .15s;
+  color: var(--sig-muted);
+  font-family: inherit;
+}
+.sigem-cat-tab:hover {
+  border-color: var(--sig-primary);
+  color: var(--sig-primary);
+}
+.sigem-cat-tab.active {
+  background: var(--sig-primary);
+  border-color: var(--sig-primary);
+  color: #fff;
+}
+.sigem-cat-tab b {
+  font-size: 11.5px !important;
+  background: var(--sig-bg);
+  border: 1px solid var(--sig-border);
+  border-radius: 99px;
+  padding: 1px 6px;
+  color: var(--sig-muted);
+  font-weight: 700;
+}
+.sigem-cat-tab.active b {
+  background: rgba(255, 255, 255, .25);
+  border-color: transparent;
+  color: #fff;
+}
 
 /* Píldora de rol */
-.sigem-rol-pill{font-size:14.5px;font-weight:700;padding:3px 8px;border-radius:7px;white-space:nowrap}
-.sigem-rol-pill.adm{background:#e8f0fe;color:#1b65d4}
-.sigem-rol-pill.ss{background:#cffafe;color:#0891b2}
+.sigem-rol-pill {
+  font-size: 12px !important;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.sigem-rol-pill.adm {
+  background: #e8f0fe;
+  color: #1b65d4;
+}
+.sigem-rol-pill.ss {
+  background: #cffafe;
+  color: #0891b2;
+}
 
 /* Preferencias */
-.sigem-pref-card{padding:20px 22px;background:var(--sig-surface);border:1px solid var(--sig-border);border-radius:14px}
-.sigem-pref-row{display:flex;gap:20px 32px;align-items:flex-start;
-  justify-content:space-between;flex-wrap:wrap}
-.sigem-pref-t{font-size:17.5px;font-weight:700;margin-bottom:4px;color:var(--sig-text)}
-.sigem-pref-d{font-size:16px;color:var(--sig-muted);max-width:460px;line-height:1.45}
-.sigem-pref-chips{display:flex;gap:6px;flex-wrap:wrap}
-.sigem-pref-chips button{font:inherit;font-size:16px;font-weight:600;height:34px;
-  min-width:48px;padding:0 12px;border-radius:99px;border:1px solid var(--sig-border);
-  background:var(--sig-surface);color:var(--sig-text);cursor:pointer;transition:all .15s}
-.sigem-pref-chips button.on{background:var(--sig-primary-light);border-color:var(--sig-primary);
-  color:var(--sig-primary-dark)}
-.sigem-pref-in{display:flex;gap:8px;align-items:center;font-size:16px;color:var(--sig-muted)}
-.sigem-pref-in input{font:inherit;font-size:17px;width:96px;height:36px;padding:0 10px;
-  border-radius:9px;border:1px solid var(--sig-border);background:var(--sig-surface);color:var(--sig-text)}
-.sigem-pref-msg{font-size:15.5px;min-height:18px}
-.sigem-pref-msg.err{color:#dc2626}
-.sigem-pref-msg.ok{color:#059669}
+.sigem-pref-card {
+  padding: 18px 20px;
+  background: var(--sig-surface);
+  border: 1px solid var(--sig-border);
+  border-radius: 12px;
+}
+.sigem-pref-row {
+  display: flex;
+  gap: 16px 28px;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.sigem-pref-t {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  margin-bottom: 4px;
+  color: var(--sig-text);
+  line-height: 1.3 !important;
+}
+.sigem-pref-d {
+  font-size: 13px !important;
+  color: var(--sig-muted);
+  max-width: 460px;
+  line-height: 1.45;
+}
+.sigem-pref-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.sigem-pref-chips button {
+  font: inherit;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  height: 30px !important;
+  min-width: 44px;
+  padding: 0 10px !important;
+  border-radius: 99px;
+  border: 1px solid var(--sig-border);
+  background: var(--sig-surface);
+  color: var(--sig-text);
+  cursor: pointer;
+  transition: all .15s;
+}
+.sigem-pref-chips button.on {
+  background: var(--sig-primary-light);
+  border-color: var(--sig-primary);
+  color: var(--sig-primary-dark);
+}
+.sigem-pref-in {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px !important;
+  color: var(--sig-muted);
+}
+.sigem-pref-in input {
+  font: inherit;
+  font-size: 13px !important;
+  width: 88px;
+  height: 30px !important;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid var(--sig-border);
+  background: var(--sig-surface);
+  color: var(--sig-text);
+}
+.sigem-pref-msg {
+  font-size: 13px !important;
+  min-height: 18px;
+}
+.sigem-pref-msg.err {
+  color: #dc2626;
+}
+.sigem-pref-msg.ok {
+  color: #059669;
+}
 
-/* Barra de filtros de Bitácora */
-.sigem-bitacora-filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px;background:var(--sig-surface);padding:12px 14px;border:1px solid var(--sig-border);border-radius:12px}
+/* Barra de filtros y encabezado de Bitácora */
+.fi-page:has(.sigem-bitacora-filters) h3,
+div:has(> .sigem-bitacora-filters) h3 {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  margin: 0 0 4px !important;
+  color: var(--sig-text) !important;
+}
+.fi-page:has(.sigem-bitacora-filters) p,
+div:has(> .sigem-bitacora-filters) p {
+  font-size: 13px !important;
+  color: var(--sig-muted) !important;
+  margin: 0 !important;
+}
+
+.sigem-bitacora-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  background: var(--sig-surface);
+  padding: 10px 12px;
+  border: 1px solid var(--sig-border);
+  border-radius: 10px;
+}
 .sigem-bitacora-filters input,
-.sigem-bitacora-filters select{height:34px;padding:0 10px;border:1px solid var(--sig-border);border-radius:8px;font-size:14.5px;background:var(--sig-surface);color:var(--sig-text)}
+.sigem-bitacora-filters select {
+  height: 30px !important;
+  padding: 0 8px !important;
+  border: 1px solid var(--sig-border);
+  border-radius: 6px;
+  font-size: 13px !important;
+  background: var(--sig-surface);
+  color: var(--sig-text);
+}
 .sigem-bitacora-filters input:focus,
-.sigem-bitacora-filters select:focus{outline:2px solid var(--sig-primary);outline-offset:1px}
+.sigem-bitacora-filters select:focus {
+  outline: 2px solid var(--sig-primary);
+  outline-offset: 1px;
+}
 
 /* ===== Fase 9: Buscador global (Buscar en SIGEM) ===== */
 .sigem-pal-ov{position:fixed;inset:0;background:rgba(15,23,42,.45);
