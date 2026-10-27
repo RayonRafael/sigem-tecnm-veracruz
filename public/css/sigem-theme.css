@@ -4149,48 +4149,58 @@ header.fi-header p.fi-header-subheading,
 }
 
 /* 2. Emojis en acciones de fila (Aprobar, Rechazar, Detalle, Editar) */
-.fi-ta-actions button[title*="Aprobar"]::before,
-.fi-ta-actions a[title*="Aprobar"]::before {
+.fi-ta-actions-cell button[title*="Aprobar"]::before,
+.fi-ta-actions-cell a[title*="Aprobar"]::before {
   content: "✅" !important;
   font-size: 14px !important;
 }
-.fi-ta-actions button[title*="Rechazar"]::before,
-.fi-ta-actions a[title*="Rechazar"]::before {
+.fi-ta-actions-cell button[title*="Rechazar"]::before,
+.fi-ta-actions-cell a[title*="Rechazar"]::before {
   content: "❌" !important;
   font-size: 14px !important;
 }
-.fi-ta-actions button[title*="Ver detalle"]::before,
-.fi-ta-actions button[title*="Detalle"]::before,
-.fi-ta-actions a[title*="Ver detalle"]::before,
-.fi-ta-actions a[title*="Detalle"]::before {
+.fi-ta-actions-cell button[title*="Ver detalle"]::before,
+.fi-ta-actions-cell button[title*="Detalle"]::before,
+.fi-ta-actions-cell a[title*="Ver detalle"]::before,
+.fi-ta-actions-cell a[title*="Detalle"]::before {
   content: "👁" !important;
   font-size: 14px !important;
 }
-.fi-ta-actions button[title*="Editar"]::before,
-.fi-ta-actions a[title*="Editar"]::before {
+.fi-ta-actions-cell button[title*="Editar"]::before,
+.fi-ta-actions-cell a[title*="Editar"]::before {
   content: "✏️" !important;
   font-size: 14px !important;
 }
-.fi-ta-actions button[title*="Eliminar"]::before,
-.fi-ta-actions a[title*="Eliminar"]::before {
+.fi-ta-actions-cell button[title*="Eliminar"]::before,
+.fi-ta-actions-cell a[title*="Eliminar"]::before {
   content: "🗑️" !important;
   font-size: 14px !important;
 }
 
 /* Ocultar iconos SVG dentro de botones de acción para dejar ver el emoji limpio */
-.fi-ta-actions button[title*="Aprobar"] svg,
-.fi-ta-actions button[title*="Rechazar"] svg,
-.fi-ta-actions button[title*="Ver detalle"] svg,
-.fi-ta-actions button[title*="Detalle"] svg,
-.fi-ta-actions button[title*="Editar"] svg,
-.fi-ta-actions button[title*="Eliminar"] svg,
-.fi-ta-actions a[title*="Eliminar"] svg {
+.fi-ta-actions-cell button[title*="Aprobar"] svg,
+.fi-ta-actions-cell button[title*="Rechazar"] svg,
+.fi-ta-actions-cell button[title*="Ver detalle"] svg,
+.fi-ta-actions-cell button[title*="Detalle"] svg,
+.fi-ta-actions-cell button[title*="Editar"] svg,
+.fi-ta-actions-cell button[title*="Eliminar"] svg,
+.fi-ta-actions-cell a[title*="Eliminar"] svg {
   display: none !important;
 }
 
 /* ============================================
    Tabla Inventario Lista = Tabla Dashboard
    ============================================ */
+
+/* Contenedor y tabla adaptiva — que no desborde */
+.fi-ta-ctn {
+  overflow: hidden !important;
+}
+
+.fi-ta-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+}
 
 /* Headers compactos */
 .fi-ta-table thead th,
@@ -4200,8 +4210,11 @@ header.fi-header p.fi-header-subheading,
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
   color: var(--sig-muted) !important;
-  padding: 5px 10px !important;
+  padding: 5px 8px !important;
   background: var(--sig-bg, #f4f6f8) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
 
 .fi-ta-table thead th button,
@@ -4230,10 +4243,35 @@ header.fi-header p.fi-header-subheading,
 
 /* Filas ultra compactas */
 .fi-ta-table tbody td {
-  padding: 4px 10px !important;
+  padding: 4px 8px !important;
   font-size: 13px !important;
   font-weight: 500 !important;
   vertical-align: middle !important;
+  overflow: hidden !important;
+}
+
+/* Checkboxes: sin desbordar */
+.fi-ta-selection-cell,
+.fi-ta-table th.fi-ta-selection-cell,
+.fi-ta-table td.fi-ta-selection-cell {
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  overflow: hidden !important;
+  padding: 4px 0 !important;
+  text-align: center !important;
+}
+.fi-ta-selection-cell > div,
+.fi-ta-selection-cell label {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+.fi-ta-selection-cell input[type="checkbox"] {
+  margin: 0 !important;
 }
 
 /* Anular padding interno excesivo de celdas en Filament */
@@ -4267,9 +4305,25 @@ header.fi-header p.fi-header-subheading,
   font-size: 13px !important;
   font-weight: 700 !important;
   color: var(--sig-text, #0f172a) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+.fi-ta-table thead th:nth-child(2),
+.fi-ta-table tbody td:nth-child(2) {
+  width: 145px !important;
+  min-width: 145px !important;
 }
 
-/* EQUIPO: nombre bold arriba + S/N debajo */
+/* EQUIPO: reducir ancho y controlar desborde */
+.fi-ta-table tbody td:nth-child(3),
+.fi-ta-table thead th:nth-child(3),
+.fi-ta-table tbody td.fi-table-cell-material\.nombre,
+.fi-ta-table thead th.fi-table-cell-material\.nombre {
+  max-width: 260px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
 .fi-ta-table tbody td .fi-ta-text-item-label,
 .fi-ta-table tbody td.fi-table-cell-material\.nombre .fi-ta-text-item-label,
 .fi-ta-table tbody td:nth-child(3) .fi-ta-text-item-label {
@@ -4277,6 +4331,10 @@ header.fi-header p.fi-header-subheading,
   font-weight: 600 !important;
   line-height: 1.2 !important;
   color: var(--sig-text, #0f172a) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  display: block !important;
 }
 .fi-ta-table tbody td .fi-ta-text-description,
 .fi-ta-table tbody td .fi-ta-text p,
@@ -4288,6 +4346,9 @@ header.fi-header p.fi-header-subheading,
   margin-top: 1px !important;
   margin-bottom: 0 !important;
   font-weight: 400 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
 }
 
 /* Badges compactos (CATEGORÍA y ESTADO) */
@@ -4296,6 +4357,7 @@ header.fi-header p.fi-header-subheading,
   padding: 2px 8px !important;
   border-radius: 99px !important;
   font-weight: 600 !important;
+  white-space: nowrap !important;
 }
 
 /* ÁREA: texto normal gris */
@@ -4306,15 +4368,40 @@ header.fi-header p.fi-header-subheading,
   color: var(--sig-muted, #64748b) !important;
   font-weight: 400 !important;
   font-size: 13px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-/* Acciones: icono pequeño en cuadro */
-.fi-ta-table .fi-ta-actions button,
+/* Acciones de FILA: botones sin encimarse (SOLO en las celdas de la tabla, NO en toolbar ni bulk actions) */
+.fi-ta-actions-cell,
+.fi-ta-table thead th:last-child,
+.fi-ta-table thead th.fi-ta-actions-cell,
+.fi-ta-table thead th.fi-ta-actions-header-cell {
+  min-width: 100px !important;
+  width: 100px !important;
+  max-width: 100px !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+.fi-ta-actions-cell {
+  padding: 4px 6px !important;
+}
+.fi-ta-actions-cell .fi-ta-actions {
+  gap: 3px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-wrap: nowrap !important;
+}
+.fi-ta-actions-cell .fi-ta-actions button,
 .fi-ta-actions-cell button {
-  width: 28px !important;
-  height: 28px !important;
-  min-width: 28px !important;
-  min-height: 28px !important;
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  min-height: 26px !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
   border-radius: 6px !important;
   border: 1px solid var(--sig-border, #e5e7eb) !important;
   background: #ffffff !important;
@@ -4323,15 +4410,91 @@ header.fi-header p.fi-header-subheading,
   justify-content: center !important;
   padding: 0 !important;
 }
-.fi-ta-actions-cell .fi-ta-actions {
-  gap: 4px !important;
-}
 
 /* Toolbar: compactar Exportar + Buscar + Filtros */
 .fi-ta-header, .fi-ta-header-toolbar {
   padding: 4px 10px !important;
-  min-height: 34px !important;
+  min-height: 36px !important;
+  gap: 8px !important;
+}
+
+/* Botón Exportar en la toolbar: texto completo sin truncar */
+.fi-ta-header .fi-ta-actions,
+.fi-ta-header-toolbar .fi-ta-actions {
+  display: flex !important;
+  gap: 8px !important;
+  width: auto !important;
+}
+
+.fi-ta-header .fi-btn,
+.fi-ta-header-toolbar .fi-btn,
+.fi-ta-header button.fi-btn {
+  width: auto !important;
+  min-width: fit-content !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 4px 12px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  background: #ffffff !important;
+  color: var(--sig-text, #0f172a) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Indicador de selección y Bulk Actions: dropdown limpio de una sola línea */
+.fi-ta-selection-indicator {
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+}
+
+@media (min-width: 640px) {
+  .fi-ta-header-ctn button.sm\:hidden,
+  .fi-ta-header-ctn .sm\:hidden,
+  .fi-ta-header-ctn button[title="Abrir acciones"].sm\:hidden {
+    display: none !important;
+  }
+}
+
+.fi-ta-header-ctn .fi-dropdown-trigger button.sm\:inline-grid,
+.fi-ta-header-ctn .fi-dropdown-trigger button.fi-ac-btn-group:not(.sm\:hidden),
+.fi-ta-header-ctn button.fi-ac-btn-group:not(.sm\:hidden) {
+  width: auto !important;
+  min-width: fit-content !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 4px 12px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
   gap: 6px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  background: #ffffff !important;
+  color: var(--sig-text, #0f172a) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.fi-ta-header-ctn .fi-dropdown-trigger button.fi-ac-btn-group .fi-btn-label {
+  white-space: nowrap !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--sig-text, #0f172a) !important;
+  line-height: 1 !important;
+}
+
+.fi-ta-header-ctn .fi-dropdown-trigger button.fi-ac-btn-group svg {
+  color: var(--sig-muted, #64748b) !important;
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0 !important;
 }
 
 
