@@ -26,9 +26,19 @@ class ReportesPage extends Page
 
     protected static ?string $slug = 'reportes';
 
-    protected static ?string $title = 'Reportes';
+    protected static ?string $title = '📊 Reportes';
 
     protected static string $view = 'filament.pages.reportes';
+
+    public function getTitle(): string
+    {
+        return '📊 Reportes';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Genera reportes del inventario y decide cuáles puede consultar Servicio Social.';
+    }
 
     public function getBreadcrumbs(): array
     {

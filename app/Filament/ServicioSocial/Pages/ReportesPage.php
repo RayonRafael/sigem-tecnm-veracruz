@@ -20,9 +20,19 @@ class ReportesPage extends BaseReportesPage
 
     protected static ?string $slug = 'reportes';
 
-    protected static ?string $title = 'Reportes';
+    protected static ?string $title = '📊 Reportes';
 
     protected static string $view = 'filament.servicio-social.pages.reportes';
+
+    public function getTitle(): string
+    {
+        return '📊 Reportes';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Consulta métricas, estadísticas y reportes autorizados del Centro de Cómputo.';
+    }
 
     public static function canAccess(): bool
     {

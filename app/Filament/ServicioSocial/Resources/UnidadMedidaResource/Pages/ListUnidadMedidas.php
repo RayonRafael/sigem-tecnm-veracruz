@@ -15,6 +15,16 @@ class ListUnidadMedidas extends ListRecords
 
     protected static string $resource = UnidadMedidaResource::class;
 
+    public function getTitle(): string
+    {
+        return '⚖️ Unidades de Medida';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Unidades de medida para el control de inventario y consumibles.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

@@ -15,6 +15,16 @@ class ListAreas extends ListRecords
 
     protected static string $resource = AreaResource::class;
 
+    public function getTitle(): string
+    {
+        return '📍 Áreas';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Áreas, laboratorios y oficinas dependientes de los departamentos.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

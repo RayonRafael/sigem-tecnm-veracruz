@@ -39,9 +39,19 @@ class CatalogosPage extends Page
 
     protected static ?string $slug = 'catalogos';
 
-    protected static ?string $title = 'Catálogos';
+    protected static ?string $title = '📁 Catálogos';
 
     protected static string $view = 'filament.servicio-social.pages.catalogos';
+
+    public function getTitle(): string
+    {
+        return '📁 Catálogos';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Consulta los catálogos del sistema para referencia.';
+    }
 
     public string $catalogoActivo = 'departamentos';
 

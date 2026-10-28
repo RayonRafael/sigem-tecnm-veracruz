@@ -15,6 +15,16 @@ class ListMaterials extends ListRecords
 
     protected static string $resource = MaterialResource::class;
 
+    public function getTitle(): string
+    {
+        return '📦 Catálogo de Materiales';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Catálogo de materiales y equipos disponibles en el inventario.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

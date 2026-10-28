@@ -41,9 +41,19 @@ class ConfiguracionPage extends Page
 
     protected static ?string $slug = 'configuracion';
 
-    protected static ?string $title = 'Configuración y Catálogos';
+    protected static ?string $title = '⚙️ Configuración y Catálogos';
 
     protected static string $view = 'filament.pages.configuracion';
+
+    public function getTitle(): string
+    {
+        return '⚙️ Configuración y Catálogos';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Gestiona los catálogos del sistema, consulta la bitácora y ajusta las preferencias.';
+    }
 
     public function getBreadcrumbs(): array
     {

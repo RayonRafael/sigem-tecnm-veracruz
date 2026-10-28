@@ -15,6 +15,16 @@ class ListTipoMaterials extends ListRecords
 
     protected static string $resource = TipoMaterialResource::class;
 
+    public function getTitle(): string
+    {
+        return '📑 Tipos de Material';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Categorías y tipos para la organización del catálogo de materiales.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [
