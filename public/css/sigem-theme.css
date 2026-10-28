@@ -5626,3 +5626,62 @@ header.fi-header p.fi-header-subheading,
 .sigem-cat-btn[title*="Eliminar"]::before {
   content: "🗑️" !important;
 }
+
+
+/* ==========================================================================
+   Slide-over Infolists y Modales: Eliminación de doble recuadro y footer
+   ========================================================================== */
+.fi-modal-slide-over-window .fi-section,
+.fi-modal-slide-over-window section.fi-section,
+.fi-modal-slide-over-window .fi-fo-component-ctn .fi-section,
+.fi-modal-slide-over-window .fi-infolist .fi-section,
+.fi-modal-slide-over-window .fi-tabs-content .fi-section,
+.fi-modal-slide-over-window .fi-infolist-component-ctn .fi-section {
+  border: none !important;
+  box-shadow: none !important;
+  --tw-ring-color: transparent !important;
+  --tw-ring-shadow: none !important;
+  --tw-ring-offset-shadow: none !important;
+  --tw-shadow: 0 0 #0000 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.fi-modal-slide-over-window .fi-section .fi-section-header,
+.fi-modal-slide-over-window .fi-infolist .fi-section-header,
+.fi-modal-slide-over-window .fi-tabs-content .fi-section-header {
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+  padding: 0 0 10px 0 !important;
+  margin-bottom: 14px !important;
+  background: transparent !important;
+}
+
+.fi-modal-slide-over-window .fi-section .fi-section-content,
+.fi-modal-slide-over-window .fi-infolist .fi-section-content,
+.fi-modal-slide-over-window .fi-tabs-content .fi-section-content {
+  padding: 0 !important;
+}
+
+/* En vista Detalle/Ver: Atajos de acción (Editar/Eliminar/Cambio/Baja/Modificar) a la izquierda, Cerrar a la derecha */
+.fi-modal-slide-over-window .fi-modal-footer-actions button.fi-btn-color-warning,
+.fi-modal-slide-over-window .fi-modal-footer-actions button.fi-btn-color-danger,
+.fi-modal-slide-over-window .fi-modal-footer-actions button.fi-btn-color-info,
+.fi-modal-slide-over-window .fi-modal-footer-actions button.fi-color-info {
+  order: -2 !important;
+  margin-left: 0 !important;
+  margin-right: 8px !important;
+}
+
+/* Botón Cerrar en modales sin botón submit de formulario: siempre a la derecha */
+.fi-modal-slide-over-window .fi-modal-footer-actions:not(:has(button[type="submit"], button.fi-btn-color-primary)) button.fi-btn-color-gray,
+.fi-modal-slide-over-window .fi-modal-footer-actions:not(:has(button[type="submit"], button.fi-btn-color-primary)) button[x-on\:click*="close"],
+.fi-modal-slide-over-window .fi-modal-footer-actions:has(> button:only-of-type) button,
+.fi-modal-slide-over-window .fi-modal-footer-actions:has(> :only-child) button,
+.fi-modal-slide-over-window:has(.fi-fo-component-ctn) .fi-modal-footer-actions:has(> button:only-of-type) button,
+.fi-modal-slide-over-window:has(.fi-fo-component-ctn) .fi-modal-footer-actions:has(> :only-child) button {
+  order: 2 !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}

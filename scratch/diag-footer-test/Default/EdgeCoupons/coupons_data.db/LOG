@@ -1,0 +1,5 @@
+2026/10/28-17:06:13.473 2798 Creating DB C:\Users\Rafael572\Downloads\Proyectos\sigem-tecnm-veracruz\scratch\diag-footer-test\Default\EdgeCoupons/coupons_data.db since it was missing.
+2026/10/28-17:06:13.498 2798 Reusing MANIFEST C:\Users\Rafael572\Downloads\Proyectos\sigem-tecnm-veracruz\scratch\diag-footer-test\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
+2026/10/28-17:06:13.631 151c Level-0 table #5: started
+2026/10/28-17:06:13.636 151c Level-0 table #5: 683273 bytes OK
+2026/10/28-17:06:13.638 151c Delete type=0 #3
