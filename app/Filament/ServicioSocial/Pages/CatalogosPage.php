@@ -256,7 +256,17 @@ class CatalogosPage extends Page
 
     protected function renderActionButtons(string $accionVer, int|string $id): string
     {
-        return '<button type="button" wire:click="mountAction(\'' . $accionVer . '\', { record: ' . $id . ' })" class="sigem-btn-icon" title="Ver detalles">👁</button>';
+        return '
+          <div class="sigem-row-actions" style="display:inline-flex;align-items:center;justify-content:center;gap:3px;">
+            <button type="button" wire:click="mountAction(\'' . $accionVer . '\', { record: ' . json_encode($id) . ' })"
+                    class="fi-icon-btn sigem-cat-btn" title="Ver detalle" aria-label="Ver detalle">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;">
+                <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+                <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        ';
     }
 
     // Acciones de Slide-Over para visualización (solo lectura)

@@ -35,6 +35,7 @@ class ServicioSocialPanelProvider extends PanelProvider
             ->favicon(asset('images/sigem-favicon.svg?v=2'))
             ->font('DM Sans')
             ->globalSearch(false)
+            ->darkMode(false)
             ->colors([
                 'primary' => Color::hex('#1b65d4'),
                 'success' => Color::hex('#059669'),
@@ -65,7 +66,18 @@ class ServicioSocialPanelProvider extends PanelProvider
                 PanelsRenderHook::USER_MENU_BEFORE,
                 fn (): string => Blade::render('
 @if (auth()->check())
-<span class="sigem-role-banner">🎓 Servicio Social</span>
+@php
+    $path = request()->path();
+    $section = match(true) {
+        str_contains($path, "inventarios") => "Inventario general",
+        str_contains($path, "solicituds") => "Solicitud de Material/Equipo",
+        str_contains($path, "mantenimientos") => "Mantenimiento",
+        str_contains($path, "catalogos") => "Catálogos",
+        str_contains($path, "reportes") => "Reportes",
+        default => "Panel principal",
+    };
+@endphp
+<span class="sigem-crumb">SIGEM › <b>{{ $section }}</b></span>
 <div class="sigem-topbar-search"
      role="button"
      tabindex="0"
@@ -75,6 +87,7 @@ class ServicioSocialPanelProvider extends PanelProvider
     <span>🔍</span>
     <span>Buscar en SIGEM…</span>
 </div>
+<span class="sigem-role-banner">🎓 Servicio Social</span>
 @endif
 ')
             )

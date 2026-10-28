@@ -25,6 +25,11 @@ class ListInventarios extends ListRecords
         return [];
     }
 
+    public function getSubheading(): ?string
+    {
+        return 'Busca, filtra y gestiona los equipos registrados en el sistema.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

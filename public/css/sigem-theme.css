@@ -23,8 +23,10 @@ body, .fi-body, html {
     background: var(--sig-bg) !important;
     background-image: none !important;
 }
+html.dark, html.dark *,
 .dark body, .dark .fi-body, .dark html {
-    background-color: #0f172a !important;
+    color-scheme: light !important;
+    background-color: var(--sig-bg, #f8fafc) !important;
 }
 
 /* ===== 2. CARDS Y CONTENEDORES ===== */
@@ -40,9 +42,19 @@ body, .fi-body, html {
 .fi-ta-ctn::before, .fi-fo-component-ctn::before, .fi-section::before, .fi-card::before {
     display: none !important; /* Quitar la barra de gradiente superior anterior */
 }
-.dark .fi-ta-ctn, .dark .fi-fo-component-ctn, .dark .fi-section, .dark .fi-card {
-    background-color: #1e293b !important;
-    border-color: #334155 !important;
+html.dark .fi-ta-ctn,
+html.dark .fi-ta-content,
+html.dark .fi-ta-table tbody tr,
+.dark .fi-ta-ctn, .dark .fi-fo-component-ctn, .dark .fi-section, .dark .fi-card,
+.fi-panel-servicio-social .fi-ta-ctn,
+.fi-panel-servicio-social .fi-ta-content,
+.fi-panel-servicio-social .fi-ta-table tbody tr {
+    background-color: var(--sig-surface, #ffffff) !important;
+    background: var(--sig-surface, #ffffff) !important;
+    border-color: var(--sig-border, #e2e8f0) !important;
+}
+.fi-panel-servicio-social .fi-ta-table tbody tr:hover {
+    background: #f8fafc !important;
 }
 /* Padding en secciones */
 .fi-section-content {
@@ -50,14 +62,16 @@ body, .fi-body, html {
 }
 
 /* ===== 3. TÍTULOS DE PÁGINA ===== */
-h1, .fi-header-heading {
-    color: #0f172a !important;
+h1, .fi-header-heading,
+html.dark .fi-header-heading,
+html.dark h1,
+.dark h1, .dark .fi-header-heading,
+.fi-panel-servicio-social .fi-header-heading,
+.fi-panel-servicio-social h1 {
+    color: var(--sig-text, #0f172a) !important;
     font-weight: 700 !important;
     font-size: 1.875rem !important;
     letter-spacing: -0.025em !important;
-}
-.dark h1, .dark .fi-header-heading {
-    color: #f1f5f9 !important;
 }
 
 /* Ocultar heading nativo duplicado de Filament en páginas que tienen su propio encabezado InvGate */
@@ -4713,8 +4727,10 @@ header.fi-header p.fi-header-subheading,
 /* Columna CÓDIGO — texto bold, tamaño normal */
 .fi-ta-table tbody td.fi-table-cell-num-serie,
 .fi-ta-table tbody td.fi-table-cell-num-serie *,
-.fi-ta-table tbody td:nth-child(2),
-.fi-ta-table tbody td:nth-child(2) * {
+.fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2),
+.fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2) *,
+.fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2),
+.fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2) * {
   font-size: 13px !important;
   font-weight: 700 !important;
   color: var(--sig-text, #0f172a) !important;
@@ -4722,10 +4738,22 @@ header.fi-header p.fi-header-subheading,
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
-.fi-ta-table thead th:nth-child(2),
-.fi-ta-table tbody td:nth-child(2) {
+
+/* Solo en tablas CON checkbox de selección */
+.fi-ta-table:has(.fi-ta-selection-cell) thead th:nth-child(2),
+.fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2),
+.fi-ta-table:has(.fi-ta-record-checkbox) thead th:nth-child(2),
+.fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2) {
   width: 145px !important;
   min-width: 145px !important;
+}
+
+/* En tablas SIN checkbox (SS), distribuir normalmente */
+.fi-ta-table:not(:has(.fi-ta-selection-cell)):not(:has(.fi-ta-record-checkbox)) thead th:nth-child(2),
+.fi-ta-table:not(:has(.fi-ta-selection-cell)):not(:has(.fi-ta-record-checkbox)) tbody td:nth-child(2) {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
 }
 
 /* EQUIPO: reducir ancho y controlar desborde */

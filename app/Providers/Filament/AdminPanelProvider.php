@@ -36,6 +36,7 @@ class AdminPanelProvider extends PanelProvider
             ->favicon(asset('images/sigem-favicon.svg?v=2'))
             ->font('DM Sans')
             ->globalSearch(false)
+            ->darkMode(false)
             ->colors([
                 'primary' => Color::hex('#1b65d4'),
                 'success' => Color::hex('#059669'),
