@@ -367,7 +367,24 @@ class InventarioResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver()->tooltip('Ver detalle'),
+                Tables\Actions\ViewAction::make()
+                    ->iconButton()
+                    ->slideOver()
+                    ->tooltip('Ver detalle')
+                    ->extraAttributes(['title' => 'Ver detalle'])
+                    ->modalHeading(fn (?Inventario $record) => $record?->material?->nombre ?? 'Detalle de equipo')
+                    ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
+                        'ID: ' . e($record?->num_serie ?? '—') . ' · ' . e($record?->material?->tipo?->nombre ?? 'Sin categoría')
+                    ))
+                    ->modalCancelActionLabel('Cerrar')
+                    ->extraModalFooterActions([
+                        Tables\Actions\Action::make('desde_detalle_editar')
+                            ->label('Modificar')
+                            ->color('warning')
+                            ->icon('heroicon-m-pencil-square')
+                            ->visible(fn (?Inventario $record) => $record && auth()->user()?->can('update', $record))
+                            ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedTableAction('edit', '{$record?->getKey()}')"),
+                    ]),
                 Tables\Actions\EditAction::make()->iconButton()->slideOver()->tooltip('Editar')->successNotificationTitle('Registro de inventario actualizado correctamente'),
             ])
             ->bulkActions([]);
@@ -375,89 +392,7 @@ class InventarioResource extends Resource
 
     public static function infolist(Infolist $infolist): Infolist
     {
-        return $infolist
-            ->schema([
-                Section::make('Identificación del activo')
-                    ->schema([
-                        TextEntry::make('num_serie')->label('No. serie')
-                            ->fontFamily('mono')
-                            ->icon('heroicon-m-qr-code'),
-                        TextEntry::make('material.nombre')->label('Material')
-                            ->icon('heroicon-m-cube'),
-                        TextEntry::make('subtipo')->label('Subtipo')->placeholder('No definido'),
-                        TextEntry::make('estado')
-                            ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                'Disponible' => 'success',
-                                'Asignado' => 'info',
-                                'Reasignado' => 'reassign',
-                                'En Mantenimiento' => 'warning',
-                                'Dañado' => 'danger',
-                                default => 'gray',
-                            })
-                            ->icon(fn (string $state): string => match ($state) {
-                                'Disponible' => 'heroicon-m-check-circle',
-                                'Asignado' => 'heroicon-m-user',
-                                'Reasignado' => 'heroicon-m-arrows-right-left',
-                                'En Mantenimiento' => 'heroicon-m-wrench',
-                                'Dañado' => 'heroicon-m-exclamation-triangle',
-                                default => 'heroicon-m-minus-circle',
-                            }),
-                    ])->columns(4),
-                Section::make('Ubicación y asignación')
-                    ->schema([
-                        TextEntry::make('ubicacion_fisica')->label('Ubicación')
-                            ->icon('heroicon-m-building-office'),
-                        TextEntry::make('fecha_asignacion')
-                            ->label('Fecha de asignación')
-                            ->date('d/m/Y')
-                            ->icon('heroicon-m-calendar')
-                            ->placeholder('Sin fecha de asignación'),
-                        TextEntry::make('fecha_cambio_area')
-                            ->label('Fecha de cambio de área')
-                            ->date('d/m/Y')
-                            ->icon('heroicon-m-calendar-days')
-                            ->placeholder('Sin cambio de área'),
-                        TextEntry::make('tipo_propiedad')->label('Propiedad')
-                            ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                'Propio' => 'primary',
-                                'Rentado' => 'gray',
-                                default => 'gray',
-                            }),
-                        TextEntry::make('usuario.name')->label('Registrado por')
-                            ->icon('heroicon-m-user'),
-                    ])->columns(3),
-                Section::make('Red y Conectividad')
-                    ->schema([
-                        TextEntry::make('ip_address')
-                            ->label('Dirección IP')
-                            ->fontFamily('mono')
-                            ->icon('heroicon-m-globe-alt')
-                            ->placeholder('—'),
-                        TextEntry::make('mac_address')
-                            ->label('Dirección MAC')
-                            ->fontFamily('mono')
-                            ->icon('heroicon-m-signal')
-                            ->placeholder('—'),
-                        TextEntry::make('procesador')
-                            ->label('Procesador')
-                            ->placeholder('—'),
-                        TextEntry::make('ram')
-                            ->label('Memoria RAM')
-                            ->placeholder('—'),
-                        TextEntry::make('disco')
-                            ->label('Disco duro')
-                            ->placeholder('—'),
-                    ])->columns(3)->collapsible(),
-                Section::make('Detalles adicionales')
-                    ->schema([
-                        TextEntry::make('proveedor.nombre_empresa')->label('Proveedor'),
-                        TextEntry::make('num_factura')->label('Factura'),
-                        TextEntry::make('garantia_estado')->label('Garantía'),
-                        TextEntry::make('observaciones_generales')->label('Observaciones')->columnSpanFull(),
-                    ])->columns(3),
-            ]);
+        return \App\Filament\Resources\InventarioResource::infolist($infolist);
     }
 
     public static function getRelations(): array

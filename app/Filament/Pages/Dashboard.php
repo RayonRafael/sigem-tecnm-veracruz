@@ -60,7 +60,10 @@ class Dashboard extends BaseDashboard
     {
         return ViewAction::make('verEquipo')
             ->label('Ver equipo')
-            ->modalHeading('Detalle de equipo')
+            ->modalHeading(fn (?Inventario $record) => $record?->material?->nombre ?? 'Detalle de equipo')
+            ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
+                'ID: ' . e($record?->num_serie ?? '—') . ' · ' . e($record?->material?->tipo?->nombre ?? 'Sin categoría')
+            ))
             ->model(Inventario::class)
             ->record(function (array $arguments) {
                 $id = $arguments['id'] ?? $arguments['record'] ?? null;
@@ -77,7 +80,27 @@ class Dashboard extends BaseDashboard
             })
             ->slideOver()
             ->infolist(fn (Infolist $infolist): Infolist => InventarioResource::infolist($infolist))
-            ->modalCancelActionLabel('Cerrar');
+            ->modalCancelActionLabel('Cerrar')
+            ->extraModalFooterActions([
+                \Filament\Actions\Action::make('desde_detalle_editar')
+                    ->label('Modificar')
+                    ->color('warning')
+                    ->icon('heroicon-m-pencil-square')
+                    ->visible(fn (?Inventario $record) => $record && auth()->user()?->can('update', $record))
+                    ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedAction('editarEquipo', { id: '{$record?->getKey()}', record: '{$record?->getKey()}' })"),
+                \Filament\Actions\Action::make('desde_detalle_cambio')
+                    ->label('Cambio')
+                    ->color('info')
+                    ->icon('heroicon-m-arrows-right-left')
+                    ->visible(fn (?Inventario $record) => $record && auth()->user()?->can('update', $record))
+                    ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedAction('editarEquipo', { id: '{$record?->getKey()}', record: '{$record?->getKey()}' })"),
+                \Filament\Actions\Action::make('desde_detalle_baja')
+                    ->label('Baja')
+                    ->color('danger')
+                    ->icon('heroicon-m-arrow-down-circle')
+                    ->visible(fn (?Inventario $record) => $record && auth()->user()?->can('delete', $record))
+                    ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedAction('eliminarEquipo', { id: '{$record?->getKey()}', record: '{$record?->getKey()}' })"),
+            ]);
     }
 
     public function verEquipo($id): void

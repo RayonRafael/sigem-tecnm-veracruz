@@ -3020,6 +3020,75 @@ table{
   box-shadow: 0 0 0 1px #ef4444 !important;
 }
 
+/* ==========================================================================
+   SLIDE-OVER DETALLE DE EQUIPO (INFOLIST & TABS)
+   ========================================================================== */
+
+/* Pestañas (Tabs) dentro del slide-over */
+.fi-modal-slide-over-window .fi-tabs {
+  margin-bottom: 16px !important;
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+}
+
+.fi-modal-slide-over-window .fi-tabs-item {
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 8px 14px !important;
+}
+
+/* Separadores horizontales entre campos */
+.fi-modal-slide-over-window .fi-in-text-entry,
+.fi-modal-slide-over-window .fi-in-badge-entry,
+.fi-modal-slide-over-window .fi-in-entry-wrp {
+  padding-bottom: 8px !important;
+  border-bottom: 1px solid var(--sig-border, #f1f5f9) !important;
+  margin-bottom: 8px !important;
+}
+
+/* Labels grises pequeños */
+.fi-modal-slide-over-window .fi-in-entry-wrp dt,
+.fi-modal-slide-over-window .fi-in-entry-wrp-label,
+.fi-modal-slide-over-window .fi-in-text-entry-label,
+.fi-modal-slide-over-window .fi-in-badge-entry-label {
+  font-size: 12px !important;
+  color: var(--sig-muted, #64748b) !important;
+  font-weight: 500 !important;
+  margin-bottom: 2px !important;
+}
+
+/* Valores bold */
+.fi-modal-slide-over-window .fi-in-entry-wrp dd,
+.fi-modal-slide-over-window .fi-in-entry-wrp-content,
+.fi-modal-slide-over-window .fi-in-text-entry-data,
+.fi-modal-slide-over-window .fi-in-badge-entry-data {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: var(--sig-text, #0f172a) !important;
+}
+
+/* Secciones colapsables con chevron sutil (sin cuadro con borde) */
+.fi-modal-slide-over-window .fi-section-header .fi-icon-btn,
+.fi-modal-slide-over-window .fi-section-header .fi-section-collapse-btn {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Header modal: estilo dinámico del detalle */
+.fi-modal-slide-over-window .fi-modal-header .fi-modal-heading {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  color: var(--sig-text, #0f172a) !important;
+  line-height: 1.3 !important;
+}
+
+.fi-modal-slide-over-window .fi-modal-header .fi-modal-description {
+  font-size: 12.5px !important;
+  color: var(--sig-muted, #64748b) !important;
+  margin-top: 3px !important;
+  font-weight: 500 !important;
+}
+
 /* Secciones y wizards ocupan ambas columnas */
 .fi-modal-slide-over-window .fi-section,
 .fi-modal-slide-over-window .fi-fo-wizard,

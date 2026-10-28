@@ -615,7 +615,32 @@ class InventarioResource extends Resource
                     ->iconButton()
                     ->tooltip('Ver detalle')
                     ->extraAttributes(['title' => 'Ver detalle'])
-                    ->slideOver(),
+                    ->slideOver()
+                    ->modalHeading(fn (?Inventario $record) => $record?->material?->nombre ?? 'Detalle de equipo')
+                    ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
+                        'ID: ' . e($record?->num_serie ?? '—') . ' · ' . e($record?->material?->tipo?->nombre ?? 'Sin categoría')
+                    ))
+                    ->modalCancelActionLabel('Cerrar')
+                    ->extraModalFooterActions([
+                        Tables\Actions\Action::make('desde_detalle_editar')
+                            ->label('Modificar')
+                            ->color('warning')
+                            ->icon('heroicon-m-pencil-square')
+                            ->visible(fn (?Inventario $record) => $record && auth()->user()?->can('update', $record))
+                            ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedTableAction('edit', '{$record?->getKey()}')"),
+                        Tables\Actions\Action::make('desde_detalle_cambio')
+                            ->label('Cambio')
+                            ->color('info')
+                            ->icon('heroicon-m-arrows-right-left')
+                            ->visible(fn (?Inventario $record) => $record && auth()->user()?->can('update', $record))
+                            ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedTableAction('edit', '{$record?->getKey()}')"),
+                        Tables\Actions\Action::make('desde_detalle_baja')
+                            ->label('Baja')
+                            ->color('danger')
+                            ->icon('heroicon-m-arrow-down-circle')
+                            ->visible(fn (?Inventario $record) => $record && auth()->user()?->can('delete', $record))
+                            ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedTableAction('delete', '{$record?->getKey()}')"),
+                    ]),
                 Tables\Actions\EditAction::make()
                     ->iconButton()
                     ->tooltip('Editar')
@@ -655,113 +680,205 @@ class InventarioResource extends Resource
     {
         return $infolist
             ->schema([
-                Infolists\Components\Section::make('Identificación del Equipo')
-                    ->schema([
-                        Infolists\Components\TextEntry::make('tipo_equipo')
-                            ->label('Tipo de equipo')
-                            ->badge()
-                            ->color('primary')
-                            ->placeholder('No definido'),
-                        Infolists\Components\TextEntry::make('subtipo')
-                            ->label('Subtipo')
-                            ->placeholder('No definido'),
-                        Infolists\Components\TextEntry::make('num_serie')
-                            ->label('Número de serie')
-                            ->fontFamily('mono')
-                            ->icon('heroicon-m-qr-code')
-                            ->placeholder('Sin número de serie'),
-                        Infolists\Components\TextEntry::make('material.nombre')
-                            ->label('Material / Equipo')
-                            ->icon('heroicon-m-cube'),
-                        Infolists\Components\TextEntry::make('estado')
-                            ->label('Estado')
-                            ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                'Disponible' => 'success',
-                                'Asignado' => 'info',
-                                'Reasignado' => 'reassign',
-                                'En Mantenimiento' => 'warning',
-                                'Dañado' => 'danger',
-                                default => 'gray',
-                            }),
-                        Infolists\Components\TextEntry::make('tipo_propiedad')
-                            ->label('Propiedad')
-                            ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                'Propio' => 'primary',
-                                'Rentado' => 'gray',
-                                default => 'gray',
-                            }),
-                        Infolists\Components\TextEntry::make('usuario.name')
-                            ->label('Registrado por')
-                            ->icon('heroicon-m-user'),
-                    ])->columns(2),
+                Infolists\Components\Tabs::make('Detalle')
+                    ->tabs([
+                        Infolists\Components\Tabs\Tab::make('Información')
+                            ->icon('heroicon-m-tag')
+                            ->schema([
+                                Infolists\Components\Section::make('Identificación del Equipo')
+                                    ->collapsible()
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('tipo_equipo')
+                                            ->label('Tipo de equipo')
+                                            ->badge()
+                                            ->color('primary')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('subtipo')
+                                            ->label('Subtipo')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('num_serie')
+                                            ->label('Número de serie')
+                                            ->fontFamily('mono')
+                                            ->icon('heroicon-m-qr-code')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('material.nombre')
+                                            ->label('Material / Equipo')
+                                            ->icon('heroicon-m-cube')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('estado')
+                                            ->label('Estado')
+                                            ->badge()
+                                            ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : 'Por capturar')
+                                            ->color(fn (?string $state): string => match ($state) {
+                                                'Disponible' => 'success',
+                                                'Asignado' => 'info',
+                                                'Reasignado' => 'reassign',
+                                                'En Mantenimiento' => 'warning',
+                                                'Dañado' => 'danger',
+                                                default => 'gray',
+                                            }),
+                                        Infolists\Components\TextEntry::make('tipo_propiedad')
+                                            ->label('Propiedad')
+                                            ->badge()
+                                            ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : 'Por capturar')
+                                            ->color(fn (?string $state): string => match ($state) {
+                                                'Propio' => 'primary',
+                                                'Rentado' => 'gray',
+                                                default => 'gray',
+                                            }),
+                                        Infolists\Components\TextEntry::make('usuario.name')
+                                            ->label('Registrado por')
+                                            ->icon('heroicon-m-user')
+                                            ->placeholder('Por capturar'),
+                                    ])->columns(2),
 
-                Infolists\Components\Section::make('Ubicación y Asignación')
-                    ->schema([
-                        Infolists\Components\TextEntry::make('ubicacion_fisica')
-                            ->label('Ubicación física descriptiva')
-                            ->icon('heroicon-m-map-pin')
-                            ->placeholder('No especificada')
-                            ->columnSpanFull(),
-                        Infolists\Components\TextEntry::make('fecha_asignacion')
-                            ->label('Fecha de asignación')
-                            ->date('d/m/Y')
-                            ->icon('heroicon-m-calendar')
-                            ->placeholder('Sin fecha de asignación'),
-                        Infolists\Components\TextEntry::make('fecha_cambio_area')
-                            ->label('Fecha de cambio de área')
-                            ->date('d/m/Y')
-                            ->icon('heroicon-m-calendar-days')
-                            ->placeholder('Sin cambio de área'),
-                    ])->columns(2),
+                                Infolists\Components\Section::make('Ubicación y Asignación')
+                                    ->collapsible()
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('ubicacion_fisica')
+                                            ->label('Ubicación física descriptiva')
+                                            ->icon('heroicon-m-map-pin')
+                                            ->placeholder('Por capturar')
+                                            ->columnSpanFull(),
+                                        Infolists\Components\TextEntry::make('fecha_asignacion')
+                                            ->label('Fecha de asignación')
+                                            ->date('d/m/Y')
+                                            ->icon('heroicon-m-calendar')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('fecha_cambio_area')
+                                            ->label('Fecha de cambio de área')
+                                            ->date('d/m/Y')
+                                            ->icon('heroicon-m-calendar-days')
+                                            ->placeholder('Por capturar'),
+                                    ])->columns(2),
 
-                Infolists\Components\Section::make('Red y Conectividad')
-                    ->schema([
-                        Infolists\Components\TextEntry::make('ip_address')
-                            ->label('Dirección IP')
-                            ->fontFamily('mono')
-                            ->icon('heroicon-m-globe-alt')
-                            ->placeholder('—'),
-                        Infolists\Components\TextEntry::make('mac_address')
-                            ->label('Dirección MAC')
-                            ->fontFamily('mono')
-                            ->icon('heroicon-m-signal')
-                            ->placeholder('—'),
-                        Infolists\Components\TextEntry::make('procesador')
-                            ->label('Procesador')
-                            ->placeholder('—'),
-                        Infolists\Components\TextEntry::make('ram')
-                            ->label('Memoria RAM')
-                            ->placeholder('—'),
-                        Infolists\Components\TextEntry::make('disco')
-                            ->label('Disco duro')
-                            ->placeholder('—'),
+                                Infolists\Components\Section::make('Red y Conectividad')
+                                    ->collapsible()
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('ip_address')
+                                            ->label('Dirección IP')
+                                            ->fontFamily('mono')
+                                            ->icon('heroicon-m-globe-alt')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('mac_address')
+                                            ->label('Dirección MAC')
+                                            ->fontFamily('mono')
+                                            ->icon('heroicon-m-signal')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('procesador')
+                                            ->label('Procesador')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('ram')
+                                            ->label('Memoria RAM')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('disco')
+                                            ->label('Disco duro')
+                                            ->placeholder('Por capturar')
+                                            ->columnSpanFull(),
+                                    ])->columns(2),
+
+                                Infolists\Components\Section::make('Componentes de la Estación')
+                                    ->collapsible()
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('especificaciones.cpu_marca')->label('Marca CPU')->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('especificaciones.cpu_sn')->label('S/N CPU')->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('especificaciones.monitor_marca')->label('Marca Monitor')->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('especificaciones.monitor_sn')->label('S/N Monitor')->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('especificaciones.teclado_marca')->label('Marca Teclado')->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('especificaciones.teclado_sn')->label('S/N Teclado')->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('especificaciones.mouse_marca')->label('Marca Mouse')->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('especificaciones.mouse_sn')->label('S/N Mouse')->placeholder('Por capturar'),
+                                    ])
+                                    ->columns(2)
+                                    ->visible(fn (?Inventario $record) => in_array($record?->tipo_equipo, ['Desktop', 'All in One', 'Computadora'])),
+
+                                Infolists\Components\Section::make('Observaciones')
+                                    ->collapsible()
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('observaciones_generales')
+                                            ->label('Observaciones generales')
+                                            ->placeholder('Por capturar')
+                                            ->columnSpanFull(),
+                                    ]),
+                            ]),
+
+                        Infolists\Components\Tabs\Tab::make('Historial')
+                            ->icon('heroicon-m-clock')
+                            ->schema([
+                                Infolists\Components\RepeatableEntry::make('historial')
+                                    ->label('')
+                                    ->getStateUsing(fn (?Inventario $record) => $record ? \App\Models\HistorialEstado::where('id_inventario', $record->id_inventario)->orderByDesc('fecha_cambio')->get() : [])
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('fecha_cambio')
+                                            ->label('Fecha')
+                                            ->dateTime('d/m/Y H:i'),
+                                        Infolists\Components\TextEntry::make('estado_anterior')
+                                            ->label('Anterior')
+                                            ->badge()
+                                            ->placeholder('—'),
+                                        Infolists\Components\TextEntry::make('estado_nuevo')
+                                            ->label('Nuevo')
+                                            ->badge(),
+                                        Infolists\Components\TextEntry::make('motivo_cambio')
+                                            ->label('Motivo')
+                                            ->placeholder('Sin motivo registrado'),
+                                    ])
+                                    ->columns(2)
+                                    ->columnSpanFull()
+                                    ->placeholder('Sin historial de cambios registrado'),
+                            ]),
+
+                        Infolists\Components\Tabs\Tab::make('Documentación')
+                            ->icon('heroicon-m-document-text')
+                            ->schema([
+                                Infolists\Components\Section::make('Factura y proveedor')
+                                    ->collapsible()
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('proveedor.nombre_empresa')
+                                            ->label('Proveedor')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('num_factura')
+                                            ->label('Factura')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('fecha_factura')
+                                            ->label('Fecha de factura')
+                                            ->date('d/m/Y')
+                                            ->placeholder('Por capturar'),
+                                    ])
+                                    ->columns(2),
+
+                                Infolists\Components\Section::make('Garantía')
+                                    ->collapsible()
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('garantia_estado')
+                                            ->label('Estado de garantía')
+                                            ->badge()
+                                            ->formatStateUsing(fn (?string $state): string => $state ? '● ' . ucfirst(str_replace('_', ' ', $state)) : 'Por capturar')
+                                            ->color(fn (?string $state): string => match ($state) {
+                                                'vigente' => 'success',
+                                                'por_vencer' => 'warning',
+                                                'vencida' => 'danger',
+                                                default => 'gray',
+                                            }),
+                                        Infolists\Components\TextEntry::make('garantia_fecha_fin')
+                                            ->label('Fin de garantía')
+                                            ->date('d/m/Y')
+                                            ->placeholder('Por capturar'),
+                                    ])
+                                    ->columns(2),
+
+                                Infolists\Components\Section::make('Archivos adjuntos')
+                                    ->collapsible()
+                                    ->schema([
+                                        Infolists\Components\TextEntry::make('archivos')
+                                            ->label('')
+                                            ->default('Sin archivos digitales adjuntos')
+                                            ->getStateUsing(fn () => 'Sin archivos digitales adjuntos')
+                                            ->color('gray'),
+                                    ]),
+                            ]),
                     ])
-                    ->columns(3)
-                    ->collapsible(),
-
-                Infolists\Components\Section::make('Componentes de la Estación')
-                    ->schema([
-                        Infolists\Components\TextEntry::make('especificaciones.cpu_marca')->label('Marca CPU')->placeholder('—'),
-                        Infolists\Components\TextEntry::make('especificaciones.cpu_sn')->label('S/N CPU')->placeholder('—'),
-                        Infolists\Components\TextEntry::make('especificaciones.monitor_marca')->label('Marca Monitor')->placeholder('—'),
-                        Infolists\Components\TextEntry::make('especificaciones.monitor_sn')->label('S/N Monitor')->placeholder('—'),
-                        Infolists\Components\TextEntry::make('especificaciones.teclado_marca')->label('Marca Teclado')->placeholder('—'),
-                        Infolists\Components\TextEntry::make('especificaciones.teclado_sn')->label('S/N Teclado')->placeholder('—'),
-                        Infolists\Components\TextEntry::make('especificaciones.mouse_marca')->label('Marca Mouse')->placeholder('—'),
-                        Infolists\Components\TextEntry::make('especificaciones.mouse_sn')->label('S/N Mouse')->placeholder('—'),
-                    ])
-                    ->columns(4)
-                    ->visible(fn ($record) => in_array($record->tipo_equipo, ['Desktop', 'All in One', 'Computadora'])),
-
-                Infolists\Components\Section::make('Detalles adicionales')
-                    ->schema([
-                        Infolists\Components\TextEntry::make('proveedor.nombre_empresa')->label('Proveedor')->placeholder('—'),
-                        Infolists\Components\TextEntry::make('num_factura')->label('Factura')->placeholder('—'),
-                        Infolists\Components\TextEntry::make('garantia_estado')->label('Garantía')->badge(),
-                        Infolists\Components\TextEntry::make('observaciones_generales')->label('Observaciones')->placeholder('Sin observaciones')->columnSpanFull(),
-                    ])->columns(3)->collapsible(),
+                    ->columnSpanFull(),
             ]);
     }
 
