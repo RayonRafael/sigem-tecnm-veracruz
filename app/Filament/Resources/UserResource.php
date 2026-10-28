@@ -8,6 +8,7 @@ use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -170,7 +171,29 @@ class UserResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\ViewAction::make()
+                    ->iconButton()
+                    ->tooltip('Ver detalle')
+                    ->extraAttributes(['title' => 'Ver detalle'])
+                    ->slideOver()
+                    ->modalHeading(fn (?User $record) => $record?->name ?? 'Detalle de usuario')
+                    ->modalDescription(fn (?User $record) => new \Illuminate\Support\HtmlString(
+                        e($record?->email ?? '—') . ' · ' . e($record?->getRoleNames()->first() ?? $record?->tipo_usuario ?? 'Sin rol')
+                    ))
+                    ->modalCancelActionLabel('Cerrar')
+                    ->extraModalFooterActions([
+                        Tables\Actions\Action::make('desde_detalle_editar')
+                            ->label('Editar')
+                            ->color('warning')
+                            ->icon('heroicon-m-pencil-square')
+                            ->alpineClickHandler(fn (?User $record) => "\$wire.replaceMountedTableAction('edit', '{$record?->getKey()}')"),
+                        Tables\Actions\Action::make('desde_detalle_eliminar')
+                            ->label('Eliminar')
+                            ->color('danger')
+                            ->icon('heroicon-m-trash')
+                            ->hidden(fn (?User $record): bool => ! $record || $record->email === 'admin@tecnm.edu.mx')
+                            ->alpineClickHandler(fn (?User $record) => "\$wire.replaceMountedTableAction('delete', '{$record?->getKey()}')"),
+                    ]),
                 Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Usuario actualizado correctamente'),
                 Tables\Actions\DeleteAction::make()->requiresConfirmation()->successNotificationTitle('Usuario eliminado')
                     ->modalHeading('Eliminar usuario')
@@ -196,45 +219,92 @@ class UserResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos personales')
-                    ->schema([
-                        TextEntry::make('name')->label('Nombre')->icon('heroicon-m-user'),
-                        TextEntry::make('apellido_paterno')->label('Apellido paterno')->icon('heroicon-m-user'),
-                        TextEntry::make('apellido_materno')->label('Apellido materno')->icon('heroicon-m-user'),
-                    ])->columns(3),
-                Section::make('Datos de acceso')
-                    ->schema([
-                        TextEntry::make('email')->label('Correo electrónico')->icon('heroicon-m-envelope'),
-                    ])->columns(1),
-                Section::make('Datos institucionales')
-                    ->schema([
-                        TextEntry::make('num_control')->label('Número de control')->icon('heroicon-m-identification'),
-                        TextEntry::make('carrera')->label('Carrera')->icon('heroicon-m-academic-cap'),
-                        TextEntry::make('RFC')->label('Rfc')->fontFamily('mono')->icon('heroicon-m-identification'),
-                    ])->columns(3),
-                Section::make('Estado y rol')
-                    ->schema([
-                        TextEntry::make('tipo_usuario')
-                            ->label('Tipo de usuario')
-                            ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                RoleEnum::ADMIN->value => 'success',
-                                RoleEnum::SERVICIO_TIPO->value => 'warning',
-                                default => 'gray',
-                            })
-                            ->icon(fn (string $state): string => match ($state) {
-                                RoleEnum::ADMIN->value => 'heroicon-m-shield-check',
-                                RoleEnum::SERVICIO_TIPO->value => 'heroicon-m-academic-cap',
-                                default => 'heroicon-m-clock',
-                            }),
-                        TextEntry::make('roles.name')->label('Rol')->badge()->icon('heroicon-m-key'),
-                        TextEntry::make('activo')
-                            ->label('Estado')
-                            ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Inactivo')
-                            ->badge()
-                            ->color(fn ($state) => $state ? 'success' : 'danger')
-                            ->icon(fn ($state) => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle'),
-                    ])->columns(3),
+                Tabs::make('Detalle')
+                    ->tabs([
+                        Tabs\Tab::make('Perfil')
+                            ->icon('heroicon-m-user')
+                            ->schema([
+                                Section::make('Datos personales')
+                                    ->schema([
+                                        TextEntry::make('name')
+                                            ->label('Nombre')
+                                            ->icon('heroicon-m-user')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('email')
+                                            ->label('Correo')
+                                            ->icon('heroicon-m-envelope')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('apellido_paterno')
+                                            ->label('Apellido paterno')
+                                            ->icon('heroicon-m-user')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('apellido_materno')
+                                            ->label('Apellido materno')
+                                            ->icon('heroicon-m-user')
+                                            ->placeholder('Por capturar'),
+                                    ])
+                                    ->columns(2),
+                            ]),
+
+                        Tabs\Tab::make('Institucional y Roles')
+                            ->icon('heroicon-m-shield-check')
+                            ->schema([
+                                Section::make('Datos institucionales')
+                                    ->schema([
+                                        TextEntry::make('num_control')
+                                            ->label('Número de control')
+                                            ->icon('heroicon-m-identification')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('carrera')
+                                            ->label('Carrera')
+                                            ->icon('heroicon-m-academic-cap')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('RFC')
+                                            ->label('RFC')
+                                            ->fontFamily('mono')
+                                            ->icon('heroicon-m-identification')
+                                            ->placeholder('Por capturar'),
+                                    ])
+                                    ->columns(2),
+
+                                Section::make('Rol y permisos')
+                                    ->schema([
+                                        TextEntry::make('roles.name')
+                                            ->label('Rol')
+                                            ->badge()
+                                            ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : 'Por capturar')
+                                            ->color(fn (?string $state): string => match ($state) {
+                                                'Administrador', 'Admin' => 'warning',
+                                                'Servicio Social', 'Servicio' => 'info',
+                                                default => 'gray',
+                                            })
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('tipo_usuario')
+                                            ->label('Tipo de usuario')
+                                            ->badge()
+                                            ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : 'Por capturar')
+                                            ->color(fn (?string $state): string => match ($state) {
+                                                RoleEnum::ADMIN->value => 'success',
+                                                RoleEnum::SERVICIO_TIPO->value => 'warning',
+                                                default => 'gray',
+                                            })
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('activo')
+                                            ->label('Estado')
+                                            ->badge()
+                                            ->formatStateUsing(fn ($state): string => $state ? '● Activo' : '● Inactivo')
+                                            ->color(fn ($state): string => $state ? 'success' : 'danger')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('created_at')
+                                            ->label('Registro')
+                                            ->dateTime('d/m/Y H:i')
+                                            ->icon('heroicon-m-calendar')
+                                            ->placeholder('Por capturar'),
+                                    ])
+                                    ->columns(2),
+                            ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 
