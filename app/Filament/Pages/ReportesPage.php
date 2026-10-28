@@ -37,7 +37,7 @@ class ReportesPage extends Page
 
     public function getSubheading(): ?string
     {
-        return 'Genera reportes del inventario y decide cuáles puede consultar Servicio Social.';
+        return null;
     }
 
     public function getBreadcrumbs(): array

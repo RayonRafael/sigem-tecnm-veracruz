@@ -31,7 +31,7 @@ class ReportesPage extends BaseReportesPage
 
     public function getSubheading(): ?string
     {
-        return 'Consulta métricas, estadísticas y reportes autorizados del Centro de Cómputo.';
+        return null;
     }
 
     public static function canAccess(): bool

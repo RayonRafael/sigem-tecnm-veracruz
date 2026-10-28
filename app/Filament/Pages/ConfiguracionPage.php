@@ -52,7 +52,7 @@ class ConfiguracionPage extends Page
 
     public function getSubheading(): ?string
     {
-        return 'Gestiona los catálogos del sistema, consulta la bitácora y ajusta las preferencias.';
+        return null;
     }
 
     public function getBreadcrumbs(): array

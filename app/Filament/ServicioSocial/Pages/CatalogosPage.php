@@ -50,7 +50,7 @@ class CatalogosPage extends Page
 
     public function getSubheading(): ?string
     {
-        return 'Consulta los catálogos del sistema para referencia.';
+        return null;
     }
 
     public string $catalogoActivo = 'departamentos';

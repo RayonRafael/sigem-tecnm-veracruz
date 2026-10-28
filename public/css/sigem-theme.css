@@ -74,14 +74,16 @@ html.dark h1,
     letter-spacing: -0.025em !important;
 }
 
-/* Ocultar heading nativo duplicado de Filament en páginas que tienen su propio encabezado InvGate */
-.fi-page:has(.sigem-rep-header) .fi-header-heading {
+/* Ocultar header nativo duplicado de Filament en páginas que tienen su propio encabezado InvGate */
+.fi-page:has(.sigem-rep-header) .fi-header,
+.fi-page:has(.sigem-rep-header) .fi-header-heading,
+.fi-page:has(.sigem-rep-header) .fi-header-subheading {
     display: none !important;
-}
-.fi-page:has(.sigem-rep-header) .fi-header {
-    margin-bottom: 0.5rem !important;
-    padding-bottom: 0 !important;
-    border-bottom: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    border: none !important;
 }
 
 /* ===== 4. TABLAS DE LISTADO ===== */
@@ -2734,17 +2736,19 @@ table{
 .fi-modal-slide-over-window [style*="--cols"] {
   column-gap: 16px !important;
   row-gap: 14px !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
 }
 
 @media (min-width: 640px) {
   .fi-modal-slide-over-window [style*="--cols-lg: repeat(2"],
-  .fi-modal-slide-over-window [style*="--cols-default: repeat(2"] {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-  }
-
+  .fi-modal-slide-over-window [style*="--cols-default: repeat(2"],
   .fi-modal-slide-over-window [style*="--cols-lg: repeat(3"],
-  .fi-modal-slide-over-window [style*="--cols-default: repeat(3"] {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  .fi-modal-slide-over-window [style*="--cols-default: repeat(3"],
+  .fi-modal-slide-over-window [style*="--cols-lg: repeat(4"],
+  .fi-modal-slide-over-window [style*="--cols-default: repeat(4"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
 
@@ -2775,6 +2779,17 @@ table{
   padding: 12px 18px !important;
   border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
   background: #f8fafc !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.fi-modal-slide-over-window .fi-section-header > div,
+.fi-modal-slide-over-window .fi-section-header-description {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
 }
 
 /* Ocultar SVGs monocromáticos de headers de sección dentro del slide-over */
@@ -2799,6 +2814,11 @@ table{
   color: var(--sig-text, #0f172a) !important;
   display: flex !important;
   align-items: center !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+}
 }
 
 /* Emojis con color por sección mediante ::before */
@@ -2954,6 +2974,7 @@ table{
 .fi-modal-slide-over-window .choices {
   min-width: 0 !important;
   width: 100% !important;
+  max-width: 100% !important;
   overflow: visible !important;
   box-sizing: border-box !important;
 }
@@ -2961,6 +2982,7 @@ table{
 .fi-modal-slide-over-window .choices__inner {
   min-width: 0 !important;
   width: 100% !important;
+  max-width: 100% !important;
   min-height: 38px !important;
   height: 38px !important;
   padding: 4px 10px !important;
@@ -2972,20 +2994,30 @@ table{
 }
 
 .fi-modal-slide-over-window .choices__list--single {
+  display: block !important;
   overflow: hidden !important;
   white-space: nowrap !important;
   text-overflow: ellipsis !important;
-  max-width: calc(100% - 28px) !important;
-  width: auto !important;
+  max-width: calc(100% - 24px) !important;
+  width: 100% !important;
+  min-width: 0 !important;
   padding: 0 !important;
+  box-sizing: border-box !important;
 }
 
+.fi-modal-slide-over-window .choices__list--single .choices__item,
+.fi-modal-slide-over-window .choices__list--single .choices__item--selectable,
+.fi-modal-slide-over-window .choices__list--single .choices__placeholder,
 .fi-modal-slide-over-window .choices__item,
-.fi-modal-slide-over-window .choices__item--selectable {
+.fi-modal-slide-over-window .choices__placeholder {
+  display: block !important;
   overflow: hidden !important;
   white-space: nowrap !important;
   text-overflow: ellipsis !important;
   max-width: 100% !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
 }
 
 /* Dropdown de Choices con fondo blanco sólido y z-index alto para montarse sobre campos inferiores */
@@ -3036,13 +3068,18 @@ table{
   padding: 8px 14px !important;
 }
 
-/* Separadores horizontales entre campos */
+/* Separadores horizontales entre campos y contención de textos */
 .fi-modal-slide-over-window .fi-in-text-entry,
 .fi-modal-slide-over-window .fi-in-badge-entry,
 .fi-modal-slide-over-window .fi-in-entry-wrp {
   padding-bottom: 8px !important;
   border-bottom: 1px solid var(--sig-border, #f1f5f9) !important;
   margin-bottom: 8px !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
+  box-sizing: border-box !important;
 }
 
 /* Labels grises pequeños */
@@ -3054,9 +3091,13 @@ table{
   color: var(--sig-muted, #64748b) !important;
   font-weight: 500 !important;
   margin-bottom: 2px !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
 }
 
-/* Valores bold */
+/* Valores bold con ajuste de palabras largas */
 .fi-modal-slide-over-window .fi-in-entry-wrp dd,
 .fi-modal-slide-over-window .fi-in-entry-wrp-content,
 .fi-modal-slide-over-window .fi-in-text-entry-data,
@@ -3064,6 +3105,10 @@ table{
   font-size: 13.5px !important;
   font-weight: 600 !important;
   color: var(--sig-text, #0f172a) !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
 }
 
 /* Secciones colapsables con chevron sutil (sin cuadro con borde) */
@@ -3074,12 +3119,22 @@ table{
   box-shadow: none !important;
 }
 
-/* Header modal: estilo dinámico del detalle */
+/* Header modal: estilo dinámico del detalle y protección contra colisión con botón cerrar */
+.fi-modal-slide-over-window .fi-modal-header {
+  padding-right: 56px !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
 .fi-modal-slide-over-window .fi-modal-header .fi-modal-heading {
   font-size: 16px !important;
   font-weight: 700 !important;
   color: var(--sig-text, #0f172a) !important;
   line-height: 1.3 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
 }
 
 .fi-modal-slide-over-window .fi-modal-header .fi-modal-description {
@@ -3087,6 +3142,10 @@ table{
   color: var(--sig-muted, #64748b) !important;
   margin-top: 3px !important;
   font-weight: 500 !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
 }
 
 /* Secciones y wizards ocupan ambas columnas */
@@ -3151,6 +3210,8 @@ table{
 .fi-modal-slide-over-window .fi-fo-wizard-header-step:nth-child(3) .fi-fo-wizard-header-step-icon-ctn::before {
   content: "🛡️" !important;
 }
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-button > div,
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-button [class*="grid"],
 .fi-fo-wizard-header-step-label,
 .fi-modal-slide-over-window .fi-fo-wizard-header-step-label {
   font-size: 12px !important;
@@ -3159,6 +3220,8 @@ table{
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   max-width: 100px !important;
+  min-width: 0 !important;
+  display: block !important;
 }
 .fi-fo-wizard-header-step-description,
 .fi-modal-slide-over-window .fi-fo-wizard-header-step-description,
@@ -3639,6 +3702,17 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
   border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
   background: #f8fafc !important;
   margin-bottom: 0 !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.fi-modal-slide-over-window .fi-section-header > div,
+.fi-modal-slide-over-window .fi-section-header-description {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
 }
 
 .fi-modal-slide-over-window .fi-section-header > svg,
@@ -3659,6 +3733,10 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
   font-size: 15px !important;
   font-weight: 700 !important;
   color: var(--sig-text, #0f172a) !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow-wrap: break-word !important;
+  word-break: break-word !important;
 }
 
 .fi-modal-slide-over-window .fi-fo-component-ctn > .fi-section > .fi-section-content,
