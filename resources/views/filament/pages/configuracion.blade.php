@@ -80,19 +80,21 @@
 
                 @if (count($catActivo['rows']) > 0)
                     <div class="sigem-rep-table-wrap">
-                        <table class="fi-ta-table">
+                        <table class="fi-ta-table sigem-cat-table sigem-cat-{{ $catActivo['id'] }}">
                             <thead>
                                 <tr>
-                                    @foreach ($catActivo['headers'] as $header)
-                                        <th>{{ $header }}</th>
+                                    @php $headersCount = count($catActivo['headers']); @endphp
+                                    @foreach ($catActivo['headers'] as $idx => $header)
+                                        <th class="{{ $idx === 0 ? 'sigem-col-id' : ($idx === $headersCount - 1 ? 'sigem-col-actions' : 'sigem-col-content') }}">{{ $header }}</th>
                                     @endforeach
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($catActivo['rows'] as $row)
+                                    @php $cellsCount = count($row); @endphp
                                     <tr>
-                                        @foreach ($row as $cell)
-                                            <td>{!! $cell !!}</td>
+                                        @foreach ($row as $idx => $cell)
+                                            <td class="{{ $idx === 0 ? 'sigem-col-id' : ($idx === $cellsCount - 1 ? 'sigem-col-actions fi-ta-actions-cell' : 'sigem-col-content') }}">{!! $cell !!}</td>
                                         @endforeach
                                     </tr>
                                 @endforeach

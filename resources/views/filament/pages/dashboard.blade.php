@@ -133,12 +133,12 @@
                             <table class="fi-ta-table">
                                 <thead>
                                     <tr>
-                                        <th>CÓDIGO</th>
+                                        <th style="width: 130px;">CÓDIGO</th>
                                         <th>EQUIPO</th>
-                                        <th>CATEGORÍA</th>
-                                        <th>ESTADO</th>
-                                        <th>ÁREA</th>
-                                        <th style="text-align: right;">ACCIONES</th>
+                                        <th style="width: 125px;">CATEGORÍA</th>
+                                        <th style="width: 130px;">ESTADO</th>
+                                        <th style="width: 130px;">ÁREA</th>
+                                        <th style="width: 104px; text-align: center;">ACCIONES</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -184,28 +184,25 @@
                                             <td>
                                                 <span style="font-size: 14px; color: var(--sig-muted);">{{ $areaUbicacion }}</span>
                                             </td>
-                                            <td style="text-align: right; white-space: nowrap;">
-                                                <div style="display: inline-flex; align-items: center; justify-content: flex-end; gap: 4px;">
+                                            <td class="fi-ta-actions-cell" style="width: 104px; text-align: center; white-space: nowrap;">
+                                                <div class="fi-ta-actions" style="display: inline-flex; align-items: center; justify-content: center; gap: 3px;">
                                                     <button type="button"
                                                             wire:click="verEquipo({{ $inv->id_inventario }})"
-                                                            class="sigem-rep-btn-sec fi-icon-btn"
+                                                            class="fi-icon-btn sigem-dash-btn"
                                                             title="Ver detalle"
-                                                            aria-label="Ver detalle"
-                                                            style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;">
+                                                            aria-label="Ver detalle">
                                                     </button>
                                                     <button type="button"
                                                             wire:click="editarEquipo({{ $inv->id_inventario }})"
-                                                            class="sigem-rep-btn-sec fi-icon-btn"
+                                                            class="fi-icon-btn sigem-dash-btn"
                                                             title="Editar"
-                                                            aria-label="Editar"
-                                                            style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;">
+                                                            aria-label="Editar">
                                                     </button>
                                                     <button type="button"
                                                             wire:click="eliminarEquipo({{ $inv->id_inventario }})"
-                                                            class="sigem-rep-btn-sec fi-icon-btn"
+                                                            class="fi-icon-btn sigem-dash-btn"
                                                             title="Eliminar"
-                                                            aria-label="Eliminar"
-                                                            style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;">
+                                                            aria-label="Eliminar">
                                                     </button>
                                                 </div>
                                             </td>
@@ -290,6 +287,28 @@
                                 <b>{{ $seg['cant'] }}</b>
                             </div>
                         @endforeach
+                    </div>
+
+                    <!-- 3. Barras por categoría -->
+                    <div style="margin-top: 18px; border-top: 1px solid var(--sig-border); padding-top: 14px;">
+                        <div style="font-size: 13.5px; font-weight: 700; color: var(--sig-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px;">
+                            Por categoría
+                        </div>
+                        @forelse(($categoriasTop ?? []) as $catNom => $catCant)
+                            @php
+                                $pct = ($dashTotal ?? 0) > 0 ? round(($catCant / $dashTotal) * 100) : 0;
+                            @endphp
+                            <a href="{{ url('/admin/inventarios?tableSearch=' . urlencode($catNom)) }}"
+                               class="sigem-cb"
+                               style="text-decoration: none; color: inherit;"
+                               title="Ver {{ $catNom }} en inventario">
+                                <span title="{{ $catNom }}">{{ $catNom }}</span>
+                                <div><span style="width: {{ $pct }}%;"></span></div>
+                                <span style="text-align: right; font-weight: 600;">{{ $catCant }}</span>
+                            </a>
+                        @empty
+                            <div style="font-size: 13px; color: var(--sig-muted);">Sin categorías registradas</div>
+                        @endforelse
                     </div>
                 </aside>
             </div>

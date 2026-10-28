@@ -281,6 +281,33 @@ class Dashboard extends BaseDashboard
             'inventariosCompletos' => $inventariosCompletos,
             'solicitudesCompletas' => $solicitudesCompletas,
             'mantenimientosCompletos' => $mantenimientosCompletos,
+            'categoriasTop' => (function () {
+                $todasCategorias = Inventario::query()
+                    ->join('material', 'inventario.id_producto', '=', 'material.id_producto')
+                    ->leftJoin('tipo_material', 'material.id_tipodematerial', '=', 'tipo_material.id_tipodematerial')
+                    ->selectRaw("COALESCE(tipo_material.nombre, 'General') as cat, count(*) as total")
+                    ->groupBy('cat')
+                    ->orderByDesc('total')
+                    ->pluck('total', 'cat')
+                    ->toArray();
+
+                $top = [];
+                $otras = 0;
+                $idx = 0;
+                foreach ($todasCategorias as $catNom => $catCant) {
+                    if ($idx < 8) {
+                        $top[$catNom] = $catCant;
+                    } else {
+                        $otras += $catCant;
+                    }
+                    $idx++;
+                }
+                if ($otras > 0) {
+                    $top['Otras categorías'] = $otras;
+                }
+
+                return $top;
+            })(),
         ], $catalogosData);
     }
 
