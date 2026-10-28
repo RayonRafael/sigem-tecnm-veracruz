@@ -2704,36 +2704,102 @@ table{
 /* 1. Dimensiones, posición y apariencia del panel InvGate */
 .fi-slide-over,
 .fi-modal-slide-over-window {
-  width: 620px !important;
-  max-width: 94vw !important;
+  width: min(840px, 92vw) !important;
+  max-width: 840px !important;
   box-shadow: -6px 0 18px rgba(15, 23, 42, .08) !important;
   border-left: 1px solid var(--sig-border) !important;
   background: #ffffff !important;
 }
 
 .fi-slide-over .fi-fo-component-ctn,
-.fi-modal-slide-over-window .fi-fo-component-ctn {
-  padding: 20px 24px !important;
+.fi-modal-slide-over-window .fi-modal-content > form,
+.fi-modal-slide-over-window .fi-modal-content > .fi-fo-component-ctn,
+.fi-modal-slide-over-window .fi-fo-wizard > .fi-fo-component-ctn {
+  padding: 16px 20px !important;
+}
+
+.fi-modal-slide-over-window .fi-fo-component-ctn .fi-fo-component-ctn {
+  padding: 0 !important;
 }
 
 .fi-modal-slide-over-window .fi-modal-content {
   overflow-y: auto !important;
 }
 
-/* 2. Grids del formulario dentro del slide-over: 1 columna (sin textos encimados) */
+/* 2. Grid de 2 columnas dentro del slide-over */
 .fi-modal-slide-over-window [class*="grid"],
-.fi-modal-slide-over-window [style*="--cols"],
-.fi-modal .fi-fo-component-ctn [class*="grid"],
-.fi-modal .fi-fo-component-ctn [style*="--cols"] {
-  --cols-default: 1 !important;
-  --cols-sm: 1 !important;
-  --cols-md: 1 !important;
-  --cols-lg: 1 !important;
-  --cols-xl: 1 !important;
-  --cols-2xl: 1 !important;
-  grid-template-columns: 1fr !important;
-  column-gap: 0 !important;
-  row-gap: 12px !important;
+.fi-modal-slide-over-window [style*="--cols"] {
+  column-gap: 16px !important;
+  row-gap: 14px !important;
+}
+
+@media (min-width: 640px) {
+  .fi-modal-slide-over-window [style*="--cols-lg: repeat(2"],
+  .fi-modal-slide-over-window [style*="--cols-default: repeat(2"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .fi-modal-slide-over-window [style*="--cols-lg: repeat(3"],
+  .fi-modal-slide-over-window [style*="--cols-default: repeat(3"] {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Toggle buttons en fila */
+.fi-modal-slide-over-window .fi-fo-toggle-buttons {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+.fi-modal-slide-over-window .fi-fo-toggle-buttons label.fi-btn {
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* Secciones tipo card (borde + fondo blanco) */
+.fi-modal-slide-over-window .fi-section,
+.fi-modal-slide-over-window section.fi-section {
+  background: var(--sig-surface, #ffffff) !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+  margin-bottom: 14px !important;
+  overflow: hidden !important;
+}
+.fi-modal-slide-over-window .fi-section-header {
+  padding: 12px 18px !important;
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: #f8fafc !important;
+}
+.fi-modal-slide-over-window .fi-section-header-heading {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: var(--sig-text, #0f172a) !important;
+}
+.fi-modal-slide-over-window .fi-section-content {
+  padding: 18px !important;
+}
+
+/* Inputs y wrappers al 100% del ancho de columna */
+.fi-modal-slide-over-window .fi-input-wrp,
+.fi-modal-slide-over-window .fi-fo-field-wrp {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.fi-modal-slide-over-window input,
+.fi-modal-slide-over-window select,
+.fi-modal-slide-over-window textarea {
+  width: 100% !important;
+}
+
+/* Labels consistentes */
+.fi-modal-slide-over-window .fi-fo-field-wrp-label label {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  color: var(--sig-text, #0f172a) !important;
 }
 
 /* Los items del grid no deben colapsar */
@@ -2754,7 +2820,7 @@ table{
   overflow-wrap: break-word !important;
   line-height: 1.3 !important;
   margin-bottom: 4px !important;
-  font-size: 13px !important;
+  font-size: 13.5px !important;
   overflow: visible !important;
 }
 
@@ -2785,7 +2851,7 @@ table{
   grid-column: 1 / -1 !important;
 }
 
-/* Stepper del wizard adaptado a panel de 620px */
+/* Stepper del wizard adaptado a panel de 840px */
 .fi-modal-slide-over-window .fi-fo-wizard-header {
   display: flex !important;
   overflow-x: auto !important;
@@ -2797,7 +2863,7 @@ table{
   min-width: 0 !important;
 }
 .fi-modal-slide-over-window .fi-fo-wizard-header-step-button {
-  padding: 10px 8px !important;
+  padding: 10px 12px !important;
   gap: 8px !important;
 }
 .fi-modal-slide-over-window .fi-fo-wizard-header-step-icon-ctn {
@@ -2810,12 +2876,12 @@ table{
   height: 16px !important;
 }
 .fi-modal-slide-over-window .fi-fo-wizard-header-step-label {
-  font-size: 12px !important;
+  font-size: 13px !important;
   line-height: 1.2 !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
-  max-width: 120px !important;
+  max-width: 180px !important;
 }
 .fi-modal-slide-over-window .fi-fo-wizard-header-step-description {
   display: none !important;
@@ -2839,8 +2905,8 @@ body {
   body.slide-over-open .fi-main,
   body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-main,
   body:has(.fi-modal.fi-modal-open .fi-modal-slide-over-window) .fi-main {
-    width: calc(100% - 620px) !important;
-    max-width: calc(100% - 620px) !important;
+    width: calc(100% - min(840px, 92vw)) !important;
+    max-width: calc(100% - min(840px, 92vw)) !important;
     margin-right: 0 !important;
     overflow-x: hidden !important;
   }
@@ -2848,8 +2914,8 @@ body {
   body.slide-over-open .fi-topbar,
   body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar,
   body:has(.fi-modal.fi-modal-open .fi-modal-slide-over-window) .fi-topbar {
-    width: calc(100% - 620px) !important;
-    max-width: calc(100% - 620px) !important;
+    width: calc(100% - min(840px, 92vw)) !important;
+    max-width: calc(100% - min(840px, 92vw)) !important;
     margin-right: 0 !important;
     overflow-x: hidden !important;
   }
@@ -3274,25 +3340,25 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
   border-color: rgba(239, 68, 68, 0.4) !important;
 }
 
-/* Reducir contenedores anidados en formularios e infolists del slide-over */
+/* Secciones tipo card en formularios e infolists del slide-over (FIX 4) */
+.fi-modal-slide-over-window .fi-section,
 .fi-modal-slide-over-window .fi-fo-component-ctn .fi-section,
 .fi-modal-slide-over-window .fi-fo-component-ctn .fi-section + .fi-section,
 .fi-modal-slide-over-window .fi-infolist-component-ctn .fi-section,
-.fi-modal-slide-over-window .fi-infolist .fi-section,
-.fi-modal-slide-over-window .fi-section {
-  border: none !important;
-  background: transparent !important;
-  padding: 0 !important;
-  box-shadow: none !important;
-  --tw-ring-shadow: 0 0 #0000 !important;
-  --tw-ring-color: transparent !important;
-  --tw-shadow: 0 0 #0000 !important;
+.fi-modal-slide-over-window .fi-infolist .fi-section {
+  background: var(--sig-surface, #ffffff) !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+  margin-bottom: 14px !important;
+  overflow: hidden !important;
 }
 
 .fi-modal-slide-over-window .fi-section-header {
-  padding: 0 0 10px 0 !important;
+  padding: 12px 18px !important;
   border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
-  margin-bottom: 14px !important;
+  background: #f8fafc !important;
+  margin-bottom: 0 !important;
 }
 
 .fi-modal-slide-over-window .fi-section-header-heading {
@@ -3304,7 +3370,7 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
 .fi-modal-slide-over-window .fi-fo-component-ctn > .fi-section > .fi-section-content,
 .fi-modal-slide-over-window .fi-infolist-component-ctn > .fi-section > .fi-section-content,
 .fi-modal-slide-over-window .fi-section-content {
-  padding: 0 !important;
+  padding: 18px !important;
 }
 
 /* Los grupos de campos sin doble recuadro */
