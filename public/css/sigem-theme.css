@@ -338,14 +338,10 @@ button[role="switch"][aria-checked="true"] {
 .dark .fi-badge-color-info { background-color: rgba(59,130,246,0.2) !important; color: #60a5fa !important; }
 .dark .fi-badge-color-gray { background-color: rgba(148,163,184,0.2) !important; color: #94a3b8 !important; }
 
-/* ===== 9. BREADCRUMBS ===== */
-.fi-breadcrumbs { align-items: center; }
-.fi-breadcrumbs-item-label { color: #64748b !important; }
-.fi-breadcrumbs-item:last-child .fi-breadcrumbs-item-label { color: #334155 !important; font-weight: 600 !important; }
-.fi-breadcrumbs-separator { color: #cbd5e1 !important; }
-.dark .fi-breadcrumbs-item-label { color: #94a3b8 !important; }
-.dark .fi-breadcrumbs-item:last-child .fi-breadcrumbs-item-label { color: #e2e8f0 !important; }
-.dark .fi-breadcrumbs-separator { color: #334155 !important; }
+/* ===== 9. BREADCRUMBS INTERNOS (OCULTOS — se usa "SIGEM › Sección" en topbar) ===== */
+.fi-breadcrumbs {
+    display: none !important;
+}
 
 /* ===== 10. PAGINACIÓN ===== */
 .fi-pagination-item { border-radius: 8px !important; margin: 0 2px !important; }

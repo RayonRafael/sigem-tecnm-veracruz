@@ -30,6 +30,11 @@ class ReportesPage extends Page
 
     protected static string $view = 'filament.pages.reportes';
 
+    public function getBreadcrumbs(): array
+    {
+        return [];
+    }
+
     public ?string $reporteActivo = null;
 
     public array $visibilidadServicioSocial = [];

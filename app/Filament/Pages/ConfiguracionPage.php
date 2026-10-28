@@ -45,6 +45,11 @@ class ConfiguracionPage extends Page
 
     protected static string $view = 'filament.pages.configuracion';
 
+    public function getBreadcrumbs(): array
+    {
+        return [];
+    }
+
     /**
      * id de catálogo => sufijo de las acciones de página (crear{X}Action / editar{X}Action).
      */
