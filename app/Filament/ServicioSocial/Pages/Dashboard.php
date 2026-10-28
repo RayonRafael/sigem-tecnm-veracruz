@@ -105,7 +105,10 @@ class Dashboard extends BaseDashboard
     {
         return EditAction::make('editarEquipo')
             ->label('Editar equipo')
-            ->modalHeading('Editar equipo')
+            ->modalHeading(fn (?Inventario $record) => 'Editar: ' . ($record?->material?->nombre ?? 'equipo'))
+            ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
+                'ID: ' . e($record?->num_serie ?? '—')
+            ))
             ->model(Inventario::class)
             ->record(function (array $arguments) {
                 return Inventario::find($arguments['id'] ?? $arguments['record']);
@@ -124,6 +127,10 @@ class Dashboard extends BaseDashboard
     {
         return DeleteAction::make('eliminarEquipo')
             ->label('Eliminar equipo')
+            ->modalHeading(fn (?Inventario $record) => '¿Eliminar ' . ($record?->material?->nombre ?? 'equipo') . '?')
+            ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
+                'ID: ' . e($record?->num_serie ?? '—') . ' · Esta acción no se puede deshacer'
+            ))
             ->model(Inventario::class)
             ->record(function (array $arguments) {
                 return Inventario::find($arguments['id'] ?? $arguments['record']);

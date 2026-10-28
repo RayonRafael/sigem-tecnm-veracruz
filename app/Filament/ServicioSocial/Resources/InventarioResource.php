@@ -385,7 +385,15 @@ class InventarioResource extends Resource
                             ->visible(fn (?Inventario $record) => $record && auth()->user()?->can('update', $record))
                             ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedTableAction('edit', '{$record?->getKey()}')"),
                     ]),
-                Tables\Actions\EditAction::make()->iconButton()->slideOver()->tooltip('Editar')->successNotificationTitle('Registro de inventario actualizado correctamente'),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->slideOver()
+                    ->tooltip('Editar')
+                    ->modalHeading(fn (?Inventario $record) => 'Editar: ' . ($record?->material?->nombre ?? 'equipo'))
+                    ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
+                        'ID: ' . e($record?->num_serie ?? '—')
+                    ))
+                    ->successNotificationTitle('Registro de inventario actualizado correctamente'),
             ])
             ->bulkActions([]);
     }

@@ -645,12 +645,20 @@ class InventarioResource extends Resource
                     ->iconButton()
                     ->tooltip('Editar')
                     ->extraAttributes(['title' => 'Editar'])
+                    ->modalHeading(fn (?Inventario $record) => 'Editar: ' . ($record?->material?->nombre ?? 'equipo'))
+                    ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
+                        'ID: ' . e($record?->num_serie ?? '—')
+                    ))
                     ->slideOver()
                     ->successNotificationTitle('Registro actualizado correctamente'),
                 Tables\Actions\DeleteAction::make()
                     ->iconButton()
                     ->tooltip('Eliminar')
                     ->extraAttributes(['title' => 'Eliminar'])
+                    ->modalHeading(fn (?Inventario $record) => '¿Eliminar ' . ($record?->material?->nombre ?? 'equipo') . '?')
+                    ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
+                        'ID: ' . e($record?->num_serie ?? '—') . ' · Esta acción no se puede deshacer'
+                    ))
                     ->successNotificationTitle('Registro eliminado correctamente'),
             ])
             ->bulkActions([
