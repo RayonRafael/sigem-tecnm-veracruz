@@ -8,6 +8,7 @@ use App\Models\Mantenimiento;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -205,7 +206,16 @@ class MantenimientoResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
+                Tables\Actions\ViewAction::make()
+                    ->iconButton()
+                    ->tooltip('Ver detalle')
+                    ->extraAttributes(['title' => 'Ver detalle'])
+                    ->slideOver()
+                    ->modalHeading(fn (?Mantenimiento $record) => $record?->inventario?->material?->nombre ?? 'Detalle de mantenimiento')
+                    ->modalDescription(fn (?Mantenimiento $record) => new \Illuminate\Support\HtmlString(
+                        'No. Serie: ' . e($record?->inventario?->num_serie ?? '—') . ' · ' . e($record?->tipo_servicio ?? 'Mantenimiento')
+                    ))
+                    ->modalCancelActionLabel('Cerrar'),
                 Tables\Actions\EditAction::make()->iconButton()->slideOver()->successNotificationTitle('Mantenimiento actualizado correctamente'),
             ])
             ->bulkActions([]);
@@ -215,58 +225,116 @@ class MantenimientoResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Equipo y técnico')
-                    ->schema([
-                        TextEntry::make('inventario.num_serie')->label('No. serie')
-                            ->fontFamily('mono')
-                            ->icon('heroicon-m-qr-code'),
-                        TextEntry::make('inventario.material.nombre')->label('Material')->icon('heroicon-m-cube'),
-                        TextEntry::make('nombre_tecnico')->label('Técnico')->icon('heroicon-m-user'),
-                        TextEntry::make('num_control_tecnico')->label('No. control')->icon('heroicon-m-identification'),
-                    ])->columns(4),
-                Section::make('Detalles del servicio')
-                    ->schema([
-                        TextEntry::make('tipo_servicio')->label('Servicio')->badge(),
-                        TextEntry::make('tipo_mantenimiento')->label('Tipo')
-                            ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                'Preventivo' => 'success',
-                                'Correctivo' => 'danger',
-                                'Mejora' => 'info',
-                                default => 'gray',
-                            })
-                            ->icon(fn (string $state): string => match ($state) {
-                                'Preventivo' => 'heroicon-m-shield-check',
-                                'Correctivo' => 'heroicon-m-exclamation-triangle',
-                                'Mejora' => 'heroicon-m-arrow-trending-up',
-                                default => 'heroicon-m-minus',
-                            }),
-                        TextEntry::make('estado')->label('Estado')
-                            ->formatStateUsing(fn ($state) => $state === 'Pendiente Revision Admin' ? 'En revisión' : $state)
-                            ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                'Solicitado' => 'warning',
-                                'En proceso' => 'primary',
-                                'Pendiente Revision Admin' => 'info',
-                                'Completado' => 'success',
-                                'Cancelado' => 'danger',
-                                default => 'gray',
-                            })
-                            ->icon(fn (string $state): string => match ($state) {
-                                'Solicitado' => 'heroicon-m-clock',
-                                'En proceso' => 'heroicon-m-wrench-screwdriver',
-                                'Pendiente Revision Admin' => 'heroicon-m-clock',
-                                'Completado' => 'heroicon-m-check-badge',
-                                'Cancelado' => 'heroicon-m-x-circle',
-                                default => 'heroicon-m-minus',
-                            }),
-                    ])->columns(3),
-                Section::make('Fechas y reportes')
-                    ->schema([
-                        TextEntry::make('fecha_solicitud')->label('Solicitud')->date('d/m/Y')->icon('heroicon-m-calendar'),
-                        TextEntry::make('descripcion_falla')->label('Falla')->columnSpanFull(),
-                        TextEntry::make('observaciones')->label('Observaciones')->columnSpanFull(),
-                    ])->columns(3),
+                Tabs::make('Detalle')
+                    ->tabs([
+                        Tabs\Tab::make('Servicio')
+                            ->icon('heroicon-m-wrench')
+                            ->schema([
+                                Section::make('Equipo y técnico')
+                                    ->schema([
+                                        TextEntry::make('inventario.num_serie')
+                                            ->label('No. serie')
+                                            ->fontFamily('mono')
+                                            ->icon('heroicon-m-qr-code')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('inventario.material.nombre')
+                                            ->label('Material')
+                                            ->icon('heroicon-m-cube')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('nombre_tecnico')
+                                            ->label('Técnico')
+                                            ->icon('heroicon-m-user')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('num_control_tecnico')
+                                            ->label('No. control')
+                                            ->icon('heroicon-m-identification')
+                                            ->placeholder('Por capturar'),
+                                    ])
+                                    ->columns(2),
+                                Section::make('Detalles del servicio')
+                                    ->schema([
+                                        TextEntry::make('tipo_servicio')
+                                            ->label('Servicio')
+                                            ->badge()
+                                            ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : 'Por capturar')
+                                            ->color('info')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('tipo_mantenimiento')
+                                            ->label('Tipo')
+                                            ->badge()
+                                            ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : 'Por capturar')
+                                            ->color(fn (?string $state): string => match ($state) {
+                                                'Preventivo' => 'success',
+                                                'Correctivo' => 'danger',
+                                                'Mejora' => 'info',
+                                                default => 'gray',
+                                            })
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('estado')
+                                            ->label('Estado')
+                                            ->badge()
+                                            ->formatStateUsing(function (?string $state): string {
+                                                if (! $state) {
+                                                    return 'Por capturar';
+                                                }
+                                                $label = match ($state) {
+                                                    'Pendiente Revision Admin' => 'En revisión',
+                                                    'Completado' => 'Terminado',
+                                                    'Cancelado' => 'Rechazado',
+                                                    default => $state,
+                                                };
+                                                return '● ' . $label;
+                                            })
+                                            ->color(fn (?string $state): string => match ($state) {
+                                                'Solicitado' => 'warning',
+                                                'En proceso' => 'primary',
+                                                'Pendiente Revision Admin', 'En revisión' => 'info',
+                                                'Completado', 'Terminado' => 'success',
+                                                'Cancelado', 'Rechazado' => 'danger',
+                                                default => 'gray',
+                                            })
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('fecha_solicitud')
+                                            ->label('Solicitud')
+                                            ->date('d/m/Y')
+                                            ->icon('heroicon-m-calendar')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('fecha_inicio')
+                                            ->label('Inicio')
+                                            ->date('d/m/Y')
+                                            ->icon('heroicon-m-calendar')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('fecha_fin')
+                                            ->label('Fin')
+                                            ->date('d/m/Y')
+                                            ->icon('heroicon-m-calendar')
+                                            ->placeholder('Por capturar'),
+                                    ])
+                                    ->columns(2),
+                            ]),
+
+                        Tabs\Tab::make('Fallas y Diagnóstico')
+                            ->icon('heroicon-m-exclamation-triangle')
+                            ->schema([
+                                Section::make('Fechas y reportes')
+                                    ->schema([
+                                        TextEntry::make('descripcion_falla')
+                                            ->label('Falla')
+                                            ->placeholder('Por capturar')
+                                            ->columnSpanFull(),
+                                        TextEntry::make('descripcion_trabajo')
+                                            ->label('Trabajo realizado')
+                                            ->placeholder('Por capturar')
+                                            ->columnSpanFull(),
+                                        TextEntry::make('observaciones')
+                                            ->label('Observaciones')
+                                            ->placeholder('Por capturar')
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(2),
+                            ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 

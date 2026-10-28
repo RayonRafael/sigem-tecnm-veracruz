@@ -8,6 +8,7 @@ use App\Models\Solicitud;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
@@ -320,7 +321,17 @@ class SolicitudResource extends Resource
                         Notification::make()->title('Solicitud rechazada')->success()->send();
                     })
                     ->requiresConfirmation(),
-                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\ViewAction::make()
+                    ->iconButton()
+                    ->tooltip('Ver detalle')
+                    ->extraAttributes(['title' => 'Ver detalle'])
+                    ->slideOver()
+                    ->modalHeading(fn (?Solicitud $record) => 'Folio: ' . ($record?->id_solicitud ? 'FOLIO-' . str_pad($record->id_solicitud, 5, '0', STR_PAD_LEFT) : '—'))
+                    ->modalDescription(fn (?Solicitud $record) => new \Illuminate\Support\HtmlString(
+                        e($record?->tipo_movimiento ?? 'Por capturar') . ' · ' .
+                        e($record?->estado ?? 'Por capturar')
+                    ))
+                    ->modalCancelActionLabel('Cerrar'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -333,46 +344,97 @@ class SolicitudResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos de la solicitud')
-                    ->schema([
-                        TextEntry::make('id_solicitud')->label('Folio')
-                            ->formatStateUsing(fn ($state) => 'FOLIO-'.str_pad($state, 5, '0', STR_PAD_LEFT))
-                            ->fontFamily('mono')
-                            ->icon('heroicon-m-hashtag'),
-                        TextEntry::make('fecha_solicitud')->label('Fecha')->date('d/m/Y')->icon('heroicon-m-calendar'),
-                        TextEntry::make('tipo_movimiento')->label('Tipo')->badge(),
-                        TextEntry::make('estado')->label('Estado')
-                            ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                'Pendiente' => 'warning',
-                                'Autorizado' => 'primary',
-                                'Completado' => 'success',
-                                'Rechazado' => 'danger',
-                                'Cancelado' => 'gray',
-                                default => 'gray',
-                            })
-                            ->icon(fn (string $state): string => match ($state) {
-                                'Pendiente' => 'heroicon-m-clock',
-                                'Autorizado' => 'heroicon-m-check-circle',
-                                'Completado' => 'heroicon-m-check-badge',
-                                'Rechazado' => 'heroicon-m-x-circle',
-                                'Cancelado' => 'heroicon-m-no-symbol',
-                                default => 'heroicon-m-minus',
-                            }),
-                    ])->columns(4),
-                Section::make('Participantes')
-                    ->schema([
-                        TextEntry::make('usuario.name')->label('Solicitante')->icon('heroicon-m-user'),
-                        TextEntry::make('receptor.nombre')->label('Receptor')->icon('heroicon-m-user-group'),
-                        TextEntry::make('receptor.area.departamento.nombre')->label('Departamento')->icon('heroicon-m-building-office'),
-                        TextEntry::make('autorizadoPor.name')->label('Autorizado por')->icon('heroicon-m-shield-check'),
-                    ])->columns(4),
-                Section::make('Devoluciones y observaciones')
-                    ->schema([
-                        TextEntry::make('fecha_devolucion_estimada')->label('Devolución estimada')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
-                        TextEntry::make('fecha_devolucion_real')->label('Devolución real')->date('d/m/Y')->icon('heroicon-m-calendar-days'),
-                        TextEntry::make('observaciones')->label('Observaciones')->columnSpanFull(),
-                    ])->columns(2),
+                Tabs::make('Detalle')
+                    ->tabs([
+                        Tabs\Tab::make('Información')
+                            ->icon('heroicon-m-tag')
+                            ->schema([
+                                Section::make('Datos de la solicitud')
+                                    ->schema([
+                                        TextEntry::make('id_solicitud')
+                                            ->label('Folio')
+                                            ->formatStateUsing(fn ($state) => $state ? 'FOLIO-' . str_pad($state, 5, '0', STR_PAD_LEFT) : 'Por capturar')
+                                            ->fontFamily('mono')
+                                            ->icon('heroicon-m-hashtag')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('fecha_solicitud')
+                                            ->label('Fecha')
+                                            ->date('d/m/Y')
+                                            ->icon('heroicon-m-calendar')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('tipo_movimiento')
+                                            ->label('Tipo')
+                                            ->badge()
+                                            ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : 'Por capturar')
+                                            ->color('info')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('estado')
+                                            ->label('Estado')
+                                            ->badge()
+                                            ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : 'Por capturar')
+                                            ->color(fn (?string $state): string => match ($state) {
+                                                'Pendiente' => 'warning',
+                                                'Autorizado' => 'success',
+                                                'Completado' => 'success',
+                                                'Entregado' => 'info',
+                                                'Rechazado' => 'danger',
+                                                'Cancelado' => 'gray',
+                                                default => 'gray',
+                                            })
+                                            ->placeholder('Por capturar'),
+                                    ])
+                                    ->columns(2),
+                            ]),
+
+                        Tabs\Tab::make('Participantes')
+                            ->icon('heroicon-m-users')
+                            ->schema([
+                                Section::make('Participantes')
+                                    ->schema([
+                                        TextEntry::make('usuario.name')
+                                            ->label('Solicitante')
+                                            ->icon('heroicon-m-user')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('receptor.nombre')
+                                            ->label('Receptor')
+                                            ->icon('heroicon-m-user-group')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('receptor.area.departamento.nombre')
+                                            ->label('Departamento')
+                                            ->icon('heroicon-m-building-office')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('autorizadoPor.name')
+                                            ->label('Autorizado por')
+                                            ->icon('heroicon-m-shield-check')
+                                            ->placeholder('Por capturar'),
+                                    ])
+                                    ->columns(2),
+                            ]),
+
+                        Tabs\Tab::make('Devolución')
+                            ->icon('heroicon-m-arrow-uturn-left')
+                            ->schema([
+                                Section::make('Devoluciones y observaciones')
+                                    ->schema([
+                                        TextEntry::make('fecha_devolucion_estimada')
+                                            ->label('Devolución estimada')
+                                            ->date('d/m/Y')
+                                            ->icon('heroicon-m-calendar-days')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('fecha_devolucion_real')
+                                            ->label('Devolución real')
+                                            ->date('d/m/Y')
+                                            ->icon('heroicon-m-calendar-days')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('observaciones')
+                                            ->label('Observaciones')
+                                            ->placeholder('Por capturar')
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(2),
+                            ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 
