@@ -205,74 +205,100 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                </div>
 
-                {{-- Panel Lateral: Gráfica de Dona --}}
-                <div class="sigem-inv-side" x-show="showGrafica" x-transition.opacity style="display: none;">
-                    <div class="sigem-chart-card">
-                        <div class="sigem-chart-head">
-                            <h3>Estado del Inventario</h3>
-                            <button type="button" class="sigem-chart-close" x-on:click="showGrafica = false" title="Cerrar gráfica">✕</button>
-                        </div>
-                        <p class="sigem-chart-sub">Proporción de equipos por condición actual</p>
-
-                        @php
-                            $disp = $inventarioDisponibles ?? 0;
-                            $mant = $inventarioEnMantenimiento ?? 0;
-                            $asig = $inventarioAsignados ?? 0;
-                            $dan  = $inventarioDanados ?? 0;
-                            $totalChart = $disp + $mant + $asig + $dan;
-                            $totalChart = $totalChart > 0 ? $totalChart : 1;
-
-                            $pDisp = round(($disp / $totalChart) * 100, 1);
-                            $pMant = round(($mant / $totalChart) * 100, 1);
-                            $pAsig = round(($asig / $totalChart) * 100, 1);
-                            $pDan  = round(($dan  / $totalChart) * 100, 1);
-
-                            $cDisp = $pDisp;
-                            $cMant = $cDisp + $pMant;
-                            $cAsig = $cMant + $pAsig;
-                        @endphp
-
-                        <div class="sigem-donut-wrap">
-                            <div class="sigem-donut" style="background: conic-gradient(
-                                var(--sig-success) 0% {{ $cDisp }}%,
-                                var(--sig-warning) {{ $cDisp }}% {{ $cMant }}%,
-                                var(--sig-info) {{ $cMant }}% {{ $cAsig }}%,
-                                var(--sig-danger) {{ $cAsig }}% 100%
-                            );">
-                                <div class="sigem-donut-hole">
-                                    <span class="sigem-donut-total">{{ $totalChart > 1 ? ($disp + $mant + $asig + $dan) : $disp }}</span>
-                                    <span class="sigem-donut-label">Total</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="sigem-donut-legend">
-                            <div class="sigem-legend-item">
-                                <span class="sigem-legend-dot" style="background: var(--sig-success);"></span>
-                                <span class="sigem-legend-name">Disponible</span>
-                                <span class="sigem-legend-val">{{ $disp }} ({{ $pDisp }}%)</span>
-                            </div>
-                            <div class="sigem-legend-item">
-                                <span class="sigem-legend-dot" style="background: var(--sig-warning);"></span>
-                                <span class="sigem-legend-name">Mantenimiento</span>
-                                <span class="sigem-legend-val">{{ $mant }} ({{ $pMant }}%)</span>
-                            </div>
-                            <div class="sigem-legend-item">
-                                <span class="sigem-legend-dot" style="background: var(--sig-info);"></span>
-                                <span class="sigem-legend-name">Asignado</span>
-                                <span class="sigem-legend-val">{{ $asig }} ({{ $pAsig }}%)</span>
-                            </div>
-                            <div class="sigem-legend-item">
-                                <span class="sigem-legend-dot" style="background: var(--sig-danger);"></span>
-                                <span class="sigem-legend-name">Dañado / Baja</span>
-                                <span class="sigem-legend-val">{{ $dan }} ({{ $pDan }}%)</span>
-                            </div>
+                        <div class="sigem-dash-more">
+                            <a href="{{ url('/servicio-social/inventarios') }}">
+                                Ver todo el inventario →
+                            </a>
                         </div>
                     </div>
                 </div>
+
+                <!-- Panel lateral derecho: Gráfica del inventario -->
+                <aside class="sigem-inv-side" x-show="showGrafica">
+                    <div class="sigem-inv-side-title">Resumen del inventario</div>
+
+                    @php
+                        $dashTotal = $totalActivos ?? 0;
+                        $circunf = 263.89;
+                        $donutSegs = [
+                            ['label' => 'Disponible', 'cant' => $inventarioDisponibles ?? 0, 'color' => '#059669'],
+                            ['label' => 'En mantenimiento', 'cant' => $inventarioEnMantenimiento ?? 0, 'color' => '#d97706'],
+                            ['label' => 'Asignado', 'cant' => $inventarioAsignados ?? 0, 'color' => '#0891b2'],
+                            ['label' => 'Dañado', 'cant' => $inventarioDanados ?? 0, 'color' => '#dc2626'],
+                        ];
+                        $dashOffset = 0;
+                    @endphp
+
+                    <!-- 1. Dona SVG -->
+                    <div class="sigem-donut">
+                        <svg viewBox="0 0 120 120" width="120" height="120">
+                            <circle cx="60" cy="60" r="42" fill="none" stroke="#f1f5f9" stroke-width="16" />
+                            @if($dashTotal > 0)
+                                @foreach($donutSegs as $seg)
+                                    @if($seg['cant'] > 0)
+                                        @php
+                                            $dLen = round(($seg['cant'] / $dashTotal) * $circunf, 2);
+                                            $dGap = round($circunf - $dLen, 2);
+                                            $curOff = $dashOffset;
+                                            $dashOffset += $dLen;
+                                        @endphp
+                                        <circle
+                                            cx="60"
+                                            cy="60"
+                                            r="42"
+                                            fill="none"
+                                            stroke="{{ $seg['color'] }}"
+                                            stroke-width="16"
+                                            stroke-dasharray="{{ $dLen }} {{ $dGap }}"
+                                            stroke-dashoffset="{{ -$curOff }}"
+                                            transform="rotate(-90 60 60)"
+                                        />
+                                    @endif
+                                @endforeach
+                            @else
+                                <circle cx="60" cy="60" r="42" fill="none" stroke="#e5e7eb" stroke-width="16" />
+                            @endif
+                        </svg>
+                        <div class="sigem-donut-center">
+                            <b>{{ $dashTotal }}</b>
+                            <span>equipos</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. Leyenda de estados -->
+                    <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 3px;">
+                        @foreach($donutSegs as $seg)
+                            <div class="sigem-lg" style="cursor: default;">
+                                <i style="background: {{ $seg['color'] }};"></i>
+                                <span>{{ $seg['label'] }}</span>
+                                <b>{{ $seg['cant'] }}</b>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- 3. Barras por categoría -->
+                    <div style="margin-top: 18px; border-top: 1px solid var(--sig-border); padding-top: 14px;">
+                        <div style="font-size: 13.5px; font-weight: 700; color: var(--sig-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px;">
+                            Por categoría
+                        </div>
+                        @forelse(($categoriasTop ?? []) as $catNom => $catCant)
+                            @php
+                                $pct = ($dashTotal ?? 0) > 0 ? round(($catCant / $dashTotal) * 100) : 0;
+                            @endphp
+                            <a href="{{ url('/servicio-social/inventarios?tableSearch=' . urlencode($catNom)) }}"
+                               class="sigem-cb"
+                               style="text-decoration: none; color: inherit;"
+                               title="Ver {{ $catNom }} en inventario">
+                                <span title="{{ $catNom }}">{{ $catNom }}</span>
+                                <div><span style="width: {{ $pct }}%;"></span></div>
+                                <span style="text-align: right; font-weight: 600;">{{ $catCant }}</span>
+                            </a>
+                        @empty
+                            <div style="font-size: 13px; color: var(--sig-muted);">Sin categorías registradas</div>
+                        @endforelse
+                    </div>
+                </aside>
             </div>
         </div>
 
