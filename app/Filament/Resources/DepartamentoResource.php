@@ -7,6 +7,8 @@ use App\Models\Departamento;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -79,9 +81,20 @@ class DepartamentoResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos del departamento')
-                    ->schema([
-                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-building-office-2'),
+                Tabs::make('Detalle')
+                    ->tabs([
+                        Tab::make('Información')
+                            ->icon('heroicon-m-tag')
+                            ->schema([
+                                Section::make('Datos del departamento')
+                                    ->schema([
+                                        TextEntry::make('nombre')->label('Nombre del departamento')->icon('heroicon-m-building-office-2'),
+                                        TextEntry::make('areas_count')
+                                            ->label('Áreas adscritas')
+                                            ->state(fn (Departamento $record): string => $record->areas()->count() . ' registradas')
+                                            ->icon('heroicon-m-map-pin'),
+                                    ])->columns(2),
+                            ]),
                     ]),
             ]);
     }

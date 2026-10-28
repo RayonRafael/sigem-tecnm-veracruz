@@ -24,6 +24,8 @@ use Filament\Actions;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Pages\Page;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\HtmlString;
 
 class CatalogosPage extends Page
 {
@@ -295,7 +297,16 @@ class CatalogosPage extends Page
 
         $action = Actions\ViewAction::make($nombre)
             ->model($model)
-            ->modalHeading('Detalle de ' . $singular . ' (Solo lectura)')
+            ->modalHeading(function (?Model $record, array $arguments = []) use ($model) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                return trim($rec?->nombre ?? $rec?->nombre_empresa ?? 'Detalle');
+            })
+            ->modalDescription(function (?Model $record, array $arguments = []) use ($model, $singular) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                return new HtmlString(
+                    '🏢 ' . e($singular) . ' · 👁 Solo lectura · ID: #' . e($rec?->getKey())
+                );
+            })
             ->record(fn (array $arguments) => $model::find($arguments['record'] ?? null))
             ->authorize(true)
             ->slideOver();

@@ -7,6 +7,8 @@ use App\Models\Receptor;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -159,16 +161,23 @@ class ReceptorResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos del receptor')
-                    ->schema([
-                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-user'),
-                        TextEntry::make('apellido_paterno')->label('Apellido paterno')->icon('heroicon-m-user'),
-                        TextEntry::make('apellido_materno')->label('Apellido materno')->icon('heroicon-m-user'),
-                        TextEntry::make('cargo')->label('Cargo / Puesto')->icon('heroicon-m-briefcase')->placeholder('—'),
-                        TextEntry::make('email')->label('Email')->icon('heroicon-m-envelope'),
-                        TextEntry::make('telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
-                        TextEntry::make('area.nombre')->label('Área')->icon('heroicon-m-building-office'),
-                    ])->columns(3),
+                Tabs::make('Detalle')
+                    ->tabs([
+                        Tab::make('Información')
+                            ->icon('heroicon-m-tag')
+                            ->schema([
+                                Section::make('Datos del receptor')
+                                    ->schema([
+                                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-user'),
+                                        TextEntry::make('apellido_paterno')->label('Apellido paterno')->icon('heroicon-m-user'),
+                                        TextEntry::make('apellido_materno')->label('Apellido materno')->icon('heroicon-m-user'),
+                                        TextEntry::make('cargo')->label('Cargo / Puesto')->icon('heroicon-m-briefcase')->placeholder('—'),
+                                        TextEntry::make('email')->label('Email')->icon('heroicon-m-envelope'),
+                                        TextEntry::make('telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
+                                        TextEntry::make('area.nombre')->label('Área')->icon('heroicon-m-building-office'),
+                                    ])->columns(2),
+                            ]),
+                    ]),
             ]);
     }
 

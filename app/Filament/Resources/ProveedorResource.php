@@ -7,6 +7,8 @@ use App\Models\Proveedor;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -145,23 +147,30 @@ class ProveedorResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos de la empresa')
-                    ->schema([
-                        TextEntry::make('nombre_empresa')->label('Empresa')->icon('heroicon-m-building-storefront'),
-                        TextEntry::make('rfc')->label('Rfc')->fontFamily('mono')->icon('heroicon-m-identification'),
-                        TextEntry::make('activo')
-                            ->label('Estado')
-                            ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Inactivo')
-                            ->badge()
-                            ->color(fn ($state) => $state ? 'success' : 'danger')
-                            ->icon(fn ($state) => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle'),
-                    ])->columns(3),
-                Section::make('Contacto')
-                    ->schema([
-                        TextEntry::make('contacto_nombre')->label('Contacto')->icon('heroicon-m-user'),
-                        TextEntry::make('contacto_telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
-                        TextEntry::make('contacto_email')->label('Email')->icon('heroicon-m-envelope'),
-                    ])->columns(3),
+                Tabs::make('Detalle')
+                    ->tabs([
+                        Tab::make('Información')
+                            ->icon('heroicon-m-tag')
+                            ->schema([
+                                Section::make('Datos de la empresa')
+                                    ->schema([
+                                        TextEntry::make('nombre_empresa')->label('Empresa')->icon('heroicon-m-building-storefront'),
+                                        TextEntry::make('rfc')->label('RFC')->fontFamily('mono')->icon('heroicon-m-identification'),
+                                        TextEntry::make('activo')
+                                            ->label('Estado')
+                                            ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Inactivo')
+                                            ->badge()
+                                            ->color(fn ($state) => $state ? 'success' : 'danger')
+                                            ->icon(fn ($state) => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle'),
+                                    ])->columns(3),
+                                Section::make('Contacto')
+                                    ->schema([
+                                        TextEntry::make('contacto_nombre')->label('Contacto')->icon('heroicon-m-user'),
+                                        TextEntry::make('contacto_telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
+                                        TextEntry::make('contacto_email')->label('Email')->icon('heroicon-m-envelope'),
+                                    ])->columns(3),
+                            ]),
+                    ]),
             ]);
     }
 

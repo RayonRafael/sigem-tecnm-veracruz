@@ -3777,11 +3777,87 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
   padding: 16px 20px !important;
 }
 
-/* Botones con mejor integración */
+/* FIX 1: Eliminar doble recuadro en formularios dentro del slide-over */
+.fi-modal-slide-over-window .fi-fo-component-ctn .fi-section,
+.fi-modal-slide-over-window .fi-fo-component-ctn section.fi-section,
+.fi-modal-slide-over-window form .fi-section,
+.fi-modal-slide-over-window form section.fi-section,
+.fi-modal-slide-over-window .fi-fo-wizard {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.fi-modal-slide-over-window .fi-fo-component-ctn .fi-section-header,
+.fi-modal-slide-over-window form .fi-section-header {
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+  padding: 0 0 10px 0 !important;
+  margin-bottom: 14px !important;
+  background: transparent !important;
+}
+
+.fi-modal-slide-over-window .fi-fo-component-ctn .fi-section-content,
+.fi-modal-slide-over-window form .fi-section-content {
+  padding: 0 !important;
+}
+
+.fi-modal-slide-over-window .fi-fo-wizard-header {
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+  margin-bottom: 16px !important;
+}
+
+/* FIX 2: Footer bipolar — Cancelar (izq) + Confirmar (der) */
 .fi-modal-slide-over-window .fi-modal-footer {
   padding: 16px 20px 20px !important;
   border-top: 1px solid var(--sig-border, #e2e8f0) !important;
   margin-top: 8px !important;
+  display: flex !important;
+  width: 100% !important;
+}
+
+.fi-modal-slide-over-window .fi-modal-footer-actions {
+  display: flex !important;
+  width: 100% !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 12px !important;
+}
+
+/* En formularios Crear/Editar: Cancelar a la izquierda, Confirmar a la derecha */
+.fi-modal-slide-over-window:has(.fi-fo-component-ctn) .fi-modal-footer-actions button.fi-btn-color-gray,
+.fi-modal-slide-over-window:has(.fi-fo-component-ctn) .fi-modal-footer-actions button[x-on\:click*="close"],
+.fi-modal-slide-over-window:has(form) .fi-modal-footer-actions button.fi-btn-color-gray,
+.fi-modal-slide-over-window:has(form) .fi-modal-footer-actions button[x-on\:click*="close"] {
+  order: -1 !important;
+  margin-right: auto !important;
+  margin-left: 0 !important;
+}
+
+.fi-modal-slide-over-window:has(.fi-fo-component-ctn) .fi-modal-footer-actions button.fi-btn-color-primary,
+.fi-modal-slide-over-window:has(.fi-fo-component-ctn) .fi-modal-footer-actions button[type="submit"],
+.fi-modal-slide-over-window:has(form) .fi-modal-footer-actions button.fi-btn-color-primary,
+.fi-modal-slide-over-window:has(form) .fi-modal-footer-actions button[type="submit"] {
+  order: 2 !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
+}
+
+/* En vista Detalle/Ver: Atajos de acción (Editar/Eliminar) a la izquierda, Cerrar a la derecha */
+.fi-modal-slide-over-window .fi-modal-footer-actions button.fi-btn-color-warning,
+.fi-modal-slide-over-window .fi-modal-footer-actions button.fi-btn-color-danger {
+  order: -2 !important;
+  margin-left: 0 !important;
+  margin-right: 8px !important;
+}
+
+.fi-modal-slide-over-window:not(:has(.fi-fo-component-ctn)) .fi-modal-footer-actions button[x-on\:click*="close"],
+.fi-modal-slide-over-window:not(:has(.fi-fo-component-ctn)) .fi-modal-footer-actions button.fi-btn-color-gray {
+  order: 2 !important;
+  margin-left: auto !important;
+  margin-right: 0 !important;
 }
 
 /* ===== TAREA: Sidebar Fijo Flexbox ===== */

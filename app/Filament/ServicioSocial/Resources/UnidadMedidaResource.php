@@ -7,6 +7,8 @@ use App\Models\UnidadMedida;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -103,9 +105,20 @@ class UnidadMedidaResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos de la unidad de medida')
-                    ->schema([
-                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-bars-3-bottom-left'),
+                Tabs::make('Detalle')
+                    ->tabs([
+                        Tab::make('Información')
+                            ->icon('heroicon-m-tag')
+                            ->schema([
+                                Section::make('Datos de la unidad de medida')
+                                    ->schema([
+                                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-bars-3-bottom-left'),
+                                        TextEntry::make('materiales_count')
+                                            ->label('Materiales vinculados')
+                                            ->state(fn (UnidadMedida $record): string => $record->materiales()->count() . ' vinculados')
+                                            ->icon('heroicon-m-cube'),
+                                    ])->columns(2),
+                            ]),
                     ]),
             ]);
     }

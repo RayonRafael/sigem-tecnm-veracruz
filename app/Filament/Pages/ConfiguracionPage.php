@@ -27,6 +27,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\HtmlString;
 use Spatie\Activitylog\Models\Activity;
 
 class ConfiguracionPage extends Page
@@ -518,7 +519,8 @@ class ConfiguracionPage extends Page
     {
         return Actions\CreateAction::make($nombre)
             ->model($resource::getModel())
-            ->modalHeading('Crear ' . $singular)
+            ->modalHeading(fn () => '+ Nuevo ' . $singular)
+            ->modalDescription(fn () => 'Da de alta un registro en el catálogo institucional.')
             ->form(fn (Form $form): Form => $resource::form($form))
             ->slideOver()
             ->createAnother(false)
@@ -532,7 +534,14 @@ class ConfiguracionPage extends Page
 
         return Actions\EditAction::make($nombre)
             ->model($model)
-            ->modalHeading('Editar ' . $singular)
+            ->modalHeading(function (?Model $record, array $arguments = []) use ($model) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                return 'Editar: ' . trim($rec?->nombre ?? $rec?->nombre_empresa ?? 'registro');
+            })
+            ->modalDescription(function (?Model $record, array $arguments = []) use ($model) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                return new HtmlString('ID: #' . e($rec?->getKey()));
+            })
             ->record(fn (array $arguments) => $model::find($arguments['record'] ?? null))
             ->form(fn (Form $form): Form => $resource::form($form))
             ->slideOver()
@@ -543,10 +552,20 @@ class ConfiguracionPage extends Page
     protected function accionVer(string $nombre, string $resource, string $singular): Actions\ViewAction
     {
         $model = $resource::getModel();
+        $entidad = str_replace('ver', '', $nombre);
 
         $action = Actions\ViewAction::make($nombre)
             ->model($model)
-            ->modalHeading('Detalle de ' . $singular)
+            ->modalHeading(function (?Model $record, array $arguments = []) use ($model) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                return trim($rec?->nombre ?? $rec?->nombre_empresa ?? 'Detalle');
+            })
+            ->modalDescription(function (?Model $record, array $arguments = []) use ($model, $singular) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                return new HtmlString(
+                    '🏢 ' . e($singular) . ' · ID: #' . e($rec?->getKey())
+                );
+            })
             ->record(fn (array $arguments) => $model::find($arguments['record'] ?? null))
             ->slideOver();
 
@@ -555,6 +574,23 @@ class ConfiguracionPage extends Page
         }
 
         $action->form(fn (Form $form): Form => $resource::form($form));
+
+        $action->extraModalFooterActions([
+            Actions\Action::make('editar_desde_detalle')
+                ->label('Editar')
+                ->color('warning')
+                ->icon('heroicon-m-pencil-square')
+                ->action(fn ($record, $livewire) => $livewire->mountAction(
+                    'editar' . $entidad, ['record' => $record->getKey()]
+                )),
+            Actions\Action::make('eliminar_desde_detalle')
+                ->label('Eliminar')
+                ->color('danger')
+                ->icon('heroicon-m-trash')
+                ->action(fn ($record, $livewire) => $livewire->mountAction(
+                    'eliminar' . $entidad, ['record' => $record->getKey()]
+                )),
+        ]);
 
         return $action;
     }
@@ -565,7 +601,14 @@ class ConfiguracionPage extends Page
 
         return Actions\DeleteAction::make($nombre)
             ->model($model)
-            ->modalHeading('Eliminar ' . $singular)
+            ->modalHeading(function (?Model $record, array $arguments = []) use ($model) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                return '¿Eliminar ' . trim($rec?->nombre ?? $rec?->nombre_empresa ?? 'registro') . '?';
+            })
+            ->modalDescription(function (?Model $record, array $arguments = []) use ($model) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                return new HtmlString('ID: #' . e($rec?->getKey()) . ' · Esta acción no se puede deshacer');
+            })
             ->record(fn (array $arguments) => $model::find($arguments['record'] ?? null))
             ->hidden(static function (?Model $record = null): bool {
                 if (! $record) {

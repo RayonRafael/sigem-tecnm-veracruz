@@ -7,6 +7,8 @@ use App\Models\TipoMaterial;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -103,9 +105,20 @@ class TipoMaterialResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos del tipo de material')
-                    ->schema([
-                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-rectangle-stack'),
+                Tabs::make('Detalle')
+                    ->tabs([
+                        Tab::make('Información')
+                            ->icon('heroicon-m-tag')
+                            ->schema([
+                                Section::make('Datos del tipo de material')
+                                    ->schema([
+                                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-rectangle-stack'),
+                                        TextEntry::make('materiales_count')
+                                            ->label('Materiales registrados')
+                                            ->state(fn (TipoMaterial $record): string => $record->materiales()->count() . ' registrados')
+                                            ->icon('heroicon-m-cube'),
+                                    ])->columns(2),
+                            ]),
                     ]),
             ]);
     }
