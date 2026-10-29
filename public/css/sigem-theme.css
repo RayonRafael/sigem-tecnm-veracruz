@@ -3534,6 +3534,7 @@ table {
 .fi-modal-slide-over-window .fi-fo-wizard-header {
   display: flex !important;
   overflow-x: hidden !important;
+  max-width: 100% !important;
   flex-wrap: nowrap !important;
   scrollbar-width: none !important;
 }
@@ -3698,6 +3699,7 @@ body {
 .fi-modal-slide-over-window .fi-fo-component-ctn {
   overflow: visible !important;
   max-width: 100% !important;
+  max-height: none !important;
 }
 
 /* Contenedores internos no deben desbordar.
@@ -3720,12 +3722,6 @@ body {
   box-sizing: border-box !important;
 }
 
-/* Stepper del wizard: sin scroll horizontal */
-.fi-modal-slide-over-window .fi-fo-wizard-header {
-  overflow-x: hidden !important;
-  max-width: 100% !important;
-  scrollbar-width: none !important;
-}
 
 /* El padding interno no debe causar overflow */
 .fi-modal-slide-over-window .fi-modal-content>*,
@@ -3745,19 +3741,6 @@ body {
   box-sizing: border-box !important;
 }
 
-/* Un solo scroll vertical: el del panel. El contenido interno crece con su
-   altura natural (clip en X, visible en Y para no crear scrolls anidados).
-   No se fuerza max-height:none global para no romper las listas desplegables. */
-.fi-modal-slide-over-window .fi-modal-content {
-  overflow-x: clip !important;
-  overflow-y: visible !important;
-  max-height: none !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-component-ctn {
-  overflow: visible !important;
-  max-height: none !important;
-}
 
 .fi-modal-slide-over-window {
   overflow-y: auto !important;
@@ -3979,10 +3962,6 @@ body {
 /* ==========================================================================
    FIX 1: Sin scroll horizontal en el topbar con el slide-over abierto
    ========================================================================== */
-html,
-body {
-  overflow-x: hidden !important;
-}
 
 body.slide-over-open .fi-topbar,
 body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar {
@@ -5419,11 +5398,6 @@ header.fi-header p.fi-header-subheading,
 /* ============================================
    Topbar y contenido más pegados: diagnóstico de .fi-page > section
    ============================================ */
-.fi-main-ctn {
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
 .fi-main,
 main.fi-main,
 body:has(.sigem-professional) .fi-main {
