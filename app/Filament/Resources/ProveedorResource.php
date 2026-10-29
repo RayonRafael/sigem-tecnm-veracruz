@@ -132,7 +132,28 @@ class ProveedorResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\ViewAction::make()
+                    ->iconButton()
+                    ->tooltip('Ver detalle')
+                    ->extraAttributes(['title' => 'Ver detalle'])
+                    ->slideOver()
+                    ->modalHeading(fn (?Proveedor $record) => $record?->nombre_empresa ?? 'Detalle de proveedor')
+                    ->modalDescription(fn (?Proveedor $record) => new \Illuminate\Support\HtmlString(
+                        e($record?->contacto_email ?? '—') . ' · ID: #' . e($record?->getKey())
+                    ))
+                    ->modalCancelActionLabel('Cerrar')
+                    ->extraModalFooterActions([
+                        Tables\Actions\Action::make('desde_detalle_editar')
+                            ->label('Editar')
+                            ->color('warning')
+                            ->icon('heroicon-m-pencil-square')
+                            ->alpineClickHandler(fn (?Proveedor $record) => "\$wire.replaceMountedTableAction('edit', '{$record?->getKey()}')"),
+                        Tables\Actions\Action::make('desde_detalle_eliminar')
+                            ->label('Eliminar')
+                            ->color('danger')
+                            ->icon('heroicon-m-trash')
+                            ->alpineClickHandler(fn (?Proveedor $record) => "\$wire.replaceMountedTableAction('delete', '{$record?->getKey()}')"),
+                    ]),
                 Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Proveedor actualizado correctamente'),
                 Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
             ])
@@ -154,23 +175,44 @@ class ProveedorResource extends Resource
                             ->schema([
                                 Section::make('Datos de la empresa')
                                     ->schema([
-                                        TextEntry::make('nombre_empresa')->label('Empresa')->icon('heroicon-m-building-storefront'),
-                                        TextEntry::make('rfc')->label('RFC')->fontFamily('mono')->icon('heroicon-m-identification'),
+                                        TextEntry::make('nombre_empresa')
+                                            ->label('Empresa')
+                                            ->icon('heroicon-m-building-office')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('rfc')
+                                            ->label('RFC')
+                                            ->fontFamily('mono')
+                                            ->icon('heroicon-m-identification')
+                                            ->placeholder('Por capturar'),
                                         TextEntry::make('activo')
                                             ->label('Estado')
-                                            ->formatStateUsing(fn ($state) => $state ? 'Activo' : 'Inactivo')
                                             ->badge()
-                                            ->color(fn ($state) => $state ? 'success' : 'danger')
-                                            ->icon(fn ($state) => $state ? 'heroicon-m-check-circle' : 'heroicon-m-x-circle'),
-                                    ])->columns(3),
+                                            ->formatStateUsing(fn ($state): string => $state ? '● Activo' : '● Inactivo')
+                                            ->color(fn ($state): string => $state ? 'success' : 'danger')
+                                            ->placeholder('Por capturar'),
+                                    ])
+                                    ->columns(2),
+
                                 Section::make('Contacto')
                                     ->schema([
-                                        TextEntry::make('contacto_nombre')->label('Contacto')->icon('heroicon-m-user'),
-                                        TextEntry::make('contacto_telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
-                                        TextEntry::make('contacto_email')->label('Email')->icon('heroicon-m-envelope'),
-                                    ])->columns(3),
+                                        TextEntry::make('contacto_nombre')
+                                            ->label('Contacto')
+                                            ->icon('heroicon-m-user')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('contacto_telefono')
+                                            ->label('Teléfono')
+                                            ->icon('heroicon-m-phone')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('contacto_email')
+                                            ->label('Correo')
+                                            ->icon('heroicon-m-envelope')
+                                            ->placeholder('Por capturar')
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(2),
                             ]),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 

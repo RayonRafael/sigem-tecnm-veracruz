@@ -558,14 +558,30 @@ class ConfiguracionPage extends Page
             ->model($model)
             ->modalHeading(function (?Model $record, array $arguments = []) use ($model) {
                 $rec = $record ?? $model::find($arguments['record'] ?? null);
+                if ($rec instanceof Receptor) {
+                    return trim(($rec->nombre ?? '') . ' ' . ($rec->apellido_paterno ?? '') . ' ' . ($rec->apellido_materno ?? '')) ?: 'Detalle de receptor';
+                }
+
                 return trim($rec?->nombre ?? $rec?->nombre_empresa ?? 'Detalle');
             })
             ->modalDescription(function (?Model $record, array $arguments = []) use ($model, $singular) {
                 $rec = $record ?? $model::find($arguments['record'] ?? null);
+                if ($rec instanceof Proveedor) {
+                    return new HtmlString(
+                        e($rec->contacto_email ?? '—') . ' · ID: #' . e($rec->getKey())
+                    );
+                }
+                if ($rec instanceof Receptor) {
+                    return new HtmlString(
+                        e($rec->cargo ?? '—') . ' · ID: #' . e($rec->getKey())
+                    );
+                }
+
                 return new HtmlString(
                     '🏢 ' . e($singular) . ' · ID: #' . e($rec?->getKey())
                 );
             })
+            ->modalCancelActionLabel('Cerrar')
             ->record(fn (array $arguments) => $model::find($arguments['record'] ?? null))
             ->slideOver();
 

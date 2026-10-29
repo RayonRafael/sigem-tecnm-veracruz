@@ -138,7 +138,16 @@ class ReceptorResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\ViewAction::make()
+                    ->iconButton()
+                    ->tooltip('Ver detalle')
+                    ->extraAttributes(['title' => 'Ver detalle'])
+                    ->slideOver()
+                    ->modalHeading(fn (?Receptor $record) => trim(($record?->nombre ?? '') . ' ' . ($record?->apellido_paterno ?? '') . ' ' . ($record?->apellido_materno ?? '')) ?: 'Detalle de receptor')
+                    ->modalDescription(fn (?Receptor $record) => new \Illuminate\Support\HtmlString(
+                        e($record?->cargo ?? '—') . ' · ID: #' . e($record?->getKey())
+                    ))
+                    ->modalCancelActionLabel('Cerrar'),
                 Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->slideOver(),
                 Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
             ])
@@ -154,18 +163,53 @@ class ReceptorResource extends Resource
                         Tab::make('Información')
                             ->icon('heroicon-m-tag')
                             ->schema([
-                                Section::make('Datos del receptor')
+                                Section::make('Datos personales')
                                     ->schema([
-                                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-user'),
-                                        TextEntry::make('apellido_paterno')->label('Apellido paterno')->icon('heroicon-m-user'),
-                                        TextEntry::make('apellido_materno')->label('Apellido materno')->icon('heroicon-m-user'),
-                                        TextEntry::make('cargo')->label('Cargo / Puesto')->icon('heroicon-m-briefcase')->placeholder('—'),
-                                        TextEntry::make('email')->label('Email')->icon('heroicon-m-envelope'),
-                                        TextEntry::make('telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
-                                        TextEntry::make('area.nombre')->label('Área')->icon('heroicon-m-building-office'),
-                                    ])->columns(2),
+                                        TextEntry::make('nombre')
+                                            ->label('Nombre')
+                                            ->icon('heroicon-m-user')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('apellido_paterno')
+                                            ->label('Apellido paterno')
+                                            ->icon('heroicon-m-user')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('apellido_materno')
+                                            ->label('Apellido materno')
+                                            ->icon('heroicon-m-user')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('cargo')
+                                            ->label('Cargo')
+                                            ->icon('heroicon-m-briefcase')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('telefono')
+                                            ->label('Teléfono')
+                                            ->icon('heroicon-m-phone')
+                                            ->placeholder('Por capturar'),
+                                        TextEntry::make('email')
+                                            ->label('Correo')
+                                            ->icon('heroicon-m-envelope')
+                                            ->placeholder('Por capturar')
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(2),
+
+                                Section::make('Ubicación')
+                                    ->schema([
+                                        TextEntry::make('area.departamento.nombre')
+                                            ->label('Departamento')
+                                            ->icon('heroicon-m-building-office')
+                                            ->placeholder('Por capturar')
+                                            ->columnSpanFull(),
+                                        TextEntry::make('area.nombre')
+                                            ->label('Área')
+                                            ->icon('heroicon-m-map-pin')
+                                            ->placeholder('Por capturar')
+                                            ->columnSpanFull(),
+                                    ])
+                                    ->columns(2),
                             ]),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 
