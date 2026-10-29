@@ -3,18 +3,10 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Resources\InventarioResource;
-use App\Models\Area;
-use App\Models\Departamento;
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
-use App\Models\MarcaMaterial;
 use App\Models\Material;
-use App\Models\Proveedor;
-use App\Models\Receptor;
 use App\Models\Solicitud;
-use App\Models\TipoMaterial;
-use App\Models\UnidadMedida;
-use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -23,8 +15,6 @@ use Filament\Actions\ViewAction;
 use Filament\Infolists\Infolist;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
-use Spatie\Activitylog\Models\Activity;
 
 class Dashboard extends BaseDashboard
 {
@@ -182,134 +172,40 @@ class Dashboard extends BaseDashboard
         $inventarioAsignados = (int) ($inventarioStats->asignados ?? 0);
         $inventarioEnMantenimiento = (int) ($inventarioStats->en_mantenimiento ?? 0);
         $inventarioDanados = (int) ($inventarioStats->danados ?? 0);
-        $activosBueno = $inventarioDisponibles + $inventarioAsignados;
-        $porcentajeBuenEstado = $totalActivos > 0 ? round(($activosBueno / $totalActivos) * 100) : 0;
         $creadosEsteMes = (int) ($inventarioStats->creados_este_mes ?? 0);
 
-        // 2. Estadísticas de Mantenimiento (1 sola consulta agregada)
-        $mantenimientoStats = Mantenimiento::toBase()
-            ->selectRaw("
-                COUNT(*) as total,
-                COUNT(CASE WHEN estado IN ('Pendiente Revision Admin', 'Solicitado') THEN 1 END) as en_revision,
-                COUNT(CASE WHEN estado = 'En proceso' THEN 1 END) as en_proceso,
-                COUNT(CASE WHEN estado = 'Completado' THEN 1 END) as completados
-            ")
-            ->first();
+        // 2. Estadísticas de Mantenimiento
+        $mantenimientosPendientes = Mantenimiento::toBase()
+            ->whereIn('estado', ['Pendiente Revision Admin', 'Solicitado'])
+            ->count();
 
-        $mantenimientosTotales = (int) ($mantenimientoStats->total ?? 0);
-        $mantenimientosPendientes = (int) ($mantenimientoStats->en_revision ?? 0);
-        $mantenimientoEnRevision = $mantenimientosPendientes;
-        $mantenimientoEnProceso = (int) ($mantenimientoStats->en_proceso ?? 0);
-        $mantenimientoCompletados = (int) ($mantenimientoStats->completados ?? 0);
-
-        // 3. Estadísticas de Solicitudes (1 sola consulta agregada)
-        $solicitudStats = Solicitud::toBase()
-            ->selectRaw("
-                COUNT(CASE WHEN estado = 'Pendiente' THEN 1 END) as pendientes,
-                COUNT(CASE WHEN estado = 'Autorizado' THEN 1 END) as autorizadas,
-                COUNT(CASE WHEN estado = 'Rechazado' THEN 1 END) as rechazadas
-            ")
-            ->first();
-
-        $solicitudesPendientes = (int) ($solicitudStats->pendientes ?? 0);
-        $solicitudesAutorizadas = (int) ($solicitudStats->autorizadas ?? 0);
-        $solicitudesRechazadas = (int) ($solicitudStats->rechazadas ?? 0);
+        // 3. Estadísticas de Solicitudes
+        $solicitudesPendientes = Solicitud::toBase()
+            ->where('estado', 'Pendiente')
+            ->count();
 
         // 4. Materiales con Stock Bajo (Usa el scope derivado)
         $materialesStockBajoCount = Material::stockBajo()->count();
 
-        // 5. Actividad Reciente (5 items con eager loading de causer)
-        $actividadReciente = Activity::with('causer')->latest()->limit(5)->get();
-
-        // 6. Inventarios Recientes y Completos (con relaciones eager loaded para evitar N+1)
+        // 5. Inventarios Completos (con relaciones eager loaded para evitar N+1)
         $inventariosCompletos = Inventario::with(['material.marca', 'material.tipo', 'proveedor', 'usuario'])
             ->latest('created_at')
             ->take(50)
             ->get();
-        $inventariosRecientes = $inventariosCompletos->take(3);
 
-        // 7. Solicitudes Recientes y Completas (con usuario y receptor eager loaded)
-        $solicitudesCompletas = Solicitud::with(['usuario', 'receptor'])
-            ->latest('created_at')
-            ->take(50)
-            ->get();
-        $solicitudesRecientes = $solicitudesCompletas->where('estado', 'Pendiente')->take(3);
-        if ($solicitudesRecientes->isEmpty()) {
-            $solicitudesRecientes = $solicitudesCompletas->take(3);
-        }
-
-        // 8. Mantenimientos Recientes y Completos (con inventario.material y usuarioSolicita eager loaded)
-        $mantenimientosCompletos = Mantenimiento::with(['inventario.material', 'usuarioSolicita'])
-            ->latest('created_at')
-            ->take(50)
-            ->get();
-        $mantenimientosRecientes = $mantenimientosCompletos
-            ->whereIn('estado', ['Pendiente', 'Solicitado', 'Pendiente Revision Admin', 'En proceso'])
-            ->take(3);
-        if ($mantenimientosRecientes->isEmpty()) {
-            $mantenimientosRecientes = $mantenimientosCompletos->take(3);
-        }
-
-        // 9. Catálogos para Modales (Cacheados por 60 minutos con invalidación reactiva)
-        $catalogosData = Cache::remember('sigem_dashboard_catalogos', now()->addMinutes(60), function () {
-            $departamentosList = Departamento::latest()->take(50)->get();
-            $materialesList = Material::with(['tipo', 'unidad', 'marca'])->latest()->take(50)->get();
-            $areasList = Area::with('departamento')->latest()->take(50)->get();
-            $marcasList = MarcaMaterial::withCount('materiales')->latest()->take(50)->get();
-            $tiposList = TipoMaterial::latest()->take(50)->get();
-            $unidadesList = UnidadMedida::latest()->take(50)->get();
-            $proveedoresList = Proveedor::latest()->take(50)->get();
-            $receptoresList = Receptor::with('area.departamento')->latest()->take(50)->get();
-            $usuariosList = User::with('roles')->latest()->take(50)->get();
-
-            $totalRegistrosCatalogos = $departamentosList->count() + $materialesList->count() + $areasList->count() +
-                                       $marcasList->count() + $tiposList->count() + $unidadesList->count() +
-                                       $proveedoresList->count() + $receptoresList->count() + $usuariosList->count();
-
-            return compact(
-                'departamentosList',
-                'materialesList',
-                'areasList',
-                'marcasList',
-                'tiposList',
-                'unidadesList',
-                'proveedoresList',
-                'receptoresList',
-                'usuariosList',
-                'totalRegistrosCatalogos'
-            );
-        });
-
-        return array_merge([
+        return [
             'totalActivos' => $totalActivos,
-            'activosBueno' => $activosBueno,
-            'porcentajeBuenEstado' => $porcentajeBuenEstado,
             'mantenimientosPendientes' => $mantenimientosPendientes,
-            'mantenimientosTotales' => $mantenimientosTotales,
             'materialesStockBajoCount' => $materialesStockBajoCount,
             'solicitudesPendientes' => $solicitudesPendientes,
             'creadosEsteMes' => $creadosEsteMes,
-
-            'actividadReciente' => $actividadReciente,
-            'inventariosRecientes' => $inventariosRecientes,
-            'solicitudesRecientes' => $solicitudesRecientes,
-            'mantenimientosRecientes' => $mantenimientosRecientes,
 
             'inventarioDisponibles' => $inventarioDisponibles,
             'inventarioAsignados' => $inventarioAsignados,
             'inventarioEnMantenimiento' => $inventarioEnMantenimiento,
             'inventarioDanados' => $inventarioDanados,
 
-            'mantenimientoEnRevision' => $mantenimientoEnRevision,
-            'mantenimientoEnProceso' => $mantenimientoEnProceso,
-            'mantenimientoCompletados' => $mantenimientoCompletados,
-
-            'solicitudesAutorizadas' => $solicitudesAutorizadas,
-            'solicitudesRechazadas' => $solicitudesRechazadas,
-
             'inventariosCompletos' => $inventariosCompletos,
-            'solicitudesCompletas' => $solicitudesCompletas,
-            'mantenimientosCompletos' => $mantenimientosCompletos,
             'categoriasTop' => (function () {
                 $todasCategorias = Inventario::query()
                     ->join('material', 'inventario.id_producto', '=', 'material.id_producto')
@@ -337,6 +233,6 @@ class Dashboard extends BaseDashboard
 
                 return $top;
             })(),
-        ], $catalogosData);
+        ];
     }
 }

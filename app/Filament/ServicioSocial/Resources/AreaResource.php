@@ -6,10 +6,6 @@ use App\Filament\ServicioSocial\Resources\AreaResource\Pages;
 use App\Models\Area;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Tabs;
-use Filament\Infolists\Components\Tabs\Tab;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -114,21 +110,7 @@ class AreaResource extends Resource
 
     public static function infolist(Infolist $infolist): Infolist
     {
-        return $infolist
-            ->schema([
-                Tabs::make('Detalle')
-                    ->tabs([
-                        Tab::make('Información')
-                            ->icon('heroicon-m-tag')
-                            ->schema([
-                                Section::make('Datos del área')
-                                    ->schema([
-                                        TextEntry::make('nombre')->label('Nombre del área')->icon('heroicon-m-map-pin'),
-                                        TextEntry::make('departamento.nombre')->label('Departamento')->icon('heroicon-m-building-office-2'),
-                                    ])->columns(2),
-                            ]),
-                    ]),
-            ]);
+        return \App\Filament\Resources\AreaResource::infolist($infolist);
     }
 
     public static function getRelations(): array

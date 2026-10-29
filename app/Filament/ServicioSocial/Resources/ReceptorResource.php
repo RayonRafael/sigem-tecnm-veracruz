@@ -6,10 +6,6 @@ use App\Filament\ServicioSocial\Resources\ReceptorResource\Pages;
 use App\Models\Receptor;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Tabs;
-use Filament\Infolists\Components\Tabs\Tab;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -156,61 +152,7 @@ class ReceptorResource extends Resource
 
     public static function infolist(Infolist $infolist): Infolist
     {
-        return $infolist
-            ->schema([
-                Tabs::make('Detalle')
-                    ->tabs([
-                        Tab::make('Información')
-                            ->icon('heroicon-m-tag')
-                            ->schema([
-                                Section::make('Datos personales')
-                                    ->schema([
-                                        TextEntry::make('nombre')
-                                            ->label('Nombre')
-                                            ->icon('heroicon-m-user')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('apellido_paterno')
-                                            ->label('Apellido paterno')
-                                            ->icon('heroicon-m-user')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('apellido_materno')
-                                            ->label('Apellido materno')
-                                            ->icon('heroicon-m-user')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('cargo')
-                                            ->label('Cargo')
-                                            ->icon('heroicon-m-briefcase')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('telefono')
-                                            ->label('Teléfono')
-                                            ->icon('heroicon-m-phone')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('email')
-                                            ->label('Correo')
-                                            ->icon('heroicon-m-envelope')
-                                            ->placeholder('Por capturar')
-                                            ->columnSpanFull(),
-                                    ])
-                                    ->columns(2),
-
-                                Section::make('Ubicación')
-                                    ->schema([
-                                        TextEntry::make('area.departamento.nombre')
-                                            ->label('Departamento')
-                                            ->icon('heroicon-m-building-office')
-                                            ->placeholder('Por capturar')
-                                            ->columnSpanFull(),
-                                        TextEntry::make('area.nombre')
-                                            ->label('Área')
-                                            ->icon('heroicon-m-map-pin')
-                                            ->placeholder('Por capturar')
-                                            ->columnSpanFull(),
-                                    ])
-                                    ->columns(2),
-                            ]),
-                    ])
-                    ->columnSpanFull(),
-            ]);
+        return \App\Filament\Resources\ReceptorResource::infolist($infolist);
     }
 
     public static function getRelations(): array

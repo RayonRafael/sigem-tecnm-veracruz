@@ -6,10 +6,6 @@ use App\Filament\ServicioSocial\Resources\MarcaMaterialResource\Pages;
 use App\Models\MarcaMaterial;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Tabs;
-use Filament\Infolists\Components\Tabs\Tab;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -103,24 +99,7 @@ class MarcaMaterialResource extends Resource
 
     public static function infolist(Infolist $infolist): Infolist
     {
-        return $infolist
-            ->schema([
-                Tabs::make('Detalle')
-                    ->tabs([
-                        Tab::make('Información')
-                            ->icon('heroicon-m-tag')
-                            ->schema([
-                                Section::make('Datos de la marca')
-                                    ->schema([
-                                        TextEntry::make('nombre')->label('Nombre de la marca')->icon('heroicon-m-tag'),
-                                        TextEntry::make('materiales_count')
-                                            ->label('Materiales asociados')
-                                            ->state(fn (MarcaMaterial $record): string => $record->materiales()->count() . ' registrados')
-                                            ->icon('heroicon-m-cube'),
-                                    ])->columns(2),
-                            ]),
-                    ]),
-            ]);
+        return \App\Filament\Resources\MarcaMaterialResource::infolist($infolist);
     }
 
     public static function getRelations(): array

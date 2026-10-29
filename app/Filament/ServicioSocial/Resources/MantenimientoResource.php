@@ -7,9 +7,6 @@ use App\Filament\ServicioSocial\Resources\MantenimientoResource\Pages;
 use App\Models\Mantenimiento;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Tabs;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -223,119 +220,7 @@ class MantenimientoResource extends Resource
 
     public static function infolist(Infolist $infolist): Infolist
     {
-        return $infolist
-            ->schema([
-                Tabs::make('Detalle')
-                    ->tabs([
-                        Tabs\Tab::make('Servicio')
-                            ->icon('heroicon-m-wrench')
-                            ->schema([
-                                Section::make('Equipo y técnico')
-                                    ->schema([
-                                        TextEntry::make('inventario.num_serie')
-                                            ->label('No. serie')
-                                            ->fontFamily('mono')
-                                            ->icon('heroicon-m-qr-code')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('inventario.material.nombre')
-                                            ->label('Material')
-                                            ->icon('heroicon-m-cube')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('nombre_tecnico')
-                                            ->label('Técnico')
-                                            ->icon('heroicon-m-user')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('num_control_tecnico')
-                                            ->label('No. control')
-                                            ->icon('heroicon-m-identification')
-                                            ->placeholder('Por capturar'),
-                                    ])
-                                    ->columns(2),
-                                Section::make('Detalles del servicio')
-                                    ->schema([
-                                        TextEntry::make('tipo_servicio')
-                                            ->label('Servicio')
-                                            ->badge()
-                                            ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : 'Por capturar')
-                                            ->color('info')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('tipo_mantenimiento')
-                                            ->label('Tipo')
-                                            ->badge()
-                                            ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : 'Por capturar')
-                                            ->color(fn (?string $state): string => match ($state) {
-                                                'Preventivo' => 'success',
-                                                'Correctivo' => 'danger',
-                                                'Mejora' => 'info',
-                                                default => 'gray',
-                                            })
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('estado')
-                                            ->label('Estado')
-                                            ->badge()
-                                            ->formatStateUsing(function (?string $state): string {
-                                                if (! $state) {
-                                                    return 'Por capturar';
-                                                }
-                                                $label = match ($state) {
-                                                    'Pendiente Revision Admin' => 'En revisión',
-                                                    'Completado' => 'Terminado',
-                                                    'Cancelado' => 'Rechazado',
-                                                    default => $state,
-                                                };
-                                                return '● ' . $label;
-                                            })
-                                            ->color(fn (?string $state): string => match ($state) {
-                                                'Solicitado' => 'warning',
-                                                'En proceso' => 'primary',
-                                                'Pendiente Revision Admin', 'En revisión' => 'info',
-                                                'Completado', 'Terminado' => 'success',
-                                                'Cancelado', 'Rechazado' => 'danger',
-                                                default => 'gray',
-                                            })
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('fecha_solicitud')
-                                            ->label('Solicitud')
-                                            ->date('d/m/Y')
-                                            ->icon('heroicon-m-calendar')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('fecha_inicio')
-                                            ->label('Inicio')
-                                            ->date('d/m/Y')
-                                            ->icon('heroicon-m-calendar')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('fecha_fin')
-                                            ->label('Fin')
-                                            ->date('d/m/Y')
-                                            ->icon('heroicon-m-calendar')
-                                            ->placeholder('Por capturar'),
-                                    ])
-                                    ->columns(2),
-                            ]),
-
-                        Tabs\Tab::make('Fallas y Diagnóstico')
-                            ->icon('heroicon-m-exclamation-triangle')
-                            ->schema([
-                                Section::make('Fechas y reportes')
-                                    ->schema([
-                                        TextEntry::make('descripcion_falla')
-                                            ->label('Falla')
-                                            ->placeholder('Por capturar')
-                                            ->columnSpanFull(),
-                                        TextEntry::make('descripcion_trabajo')
-                                            ->label('Trabajo realizado')
-                                            ->placeholder('Por capturar')
-                                            ->columnSpanFull(),
-                                        TextEntry::make('observaciones')
-                                            ->label('Observaciones')
-                                            ->placeholder('Por capturar')
-                                            ->columnSpanFull(),
-                                    ])
-                                    ->columns(2),
-                            ]),
-                    ])
-                    ->columnSpanFull(),
-            ]);
+        return \App\Filament\Resources\MantenimientoResource::infolist($infolist);
     }
 
     public static function getRelations(): array

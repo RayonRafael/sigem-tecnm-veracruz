@@ -3,18 +3,9 @@
 namespace App\Filament\ServicioSocial\Pages;
 
 use App\Filament\ServicioSocial\Resources\InventarioResource;
-use App\Models\Area;
-use App\Models\Departamento;
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
-use App\Models\MarcaMaterial;
-use App\Models\Material;
-use App\Models\Proveedor;
-use App\Models\Receptor;
 use App\Models\Solicitud;
-use App\Models\TipoMaterial;
-use App\Models\UnidadMedida;
-use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -22,7 +13,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Infolist;
 use Filament\Pages\Dashboard as BaseDashboard;
-use Spatie\Activitylog\Models\Activity;
 
 class Dashboard extends BaseDashboard
 {
@@ -165,27 +155,8 @@ class Dashboard extends BaseDashboard
         $misMantenimientos = Mantenimiento::where('id_usuario_solicita', $userId)->count();
         $totalActivos = Inventario::count();
 
-        // Bitacora activity just for this user
-        $actividadReciente = Activity::with('causer')
-            ->where('causer_id', $userId)
-            ->where('causer_type', User::class)
-            ->latest()->limit(5)->get();
-
-        // Colecciones limitadas (mini tablas) y completas (modales)
+        // Inventarios para tabla principal del Dashboard
         $inventariosCompletos = Inventario::with(['material', 'material.marca', 'material.tipo'])->latest('created_at')->take(50)->get();
-        $inventariosRecientes = $inventariosCompletos->take(3);
-
-        $solicitudesCompletas = Solicitud::with('usuario')->where('id_usuario', $userId)->latest('created_at')->take(50)->get();
-        $solicitudesRecientes = $solicitudesCompletas->where('estado', 'Pendiente')->take(3);
-        if ($solicitudesRecientes->isEmpty()) {
-            $solicitudesRecientes = $solicitudesCompletas->take(3);
-        }
-
-        $mantenimientosCompletos = Mantenimiento::with(['inventario', 'inventario.material', 'usuarioSolicita'])->where('id_usuario_solicita', $userId)->latest('created_at')->take(50)->get();
-        $mantenimientosRecientes = $mantenimientosCompletos->whereIn('estado', ['Pendiente', 'Solicitado', 'Pendiente Revision Admin', 'En proceso'])->take(3);
-        if ($mantenimientosRecientes->isEmpty()) {
-            $mantenimientosRecientes = $mantenimientosCompletos->take(3);
-        }
 
         $inventarioDisponibles = Inventario::disponibles()->count();
         $inventarioAsignados = Inventario::asignados()->count();
@@ -193,26 +164,8 @@ class Dashboard extends BaseDashboard
         $inventarioDanados = Inventario::danados()->count();
 
         $mantenimientoEnRevision = Mantenimiento::where('id_usuario_solicita', $userId)->enRevision()->count();
-        $mantenimientoEnProceso = Mantenimiento::where('id_usuario_solicita', $userId)->enProceso()->count();
-        $mantenimientoCompletados = Mantenimiento::where('id_usuario_solicita', $userId)->completados()->count();
 
         $solicitudesAutorizadas = Solicitud::where('id_usuario', $userId)->autorizadas()->count();
-        $solicitudesRechazadas = Solicitud::where('id_usuario', $userId)->rechazadas()->count();
-
-        // Catálogos Completos (Read-only for SS)
-        $departamentosList = Departamento::latest()->take(50)->get();
-        $materialesList = Material::with(['tipo', 'unidad', 'marca'])->latest()->take(50)->get();
-        $areasList = Area::with('departamento')->latest()->take(50)->get();
-        $marcasList = MarcaMaterial::withCount('materiales')->latest()->take(50)->get();
-        $tiposList = TipoMaterial::latest()->take(50)->get();
-        $unidadesList = UnidadMedida::latest()->take(50)->get();
-        $proveedoresList = Proveedor::latest()->take(50)->get();
-        $receptoresList = Receptor::with('area.departamento')->latest()->take(50)->get();
-        $usuariosList = User::with('roles')->latest()->take(50)->get();
-
-        $totalRegistrosCatalogos = $departamentosList->count() + $materialesList->count() + $areasList->count() +
-                                   $marcasList->count() + $tiposList->count() + $unidadesList->count() +
-                                   $proveedoresList->count() + $receptoresList->count() + $usuariosList->count();
 
         return [
             'misSolicitudes' => $misSolicitudes,
@@ -220,39 +173,15 @@ class Dashboard extends BaseDashboard
             'misMantenimientos' => $misMantenimientos,
             'totalActivos' => $totalActivos,
 
-            'actividadReciente' => $actividadReciente,
-            'inventariosRecientes' => $inventariosRecientes,
-            'solicitudesRecientes' => $solicitudesRecientes,
-            'mantenimientosRecientes' => $mantenimientosRecientes,
-
-            // Variables para módulos
             'inventarioDisponibles' => $inventarioDisponibles,
             'inventarioAsignados' => $inventarioAsignados,
             'inventarioEnMantenimiento' => $inventarioEnMantenimiento,
             'inventarioDanados' => $inventarioDanados,
 
             'mantenimientoEnRevision' => $mantenimientoEnRevision,
-            'mantenimientoEnProceso' => $mantenimientoEnProceso,
-            'mantenimientoCompletados' => $mantenimientoCompletados,
-
             'solicitudesAutorizadas' => $solicitudesAutorizadas,
-            'solicitudesRechazadas' => $solicitudesRechazadas,
 
             'inventariosCompletos' => $inventariosCompletos,
-            'solicitudesCompletas' => $solicitudesCompletas,
-            'mantenimientosCompletos' => $mantenimientosCompletos,
-
-            'departamentosList' => $departamentosList,
-            'materialesList' => $materialesList,
-            'areasList' => $areasList,
-            'marcasList' => $marcasList,
-            'tiposList' => $tiposList,
-            'unidadesList' => $unidadesList,
-            'proveedoresList' => $proveedoresList,
-            'receptoresList' => $receptoresList,
-            'usuariosList' => $usuariosList,
-
-            'totalRegistrosCatalogos' => $totalRegistrosCatalogos,
             'categoriasTop' => (function () {
                 $todasCategorias = Inventario::query()
                     ->join('material', 'inventario.id_producto', '=', 'material.id_producto')
