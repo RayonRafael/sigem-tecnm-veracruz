@@ -11,7 +11,6 @@ use Filament\Infolists\Concerns\InteractsWithInfolists;
 use Filament\Infolists\Contracts\HasInfolists;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Tables\Table;
 
 class ListInventarios extends ListRecords implements HasInfolists
 {
@@ -28,16 +27,6 @@ class ListInventarios extends ListRecords implements HasInfolists
     public function getTitle(): string
     {
         return '💻 Inventario general';
-    }
-
-    public function getHeading(): string
-    {
-        return '💻 Inventario general';
-    }
-
-    public function getBreadcrumbs(): array
-    {
-        return [];
     }
 
     public function getSubheading(): ?string
@@ -76,11 +65,6 @@ class ListInventarios extends ListRecords implements HasInfolists
         $action->url(null);
         $action->slideOver();
         $action->steps(InventarioResource::getFormSteps());
-    }
-
-    public function table(Table $table): Table
-    {
-        return parent::table($table);
     }
 
     public function infolist(Infolist $infolist): Infolist

@@ -3,13 +3,10 @@
 namespace App\Filament\ServicioSocial\Pages;
 
 use App\Enums\RoleEnum;
-use App\Filament\Concerns\ConDashboardBreadcrumb;
 use App\Filament\Pages\ReportesPage as BaseReportesPage;
 
 class ReportesPage extends BaseReportesPage
 {
-    use ConDashboardBreadcrumb;
-
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?string $navigationGroup = 'Gestión de inventario';

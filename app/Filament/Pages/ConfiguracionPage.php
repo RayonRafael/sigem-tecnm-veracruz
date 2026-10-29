@@ -699,14 +699,4 @@ class ConfiguracionPage extends Page
           </div>
         ';
     }
-
-    protected function renderEditIconButton(string $accion, int|string $id): string
-    {
-        return $this->renderActionButtons(
-            $accion,
-            str_replace('editar', 'ver', $accion),
-            str_replace('editar', 'eliminar', $accion),
-            $id
-        );
-    }
 }

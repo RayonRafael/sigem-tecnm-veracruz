@@ -20,11 +20,6 @@ class ListInventarios extends ListRecords
         return '💻 Inventario general';
     }
 
-    public function getBreadcrumbs(): array
-    {
-        return [];
-    }
-
     public function getSubheading(): ?string
     {
         return 'Busca, filtra y gestiona los equipos registrados en el sistema.';

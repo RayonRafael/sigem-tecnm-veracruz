@@ -25,11 +25,6 @@ class ListSolicituds extends ListRecords
         return 'Peticiones de salida de material. Clic en el ojo 👁 o en la fila para desplegar el detalle en el panel lateral.';
     }
 
-    public function getBreadcrumbs(): array
-    {
-        return [];
-    }
-
     protected function getHeaderActions(): array
     {
         return [

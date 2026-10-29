@@ -6,8 +6,6 @@ use App\Filament\ServicioSocial\Resources\InventarioResource\Pages;
 use App\Models\Inventario;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -415,12 +413,5 @@ class InventarioResource extends Resource
             'create' => Pages\CreateInventario::route('/create'),
             'edit' => Pages\EditInventario::route('/{record}/edit'),
         ];
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery();
-        // Sin filtro por usuario — SS ve todo el inventario
-        // Los permisos de edición los controla InventarioPolicy
     }
 }
