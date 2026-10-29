@@ -49,21 +49,25 @@ class MaterialResource extends Resource
                             Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\TextInput::make('nombre')
+                                        ->placeholder('Ej. Computadora de Escritorio OptiPlex')
                                         ->required()
                                         ->prefixIcon('heroicon-m-tag')
                                         ->maxLength(150),
                                     Forms\Components\TextInput::make('modelo')
+                                        ->placeholder('Ej. OptiPlex 7090')
                                         ->prefixIcon('heroicon-m-qr-code')
                                         ->maxLength(100),
                                     Forms\Components\Textarea::make('descripcion')
                                         ->label('Descripción')
+                                        ->placeholder('Ej. Especificaciones y características generales del material...')
                                         ->rows(3)
                                         ->columnSpanFull(),
                                 ]),
-                            Forms\Components\Grid::make(3)
+                            Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\Select::make('id_marca')
                                         ->label('Marca')
+                                        ->placeholder('Selecciona...')
                                         ->relationship('marca', 'nombre')
                                         ->required()
                                         ->searchable()
@@ -71,6 +75,7 @@ class MaterialResource extends Resource
                                         ->prefixIcon('heroicon-m-star'),
                                     Forms\Components\Select::make('id_tipodematerial')
                                         ->label('Tipo de material')
+                                        ->placeholder('Selecciona...')
                                         ->relationship('tipo', 'nombre')
                                         ->required()
                                         ->searchable()
@@ -78,11 +83,13 @@ class MaterialResource extends Resource
                                         ->prefixIcon('heroicon-m-square-3-stack-3d'),
                                     Forms\Components\Select::make('id_unidad')
                                         ->label('Unidad de medida')
+                                        ->placeholder('Selecciona...')
                                         ->relationship('unidad', 'nombre')
                                         ->required()
                                         ->searchable()
                                         ->preload()
-                                        ->prefixIcon('heroicon-m-scale'),
+                                        ->prefixIcon('heroicon-m-scale')
+                                        ->columnSpanFull(),
                                 ]),
                         ]),
 
@@ -156,7 +163,16 @@ class MaterialResource extends Resource
             ->recordAction(null)
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->slideOver(),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Editar')
+                    ->extraAttributes(['title' => 'Editar'])
+                    ->slideOver()
+                    ->modalHeading(fn (?Material $record) => 'Editar: ' . ($record?->nombre ?? 'material'))
+                    ->modalDescription(fn (?Material $record) => new \Illuminate\Support\HtmlString(
+                        e($record?->tipo?->nombre ?? '—') . ' · ID: #' . e($record?->getKey())
+                    ))
+                    ->successNotificationTitle('Material actualizado correctamente'),
                 Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
             ])
             ->bulkActions([]);

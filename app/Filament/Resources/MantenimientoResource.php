@@ -65,12 +65,14 @@ class MantenimientoResource extends Resource
                                 ->schema([
                                     Forms\Components\TextInput::make('nombre_tecnico')
                                         ->label('Técnico / alumno')
+                                        ->placeholder('Ej. Juan Pérez López')
                                         ->required()
                                         ->default(fn () => auth()->user() ? trim(auth()->user()->name.' '.auth()->user()->apellido_paterno.' '.auth()->user()->apellido_materno) : null)
                                         ->prefixIcon('heroicon-m-user')
                                         ->maxLength(150),
                                     Forms\Components\TextInput::make('num_control_tecnico')
                                         ->label('Número de control técnico')
+                                        ->placeholder('Ej. 21020123')
                                         ->default(fn () => auth()->user()?->num_control)
                                         ->prefixIcon('heroicon-m-identification')
                                         ->maxLength(100),
@@ -130,10 +132,9 @@ class MantenimientoResource extends Resource
                                 ->inline()
                                 ->default('Pendiente Revision Admin')
                                 ->required()
-                                ->required()
                                 ->columnSpanFull(),
 
-                            Forms\Components\Grid::make(3)
+                            Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\DatePicker::make('fecha_solicitud')->label('Fecha de solicitud')
                                         ->default(now())
@@ -148,14 +149,17 @@ class MantenimientoResource extends Resource
                                 ]),
                             Forms\Components\Textarea::make('descripcion_falla')
                                 ->label('Descripción de la falla')
+                                ->placeholder('Ej. El equipo no enciende o presenta pantalla azul...')
                                 ->rows(2)
                                 ->columnSpanFull(),
                             Forms\Components\Textarea::make('descripcion_trabajo')
                                 ->label('Trabajo realizado')
+                                ->placeholder('Ej. Limpieza interna y reemplazo de pasta térmica...')
                                 ->rows(2)
                                 ->columnSpanFull(),
                             Forms\Components\Textarea::make('observaciones')->label('Observaciones')
                                 ->label('Observaciones')
+                                ->placeholder('Ej. Observaciones adicionales del servicio...')
                                 ->rows(2)
                                 ->columnSpanFull(),
                         ]),
@@ -288,7 +292,15 @@ class MantenimientoResource extends Resource
                         'No. Serie: ' . e($record?->inventario?->num_serie ?? '—') . ' · ' . e($record?->tipo_servicio ?? 'Mantenimiento')
                     ))
                     ->modalCancelActionLabel('Cerrar'),
-                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Mantenimiento actualizado correctamente'),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Editar')
+                    ->extraAttributes(['title' => 'Editar'])
+                    ->modalHeading(fn (?Mantenimiento $record) => 'Editar: ' . ($record?->inventario?->material?->nombre ?? 'mantenimiento'))
+                    ->modalDescription(fn (?Mantenimiento $record) => new \Illuminate\Support\HtmlString(
+                        'No. Serie: ' . e($record?->inventario?->num_serie ?? '—') . ' · ' . e($record?->tipo_servicio ?? '')
+                    ))
+                    ->successNotificationTitle('Mantenimiento actualizado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

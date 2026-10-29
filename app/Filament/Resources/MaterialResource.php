@@ -54,18 +54,21 @@ class MaterialResource extends Resource
                             Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\TextInput::make('nombre')
+                                        ->placeholder('Ej. Computadora de Escritorio OptiPlex')
                                         ->required()
                                         ->prefixIcon('heroicon-m-tag')
                                         ->maxLength(150),
                                     Forms\Components\TextInput::make('modelo')
+                                        ->placeholder('Ej. OptiPlex 7090')
                                         ->prefixIcon('heroicon-m-qr-code')
                                         ->maxLength(100),
                                     Forms\Components\Textarea::make('descripcion')
                                         ->label('Descripción')
+                                        ->placeholder('Ej. Especificaciones y características generales del material...')
                                         ->rows(3)
                                         ->columnSpanFull(),
                                 ]),
-                            Forms\Components\Grid::make(3)
+                            Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\Select::make('id_marca')->placeholder('Selecciona...')
                                         ->label('Marca')
@@ -77,6 +80,7 @@ class MaterialResource extends Resource
                                         ->createOptionForm([
                                             Forms\Components\TextInput::make('nombre')
                                                 ->label('Nombre de la marca')
+                                                ->placeholder('Ej. Dell')
                                                 ->required()
                                                 ->maxLength(100),
                                         ]),
@@ -90,6 +94,7 @@ class MaterialResource extends Resource
                                         ->createOptionForm([
                                             Forms\Components\TextInput::make('nombre')
                                                 ->label('Nombre del tipo de material')
+                                                ->placeholder('Ej. Equipo de Cómputo')
                                                 ->required()
                                                 ->maxLength(100),
                                         ]),
@@ -100,9 +105,11 @@ class MaterialResource extends Resource
                                         ->searchable()
                                         ->preload()
                                         ->prefixIcon('heroicon-m-scale')
+                                        ->columnSpanFull()
                                         ->createOptionForm([
                                             Forms\Components\TextInput::make('nombre')
                                                 ->label('Nombre de la unidad de medida')
+                                                ->placeholder('Ej. Pieza')
                                                 ->required()
                                                 ->maxLength(100),
                                         ]),
@@ -121,6 +128,7 @@ class MaterialResource extends Resource
                             ->helperText('Calculado automáticamente'),
                         Forms\Components\TextInput::make('stock_minimo')
                             ->label('Stock mínimo')
+                            ->placeholder('Ej. 5')
                             ->numeric()
                             ->minValue(0)
                             ->default(0)
@@ -190,7 +198,15 @@ class MaterialResource extends Resource
             ->recordAction(null)
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Material actualizado correctamente'),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Editar')
+                    ->extraAttributes(['title' => 'Editar'])
+                    ->modalHeading(fn (?Material $record) => 'Editar: ' . ($record?->nombre ?? 'material'))
+                    ->modalDescription(fn (?Material $record) => new \Illuminate\Support\HtmlString(
+                        e($record?->tipo?->nombre ?? '—') . ' · ID: #' . e($record?->getKey())
+                    ))
+                    ->successNotificationTitle('Material actualizado correctamente'),
                 Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
             ])
             ->bulkActions([

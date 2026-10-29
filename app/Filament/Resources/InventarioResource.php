@@ -154,7 +154,7 @@ class InventarioResource extends Resource
                                 ->icon('heroicon-m-cpu-chip')
                                 ->collapsible()
                                 ->schema([
-                                    Forms\Components\Grid::make(3)
+                                    Forms\Components\Grid::make(2)
                                         ->schema([
                                             Forms\Components\TextInput::make('procesador')
                                                 ->label('Procesador')
@@ -170,7 +170,8 @@ class InventarioResource extends Resource
                                                 ->label('Disco duro')
                                                 ->placeholder('Ej. 512GB SSD')
                                                 ->prefixIcon('heroicon-m-circle-stack')
-                                                ->maxLength(100),
+                                                ->maxLength(100)
+                                                ->columnSpanFull(),
                                         ]),
                                     Forms\Components\Grid::make(2)
                                         ->schema([
@@ -382,6 +383,7 @@ class InventarioResource extends Resource
                                         ]),
                                     Forms\Components\TextInput::make('num_factura')
                                         ->label('Número de factura')
+                                        ->placeholder('Ej. FAC-2026-001')
                                         ->prefixIcon('heroicon-m-hashtag')
                                         ->maxLength(100)
                                         ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
@@ -400,6 +402,7 @@ class InventarioResource extends Resource
                                         ->prefixIcon('heroicon-m-calendar-days'),
                                     Forms\Components\Textarea::make('observaciones_renta')
                                         ->label('Observaciones de renta')
+                                        ->placeholder('Ej. Contrato anual de arrendamiento...')
                                         ->columnSpanFull(),
                                 ])
                                 ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
@@ -443,6 +446,7 @@ class InventarioResource extends Resource
                                         ->visible(fn () => auth()->user() && auth()->user()->hasPermissionTo(RoleEnum::PERM_ACCESS_ADMIN)),
                                     Forms\Components\Textarea::make('observaciones_generales')
                                         ->label('Observaciones generales')
+                                        ->placeholder('Ej. Equipo en buen estado físico...')
                                         ->rows(2),
                                 ]),
                         ]),

@@ -50,6 +50,7 @@ class UnidadMedidaResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
                             ->label('Nombre de la unidad')
+                            ->placeholder('Ej. Pieza, Caja, Metro')
                             ->required()
                             ->prefixIcon('heroicon-m-bars-3-bottom-left')
                             ->maxLength(50),

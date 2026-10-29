@@ -50,6 +50,7 @@ class MarcaMaterialResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
                             ->label('Nombre de la marca')
+                            ->placeholder('Ej. Dell, HP, Cisco')
                             ->required()
                             ->prefixIcon('heroicon-m-tag')
                             ->maxLength(100),

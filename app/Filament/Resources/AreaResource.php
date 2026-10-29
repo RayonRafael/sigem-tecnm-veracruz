@@ -50,6 +50,7 @@ class AreaResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
                             ->label('Nombre del área')
+                            ->placeholder('Ej. Laboratorio de Redes')
                             ->required()
                             ->prefixIcon('heroicon-m-tag')
                             ->maxLength(100),

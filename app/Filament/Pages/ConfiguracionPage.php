@@ -536,10 +536,25 @@ class ConfiguracionPage extends Page
             ->model($model)
             ->modalHeading(function (?Model $record, array $arguments = []) use ($model) {
                 $rec = $record ?? $model::find($arguments['record'] ?? null);
+                if ($rec instanceof Receptor) {
+                    return 'Editar: ' . (trim(($rec->nombre ?? '') . ' ' . ($rec->apellido_paterno ?? '')) ?: 'receptor');
+                }
+
                 return 'Editar: ' . trim($rec?->nombre ?? $rec?->nombre_empresa ?? 'registro');
             })
             ->modalDescription(function (?Model $record, array $arguments = []) use ($model) {
                 $rec = $record ?? $model::find($arguments['record'] ?? null);
+                if ($rec instanceof Proveedor) {
+                    return new HtmlString(
+                        e($rec->contacto_email ?? '—') . ' · ID: #' . e($rec->getKey())
+                    );
+                }
+                if ($rec instanceof Receptor) {
+                    return new HtmlString(
+                        e($rec->cargo ?? '—') . ' · ID: #' . e($rec->getKey())
+                    );
+                }
+
                 return new HtmlString('ID: #' . e($rec?->getKey()));
             })
             ->record(fn (array $arguments) => $model::find($arguments['record'] ?? null))

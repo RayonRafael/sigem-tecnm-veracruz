@@ -49,6 +49,7 @@ class DepartamentoResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
                             ->label('Nombre')
+                            ->placeholder('Ej. Departamento de Ciencias Básicas')
                             ->required()
                             ->prefixIcon('heroicon-m-tag')
                             ->maxLength(100),

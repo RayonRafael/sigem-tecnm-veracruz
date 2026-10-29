@@ -50,6 +50,7 @@ class TipoMaterialResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
                             ->label('Nombre del tipo')
+                            ->placeholder('Ej. Equipo de Cómputo')
                             ->required()
                             ->prefixIcon('heroicon-m-rectangle-stack')
                             ->maxLength(100),

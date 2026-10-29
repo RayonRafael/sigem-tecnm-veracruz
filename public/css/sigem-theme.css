@@ -4069,12 +4069,6 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
   border-color: rgba(239, 68, 68, 0.4) !important;
 }
 
-.fi-modal-slide-over-window .fi-fo-component-ctn>.fi-section>.fi-section-content,
-.fi-modal-slide-over-window .fi-infolist-component-ctn>.fi-section>.fi-section-content,
-.fi-modal-slide-over-window .fi-section-content {
-  padding: 18px !important;
-}
-
 /* Los grupos de campos sin doble recuadro */
 .fi-modal-slide-over-window .fi-fo-component-ctn .fi-fieldset,
 .fi-modal-slide-over-window .fi-fo-component-ctn [class*="fieldset"] {
@@ -6092,8 +6086,10 @@ body:has(.sigem-professional) .fi-main {
 /* ============================================
    FIX: Eliminar doble recuadro completo + espacio bajo footer
    ============================================ */
-/* 1. Limpiar bordes, sombras y rings en contenedores de infolists */
+/* 1. Limpiar bordes, sombras y rings en contenedores de infolists y wizards */
 .fi-modal-slide-over-window .fi-fo-component-ctn,
+.fi-modal-slide-over-window .fi-fo-wizard,
+.fi-modal-slide-over-window .fi-fo-wizard.fi-contained,
 .fi-modal-slide-over-window .fi-in-tabs,
 .fi-modal-slide-over-window .fi-in-tabs.fi-contained,
 .fi-modal-slide-over-window .fi-in-tabs-tab {

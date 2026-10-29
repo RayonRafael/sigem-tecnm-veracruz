@@ -50,11 +50,13 @@ class ProveedorResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('nombre_empresa')
                             ->label('Nombre de la empresa')
+                            ->placeholder('Ej. Soluciones Tecnológicas S.A. de C.V.')
                             ->required()
                             ->prefixIcon('heroicon-m-building-storefront')
                             ->maxLength(150),
                         Forms\Components\TextInput::make('rfc')
                             ->label('Rfc')
+                            ->placeholder('Ej. STE200101AAA')
                             ->prefixIcon('heroicon-m-identification')
                             ->maxLength(13)
                             ->default(null),
@@ -64,29 +66,33 @@ class ProveedorResource extends Resource
                             ->inline()
                             ->default(true)
                             ->required(),
-                    ])->columns(3),
+                    ])->columns(2),
 
                 Forms\Components\Section::make('Información de contacto')
                     ->icon('heroicon-m-phone')
                     ->schema([
                         Forms\Components\TextInput::make('contacto_nombre')
                             ->label('Nombre del contacto')
+                            ->placeholder('Ej. Lic. María Gómez')
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(100)
                             ->default(null),
                         Forms\Components\TextInput::make('contacto_telefono')
                             ->label('Teléfono')
+                            ->placeholder('Ej. 229 123 4567')
                             ->tel()
                             ->prefixIcon('heroicon-m-device-phone-mobile')
                             ->maxLength(20)
                             ->default(null),
                         Forms\Components\TextInput::make('contacto_email')
                             ->label('Correo electrónico')
+                            ->placeholder('Ej. ventas@proveedor.com.mx')
                             ->email()
                             ->prefixIcon('heroicon-m-envelope')
                             ->maxLength(100)
-                            ->default(null),
-                    ])->columns(3),
+                            ->default(null)
+                            ->columnSpanFull(),
+                    ])->columns(2),
             ]);
     }
 
@@ -154,7 +160,15 @@ class ProveedorResource extends Resource
                             ->icon('heroicon-m-trash')
                             ->alpineClickHandler(fn (?Proveedor $record) => "\$wire.replaceMountedTableAction('delete', '{$record?->getKey()}')"),
                     ]),
-                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Proveedor actualizado correctamente'),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Editar')
+                    ->extraAttributes(['title' => 'Editar'])
+                    ->modalHeading(fn (?Proveedor $record) => 'Editar: ' . ($record?->nombre_empresa ?? 'proveedor'))
+                    ->modalDescription(fn (?Proveedor $record) => new \Illuminate\Support\HtmlString(
+                        e($record?->contacto_email ?? '—') . ' · ID: #' . e($record?->getKey())
+                    ))
+                    ->successNotificationTitle('Proveedor actualizado correctamente'),
                 Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
             ])
             ->bulkActions([

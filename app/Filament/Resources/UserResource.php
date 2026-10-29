@@ -52,45 +52,55 @@ class UserResource extends Resource
                         ->schema([
                             Forms\Components\TextInput::make('name')
                                 ->label('Nombre(s)')
+                                ->placeholder('Ej. Juan Carlos')
                                 ->required()
                                 ->prefixIcon('heroicon-m-user')
                                 ->maxLength(255),
                             Forms\Components\TextInput::make('apellido_paterno')
                                 ->label('Apellido paterno')
+                                ->placeholder('Ej. Pérez')
                                 ->prefixIcon('heroicon-m-user')
                                 ->maxLength(255),
                             Forms\Components\TextInput::make('apellido_materno')
                                 ->label('Apellido materno')
+                                ->placeholder('Ej. López')
                                 ->prefixIcon('heroicon-m-user')
                                 ->maxLength(255),
                             Forms\Components\TextInput::make('email')
                                 ->label('Correo electrónico')
+                                ->placeholder('Ej. usuario@tecnm.edu.mx')
                                 ->email()
                                 ->required()
                                 ->prefixIcon('heroicon-m-envelope')
                                 ->maxLength(255),
                             Forms\Components\TextInput::make('password')
                                 ->label('Contraseña')
+                                ->placeholder('••••••••')
                                 ->password()
                                 ->prefixIcon('heroicon-m-key')
                                 ->required(fn (string $operation): bool => $operation === 'create')
                                 ->dehydrated(fn (?string $state): bool => filled($state))
-                                ->maxLength(255),
-                        ]),
+                                ->maxLength(255)
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(2),
 
                     Forms\Components\Wizard\Step::make('Datos institucionales y rol')
                         ->icon('heroicon-m-academic-cap')
                         ->schema([
                             Forms\Components\TextInput::make('num_control')
                                 ->label('Número de control')
+                                ->placeholder('Ej. 21020123')
                                 ->prefixIcon('heroicon-m-identification')
                                 ->maxLength(255),
                             Forms\Components\TextInput::make('carrera')
                                 ->label('Carrera / área')
+                                ->placeholder('Ej. Ingeniería en Sistemas Computacionales')
                                 ->prefixIcon('heroicon-m-academic-cap')
                                 ->maxLength(255),
                             Forms\Components\TextInput::make('RFC')
                                 ->label('Rfc (opcional)')
+                                ->placeholder('Ej. PELJ900101XXX')
                                 ->prefixIcon('heroicon-m-identification')
                                 ->maxLength(13),
                             Forms\Components\Select::make('roles')
@@ -112,8 +122,10 @@ class UserResource extends Resource
                                 ->boolean(trueLabel: 'Sí', falseLabel: 'No')
                                 ->inline()
                                 ->default(true)
-                                ->required(),
-                        ]),
+                                ->required()
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(2),
                 ])->columnSpanFull(),
             ]);
     }
@@ -194,7 +206,15 @@ class UserResource extends Resource
                             ->hidden(fn (?User $record): bool => ! $record || $record->email === 'admin@tecnm.edu.mx')
                             ->alpineClickHandler(fn (?User $record) => "\$wire.replaceMountedTableAction('delete', '{$record?->getKey()}')"),
                     ]),
-                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Usuario actualizado correctamente'),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Editar')
+                    ->extraAttributes(['title' => 'Editar'])
+                    ->modalHeading(fn (?User $record) => 'Editar: ' . ($record?->name ?? 'usuario'))
+                    ->modalDescription(fn (?User $record) => new \Illuminate\Support\HtmlString(
+                        e($record?->email ?? '—') . ' · ' . e($record?->getRoleNames()->first() ?? 'Sin rol')
+                    ))
+                    ->successNotificationTitle('Usuario actualizado correctamente'),
                 Tables\Actions\DeleteAction::make()->requiresConfirmation()->successNotificationTitle('Usuario eliminado')
                     ->modalHeading('Eliminar usuario')
                     ->modalDescription('¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.')

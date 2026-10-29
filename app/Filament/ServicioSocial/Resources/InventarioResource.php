@@ -53,12 +53,14 @@ class InventarioResource extends Resource
                 ->schema([
                     Forms\Components\TextInput::make('num_serie')
                         ->label('Número de serie')
+                        ->placeholder('Ej. SN-12345')
                         ->prefixIcon('heroicon-m-qr-code')
                         ->required()
                         ->maxLength(100)
                         ->columnSpan(1),
                     Forms\Components\Select::make('id_producto')
                         ->label('Material / equipo')
+                        ->placeholder('Selecciona...')
                         ->relationship('material', 'nombre')
                         ->required()
                         ->searchable()
@@ -118,7 +120,7 @@ class InventarioResource extends Resource
                         ->icon('heroicon-m-cpu-chip')
                         ->collapsible()
                         ->schema([
-                            Forms\Components\Grid::make(3)
+                            Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\TextInput::make('procesador')
                                         ->label('Procesador')
@@ -134,7 +136,8 @@ class InventarioResource extends Resource
                                         ->label('Disco duro')
                                         ->placeholder('Ej. 512GB SSD')
                                         ->prefixIcon('heroicon-m-circle-stack')
-                                        ->maxLength(100),
+                                        ->maxLength(100)
+                                        ->columnSpanFull(),
                                 ]),
                             Forms\Components\Grid::make(2)
                                 ->schema([
@@ -153,6 +156,7 @@ class InventarioResource extends Resource
                         ->columnSpanFull(),
                     Forms\Components\TextInput::make('ubicacion_fisica')
                         ->label('Ubicación física')
+                        ->placeholder('Ej. Edif. A > Centro de Cómputo')
                         ->prefixIcon('heroicon-m-building-office')
                         ->maxLength(150)
                         ->columnSpan(2),
@@ -190,6 +194,7 @@ class InventarioResource extends Resource
                         ->schema([
                             Forms\Components\Select::make('id_proveedor')
                                 ->label('Proveedor')
+                                ->placeholder('Selecciona...')
                                 ->relationship('proveedor', 'nombre_empresa')
                                 ->searchable()
                                 ->preload()
@@ -197,6 +202,7 @@ class InventarioResource extends Resource
                                 ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
                             Forms\Components\TextInput::make('num_factura')
                                 ->label('Número de factura')
+                                ->placeholder('Ej. FAC-2026-001')
                                 ->prefixIcon('heroicon-m-hashtag')
                                 ->maxLength(100)
                                 ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
@@ -215,6 +221,7 @@ class InventarioResource extends Resource
                                 ->prefixIcon('heroicon-m-calendar-days'),
                             Forms\Components\Textarea::make('observaciones_renta')
                                 ->label('Observaciones de renta')
+                                ->placeholder('Ej. Contrato anual de arrendamiento...')
                                 ->columnSpanFull(),
                         ])
                         ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
@@ -224,7 +231,7 @@ class InventarioResource extends Resource
                 ->icon('heroicon-m-clipboard-document-check')
                 ->schema([
 
-                    Forms\Components\Grid::make(3)
+                    Forms\Components\Grid::make(2)
                         ->schema([
                             Forms\Components\DatePicker::make('fecha_registro')
                                 ->label('Fecha de registro')
@@ -236,6 +243,7 @@ class InventarioResource extends Resource
                                 ->prefixIcon('heroicon-m-shield-check'),
                             Forms\Components\Select::make('garantia_estado')
                                 ->label('Estado de garantía')
+                                ->placeholder('Selecciona...')
                                 ->options([
                                     'vigente' => 'Vigente',
                                     'vencida' => 'Vencida',
@@ -248,6 +256,7 @@ class InventarioResource extends Resource
                         ->schema([
                             Forms\Components\Textarea::make('observaciones_generales')
                                 ->label('Observaciones generales')
+                                ->placeholder('Ej. Equipo en buen estado físico...')
                                 ->rows(2),
                         ]),
                 ]),

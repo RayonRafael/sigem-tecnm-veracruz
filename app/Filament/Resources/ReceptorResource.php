@@ -50,16 +50,19 @@ class ReceptorResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
                             ->label('Nombre')
+                            ->placeholder('Ej. Roberto')
                             ->required()
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
                         Forms\Components\TextInput::make('apellido_paterno')
                             ->label('Apellido paterno')
+                            ->placeholder('Ej. Hernández')
                             ->required()
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
                         Forms\Components\TextInput::make('apellido_materno')
                             ->label('Apellido materno')
+                            ->placeholder('Ej. García')
                             ->required()
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
@@ -70,12 +73,14 @@ class ReceptorResource extends Resource
                             ->prefixIcon('heroicon-m-briefcase'),
                         Forms\Components\TextInput::make('email')->label('Correo electrónico')
                             ->label('Correo electrónico')
+                            ->placeholder('Ej. receptor@veracruz.tecnm.mx')
                             ->email()
                             ->prefixIcon('heroicon-m-envelope')
                             ->maxLength(100)
                             ->default(null),
                         Forms\Components\TextInput::make('telefono')
                             ->label('Teléfono')
+                            ->placeholder('Ej. 229 123 4567')
                             ->tel()
                             ->prefixIcon('heroicon-m-device-phone-mobile')
                             ->maxLength(20)
@@ -87,9 +92,11 @@ class ReceptorResource extends Resource
                             ->searchable()
                             ->preload()
                             ->prefixIcon('heroicon-m-building-office')
+                            ->columnSpanFull()
                             ->createOptionForm([
                                 Forms\Components\TextInput::make('nombre')
                                     ->label('Nombre del área')
+                                    ->placeholder('Ej. Laboratorio de Cómputo')
                                     ->required()
                                     ->maxLength(100),
                                 Forms\Components\Select::make('id_departamento')->placeholder('Selecciona...')
@@ -168,7 +175,15 @@ class ReceptorResource extends Resource
                             ->icon('heroicon-m-trash')
                             ->alpineClickHandler(fn (?Receptor $record) => "\$wire.replaceMountedTableAction('delete', '{$record?->getKey()}')"),
                     ]),
-                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Receptor actualizado correctamente'),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Editar')
+                    ->extraAttributes(['title' => 'Editar'])
+                    ->modalHeading(fn (?Receptor $record) => 'Editar: ' . trim(($record?->nombre ?? '') . ' ' . ($record?->apellido_paterno ?? '')))
+                    ->modalDescription(fn (?Receptor $record) => new \Illuminate\Support\HtmlString(
+                        e($record?->cargo ?? '—') . ' · ID: #' . e($record?->getKey())
+                    ))
+                    ->successNotificationTitle('Receptor actualizado correctamente'),
                 Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
             ])
             ->bulkActions([
