@@ -210,6 +210,7 @@ class UserResource extends Resource
                     ->iconButton()
                     ->tooltip('Editar')
                     ->extraAttributes(['title' => 'Editar'])
+                    ->slideOver()
                     ->modalHeading(fn (?User $record) => 'Editar: ' . ($record?->name ?? 'usuario'))
                     ->modalDescription(fn (?User $record) => new \Illuminate\Support\HtmlString(
                         e($record?->email ?? '—') . ' · ' . e($record?->getRoleNames()->first() ?? 'Sin rol')
@@ -342,8 +343,12 @@ class UserResource extends Resource
         ];
     }
 
-    public static function mapRoleToTipoUsuario(?string $roleNameOrId): string
+    public static function mapRoleToTipoUsuario(string|array|null $roleNameOrId): string
     {
+        if (is_array($roleNameOrId)) {
+            $roleNameOrId = reset($roleNameOrId) ?: null;
+        }
+
         if (! $roleNameOrId) {
             return 'Pendiente';
         }
