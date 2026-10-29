@@ -3381,6 +3381,7 @@ table {
   display: -webkit-box !important;
   -webkit-box-orient: vertical !important;
   -webkit-line-clamp: 2 !important;
+  line-clamp: 2 !important;
   white-space: normal !important;
   overflow: hidden !important;
   line-height: 1.35 !important;
@@ -3554,12 +3555,20 @@ table {
   gap: 4px !important;
 }
 
+/* Quitar círculo del icono del paso del wizard (TODOS) */
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-icon-ctn,
 .fi-fo-wizard-header-step-icon-ctn,
-.fi-modal-slide-over-window .fi-fo-wizard-header-step-icon-ctn {
-  width: 28px !important;
-  height: 28px !important;
-  min-width: 28px !important;
-  min-height: 28px !important;
+.fi-modal-slide-over .fi-fo-wizard-header-step-icon-ctn {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: auto !important;
+  min-height: auto !important;
+  box-shadow: none !important;
+  --tw-ring-color: transparent !important;
+  --tw-ring-shadow: none !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
