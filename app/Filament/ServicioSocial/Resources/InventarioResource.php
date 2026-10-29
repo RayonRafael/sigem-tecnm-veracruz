@@ -66,7 +66,7 @@ class InventarioResource extends Resource
                         ->searchable()
                         ->preload()
                         ->prefixIcon('heroicon-m-cube')
-                        ->columnSpan(1),
+                        ->columnSpanFull(),
                     // TODO: Convertir en Select con opciones dependientes de tipo_equipo (ej. Computadora -> Escritorio / Portátil)
                     Forms\Components\TextInput::make('subtipo')
                         ->label('Subtipo')

@@ -61,6 +61,7 @@ class AreaResource extends Resource
                             ->searchable()
                             ->preload()
                             ->prefixIcon('heroicon-m-building-office-2')
+                            ->columnSpanFull()
                             ->createOptionForm([
                                 Forms\Components\TextInput::make('nombre')
                                     ->label('Nombre del departamento')

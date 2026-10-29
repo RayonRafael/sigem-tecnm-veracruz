@@ -69,7 +69,8 @@ class AreaResource extends Resource
                             ->required()
                             ->searchable()
                             ->preload()
-                            ->prefixIcon('heroicon-m-building-office-2'),
+                            ->prefixIcon('heroicon-m-building-office-2')
+                            ->columnSpanFull(),
                     ])->columns(2),
             ]);
     }

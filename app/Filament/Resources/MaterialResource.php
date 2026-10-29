@@ -57,7 +57,8 @@ class MaterialResource extends Resource
                                         ->placeholder('Ej. Computadora de Escritorio OptiPlex')
                                         ->required()
                                         ->prefixIcon('heroicon-m-tag')
-                                        ->maxLength(150),
+                                        ->maxLength(150)
+                                        ->columnSpanFull(),
                                     Forms\Components\TextInput::make('modelo')
                                         ->placeholder('Ej. OptiPlex 7090')
                                         ->prefixIcon('heroicon-m-qr-code')

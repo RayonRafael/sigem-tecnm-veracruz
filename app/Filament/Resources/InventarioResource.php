@@ -74,7 +74,8 @@ class InventarioResource extends Resource
                                         ->required()
                                         ->searchable()
                                         ->preload()
-                                        ->prefixIcon('heroicon-m-cube'),
+                                        ->prefixIcon('heroicon-m-cube')
+                                        ->columnSpanFull(),
                                     Forms\Components\Select::make('tipo_equipo')
                                         ->label('Tipo de equipo')
                                         ->placeholder('Selecciona el tipo...')

@@ -3085,10 +3085,7 @@ table {
 .fi-slide-over .fi-fo-component-ctn,
 .fi-modal-slide-over-window .fi-modal-content>form,
 .fi-modal-slide-over-window .fi-modal-content>.fi-fo-component-ctn,
-.fi-modal-slide-over-window .fi-fo-wizard>.fi-fo-component-ctn {
-  padding: 16px 20px !important;
-}
-
+.fi-modal-slide-over-window .fi-fo-wizard>.fi-fo-component-ctn,
 .fi-modal-slide-over-window .fi-fo-component-ctn .fi-fo-component-ctn {
   padding: 0 !important;
 }
@@ -3325,9 +3322,14 @@ table {
   box-sizing: border-box !important;
 }
 
-.fi-modal-slide-over-window input {
+.fi-modal-slide-over-window input:not(:focus) {
   text-overflow: ellipsis !important;
   overflow: hidden !important;
+  white-space: nowrap !important;
+}
+
+.fi-modal-slide-over-window input:focus {
+  text-overflow: clip !important;
 }
 
 .fi-modal-slide-over-window input::placeholder,
@@ -3337,7 +3339,7 @@ table {
   white-space: nowrap !important;
 }
 
-/* Choices.js: evitar desbordamiento y solapamiento de texto largo manteniendo desplegable accesible */
+/* Choices.js: máximo 2 líneas, altura controlada y desplegable accesible */
 .fi-modal-slide-over-window .choices {
   min-width: 0 !important;
   width: 100% !important;
@@ -3347,12 +3349,10 @@ table {
 }
 
 .fi-modal-slide-over-window .choices__inner {
-  min-width: 0 !important;
-  width: 100% !important;
-  max-width: 100% !important;
   min-height: 38px !important;
-  height: 38px !important;
-  padding: 4px 10px !important;
+  height: auto !important;
+  max-height: 50px !important;
+  padding: 5px 10px !important;
   overflow: hidden !important;
   box-sizing: border-box !important;
   display: flex !important;
@@ -3363,13 +3363,14 @@ table {
 .fi-modal-slide-over-window .choices__list--single {
   display: block !important;
   overflow: hidden !important;
-  white-space: nowrap !important;
-  text-overflow: ellipsis !important;
+  white-space: normal !important;
+  text-overflow: clip !important;
   max-width: calc(100% - 24px) !important;
   width: 100% !important;
   min-width: 0 !important;
-  padding: 0 !important;
+  padding: 0 22px 0 0 !important;
   box-sizing: border-box !important;
+  line-height: 1.35 !important;
 }
 
 .fi-modal-slide-over-window .choices__list--single .choices__item,
@@ -3377,10 +3378,13 @@ table {
 .fi-modal-slide-over-window .choices__list--single .choices__placeholder,
 .fi-modal-slide-over-window .choices__item,
 .fi-modal-slide-over-window .choices__placeholder {
-  display: block !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 2 !important;
+  white-space: normal !important;
   overflow: hidden !important;
-  white-space: nowrap !important;
-  text-overflow: ellipsis !important;
+  line-height: 1.35 !important;
+  word-break: break-word !important;
   max-width: 100% !important;
   width: 100% !important;
   min-width: 0 !important;
@@ -3528,7 +3532,7 @@ table {
 .fi-fo-wizard-header,
 .fi-modal-slide-over-window .fi-fo-wizard-header {
   display: flex !important;
-  overflow-x: auto !important;
+  overflow-x: hidden !important;
   flex-wrap: nowrap !important;
   scrollbar-width: none !important;
 }
@@ -3546,8 +3550,8 @@ table {
 
 .fi-fo-wizard-header-step-button,
 .fi-modal-slide-over-window .fi-fo-wizard-header-step-button {
-  padding: 8px 6px !important;
-  gap: 5px !important;
+  padding: 8px 4px !important;
+  gap: 4px !important;
 }
 
 .fi-fo-wizard-header-step-icon-ctn,
@@ -3591,12 +3595,11 @@ table {
 .fi-modal-slide-over-window .fi-fo-wizard-header-step-button [class*="grid"],
 .fi-fo-wizard-header-step-label,
 .fi-modal-slide-over-window .fi-fo-wizard-header-step-label {
-  font-size: 12px !important;
-  line-height: 1.2 !important;
-  white-space: nowrap !important;
+  font-size: 11.5px !important;
+  white-space: normal !important;
+  max-width: 100% !important;
+  line-height: 1.15 !important;
   overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  max-width: 100px !important;
   min-width: 0 !important;
   display: block !important;
 }
@@ -3684,7 +3687,7 @@ body {
 }
 
 .fi-modal-slide-over-window .fi-fo-component-ctn {
-  overflow-x: hidden !important;
+  overflow: visible !important;
   max-width: 100% !important;
 }
 
@@ -3708,11 +3711,11 @@ body {
   box-sizing: border-box !important;
 }
 
-/* Stepper del wizard: scroll horizontal contenido solo en el stepper */
+/* Stepper del wizard: sin scroll horizontal */
 .fi-modal-slide-over-window .fi-fo-wizard-header {
-  overflow-x: auto !important;
+  overflow-x: hidden !important;
   max-width: 100% !important;
-  scrollbar-width: thin !important;
+  scrollbar-width: none !important;
 }
 
 /* El padding interno no debe causar overflow */
@@ -3736,10 +3739,14 @@ body {
 /* Un solo scroll vertical: el del panel. El contenido interno crece con su
    altura natural (clip en X, visible en Y para no crear scrolls anidados).
    No se fuerza max-height:none global para no romper las listas desplegables. */
-.fi-modal-slide-over-window .fi-modal-content,
-.fi-modal-slide-over-window .fi-fo-component-ctn {
+.fi-modal-slide-over-window .fi-modal-content {
   overflow-x: clip !important;
   overflow-y: visible !important;
+  max-height: none !important;
+}
+
+.fi-modal-slide-over-window .fi-fo-component-ctn {
+  overflow: visible !important;
   max-height: none !important;
 }
 
@@ -4107,6 +4114,7 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
   background: transparent !important;
   padding: 0 !important;
   margin-bottom: 0 !important;
+  overflow: visible !important;
 }
 
 .fi-modal-slide-over-window .fi-fo-component-ctn .fi-section-header,
@@ -6104,9 +6112,15 @@ body:has(.sigem-professional) .fi-main {
   background-color: transparent !important;
 }
 
-/* 2. Quitar padding redundante del tab panel */
-.fi-modal-slide-over-window .fi-in-tabs-tab {
+/* 2. Quitar padding redundante del tab panel y wizard step */
+.fi-modal-slide-over-window .fi-in-tabs-tab,
+.fi-modal-slide-over-window .fi-fo-wizard-step {
   padding: 16px 0 0 0 !important;
+  scroll-margin-top: 160px !important;
+}
+
+.fi-modal-slide-over-window {
+  scroll-padding-top: 160px !important;
 }
 
 /* 3. Contenido crece para ocupar el alto disponible (consolidado) */
