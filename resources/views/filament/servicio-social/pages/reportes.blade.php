@@ -72,7 +72,7 @@
 
                 @if (count($reporteActual['rows']) > 0)
                     <div class="sigem-rep-table-wrap">
-                        <table class="fi-ta-table">
+                        <table class="sigem-rep-table">
                             <thead>
                                 <tr>
                                     @foreach ($reporteActual['headers'] as $header)

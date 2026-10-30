@@ -6148,3 +6148,52 @@ body:has(.sigem-professional) .fi-main {
   display: flex !important;
   width: 100% !important;
 }
+
+/* Tablas de reportes: layout libre sin restricciones de Filament */
+.sigem-rep-table {
+  width: 100% !important;
+  min-width: 850px;
+  table-layout: auto !important;
+  border-collapse: collapse;
+}
+
+.sigem-rep-table thead th {
+  white-space: normal !important;
+  max-width: none !important;
+  width: auto !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  line-height: 1.25 !important;
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .05em !important;
+  color: var(--sig-muted) !important;
+  padding: 6px 10px !important;
+  background: var(--sig-bg, #f4f6f8) !important;
+}
+
+.sigem-rep-table tbody td {
+  white-space: nowrap !important;
+  max-width: none !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  padding: 6px 10px !important;
+}
+
+.sigem-rep-table tbody tr {
+  background: var(--sig-surface, #ffffff) !important;
+}
+
+.sigem-rep-table tbody tr:hover {
+  background: #f8fafc !important;
+}
+
+.sigem-rep-table thead th:last-child,
+.sigem-rep-table tbody td:last-child {
+  min-width: auto !important;
+  max-width: none !important;
+  width: auto !important;
+}
