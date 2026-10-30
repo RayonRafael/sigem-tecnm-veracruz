@@ -18,6 +18,13 @@ use Illuminate\Support\Carbon;
 
 class Dashboard extends BaseDashboard
 {
+    public array $tableColumnSearches = [];
+
+    public function resetTableColumnSearches(): void
+    {
+        $this->tableColumnSearches = [];
+    }
+
     protected static ?string $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $navigationGroup = 'Panel principal';
@@ -187,11 +194,37 @@ class Dashboard extends BaseDashboard
         // 4. Materiales con Stock Bajo (Usa el scope derivado)
         $materialesStockBajoCount = Material::stockBajo()->count();
 
-        // 5. Inventarios Completos (con relaciones eager loaded para evitar N+1)
-        $inventariosCompletos = Inventario::with(['material.marca', 'material.tipo', 'proveedor', 'usuario'])
-            ->latest('created_at')
-            ->take(50)
-            ->get();
+        // Opciones de filtros para la tabla de inventario general
+        $categoriasFiltro = ['' => 'Todas'];
+        try {
+            $categoriasFiltro += \App\Models\TipoMaterial::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+        } catch (\Throwable $e) {}
+
+        $areasFiltro = ['' => 'Todas'];
+        try {
+            $areasFiltro += \App\Models\Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+        } catch (\Throwable $e) {}
+
+        // 5. Inventarios (con filtros aplicados dinámicamente)
+        $invQuery = Inventario::with(['material.marca', 'material.tipo', 'proveedor', 'usuario']);
+
+        if (! empty($this->tableColumnSearches['num_serie'])) {
+            $invQuery->where('num_serie', 'like', '%' . trim($this->tableColumnSearches['num_serie']) . '%');
+        }
+        if (! empty($this->tableColumnSearches['material_nombre'])) {
+            $invQuery->whereHas('material', fn ($q) => $q->where('nombre', 'like', '%' . trim($this->tableColumnSearches['material_nombre']) . '%'));
+        }
+        if (! empty($this->tableColumnSearches['material_tipo_nombre'])) {
+            $invQuery->whereHas('material.tipo', fn ($q) => $q->where('nombre', trim($this->tableColumnSearches['material_tipo_nombre'])));
+        }
+        if (! empty($this->tableColumnSearches['estado'])) {
+            $invQuery->where('estado', $this->tableColumnSearches['estado']);
+        }
+        if (! empty($this->tableColumnSearches['ubicacion_fisica'])) {
+            $invQuery->where('ubicacion_fisica', 'like', '%' . trim($this->tableColumnSearches['ubicacion_fisica']) . '%');
+        }
+
+        $inventariosCompletos = $invQuery->latest('created_at')->take(50)->get();
 
         return [
             'totalActivos' => $totalActivos,
@@ -205,6 +238,8 @@ class Dashboard extends BaseDashboard
             'inventarioEnMantenimiento' => $inventarioEnMantenimiento,
             'inventarioDanados' => $inventarioDanados,
 
+            'categoriasFiltro' => $categoriasFiltro,
+            'areasFiltro' => $areasFiltro,
             'inventariosCompletos' => $inventariosCompletos,
             'categoriasTop' => (function () {
                 $todasCategorias = Inventario::query()

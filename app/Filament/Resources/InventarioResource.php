@@ -511,7 +511,9 @@ class InventarioResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('ubicacion_fisica')
                     ->label('ÁREA')
-                    ->searchable(isIndividual: true)
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where('ubicacion_fisica', 'like', '%' . trim($search) . '%');
+                    }, isIndividual: true)
                     ->placeholder('—')
                     ->width('120px'),
                 Tables\Columns\TextColumn::make('material.marca.nombre')->wrap(false)->limit(30)->grow(false)

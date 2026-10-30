@@ -169,7 +169,9 @@ class SolicitudResource extends Resource
                     ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('receptor.area.departamento.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Departamento')
-                    ->searchable(isIndividual: true)
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->whereHas('receptor.area.departamento', fn ($q) => $q->where('nombre', 'like', '%' . trim($search) . '%'));
+                    }, isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('fecha_solicitud')->wrap(false)->limit(30)->grow(false)
                     ->label('Fecha')

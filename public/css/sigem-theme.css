@@ -5000,7 +5000,7 @@ header.fi-topbar nav>div.ms-auto,
   justify-content: space-between !important;
   gap: 12px !important;
   padding: 10px 16px !important;
-  background: var(--sig-surface, #ffffff) !important;
+  background: var(--sig-bg, #f4f6f8) !important;
 }
 
 .fi-ta-header-toolbar > .ms-auto {
@@ -5017,13 +5017,24 @@ header.fi-topbar nav>div.ms-auto,
   gap: 10px !important;
   flex: 1 1 auto !important;
   width: 100% !important;
-  justify-content: flex-end !important;
+  justify-content: flex-start !important;
 }
 
 .sigem-table-toolbar-group .sigem-toolbar-search {
-  flex: 1 1 320px !important;
-  min-width: 220px !important;
+  flex: 0 1 450px !important;
+  min-width: 280px !important;
   max-width: 550px !important;
+  margin-left: 10px !important;
+}
+
+/* Fechas y botón a la derecha */
+.sigem-table-toolbar-group .sigem-toolbar-search + .sigem-toolbar-date {
+  margin-left: auto !important;
+}
+
+.fi-ta-header-toolbar > .ms-auto {
+  flex: 1 1 auto !important;
+  justify-content: flex-start !important;
 }
 
 .sigem-toolbar-date {
@@ -6335,4 +6346,201 @@ body:has(.sigem-professional) .fi-main {
   outline: none !important;
 }
 
+/* ============================================
+   FIX 2: Fondo gris uniforme (sin huecos blancos)
+   ============================================ */
+.fi-ta-ctn,
+.fi-ta-header-ctn,
+.fi-ta-header,
+.fi-ta-header-toolbar,
+.fi-ta-content,
+.fi-ta-table-ctn,
+.fi-ta-table thead,
+.fi-ta-table thead tr,
+.fi-ta-table thead th,
+.fi-ta-table thead tr:not(:first-child) td,
+.fi-ta-table thead tr:not(:first-child) th,
+.fi-table-individual-search-cell,
+[class*="fi-table-individual-search-cell"] {
+  background: var(--sig-bg, #f4f6f8) !important;
+}
+
+.fi-ta-header-ctn {
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+}
+
+/* Filas de la tabla: fondo blanco limpio con hover */
+.fi-ta-table tbody tr {
+  background: #ffffff !important;
+}
+
+.fi-ta-table tbody tr:hover {
+  background: #f8fafc !important;
+}
+
+/* ============================================
+   FIX 4: Eliminar icono de 3 barras (toggle de columnas)
+   ============================================ */
+.fi-ta-col-toggle,
+.fi-ta-column-toggle-btn,
+.fi-ta-header-toolbar button[class*="column-toggle"],
+.fi-ta-header-toolbar .fi-ta-col-toggle,
+.fi-ta-header-toolbar button:has(svg[class*="view-columns"]),
+.fi-ta-header-toolbar button:has(svg[data-slot="icon"][class*="columns"]) {
+  display: none !important;
+}
+
+/* ============================================
+   FIX 5: Lupa del buscador de color azul
+   ============================================ */
+.sigem-toolbar-search .fi-input-wrp-prefix svg,
+.sigem-toolbar-search [data-slot="prefix"] svg,
+.sigem-toolbar-search .fi-input-wrp-icon svg {
+  color: var(--sig-primary, #1b65d4) !important;
+  fill: var(--sig-primary, #1b65d4) !important;
+}
+
+/* ============================================
+   FILTROS DASHBOARD: inputs y botón reset
+   ============================================ */
+.sigem-dash-filter-row th {
+  background: var(--sig-bg, #f4f6f8) !important;
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+}
+
+.sigem-dash-filter-input {
+  width: 100% !important;
+  font-size: 12.5px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 4px 10px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: var(--sig-surface, #ffffff) !important;
+  color: var(--sig-text, #0f172a) !important;
+  box-sizing: border-box !important;
+}
+
+.sigem-dash-filter-input:focus {
+  border-color: var(--sig-primary, #1b65d4) !important;
+  box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+  outline: none !important;
+}
+
+.sigem-dash-filter-input::placeholder {
+  color: var(--sig-muted, #64748b) !important;
+  font-size: 11.5px !important;
+}
+
+.sigem-dash-filter-clear {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: #ffffff !important;
+  color: var(--sig-muted, #64748b) !important;
+  font-size: 13px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.sigem-dash-filter-clear:hover {
+  background: #fee2e2 !important;
+  color: #ef4444 !important;
+  border-color: #fca5a5 !important;
+}
+
+
+
+
+/* FIX: huecos blancos + emoji lupa */
+.fi-table-individual-search-cell,
+.fi-table-individual-search-cell:empty,
+.fi-ta-table thead th:last-child,
+.fi-ta-table thead th:last-child *,
+.fi-ta-table thead tr th,
+.fi-ta-table thead tr td,
+[class*="fi-table-individual-search-cell"] {
+  background: var(--sig-bg, #f4f6f8) !important;
+}
+
+.sigem-search-emoji {
+  font-size: 15px !important;
+  line-height: 1 !important;
+  background: transparent !important;
+}
+
+
+/* FIX: boton X decorativo en ACCIONES (fila de filtros) + gris uniforme en thead */
+.fi-ta-table thead tr:has([class*="fi-table-individual-search-cell"]) > td:last-child {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+.fi-ta-table thead tr:has([class*="fi-table-individual-search-cell"]) > td:last-child::after,
+.sigem-filter-visual-x {
+  content: "\2715";
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: var(--sig-surface, #ffffff) !important;
+  color: var(--sig-muted, #64748b) !important;
+  font-size: 13px !important;
+  cursor: default !important;
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+}
+.fi-ta-table thead,
+.fi-ta-table thead tr,
+.fi-ta-table thead th,
+.fi-ta-table thead td,
+.fi-ta-table thead th.fi-ta-selection-cell,
+.fi-ta-table thead td.fi-ta-selection-cell,
+.fi-ta-table thead th.fi-ta-actions-header-cell,
+.fi-ta-table thead th > div,
+.fi-ta-table thead th.fi-ta-selection-cell > div {
+  background: var(--sig-bg, #f4f6f8) !important;
+}
+
+
+/* FIX (DOM real): la fila de filtros es <tr class="fi-ta-row"> dentro de TBODY (no thead); se identifica por contener .fi-ta-search-field */
+.fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field),
+.fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field):hover,
+.fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field) > td {
+  background: var(--sig-bg, #f4f6f8) !important;
+  background-color: var(--sig-bg, #f4f6f8) !important;
+}
+
+/* Celdas de datos: volver a blanco (la regla [class*=individual-search-cell] anterior tambien las alcanzaba) */
+.fi-ta-table tbody tr.fi-ta-row:not(:has(.fi-ta-search-field)) > td {
+  background: transparent !important;
+}
+
+/* X decorativa en la celda vacia de ACCIONES de la fila de filtros */
+.fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field) > td:last-child:empty {
+  text-align: center !important;
+  vertical-align: middle !important;
+  min-width: 52px !important;
+}
+.fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field) > td:last-child:empty::after {
+  content: "\2715";
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: var(--sig-surface, #ffffff) !important;
+  color: var(--sig-muted, #64748b) !important;
+  font-size: 13px !important;
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+}
 

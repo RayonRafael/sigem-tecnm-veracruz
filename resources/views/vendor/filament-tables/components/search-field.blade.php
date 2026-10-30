@@ -102,10 +102,12 @@
                 {{ __('filament-tables::table.fields.search.label') }}
             </label>
 
+            @php
+                $searchEmoji = new \Illuminate\Support\HtmlString('<span class="sigem-search-emoji">🔍</span>');
+            @endphp
             <x-filament::input.wrapper
                 inline-prefix
-                prefix-icon="heroicon-m-magnifying-glass"
-                prefix-icon-alias="tables::search-field"
+                :prefix="$searchEmoji"
                 :wire:target="$wireModel"
             >
                 <x-filament::input

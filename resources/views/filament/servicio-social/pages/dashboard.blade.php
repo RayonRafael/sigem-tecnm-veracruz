@@ -129,6 +129,71 @@
                                         <th style="width: 130px;">ÁREA</th>
                                         <th style="width: 104px; text-align: center;">ACCIONES</th>
                                     </tr>
+                                    <tr class="sigem-dash-filter-row">
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <input
+                                                type="search"
+                                                wire:model.live.debounce.500ms="tableColumnSearches.num_serie"
+                                                placeholder="ej. BM6R..."
+                                                class="sigem-dash-filter-input"
+                                            />
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <input
+                                                type="search"
+                                                wire:model.live.debounce.500ms="tableColumnSearches.material_nombre"
+                                                placeholder="Filtrar..."
+                                                class="sigem-dash-filter-input"
+                                            />
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <select
+                                                wire:model.live="tableColumnSearches.material_tipo_nombre"
+                                                class="fi-table-individual-search-select"
+                                            >
+                                                @foreach (($categoriasFiltro ?? []) as $optVal => $optLbl)
+                                                    <option value="{{ $optVal }}">{{ $optLbl }}</option>
+                                                @endforeach
+                                            </select>
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <select
+                                                wire:model.live="tableColumnSearches.estado"
+                                                class="fi-table-individual-search-select"
+                                            >
+                                                <option value="">Todos</option>
+                                                <option value="Disponible">Disponible</option>
+                                                <option value="Asignado">Asignado</option>
+                                                <option value="Reasignado">Reasignado</option>
+                                                <option value="En Mantenimiento">En Mantenimiento</option>
+                                                <option value="Dañado">Dañado</option>
+                                                <option value="Baja">Baja</option>
+                                            </select>
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <select
+                                                wire:model.live="tableColumnSearches.ubicacion_fisica"
+                                                class="fi-table-individual-search-select"
+                                            >
+                                                @foreach (($areasFiltro ?? []) as $optVal => $optLbl)
+                                                    <option value="{{ $optVal }}">{{ $optLbl }}</option>
+                                                @endforeach
+                                            </select>
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px; text-align: center;">
+                                            <button
+                                                type="button"
+                                                x-data
+                                                x-show="Object.values($wire.tableColumnSearches || {}).some(v => Boolean(v))"
+                                                x-cloak
+                                                x-on:click="$wire.set('tableColumnSearches', {})"
+                                                class="sigem-dash-filter-clear"
+                                                title="Limpiar filtros"
+                                            >
+                                                ✕
+                                            </button>
+                                        </th>
+                                    </tr>
                                 </thead>
                                 <tbody>
                                     @php

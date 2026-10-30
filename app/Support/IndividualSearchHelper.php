@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use App\Models\Area;
+use App\Models\Departamento;
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
 use App\Models\Solicitud;
@@ -49,6 +51,19 @@ class IndividualSearchHelper
                     'Rentado' => 'Rentado',
                 ];
             }
+
+            if ($columnName === 'ubicacion_fisica') {
+                $areas = [];
+                try {
+                    if (Schema::hasTable('area')) {
+                        $areas = Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+                    }
+                } catch (\Throwable $e) {
+                    $areas = [];
+                }
+
+                return ['' => 'Todas'] + $areas;
+            }
         }
 
         // 2. Solicitudes
@@ -71,6 +86,19 @@ class IndividualSearchHelper
                     'Completado' => 'Completado',
                     'Cancelado' => 'Cancelado',
                 ];
+            }
+
+            if ($columnName === 'receptor.area.departamento.nombre' || $columnName === 'departamento') {
+                $deptos = [];
+                try {
+                    if (Schema::hasTable('departamento')) {
+                        $deptos = Departamento::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+                    }
+                } catch (\Throwable $e) {
+                    $deptos = [];
+                }
+
+                return ['' => 'Todos'] + $deptos;
             }
         }
 
@@ -124,6 +152,32 @@ class IndividualSearchHelper
             ];
         }
 
+        if ($columnName === 'ubicacion_fisica') {
+            $areas = [];
+            try {
+                if (Schema::hasTable('area')) {
+                    $areas = Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+                }
+            } catch (\Throwable $e) {
+                $areas = [];
+            }
+
+            return ['' => 'Todas'] + $areas;
+        }
+
+        if ($columnName === 'receptor.area.departamento.nombre' || $columnName === 'departamento') {
+            $deptos = [];
+            try {
+                if (Schema::hasTable('departamento')) {
+                    $deptos = Departamento::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+                }
+            } catch (\Throwable $e) {
+                $deptos = [];
+            }
+
+            return ['' => 'Todos'] + $deptos;
+        }
+
         return null;
     }
 
@@ -136,7 +190,6 @@ class IndividualSearchHelper
             return match ($columnName) {
                 'num_serie' => 'ej. BM6R...',
                 'material.nombre' => 'Filtrar...',
-                'ubicacion_fisica' => 'ej. Aulas de cómputo',
                 default => 'Filtrar...',
             };
         }
@@ -146,7 +199,6 @@ class IndividualSearchHelper
                 'id_solicitud' => 'ej. FOLIO-00001',
                 'usuario.name' => 'ej. Juan Pérez',
                 'receptor.nombre' => 'ej. Alejandro',
-                'receptor.area.departamento.nombre' => 'ej. Sistemas',
                 'fecha_solicitud' => 'ej. dd/mm/aaaa',
                 default => 'Filtrar...',
             };
@@ -168,13 +220,10 @@ class IndividualSearchHelper
             'id_solicitud' => 'ej. FOLIO-00001',
             'usuario.name' => 'ej. Juan Pérez',
             'receptor.nombre' => 'ej. Alejandro',
-            'receptor.area.departamento.nombre' => 'ej. Sistemas',
             'tipo_servicio' => 'ej. Servicio Social',
             'fecha_solicitud' => 'ej. dd/mm/aaaa',
             'nombre_tecnico' => 'ej. Juan Pérez',
-            'ubicacion_fisica' => 'ej. Aulas de cómputo',
             default => 'Filtrar...',
         };
     }
 }
-

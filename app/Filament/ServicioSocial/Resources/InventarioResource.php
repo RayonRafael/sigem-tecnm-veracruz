@@ -292,7 +292,9 @@ class InventarioResource extends Resource
                     ->placeholder('—'),
                 Tables\Columns\TextColumn::make('ubicacion_fisica')->wrap(false)->limit(30)->grow(false)
                     ->label('Ubicación')
-                    ->searchable(isIndividual: true),
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where('ubicacion_fisica', 'like', '%' . trim($search) . '%');
+                    }, isIndividual: true),
                 Tables\Columns\TextColumn::make('material.marca.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Marca')
                     ->searchable()
