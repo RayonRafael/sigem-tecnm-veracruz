@@ -42,15 +42,6 @@ html {
   background-image: none !important;
 }
 
-html.dark,
-html.dark *,
-.dark body,
-.dark .fi-body,
-.dark html {
-  color-scheme: light !important;
-  background-color: var(--sig-bg, #f8fafc) !important;
-}
-
 /* ===== 2. CARDS Y CONTENEDORES ===== */
 .fi-main,
 .fi-main-ctn,
@@ -79,13 +70,6 @@ html.dark *,
   /* Quitar la barra de gradiente superior anterior */
 }
 
-html.dark .fi-ta-ctn,
-html.dark .fi-ta-content,
-html.dark .fi-ta-table tbody tr,
-.dark .fi-ta-ctn,
-.dark .fi-fo-component-ctn,
-.dark .fi-section,
-.dark .fi-card,
 .fi-panel-servicio-social .fi-ta-ctn,
 .fi-panel-servicio-social .fi-ta-content,
 .fi-panel-servicio-social .fi-ta-table tbody tr {
@@ -106,10 +90,6 @@ html.dark .fi-ta-table tbody tr,
 /* ===== 3. TÍTULOS DE PÁGINA ===== */
 h1,
 .fi-header-heading,
-html.dark .fi-header-heading,
-html.dark h1,
-.dark h1,
-.dark .fi-header-heading,
 .fi-panel-servicio-social .fi-header-heading,
 .fi-panel-servicio-social h1 {
   color: var(--sig-text, #0f172a) !important;
@@ -170,30 +150,6 @@ tr:nth-child(even) {
   background-color: #ffffff !important;
 }
 
-/* Tablas Modo Oscuro */
-.dark .fi-ta-header,
-.dark .fi-ta-header-cell,
-.dark th {
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
-}
-
-.dark .fi-ta-header-cell *,
-.dark th * {
-  color: #94a3b8 !important;
-}
-
-.dark .fi-ta-row,
-.dark tr {
-  background-color: #0f172a !important;
-  border-color: #334155 !important;
-}
-
-.dark .fi-ta-row:hover,
-.dark tr:hover {
-  background-color: #1e293b !important;
-}
-
 /* ===== 5. INPUTS, SELECTS, TEXTAREAS ===== */
 .fi-input,
 .fi-select-input,
@@ -212,23 +168,6 @@ textarea:focus,
 select:focus {
   border-color: #2563eb !important;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
-}
-
-.dark .fi-input,
-.dark .fi-select-input,
-.dark textarea,
-.dark select {
-  background-color: #1e293b !important;
-  border-color: #475569 !important;
-  color: #f1f5f9 !important;
-}
-
-.dark .fi-input:focus,
-.dark .fi-select-input:focus,
-.dark textarea:focus,
-.dark select:focus {
-  border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
 }
 
 /* ===== 5.1 RADIO, CHECKBOX, TOGGLES (CORREGIDO) ===== */
@@ -297,50 +236,11 @@ button[role="switch"][aria-checked="true"] {
   background-color: #2563eb !important;
 }
 
-/* ===== MODO OSCURO ===== */
-.dark .fi-fo-toggle-buttons label.fi-btn,
-.dark .fi-fo-radio label {
-  border-color: #30363d !important;
-  background-color: #161b22 !important;
-  color: #e2e8f0 !important;
-}
-
-.dark .fi-fo-toggle-buttons label.fi-btn *,
-.dark .fi-fo-radio label * {
-  color: #e2e8f0 !important;
-}
-
-.dark .fi-fo-toggle-buttons input[type="radio"]:checked+label.fi-btn,
-.dark .fi-fo-toggle-buttons input[type="checkbox"]:checked+label.fi-btn,
-.dark .fi-fo-radio label:has(input[type="radio"]:checked) {
-  border-color: #3b82f6 !important;
-  background-color: #1e3a5f !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2) !important;
-}
-
-.dark .fi-fo-toggle-buttons input[type="radio"]:checked+label.fi-btn *,
-.dark .fi-fo-toggle-buttons input[type="checkbox"]:checked+label.fi-btn *,
-.dark .fi-fo-radio label:has(input[type="radio"]:checked) * {
-  color: #93c5fd !important;
-}
-
-.dark .fi-fo-radio input[type="radio"]:checked,
-.dark .fi-checkbox-input:checked,
-.dark button[role="switch"][aria-checked="true"] {
-  background-color: #3b82f6 !important;
-  border-color: #3b82f6 !important;
-}
-
 /* ===== 6. LABELS DE CAMPOS ===== */
 .fi-fo-field-wrp-label,
 .fi-fo-field-wrp-label * {
   color: #334155 !important;
   font-weight: 600 !important;
-}
-
-.dark .fi-fo-field-wrp-label,
-.dark .fi-fo-field-wrp-label * {
-  color: #e2e8f0 !important;
 }
 
 /* ===== 7. BOTONES ===== */
@@ -458,24 +358,6 @@ button[role="switch"][aria-checked="true"] {
   background-color: #f1f5f9 !important;
 }
 
-/* Modo oscuro botones secundarios */
-.dark .fi-btn-color-gray,
-.dark .btn-secondary {
-  background-color: #1e293b !important;
-  color: #e2e8f0 !important;
-  border-color: #334155 !important;
-}
-
-.dark .fi-btn-color-gray *,
-.dark .btn-secondary * {
-  color: #e2e8f0 !important;
-}
-
-.dark .fi-btn-color-gray:hover,
-.dark .btn-secondary:hover {
-  background-color: #334155 !important;
-}
-
 /* ===== 8. BADGES Y ETIQUETAS ===== */
 .fi-badge {
   border-radius: 999px !important;
@@ -505,31 +387,6 @@ button[role="switch"][aria-checked="true"] {
 .fi-badge-color-gray {
   background-color: #f1f5f9 !important;
   color: #475569 !important;
-}
-
-.dark .fi-badge-color-success {
-  background-color: rgba(16, 185, 129, 0.2) !important;
-  color: #34d399 !important;
-}
-
-.dark .fi-badge-color-warning {
-  background-color: rgba(245, 158, 11, 0.2) !important;
-  color: #fbbf24 !important;
-}
-
-.dark .fi-badge-color-danger {
-  background-color: rgba(239, 68, 68, 0.2) !important;
-  color: #f87171 !important;
-}
-
-.dark .fi-badge-color-info {
-  background-color: rgba(59, 130, 246, 0.2) !important;
-  color: #60a5fa !important;
-}
-
-.dark .fi-badge-color-gray {
-  background-color: rgba(148, 163, 184, 0.2) !important;
-  color: #94a3b8 !important;
 }
 
 /* ===== 9. BREADCRUMBS INTERNOS (OCULTOS — se usa "SIGEM › Sección" en topbar) ===== */
@@ -563,21 +420,6 @@ button[role="switch"][aria-checked="true"] {
   background-color: #f8fafc !important;
 }
 
-.dark .fi-pagination-item-active,
-.dark .fi-pagination-item-active button {
-  background-color: #3b82f6 !important;
-}
-
-.dark .fi-pagination-item:not(.fi-pagination-item-active),
-.dark .fi-pagination-item:not(.fi-pagination-item-active) button {
-  background-color: #1e293b !important;
-  color: #94a3b8 !important;
-}
-
-.dark .fi-pagination-item:not(.fi-pagination-item-active):hover {
-  background-color: #334155 !important;
-}
-
 /* ===== 11. FILTROS Y BÚSQUEDA ===== */
 .fi-ta-filters,
 .fi-ta-search,
@@ -585,13 +427,6 @@ button[role="switch"][aria-checked="true"] {
   background-color: #ffffff !important;
   border: 1px solid #e2e8f0 !important;
   border-radius: 8px !important;
-}
-
-.dark .fi-ta-filters,
-.dark .fi-ta-search,
-.dark .fi-global-search {
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
 }
 
 /* ===== 12. NOTIFICACIONES Y TOASTS ===== */
@@ -613,11 +448,6 @@ button[role="switch"][aria-checked="true"] {
   border-left: 4px solid #3b82f6 !important;
 }
 
-.dark .fi-no-notification {
-  background-color: #1e293b !important;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
-}
-
 /* ===== 13. MODALES NATIVOS DE FILAMENT ===== */
 .fi-modal-window {
   border-radius: 12px !important;
@@ -628,16 +458,6 @@ button[role="switch"][aria-checked="true"] {
   background-color: #f8fafc !important;
   border-bottom: 1px solid #e2e8f0 !important;
   border-radius: 12px 12px 0 0 !important;
-}
-
-.dark .fi-modal-window {
-  background-color: #1e293b !important;
-  border: 1px solid #334155 !important;
-}
-
-.dark .fi-modal-header {
-  background-color: #0f172a !important;
-  border-bottom-color: #334155 !important;
 }
 
 /* ===== 14. BOTONES DE ACCIÓN EN TABLAS ===== */
@@ -676,16 +496,6 @@ button[role="switch"][aria-checked="true"] {
   color: #94a3b8 !important;
 }
 
-.dark .fi-wizard {
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
-}
-
-.dark .fi-wizard-step-pending .fi-wizard-step-icon {
-  background-color: #334155 !important;
-  color: #94a3b8 !important;
-}
-
 /* ===== 16. SELECTS CON BÚSQUEDA ===== */
 .fi-select-input-dropdown,
 .choices__list--dropdown {
@@ -706,24 +516,6 @@ button[role="switch"][aria-checked="true"] {
   color: #2563eb !important;
 }
 
-.dark .fi-select-input-dropdown,
-.dark .choices__list--dropdown {
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
-}
-
-.dark .fi-select-input-option:hover,
-.dark .choices__item--choice:hover {
-  background-color: #334155 !important;
-}
-
-.dark .fi-select-input-option-selected,
-.dark .choices__item--selectable.is-highlighted {
-  background-color: rgba(37, 99, 235, 0.2) !important;
-  color: #60a5fa !important;
-}
-
-
 /* ===== 18. TABLAS VACÍAS ===== */
 .fi-ta-empty-state-heading {
   color: #475569 !important;
@@ -732,14 +524,6 @@ button[role="switch"][aria-checked="true"] {
 
 .fi-ta-empty-state-icon {
   color: #cbd5e1 !important;
-}
-
-.dark .fi-ta-empty-state-heading {
-  color: #f1f5f9 !important;
-}
-
-.dark .fi-ta-empty-state-icon {
-  color: #475569 !important;
 }
 
 /* ===== TOPBAR ====== */
@@ -779,23 +563,6 @@ body:has(.sigem-professional) .fi-topbar nav,
   background-color: #f1f5f9 !important;
 }
 
-.dark .fi-dropdown-panel,
-.dark .fi-dropdown-list,
-.dark .fi-dropdown-list-item,
-.dark .fi-user-menu {
-  background-color: #161b22 !important;
-  border-color: #30363d !important;
-}
-
-.dark .fi-dropdown-panel *,
-.dark .fi-dropdown-list-item * {
-  color: #e2e8f0 !important;
-}
-
-.dark .fi-dropdown-list-item:hover {
-  background-color: #1f2937 !important;
-}
-
 /* ===== LINKS INTERACTIVOS (TEXTO) ===== */
 .fi-main a:not([class*="btn"]),
 .fi-ta-text-item-label a {
@@ -806,16 +573,6 @@ body:has(.sigem-professional) .fi-topbar nav,
 .fi-main a:not([class*="btn"]):hover,
 .fi-ta-text-item-label a:hover {
   color: #0d47a1 !important;
-}
-
-.dark .fi-main a:not([class*="btn"]),
-.dark .fi-ta-text-item-label a {
-  color: #3b82f6 !important;
-}
-
-.dark .fi-main a:not([class*="btn"]):hover,
-.dark .fi-ta-text-item-label a:hover {
-  color: #60a5fa !important;
 }
 
 /* JetBrains Mono */
@@ -854,15 +611,6 @@ body:has(.sigem-professional) .fi-topbar nav,
   border-radius: 12px !important;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
-}
-
-.dark .fi-simple-main-ctn>div {
-  background: rgba(13, 17, 23, 0.95) !important;
-  border: 1px solid rgba(48, 54, 61, 0.8) !important;
-}
-
-.dark .fi-simple-main-ctn h2 {
-  color: #e2e8f0 !important;
 }
 
 /* ===== SIDEBAR RESTAURADO PARA FASE 2.5 ===== */
@@ -942,18 +690,6 @@ body:has(.sigem-professional) .sigem-topbar-brand {
 
 .text-muted-util {
   color: var(--slate-500);
-}
-
-.dark .sigem-professional ::-webkit-scrollbar-thumb {
-  background: #475569;
-}
-
-.dark .sigem-professional ::-webkit-scrollbar-thumb:hover {
-  background: #64748b;
-}
-
-.dark .text-muted-util {
-  color: #94a3b8 !important;
 }
 
 /* ==================================================== */
@@ -1662,10 +1398,6 @@ img.sigem-brand-logo {
   height: 36px !important;
 }
 
-img.sigem-brand-logo[src*="sigem-logo.svg"] {
-  object-view-box: xywh(25px 20px 65px 75px);
-}
-
 .fi-simple-main .sigem-brand,
 .fi-simple-layout .sigem-brand {
   border-bottom: none !important;
@@ -1831,9 +1563,6 @@ aside.fi-sidebar,
   color: #6b7280 !important;
 }
 
-.fi-ta-table tbody tr:hover {
-  background: #f8fafd !important;
-}
 
 .fi-ta-table .fi-ta-text-item-label {
   font-weight: 600 !important;
@@ -3095,6 +2824,7 @@ table {
   width: min(620px, 92vw) !important;
   max-width: 620px !important;
   overflow-x: hidden !important;
+  overflow-y: auto !important;
   box-shadow: -6px 0 18px rgba(15, 23, 42, .08) !important;
   border-left: 1px solid var(--sig-border) !important;
   background: #ffffff !important;
@@ -3709,10 +3439,6 @@ body {
 /* ==========================================================================
    Slide-over: sin scroll horizontal (todo el contenido cabe en el panel)
    ========================================================================== */
-.fi-modal-slide-over-window {
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-}
 
 .fi-modal-slide-over-window .fi-fo-component-ctn {
   overflow: visible !important;
@@ -3760,10 +3486,6 @@ body {
 }
 
 
-.fi-modal-slide-over-window {
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
-}
 
 /* Scrollbar discreta solo en el panel (el stepper conserva la suya) */
 .fi-modal-slide-over-window *:not(.fi-fo-wizard-header)::-webkit-scrollbar {
@@ -3854,48 +3576,6 @@ body {
   color: #ffffff !important;
 }
 
-/* Modo oscuro: ToggleButtons */
-.dark .fi-fo-toggle-buttons label.fi-btn,
-.dark .fi-fo-toggle-buttons input:not(:checked)+label.fi-btn,
-.dark .fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn {
-  border-color: #334155 !important;
-  background-color: #1e293b !important;
-  background: #1e293b !important;
-  color: #94a3b8 !important;
-}
-
-.dark .fi-fo-toggle-buttons label.fi-btn *,
-.dark .fi-fo-toggle-buttons input:not(:checked)+label.fi-btn *,
-.dark .fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn * {
-  color: #94a3b8 !important;
-}
-
-.dark .fi-fo-toggle-buttons input:not(:checked)+label.fi-btn:hover,
-.dark .fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn:hover {
-  border-color: #3b82f6 !important;
-  background-color: #1e3a5f !important;
-  background: #1e3a5f !important;
-  color: #93c5fd !important;
-}
-
-.dark .fi-fo-toggle-buttons input:not(:checked)+label.fi-btn:hover *,
-.dark .fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn:hover * {
-  color: #93c5fd !important;
-}
-
-.dark .fi-fo-toggle-buttons input:checked+label.fi-btn,
-.dark .fi-fo-toggle-buttons div:has(input:checked)>label.fi-btn {
-  background-color: #2563eb !important;
-  background: #2563eb !important;
-  border-color: #2563eb !important;
-  color: #ffffff !important;
-}
-
-.dark .fi-fo-toggle-buttons input:checked+label.fi-btn *,
-.dark .fi-fo-toggle-buttons div:has(input:checked)>label.fi-btn * {
-  color: #ffffff !important;
-}
-
 /* ==========================================================================
    Slide-over: Acciones / Footer integrados al contenido (Problema 4)
    ========================================================================== */
@@ -3962,19 +3642,6 @@ body {
   margin-top: 24px !important;
   padding-top: 16px !important;
   border-top: 1px solid var(--sig-border, #e2e8f0) !important;
-}
-
-/* Modo oscuro para footer de slide-over */
-.dark .fi-modal-slide-over-window .fi-modal-footer,
-.dark .fi-modal-slide-over-window .fi-fo-wizard>div:last-child {
-  border-top-color: #334155 !important;
-}
-
-.dark .fi-modal-slide-over-window .fi-modal-footer .fi-btn-color-gray,
-.dark .fi-modal-slide-over-window .fi-modal-footer .fi-color-gray {
-  background-color: #1e293b !important;
-  border-color: #475569 !important;
-  color: #e2e8f0 !important;
 }
 
 /* ==========================================================================
@@ -4063,23 +3730,6 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
   color: #dc2626 !important;
   background: #fee2e2 !important;
   border-color: #fca5a5 !important;
-}
-
-.dark .fi-icon-btn {
-  background: #1e293b;
-  border-color: #334155;
-  color: #94a3b8;
-}
-
-.dark .fi-icon-btn:hover {
-  color: #38bdf8;
-  background: #0f172a;
-}
-
-.dark .fi-icon-btn-danger:hover {
-  color: #ef4444 !important;
-  background: rgba(220, 38, 38, 0.2) !important;
-  border-color: rgba(239, 68, 68, 0.4) !important;
 }
 
 /* Los grupos de campos sin doble recuadro */
@@ -4998,8 +4648,9 @@ header.fi-topbar nav>div.ms-auto,
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  gap: 12px !important;
-  padding: 10px 16px !important;
+  gap: 8px !important;
+  min-height: 36px !important;
+  padding: 4px 10px !important;
   background: var(--sig-bg, #f4f6f8) !important;
 }
 
@@ -5008,7 +4659,7 @@ header.fi-topbar nav>div.ms-auto,
   align-items: center !important;
   gap: 10px !important;
   flex: 1 1 auto !important;
-  justify-content: flex-end !important;
+  justify-content: flex-start !important;
 }
 
 .sigem-table-toolbar-group {
@@ -5032,10 +4683,6 @@ header.fi-topbar nav>div.ms-auto,
   margin-left: auto !important;
 }
 
-.fi-ta-header-toolbar > .ms-auto {
-  flex: 1 1 auto !important;
-  justify-content: flex-start !important;
-}
 
 .sigem-toolbar-date {
   display: inline-flex !important;
@@ -5451,8 +5098,7 @@ header.fi-header p.fi-header-subheading,
 
 /* Botones */
 .fi-btn,
-.sigem-btn-primary,
-.sigem-btn-secondary {
+.sigem-btn-primary {
   font-size: 14px !important;
   font-weight: 600 !important;
 }
@@ -5526,8 +5172,7 @@ body:has(.sigem-professional) .fi-main {
    ============================================ */
 
 /* 1. Toolbar compacta */
-.fi-ta-header,
-.fi-ta-header-toolbar {
+.fi-ta-header {
   padding-top: 4px !important;
   padding-bottom: 4px !important;
   min-height: auto !important;
@@ -5856,8 +5501,7 @@ body:has(.sigem-professional) .fi-main {
 }
 
 /* Toolbar: compactar Exportar + Buscar + Filtros */
-.fi-ta-header,
-.fi-ta-header-toolbar {
+.fi-ta-header {
   padding: 4px 10px !important;
   min-height: 36px !important;
   gap: 8px !important;
@@ -6048,16 +5692,6 @@ body:has(.sigem-professional) .fi-main {
   white-space: nowrap !important;
 }
 
-/* Excepción: Materiales con ID/Modelo de texto largo (~160px) */
-.sigem-cat-materiales .sigem-col-id,
-.sigem-cat-materiales thead th.sigem-col-id,
-.sigem-cat-materiales tbody td.sigem-col-id {
-  width: 160px !important;
-  min-width: 150px !important;
-  max-width: 180px !important;
-  text-align: left !important;
-  white-space: nowrap !important;
-}
 
 /* Columna ACCIONES (104px) */
 .sigem-cat-table .sigem-col-actions,
@@ -6358,8 +5992,6 @@ body:has(.sigem-professional) .fi-main {
 .fi-ta-table thead,
 .fi-ta-table thead tr,
 .fi-ta-table thead th,
-.fi-ta-table thead tr:not(:first-child) td,
-.fi-ta-table thead tr:not(:first-child) th,
 .fi-table-individual-search-cell,
 [class*="fi-table-individual-search-cell"] {
   background: var(--sig-bg, #f4f6f8) !important;
@@ -6388,16 +6020,6 @@ body:has(.sigem-professional) .fi-main {
 .fi-ta-header-toolbar button:has(svg[class*="view-columns"]),
 .fi-ta-header-toolbar button:has(svg[data-slot="icon"][class*="columns"]) {
   display: none !important;
-}
-
-/* ============================================
-   FIX 5: Lupa del buscador de color azul
-   ============================================ */
-.sigem-toolbar-search .fi-input-wrp-prefix svg,
-.sigem-toolbar-search [data-slot="prefix"] svg,
-.sigem-toolbar-search .fi-input-wrp-icon svg {
-  color: var(--sig-primary, #1b65d4) !important;
-  fill: var(--sig-primary, #1b65d4) !important;
 }
 
 /* ============================================
@@ -6474,28 +6096,6 @@ body:has(.sigem-professional) .fi-main {
 }
 
 
-/* FIX: boton X decorativo en ACCIONES (fila de filtros) + gris uniforme en thead */
-.fi-ta-table thead tr:has([class*="fi-table-individual-search-cell"]) > td:last-child {
-  text-align: center !important;
-  vertical-align: middle !important;
-}
-.fi-ta-table thead tr:has([class*="fi-table-individual-search-cell"]) > td:last-child::after,
-.sigem-filter-visual-x {
-  content: "\2715";
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 26px !important;
-  height: 26px !important;
-  border-radius: 6px !important;
-  border: 1px solid var(--sig-border, #e2e8f0) !important;
-  background: var(--sig-surface, #ffffff) !important;
-  color: var(--sig-muted, #64748b) !important;
-  font-size: 13px !important;
-  cursor: default !important;
-  opacity: 0.5 !important;
-  pointer-events: none !important;
-}
 .fi-ta-table thead,
 .fi-ta-table thead tr,
 .fi-ta-table thead th,

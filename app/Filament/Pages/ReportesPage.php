@@ -225,21 +225,29 @@ class ReportesPage extends Page
     protected function generarReporteEquiposArea(string $fecha): array
     {
         $areas = Area::with('departamento')->orderBy('nombre')->get();
+        $inventarios = Inventario::select(['id_inventario', 'ubicacion_fisica', 'especificaciones', 'tipo_propiedad', 'estado'])->get();
         $rows = [];
 
         foreach ($areas as $area) {
-            $inventarios = Inventario::where(function ($q) use ($area) {
-                $q->where('ubicacion_fisica', 'like', '%' . $area->nombre . '%')
-                    ->orWhere('especificaciones->area_id', (string) $area->id_area);
-            })->get();
+            $areaNombre = $area->nombre;
+            $areaIdStr = (string) $area->id_area;
 
-            $total = $inventarios->count();
+            $areaInventarios = $inventarios->filter(function ($inv) use ($areaNombre, $areaIdStr) {
+                if ($inv->ubicacion_fisica && stripos($inv->ubicacion_fisica, $areaNombre) !== false) {
+                    return true;
+                }
+                $espec = is_array($inv->especificaciones) ? $inv->especificaciones : json_decode($inv->especificaciones ?? '[]', true);
+
+                return isset($espec['area_id']) && (string) $espec['area_id'] === $areaIdStr;
+            });
+
+            $total = $areaInventarios->count();
             if ($total === 0) {
                 continue;
             }
 
-            $propios = $inventarios->where('tipo_propiedad', 'Propio')->count();
-            $rentados = $inventarios->where('tipo_propiedad', 'Rentado')->count();
+            $propios = $areaInventarios->where('tipo_propiedad', 'Propio')->count();
+            $rentados = $areaInventarios->where('tipo_propiedad', 'Rentado')->count();
 
             $rows[] = [
                 'depto' => e($area->departamento?->nombre ?? 'N/A'),
@@ -247,8 +255,8 @@ class ReportesPage extends Page
                 'total' => '<span class="sigem-td-folio">' . $total . '</span>',
                 'propio' => $this->renderBadgeConteo($propios, 'ok'),
                 'renta' => $this->renderBadgeConteo($rentados, 'info'),
-                'disponibles' => $this->renderBadgeConteo($inventarios->where('estado', 'Disponible')->count(), 'ok'),
-                'asignados' => $this->renderBadgeConteo($inventarios->where('estado', 'Asignado')->count(), 'warn'),
+                'disponibles' => $this->renderBadgeConteo($areaInventarios->where('estado', 'Disponible')->count(), 'ok'),
+                'asignados' => $this->renderBadgeConteo($areaInventarios->where('estado', 'Asignado')->count(), 'warn'),
             ];
         }
 

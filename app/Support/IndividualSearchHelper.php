@@ -20,162 +20,67 @@ class IndividualSearchHelper
         // 1. Inventario
         if ($model === Inventario::class || $model === 'App\\Models\\Inventario' || str_ends_with((string) $model, 'Inventario')) {
             if ($columnName === 'material.tipo.nombre' || $columnName === 'id_tipodematerial' || $columnName === 'tipo') {
-                $tipos = [];
-                try {
-                    if (Schema::hasTable('tiposdematerial')) {
-                        $tipos = TipoMaterial::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
-                    }
-                } catch (\Throwable $e) {
-                    $tipos = [];
-                }
-
-                return ['' => 'Todas'] + $tipos;
+                return self::getTiposMaterial();
             }
 
             if ($columnName === 'estado') {
-                return [
-                    '' => 'Todos',
-                    'Disponible' => 'Disponible',
-                    'Asignado' => 'Asignado',
-                    'Reasignado' => 'Reasignado',
-                    'En Mantenimiento' => 'En Mantenimiento',
-                    'Dañado' => 'Dañado',
-                    'Baja' => 'Baja',
-                ];
+                return self::getEstadosInventario();
             }
 
             if ($columnName === 'tipo_propiedad') {
-                return [
-                    '' => 'Todas',
-                    'Propio' => 'Propio',
-                    'Rentado' => 'Rentado',
-                ];
+                return self::getTiposPropiedad();
             }
 
             if ($columnName === 'ubicacion_fisica') {
-                $areas = [];
-                try {
-                    if (Schema::hasTable('area')) {
-                        $areas = Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
-                    }
-                } catch (\Throwable $e) {
-                    $areas = [];
-                }
-
-                return ['' => 'Todas'] + $areas;
+                return self::getAreas();
             }
         }
 
         // 2. Solicitudes
         if ($model === Solicitud::class || $model === 'App\\Models\\Solicitud' || str_ends_with((string) $model, 'Solicitud')) {
             if ($columnName === 'tipo_movimiento') {
-                return [
-                    '' => 'Todos',
-                    'Asignacion Temporal' => 'Asignación Temporal',
-                    'Asignacion Permanente' => 'Asignación Permanente',
-                    'Renta Externa' => 'Renta Externa',
-                ];
+                return self::getTiposMovimiento();
             }
 
             if ($columnName === 'estado') {
-                return [
-                    '' => 'Todos',
-                    'Pendiente' => 'Pendiente',
-                    'Autorizado' => 'Autorizado',
-                    'Rechazado' => 'Rechazado',
-                    'Completado' => 'Completado',
-                    'Cancelado' => 'Cancelado',
-                ];
+                return self::getEstadosSolicitud();
             }
 
             if ($columnName === 'receptor.area.departamento.nombre' || $columnName === 'departamento') {
-                $deptos = [];
-                try {
-                    if (Schema::hasTable('departamento')) {
-                        $deptos = Departamento::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
-                    }
-                } catch (\Throwable $e) {
-                    $deptos = [];
-                }
-
-                return ['' => 'Todos'] + $deptos;
+                return self::getDepartamentos();
             }
         }
 
         // 3. Mantenimientos
         if ($model === Mantenimiento::class || $model === 'App\\Models\\Mantenimiento' || str_ends_with((string) $model, 'Mantenimiento')) {
             if ($columnName === 'tipo_mantenimiento') {
-                return [
-                    '' => 'Todos',
-                    'Preventivo' => 'Preventivo',
-                    'Correctivo' => 'Correctivo',
-                    'Mejora' => 'Mejora',
-                ];
+                return self::getTiposMantenimiento();
             }
 
             if ($columnName === 'estado') {
-                return [
-                    '' => 'Todos',
-                    'Solicitado' => 'Solicitado',
-                    'En proceso' => 'En proceso',
-                    'Pendiente Revision Admin' => 'En revisión',
-                    'Completado' => 'Completado',
-                    'Cancelado' => 'Cancelado',
-                ];
+                return self::getEstadosMantenimiento();
             }
         }
 
         // Fallbacks por nombre de columna si el modelo no está definido
         if ($columnName === 'tipo_propiedad') {
-            return [
-                '' => 'Todas',
-                'Propio' => 'Propio',
-                'Rentado' => 'Rentado',
-            ];
+            return self::getTiposPropiedad();
         }
 
         if ($columnName === 'tipo_movimiento') {
-            return [
-                '' => 'Todos',
-                'Asignacion Temporal' => 'Asignación Temporal',
-                'Asignacion Permanente' => 'Asignación Permanente',
-                'Renta Externa' => 'Renta Externa',
-            ];
+            return self::getTiposMovimiento();
         }
 
         if ($columnName === 'tipo_mantenimiento') {
-            return [
-                '' => 'Todos',
-                'Preventivo' => 'Preventivo',
-                'Correctivo' => 'Correctivo',
-                'Mejora' => 'Mejora',
-            ];
+            return self::getTiposMantenimiento();
         }
 
         if ($columnName === 'ubicacion_fisica') {
-            $areas = [];
-            try {
-                if (Schema::hasTable('area')) {
-                    $areas = Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
-                }
-            } catch (\Throwable $e) {
-                $areas = [];
-            }
-
-            return ['' => 'Todas'] + $areas;
+            return self::getAreas();
         }
 
         if ($columnName === 'receptor.area.departamento.nombre' || $columnName === 'departamento') {
-            $deptos = [];
-            try {
-                if (Schema::hasTable('departamento')) {
-                    $deptos = Departamento::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
-                }
-            } catch (\Throwable $e) {
-                $deptos = [];
-            }
-
-            return ['' => 'Todos'] + $deptos;
+            return self::getDepartamentos();
         }
 
         return null;
@@ -225,5 +130,114 @@ class IndividualSearchHelper
             'nombre_tecnico' => 'ej. Juan Pérez',
             default => 'Filtrar...',
         };
+    }
+
+    private static function getTiposMaterial(): array
+    {
+        $tipos = [];
+        try {
+            if (Schema::hasTable('tiposdematerial')) {
+                $tipos = TipoMaterial::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+            }
+        } catch (\Throwable $e) {
+            $tipos = [];
+        }
+
+        return ['' => 'Todas'] + $tipos;
+    }
+
+    private static function getEstadosInventario(): array
+    {
+        return [
+            '' => 'Todos',
+            'Disponible' => 'Disponible',
+            'Asignado' => 'Asignado',
+            'Reasignado' => 'Reasignado',
+            'En Mantenimiento' => 'En Mantenimiento',
+            'Dañado' => 'Dañado',
+            'Baja' => 'Baja',
+        ];
+    }
+
+    private static function getTiposPropiedad(): array
+    {
+        return [
+            '' => 'Todas',
+            'Propio' => 'Propio',
+            'Rentado' => 'Rentado',
+        ];
+    }
+
+    private static function getAreas(): array
+    {
+        $areas = [];
+        try {
+            if (Schema::hasTable('area')) {
+                $areas = Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+            }
+        } catch (\Throwable $e) {
+            $areas = [];
+        }
+
+        return ['' => 'Todas'] + $areas;
+    }
+
+    private static function getTiposMovimiento(): array
+    {
+        return [
+            '' => 'Todos',
+            'Asignacion Temporal' => 'Asignación Temporal',
+            'Asignacion Permanente' => 'Asignación Permanente',
+            'Renta Externa' => 'Renta Externa',
+        ];
+    }
+
+    private static function getEstadosSolicitud(): array
+    {
+        return [
+            '' => 'Todos',
+            'Pendiente' => 'Pendiente',
+            'Autorizado' => 'Autorizado',
+            'Rechazado' => 'Rechazado',
+            'Entregado' => 'Entregado',
+            'Completado' => 'Completado',
+            'Cancelado' => 'Cancelado',
+        ];
+    }
+
+    private static function getDepartamentos(): array
+    {
+        $deptos = [];
+        try {
+            if (Schema::hasTable('departamento')) {
+                $deptos = Departamento::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+            }
+        } catch (\Throwable $e) {
+            $deptos = [];
+        }
+
+        return ['' => 'Todos'] + $deptos;
+    }
+
+    private static function getTiposMantenimiento(): array
+    {
+        return [
+            '' => 'Todos',
+            'Preventivo' => 'Preventivo',
+            'Correctivo' => 'Correctivo',
+            'Mejora' => 'Mejora',
+        ];
+    }
+
+    private static function getEstadosMantenimiento(): array
+    {
+        return [
+            '' => 'Todos',
+            'Solicitado' => 'Solicitado',
+            'En proceso' => 'En proceso',
+            'Pendiente Revision Admin' => 'En revisión',
+            'Completado' => 'Completado',
+            'Cancelado' => 'Cancelado',
+        ];
     }
 }

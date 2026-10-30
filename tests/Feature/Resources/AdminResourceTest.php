@@ -13,6 +13,8 @@ use App\Filament\Resources\ProveedorResource;
 use App\Filament\Resources\ReceptorResource;
 use App\Filament\Resources\SolicitudResource;
 use App\Filament\Resources\UserResource;
+use App\Models\Area;
+use App\Models\Departamento;
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
 use App\Models\MarcaMaterial;
@@ -366,6 +368,122 @@ class AdminResourceTest extends TestCase
             ->assertSet('tableSearch', 'Laptop')
             ->call('filtrarPorCategoria', 'Laptop')
             ->assertSet('tableSearch', '');
+    }
+
+    public function test_reporte_inventario_categoria()
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $user = $this->getAdminUser();
+
+        $unidad = UnidadMedida::firstOrCreate(['nombre' => 'Pieza']);
+        $marca = MarcaMaterial::firstOrCreate(['nombre' => 'HP']);
+        $tipo = TipoMaterial::firstOrCreate(['nombre' => 'Laptops Test']);
+        $material = Material::create([
+            'nombre' => 'Laptop EliteBook Test',
+            'id_unidad' => $unidad->id_unidad,
+            'id_marca' => $marca->id_marca,
+            'id_tipodematerial' => $tipo->id_tipodematerial,
+            'stock_actual' => 1,
+            'requiere_control_individual' => 1,
+        ]);
+        Inventario::create([
+            'num_serie' => 'HP-TEST-001',
+            'id_producto' => $material->id_producto,
+            'id_usuario' => $user->id,
+            'estado' => 'Disponible',
+            'estado_registro' => 'Aprobado',
+            'tipo_propiedad' => 'Propio',
+            'ubicacion_fisica' => 'Edificio Central',
+            'fecha_registro' => now(),
+        ]);
+
+        \Livewire\Livewire::actingAs($user)
+            ->test(ReportesPage::class)
+            ->call('verReporte', 'inventario_categoria')
+            ->assertSet('reporteActivo', 'inventario_categoria')
+            ->assertSee('Inventario por categoría')
+            ->assertSee('Laptops Test')
+            ->assertSee('Total');
+    }
+
+    public function test_reporte_equipos_area()
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $user = $this->getAdminUser();
+
+        $depto = Departamento::firstOrCreate(['nombre' => 'Depto Sistemas Test']);
+        $area = Area::firstOrCreate([
+            'nombre' => 'Laboratorio Redes Test',
+            'id_departamento' => $depto->id_departamento,
+        ]);
+
+        $unidad = UnidadMedida::firstOrCreate(['nombre' => 'Pieza']);
+        $marca = MarcaMaterial::firstOrCreate(['nombre' => 'Cisco']);
+        $tipo = TipoMaterial::firstOrCreate(['nombre' => 'Redes']);
+        $material = Material::create([
+            'nombre' => 'Switch Cisco Test',
+            'id_unidad' => $unidad->id_unidad,
+            'id_marca' => $marca->id_marca,
+            'id_tipodematerial' => $tipo->id_tipodematerial,
+            'stock_actual' => 1,
+            'requiere_control_individual' => 1,
+        ]);
+        Inventario::create([
+            'num_serie' => 'CSCO-TEST-8899',
+            'id_producto' => $material->id_producto,
+            'id_usuario' => $user->id,
+            'estado' => 'Disponible',
+            'estado_registro' => 'Aprobado',
+            'tipo_propiedad' => 'Rentado',
+            'ubicacion_fisica' => 'Laboratorio Redes Test - Rack 1',
+            'especificaciones' => ['area_id' => (string) $area->id_area],
+            'fecha_registro' => now(),
+        ]);
+
+        \Livewire\Livewire::actingAs($user)
+            ->test(ReportesPage::class)
+            ->call('verReporte', 'equipos_area')
+            ->assertSet('reporteActivo', 'equipos_area')
+            ->assertSee('Equipos por área')
+            ->assertSee('Laboratorio Redes Test')
+            ->assertSee('Depto Sistemas Test');
+    }
+
+    public function test_exportar_reporte_csv()
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $user = $this->getAdminUser();
+
+        $unidad = UnidadMedida::firstOrCreate(['nombre' => 'Pieza']);
+        $marca = MarcaMaterial::firstOrCreate(['nombre' => 'Dell']);
+        $tipo = TipoMaterial::firstOrCreate(['nombre' => 'Export Tipo Test']);
+        $material = Material::create([
+            'nombre' => 'Material Export Test',
+            'id_unidad' => $unidad->id_unidad,
+            'id_marca' => $marca->id_marca,
+            'id_tipodematerial' => $tipo->id_tipodematerial,
+            'stock_actual' => 1,
+            'requiere_control_individual' => 1,
+        ]);
+        Inventario::create([
+            'num_serie' => 'EXP-TEST-1234',
+            'id_producto' => $material->id_producto,
+            'id_usuario' => $user->id,
+            'estado' => 'Disponible',
+            'estado_registro' => 'Aprobado',
+            'tipo_propiedad' => 'Propio',
+            'ubicacion_fisica' => 'Area Export Test',
+            'fecha_registro' => now(),
+        ]);
+
+        $testable = \Livewire\Livewire::actingAs($user)
+            ->test(ReportesPage::class);
+
+        $response = $testable->instance()->exportarReporte('inventario_categoria');
+
+        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertStringContainsString('text/csv', (string) $response->headers->get('content-type'));
     }
 }
 

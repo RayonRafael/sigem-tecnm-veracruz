@@ -208,23 +208,23 @@ class Dashboard extends BaseDashboard
         // 5. Inventarios (con filtros aplicados dinámicamente)
         $invQuery = Inventario::with(['material.marca', 'material.tipo', 'proveedor', 'usuario']);
 
-        if (! empty($this->tableColumnSearches['num_serie'])) {
+        if (filled($this->tableColumnSearches['num_serie'] ?? null)) {
             $invQuery->where('num_serie', 'like', '%' . trim($this->tableColumnSearches['num_serie']) . '%');
         }
-        if (! empty($this->tableColumnSearches['material_nombre'])) {
+        if (filled($this->tableColumnSearches['material_nombre'] ?? null)) {
             $invQuery->whereHas('material', fn ($q) => $q->where('nombre', 'like', '%' . trim($this->tableColumnSearches['material_nombre']) . '%'));
         }
-        if (! empty($this->tableColumnSearches['material_tipo_nombre'])) {
+        if (filled($this->tableColumnSearches['material_tipo_nombre'] ?? null)) {
             $invQuery->whereHas('material.tipo', fn ($q) => $q->where('nombre', trim($this->tableColumnSearches['material_tipo_nombre'])));
         }
-        if (! empty($this->tableColumnSearches['estado'])) {
+        if (filled($this->tableColumnSearches['estado'] ?? null)) {
             $invQuery->where('estado', $this->tableColumnSearches['estado']);
         }
-        if (! empty($this->tableColumnSearches['ubicacion_fisica'])) {
+        if (filled($this->tableColumnSearches['ubicacion_fisica'] ?? null)) {
             $invQuery->where('ubicacion_fisica', 'like', '%' . trim($this->tableColumnSearches['ubicacion_fisica']) . '%');
         }
 
-                if (! empty($this->tableColumnSearches['busqueda'])) {
+        if (filled($this->tableColumnSearches['busqueda'] ?? null)) {
             $term = '%' . trim($this->tableColumnSearches['busqueda']) . '%';
             $invQuery->where(function ($q) use ($term) {
                 $q->where('num_serie', 'like', $term)
@@ -235,13 +235,13 @@ class Dashboard extends BaseDashboard
                         ->orWhereHas('marca', fn ($b) => $b->where('nombre', 'like', $term)));
             });
         }
-        if (! empty($this->tableColumnSearches['fecha_desde'])) {
+        if (filled($this->tableColumnSearches['fecha_desde'] ?? null)) {
             $invQuery->whereDate('fecha_registro', '>=', $this->tableColumnSearches['fecha_desde']);
         }
-        if (! empty($this->tableColumnSearches['fecha_hasta'])) {
+        if (filled($this->tableColumnSearches['fecha_hasta'] ?? null)) {
             $invQuery->whereDate('fecha_registro', '<=', $this->tableColumnSearches['fecha_hasta']);
         }
-$inventariosCompletos = $invQuery->latest('created_at')->take(50)->get();
+        $inventariosCompletos = $invQuery->latest('created_at')->take(50)->get();
 
         return [
             'totalActivos' => $totalActivos,
