@@ -31,7 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('SIGEM - TecNM Veracruz')
-            ->brandLogo(new HtmlString('<div class="sigem-brand"><img src="' . asset('images/sigem-logo.svg') . '" alt="SIGEM" class="sigem-brand-logo"></div>'))
+            ->brandLogo(new HtmlString('<div class="sigem-brand"><img src="' . asset('images/sigem-icon.svg') . '" alt="SIGEM" class="sigem-brand-logo"></div>'))
             ->brandLogoHeight('auto')
             ->favicon(asset('images/sigem-favicon.svg?v=2'))
             ->font('DM Sans')

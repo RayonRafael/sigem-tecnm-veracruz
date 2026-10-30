@@ -118,7 +118,47 @@
             <div class="sigem-inv-layout" :class="showGrafica ? '' : 'sigem-inv-no-chart'" style="margin-top: 14px;">
                 <div class="sigem-inv-main" style="min-width: 0;">
                     <div class="sigem-rep-view sigem-dash-table" style="margin-bottom: 0;">
-                        <div class="sigem-rep-table-wrap">
+                        {{-- TOOLBAR: [Buscador] + [Desde] + [Hasta] + [Quitar filtros] --}}
+                        <div class="fi-ta-header-toolbar sigem-dash-toolbar">
+                            <div class="sigem-table-toolbar-group">
+                                <div class="fi-ta-search-field sigem-toolbar-search">
+                                    <label for="sigem-dash-busqueda" class="sr-only">Buscar</label>
+                                    <div class="fi-input-wrp">
+                                        <div class="fi-input-wrp-prefix"><span class="sigem-search-emoji">🔍</span></div>
+                                        <input
+                                            id="sigem-dash-busqueda"
+                                            type="search"
+                                            autocomplete="off"
+                                            maxlength="1000"
+                                            wire:model.live.debounce.500ms="tableColumnSearches.busqueda"
+                                            placeholder="Buscar por equipo, código, IP, MAC, marca..."
+                                            class="fi-input sigem-dash-search-input"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="sigem-toolbar-date">
+                                    <span class="sigem-toolbar-date-label">Desde</span>
+                                    <input type="date" wire:model.live="tableColumnSearches.fecha_desde" class="sigem-toolbar-date-input" title="Filtrar desde fecha" />
+                                </div>
+                                <div class="sigem-toolbar-date">
+                                    <span class="sigem-toolbar-date-label">Hasta</span>
+                                    <input type="date" wire:model.live="tableColumnSearches.fecha_hasta" class="sigem-toolbar-date-input" title="Filtrar hasta fecha" />
+                                </div>
+
+                                <button
+                                    type="button"
+                                    x-data
+                                    x-show="Object.values($wire.tableColumnSearches || {}).some(v => Boolean(v))"
+                                    x-cloak
+                                    x-on:click="$wire.resetTableColumnSearches()"
+                                    class="sigem-toolbar-reset-btn"
+                                    title="Quitar todos los filtros"
+                                >
+                                    ✕ Quitar filtros
+                                </button>
+                            </div>
+                        </div>                        <div class="sigem-rep-table-wrap">
                             <table class="fi-ta-table">
                                 <thead>
                                     <tr>

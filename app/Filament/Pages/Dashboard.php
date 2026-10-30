@@ -224,7 +224,24 @@ class Dashboard extends BaseDashboard
             $invQuery->where('ubicacion_fisica', 'like', '%' . trim($this->tableColumnSearches['ubicacion_fisica']) . '%');
         }
 
-        $inventariosCompletos = $invQuery->latest('created_at')->take(50)->get();
+                if (! empty($this->tableColumnSearches['busqueda'])) {
+            $term = '%' . trim($this->tableColumnSearches['busqueda']) . '%';
+            $invQuery->where(function ($q) use ($term) {
+                $q->where('num_serie', 'like', $term)
+                    ->orWhere('ubicacion_fisica', 'like', $term)
+                    ->orWhere('mac_address', 'like', $term)
+                    ->orWhere('ip_address', 'like', $term)
+                    ->orWhereHas('material', fn ($m) => $m->where('nombre', 'like', $term)
+                        ->orWhereHas('marca', fn ($b) => $b->where('nombre', 'like', $term)));
+            });
+        }
+        if (! empty($this->tableColumnSearches['fecha_desde'])) {
+            $invQuery->whereDate('fecha_registro', '>=', $this->tableColumnSearches['fecha_desde']);
+        }
+        if (! empty($this->tableColumnSearches['fecha_hasta'])) {
+            $invQuery->whereDate('fecha_registro', '<=', $this->tableColumnSearches['fecha_hasta']);
+        }
+$inventariosCompletos = $invQuery->latest('created_at')->take(50)->get();
 
         return [
             'totalActivos' => $totalActivos,
