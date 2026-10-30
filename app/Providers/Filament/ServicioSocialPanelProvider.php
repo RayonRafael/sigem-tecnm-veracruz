@@ -30,7 +30,7 @@ class ServicioSocialPanelProvider extends PanelProvider
             ->path('servicio-social')
             ->login()
             ->brandName('SIGEM - Servicio Social')
-            ->brandLogo(new HtmlString('<div class="sigem-brand"><div class="sigem-brand-logo">S</div></div>'))
+            ->brandLogo(new HtmlString('<div class="sigem-brand"><img src="' . asset('images/sigem-icon.svg') . '" alt="SIGEM" class="sigem-brand-logo"></div>'))
             ->brandLogoHeight('auto')
             ->favicon(asset('images/sigem-favicon.svg?v=2'))
             ->font('DM Sans')

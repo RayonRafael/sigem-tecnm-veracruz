@@ -1654,6 +1654,24 @@ th.fi-ta-header-cell span,
   user-select: none;
 }
 
+img.sigem-brand-logo {
+  background: transparent !important;
+  border-radius: 0 !important;
+  object-fit: contain !important;
+  width: 36px !important;
+  height: 36px !important;
+}
+
+img.sigem-brand-logo[src*="sigem-logo.svg"] {
+  object-view-box: xywh(25px 20px 65px 75px);
+}
+
+.fi-simple-main .sigem-brand,
+.fi-simple-layout .sigem-brand {
+  border-bottom: none !important;
+  padding: 0 !important;
+}
+
 .fi-sidebar-header {
   padding: 0 !important;
   height: auto !important;
