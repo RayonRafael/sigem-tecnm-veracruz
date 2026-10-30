@@ -16,6 +16,7 @@ use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class SolicitudResource extends Resource
 {
@@ -214,25 +215,42 @@ class SolicitudResource extends Resource
                     ->fontFamily('mono')
                     ->weight(FontWeight::Bold)
                     ->extraAttributes(['class' => 'sigem-td-folio'])
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        $num = preg_replace('/[^0-9]/', '', $search);
+                        return $query->where(function (Builder $q) use ($search, $num) {
+                            $q->where('id_solicitud', 'like', "%{$search}%");
+                            if ($num !== '') {
+                                $q->orWhere('id_solicitud', $num);
+                            }
+                        });
+                    }, isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('tipo_movimiento')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo de movimiento')
                     ->badge()
                     ->color('gray')
-                    ->searchable(),
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where('tipo_movimiento', $search);
+                    }, isIndividual: true),
                 Tables\Columns\TextColumn::make('usuario.name')->wrap(false)->limit(30)->grow(false)
                     ->label('Solicitante')
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('receptor.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Receptor')
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('receptor.area.departamento.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Departamento')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('fecha_solicitud')->wrap(false)->limit(30)->grow(false)->label('Fecha de solicitud')
                     ->label('Fecha')
                     ->date('d/m/Y')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', trim($search), $m)) {
+                            $search = sprintf('%04d-%02d-%02d', $m[3], $m[2], $m[1]);
+                        }
+                        return $query->where('fecha_solicitud', 'like', "%{$search}%");
+                    }, isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)->label('Estado')
                     ->badge()
@@ -243,7 +261,10 @@ class SolicitudResource extends Resource
                         'Rechazado' => 'danger',
                         'Entregado' => 'info',
                         default => 'gray',
-                    }),
+                    })
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where('estado', $search);
+                    }, isIndividual: true),
                 Tables\Columns\TextColumn::make('fecha_devolucion_estimada')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Devolución estimada')
                     ->date('d/m/Y')
@@ -257,26 +278,21 @@ class SolicitudResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
+            ->searchPlaceholder('Buscar por folio, solicitante o detalle...')
             ->defaultPaginationPageOption(fn () => \App\Support\SigemPagination::getPageOption())
             ->paginationPageOptions(fn () => \App\Support\SigemPagination::getPageOptions())
-            ->filters([
-                Tables\Filters\SelectFilter::make('estado')->label('Estado')
-                    ->options([
-                        'Pendiente' => 'Pendiente',
-                        'Autorizado' => 'Autorizado',
-                        'Rechazado' => 'Rechazado',
-                        'Completado' => 'Completado',
-                        'Cancelado' => 'Cancelado',
-                    ]),
-                Tables\Filters\SelectFilter::make('tipo_movimiento')
-                    ->label('Tipo de movimiento')
-                    ->options([
-                        'Asignacion Temporal' => 'Asignación Temporal',
-                        'Asignacion Permanente' => 'Asignación Permanente',
-                        'Renta Externa' => 'Renta Externa',
-                    ]),
-            ])
-
+            ->filters([])
+            ->modifyQueryUsing(function (Builder $query, $livewire): Builder {
+                $desde = $livewire->tableColumnSearches['fecha_desde'] ?? null;
+                $hasta = $livewire->tableColumnSearches['fecha_hasta'] ?? null;
+                if (filled($desde)) {
+                    $query->whereDate('fecha_solicitud', '>=', $desde);
+                }
+                if (filled($hasta)) {
+                    $query->whereDate('fecha_solicitud', '<=', $hasta);
+                }
+                return $query;
+            })
             ->emptyStateHeading('No hay registros')
             ->emptyStateDescription('Cuando se creen registros, aparecerán aquí.')
             ->emptyStateIcon('heroicon-o-document-text')

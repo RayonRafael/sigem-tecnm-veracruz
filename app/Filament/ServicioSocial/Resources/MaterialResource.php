@@ -119,7 +119,7 @@ class MaterialResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('modelo')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Modelo')
@@ -156,6 +156,7 @@ class MaterialResource extends Resource
             ])
             ->defaultSort('nombre', 'asc')
             ->striped()
+            ->searchPlaceholder('Buscar por nombre, modelo, marca o tipo...')
             ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),

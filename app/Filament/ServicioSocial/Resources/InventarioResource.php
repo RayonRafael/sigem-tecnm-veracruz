@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -270,11 +271,20 @@ class InventarioResource extends Resource
                 Tables\Columns\TextColumn::make('num_serie')->wrap(false)->limit(30)->grow(false)
                     ->label('No. serie')
                     ->fontFamily('mono')
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('material.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Material')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
+                Tables\Columns\TextColumn::make('material.tipo.nombre')
+                    ->label('CATEGORÍA')
+                    ->badge()
+                    ->color('gray')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->whereHas('material.tipo', fn (Builder $q) => $q->where('nombre', 'like', trim($search) . '%'));
+                    }, isIndividual: true)
+                    ->sortable()
+                    ->width('130px'),
                 Tables\Columns\TextColumn::make('subtipo')->wrap(false)->limit(30)->grow(false)
                     ->label('Subtipo')
                     ->searchable()
@@ -282,7 +292,12 @@ class InventarioResource extends Resource
                     ->placeholder('—'),
                 Tables\Columns\TextColumn::make('ubicacion_fisica')->wrap(false)->limit(30)->grow(false)
                     ->label('Ubicación')
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
+                Tables\Columns\TextColumn::make('material.marca.nombre')->wrap(false)->limit(30)->grow(false)
+                    ->label('Marca')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)->label('Estado')
                     ->badge()
                     ->colors([
@@ -300,7 +315,19 @@ class InventarioResource extends Resource
                         'heroicon-m-wrench' => 'En Mantenimiento',
                         'heroicon-m-exclamation-triangle' => 'Dañado',
                         'heroicon-m-minus-circle' => 'Baja',
-                    ]),
+                    ])
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where('estado', $search);
+                    }, isIndividual: true),
+                Tables\Columns\TextColumn::make('tipo_propiedad')
+                    ->label('PROPIEDAD')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : 'Por capturar')
+                    ->color(fn (?string $state): string => $state === 'Propio' ? 'success' : 'info')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where('tipo_propiedad', $search);
+                    }, isIndividual: true)
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('procesador')->wrap(false)->limit(30)->grow(false)
                     ->label('Procesador')
                     ->searchable()
@@ -334,43 +361,26 @@ class InventarioResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
+            ->searchPlaceholder('Buscar por equipo, código, IP, MAC, marca...')
             ->defaultPaginationPageOption(10)
-            ->filters([
-                TrashedFilter::make(),
-                Tables\Filters\SelectFilter::make('estado')
-                    ->options([
-                        'Disponible' => 'Disponible',
-                        'Asignado' => 'Asignado',
-                        'Reasignado' => 'Reasignado',
-                        'En Mantenimiento' => 'En Mantenimiento',
-                        'Dañado' => 'Dañado',
-                        'Baja' => 'Baja',
-                    ]),
-                Tables\Filters\TernaryFilter::make('aprobado')
-                    ->label('Estado de aprobación'),
-                Tables\Filters\Filter::make('red')
-                    ->form([
-                        Forms\Components\TextInput::make('mac_address')->label('Dirección MAC')->placeholder('Ej. AA:BB:CC...'),
-                        Forms\Components\TextInput::make('ip_address')->label('Dirección IP')->placeholder('Ej. 192.168...'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when($data['mac_address'], fn (Builder $q, $mac) => $q->where('mac_address', 'like', "%{$mac}%"))
-                            ->when($data['ip_address'], fn (Builder $q, $ip) => $q->where('ip_address', 'like', "%{$ip}%"));
-                    }),
-                Tables\Filters\Filter::make('especificaciones')
-                    ->form([
-                        Forms\Components\TextInput::make('procesador')->label('Procesador')->placeholder('Ej. i5, Ryzen...'),
-                        Forms\Components\TextInput::make('ram')->label('Memoria RAM')->placeholder('Ej. 8 GB, 16 GB...'),
-                        Forms\Components\TextInput::make('disco')->label('Disco Duro')->placeholder('Ej. 512GB SSD...'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when($data['procesador'], fn (Builder $q, $val) => $q->where('procesador', 'like', "%{$val}%"))
-                            ->when($data['ram'], fn (Builder $q, $val) => $q->where('ram', 'like', "%{$val}%"))
-                            ->when($data['disco'], fn (Builder $q, $val) => $q->where('disco', 'like', "%{$val}%"));
-                    }),
-            ])
+            ->filters([])
+            ->modifyQueryUsing(function (Builder $query, $livewire): Builder {
+                $desde = $livewire->tableColumnSearches['fecha_desde'] ?? null;
+                $hasta = $livewire->tableColumnSearches['fecha_hasta'] ?? null;
+                if (filled($desde)) {
+                    $query->where(function (Builder $q) use ($desde) {
+                        $q->whereDate('fecha_registro', '>=', $desde)
+                          ->orWhere(fn ($sub) => $sub->whereNull('fecha_registro')->whereDate('created_at', '>=', $desde));
+                    });
+                }
+                if (filled($hasta)) {
+                    $query->where(function (Builder $q) use ($hasta) {
+                        $q->whereDate('fecha_registro', '<=', $hasta)
+                          ->orWhere(fn ($sub) => $sub->whereNull('fecha_registro')->whereDate('created_at', '<=', $hasta));
+                    });
+                }
+                return $query;
+            })
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([

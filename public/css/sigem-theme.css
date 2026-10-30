@@ -4992,15 +4992,95 @@ header.fi-topbar nav>div.ms-auto,
 }
 
 /* ============================================
-   PASO 4b: Filtros de Filament como fila
+   TOOLBAR DE TABLAS: fila única (Acciones + Buscador + Fechas + Quitar)
    ============================================ */
-.fi-ta-ctn .fi-ta-filters {
+.fi-ta-header-toolbar {
   display: flex !important;
-  flex-wrap: nowrap !important;
-  gap: 8px !important;
-  padding: 6px 12px !important;
-  background: var(--sig-bg, #f4f6f8) !important;
-  border-bottom: 1px solid var(--sig-border, #e5e7eb) !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 10px 16px !important;
+  background: var(--sig-surface, #ffffff) !important;
+}
+
+.fi-ta-header-toolbar > .ms-auto {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex: 1 1 auto !important;
+  justify-content: flex-end !important;
+}
+
+.sigem-table-toolbar-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  justify-content: flex-end !important;
+}
+
+.sigem-table-toolbar-group .sigem-toolbar-search {
+  flex: 1 1 320px !important;
+  min-width: 220px !important;
+  max-width: 550px !important;
+}
+
+.sigem-toolbar-date {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-shrink: 0 !important;
+}
+
+.sigem-toolbar-date-label {
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .05em !important;
+  color: var(--sig-muted, #64748b) !important;
+}
+
+.sigem-toolbar-date-input {
+  height: 36px !important;
+  width: 135px !important;
+  font-size: 12px !important;
+  padding: 4px 8px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: var(--sig-surface, #ffffff) !important;
+  color: var(--sig-text, #0f172a) !important;
+  outline: none !important;
+  transition: all 0.15s ease !important;
+}
+
+.sigem-toolbar-date-input:focus {
+  border-color: var(--sig-primary, #1b65d4) !important;
+  box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+}
+
+.sigem-toolbar-reset-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  height: 36px !important;
+  padding: 0 12px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: transparent !important;
+  color: var(--sig-muted, #64748b) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  transition: all 0.15s ease !important;
+}
+
+.sigem-toolbar-reset-btn:hover {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: var(--sig-text, #0f172a) !important;
 }
 
 /* ============================================
@@ -6197,3 +6277,62 @@ body:has(.sigem-professional) .fi-main {
   max-width: none !important;
   width: auto !important;
 }
+
+/* Inputs de búsqueda por columna (isIndividual) */
+.fi-table-individual-search-cell,
+[class*="fi-table-individual-search-cell"] {
+  padding: 4px 8px !important;
+  background: var(--sig-bg, #f4f6f8) !important;
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+}
+
+.fi-table-individual-search-cell input,
+[class*="fi-table-individual-search-cell"] input {
+  font-size: 12.5px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 4px 10px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: var(--sig-surface, #ffffff) !important;
+}
+
+.fi-table-individual-search-cell input:focus,
+[class*="fi-table-individual-search-cell"] input:focus {
+  border-color: var(--sig-primary, #1b65d4) !important;
+  box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+  outline: none !important;
+}
+
+.fi-table-individual-search-cell input::placeholder,
+[class*="fi-table-individual-search-cell"] input::placeholder {
+  color: var(--sig-muted, #64748b) !important;
+  font-size: 11.5px !important;
+}
+
+/* Dropdown en celda de búsqueda individual */
+.fi-table-individual-search-cell select,
+[class*="fi-table-individual-search-cell"] select,
+.fi-table-individual-search-select {
+  width: 100% !important;
+  font-size: 12.5px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 4px 28px 4px 10px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: var(--sig-surface, #ffffff) !important;
+  appearance: auto !important;
+  cursor: pointer !important;
+  color: var(--sig-text, #0f172a) !important;
+}
+
+.fi-table-individual-search-cell select:focus,
+[class*="fi-table-individual-search-cell"] select:focus,
+.fi-table-individual-search-select:focus {
+  border-color: var(--sig-primary, #1b65d4) !important;
+  box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+  outline: none !important;
+}
+
+

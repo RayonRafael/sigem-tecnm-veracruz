@@ -51,9 +51,17 @@
                     <div style="position: relative;">
                         <input type="text"
                                wire:model.live.debounce.300ms="search"
-                               placeholder="🔍 Buscar en este catálogo..."
-                               style="padding: 7px 12px; border-radius: 8px; border: 1px solid var(--sig-border); font-size: 13.5px; width: 220px; outline: none;">
+                               placeholder="{{ $this->getPlaceholder() }}"
+                               style="padding: 7px 12px; border-radius: 8px; border: 1px solid var(--sig-border); font-size: 13.5px; min-width: 260px; outline: none;">
                     </div>
+                    @if (filled($search))
+                        <button type="button"
+                                wire:click="$set('search', '')"
+                                class="sigem-rep-btn-sec"
+                                title="Quitar búsqueda">
+                            ✕ Quitar filtros
+                        </button>
+                    @endif
                     @php
                         $routeIndex = match ($catalogoActivo) {
                             'areas' => url('/servicio-social/areas'),

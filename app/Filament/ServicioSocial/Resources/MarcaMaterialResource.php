@@ -73,7 +73,7 @@ class MarcaMaterialResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->dateTime('d/m/Y')
@@ -82,6 +82,7 @@ class MarcaMaterialResource extends Resource
             ])
             ->defaultSort('nombre', 'asc')
             ->striped()
+            ->searchPlaceholder('Buscar por nombre de la marca...')
             ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),

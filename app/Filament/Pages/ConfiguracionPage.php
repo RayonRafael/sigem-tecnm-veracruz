@@ -81,6 +81,19 @@ class ConfiguracionPage extends Page
 
     public string $catalogoActivo = 'departamentos';
 
+    // Filtros de Catálogos
+    public string $catalogoSearch = '';
+
+    public string $filtroDepartamento = '';
+
+    public string $filtroTipoMaterial = '';
+
+    public string $filtroMarca = '';
+
+    public string $filtroRol = '';
+
+    public string $filtroEstadoUsuario = '';
+
     // Filtros de Bitácora
     public string $bitacoraSearch = '';
 
@@ -123,6 +136,43 @@ class ConfiguracionPage extends Page
     public function setCatalogo(string $cat): void
     {
         $this->catalogoActivo = $cat;
+        $this->limpiarFiltrosCatalogo();
+    }
+
+    public function limpiarFiltrosCatalogo(): void
+    {
+        $this->catalogoSearch = '';
+        $this->filtroDepartamento = '';
+        $this->filtroTipoMaterial = '';
+        $this->filtroMarca = '';
+        $this->filtroRol = '';
+        $this->filtroEstadoUsuario = '';
+    }
+
+    public function getPlaceholderCatalogo(): string
+    {
+        return match ($this->catalogoActivo) {
+            'departamentos' => 'Buscar por nombre del departamento...',
+            'areas' => 'Buscar por nombre o departamento...',
+            'materiales' => 'Buscar por nombre, modelo, marca o tipo...',
+            'marcas' => 'Buscar por nombre de la marca...',
+            'tipos' => 'Buscar por nombre del tipo...',
+            'unidades' => 'Buscar por nombre de la unidad...',
+            'proveedores' => 'Buscar por empresa, RFC, contacto o correo...',
+            'receptores' => 'Buscar por nombre, cargo, área o correo...',
+            'usuarios' => 'Buscar por nombre, correo o número de control...',
+            default => 'Buscar en este catálogo...',
+        };
+    }
+
+    public function tieneFiltrosCatalogoActivos(): bool
+    {
+        return filled($this->catalogoSearch)
+            || filled($this->filtroDepartamento)
+            || filled($this->filtroTipoMaterial)
+            || filled($this->filtroMarca)
+            || filled($this->filtroRol)
+            || filled($this->filtroEstadoUsuario);
     }
 
     public function limpiarFiltrosBitacora(): void
@@ -253,12 +303,17 @@ class ConfiguracionPage extends Page
         $rows = [];
         $crearAccion = 'crear' . self::ENTIDADES_CATALOGO[$cat['id']];
         $indexUrl = $cat['resource']::getUrl('index');
+        $term = trim($this->catalogoSearch);
 
         // TODO [Fase 10 - Documentado]: Vista previa embebida en pestaña Catálogos; cada catálogo redirige a su ListRecords nativo completo al hacer clic.
         switch ($cat['id']) {
             case 'departamentos':
                 $headers = ['ID', 'Nombre del departamento', 'Acciones'];
-                $deptos = Departamento::orderBy('nombre')->limit(25)->get();
+                $deptosQ = Departamento::orderBy('nombre');
+                if ($term !== '') {
+                    $deptosQ->where('nombre', 'like', "%{$term}%");
+                }
+                $deptos = $deptosQ->limit(25)->get();
                 foreach ($deptos as $d) {
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $d->id_departamento . '</span>',
@@ -270,7 +325,17 @@ class ConfiguracionPage extends Page
 
             case 'areas':
                 $headers = ['ID', 'Área', 'Departamento', 'Acciones'];
-                $areas = Area::with('departamento')->orderBy('nombre')->limit(25)->get();
+                $areasQ = Area::with('departamento')->orderBy('nombre');
+                if ($term !== '') {
+                    $areasQ->where(function ($q) use ($term) {
+                        $q->where('nombre', 'like', "%{$term}%")
+                          ->orWhereHas('departamento', fn ($dq) => $dq->where('nombre', 'like', "%{$term}%"));
+                    });
+                }
+                if ($this->filtroDepartamento !== '') {
+                    $areasQ->where('id_departamento', $this->filtroDepartamento);
+                }
+                $areas = $areasQ->limit(25)->get();
                 foreach ($areas as $a) {
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $a->id_area . '</span>',
@@ -283,7 +348,22 @@ class ConfiguracionPage extends Page
 
             case 'materiales':
                 $headers = ['Modelo / ID', 'Material / Equipo', 'Marca', 'Tipo', 'Stock', 'Acciones'];
-                $materiales = Material::with(['marca', 'tipo'])->orderBy('nombre')->limit(25)->get();
+                $materialesQ = Material::with(['marca', 'tipo'])->orderBy('nombre');
+                if ($term !== '') {
+                    $materialesQ->where(function ($q) use ($term) {
+                        $q->where('nombre', 'like', "%{$term}%")
+                          ->orWhere('modelo', 'like', "%{$term}%")
+                          ->orWhereHas('marca', fn ($mq) => $mq->where('nombre', 'like', "%{$term}%"))
+                          ->orWhereHas('tipo', fn ($tq) => $tq->where('nombre', 'like', "%{$term}%"));
+                    });
+                }
+                if ($this->filtroTipoMaterial !== '') {
+                    $materialesQ->where('id_tipodematerial', $this->filtroTipoMaterial);
+                }
+                if ($this->filtroMarca !== '') {
+                    $materialesQ->where('id_marca', $this->filtroMarca);
+                }
+                $materiales = $materialesQ->limit(25)->get();
                 foreach ($materiales as $m) {
                     $codigo = $m->modelo ?: ('#' . $m->id_producto);
                     $rows[] = [
@@ -299,7 +379,11 @@ class ConfiguracionPage extends Page
 
             case 'marcas':
                 $headers = ['ID', 'Marca de material', 'Acciones'];
-                $marcas = MarcaMaterial::orderBy('nombre')->limit(25)->get();
+                $marcasQ = MarcaMaterial::orderBy('nombre');
+                if ($term !== '') {
+                    $marcasQ->where('nombre', 'like', "%{$term}%");
+                }
+                $marcas = $marcasQ->limit(25)->get();
                 foreach ($marcas as $mc) {
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $mc->id_marca . '</span>',
@@ -311,7 +395,11 @@ class ConfiguracionPage extends Page
 
             case 'tipos':
                 $headers = ['ID', 'Tipo de material', 'Acciones'];
-                $tipos = TipoMaterial::orderBy('nombre')->limit(25)->get();
+                $tiposQ = TipoMaterial::orderBy('nombre');
+                if ($term !== '') {
+                    $tiposQ->where('nombre', 'like', "%{$term}%");
+                }
+                $tipos = $tiposQ->limit(25)->get();
                 foreach ($tipos as $t) {
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $t->id_tipodematerial . '</span>',
@@ -323,7 +411,11 @@ class ConfiguracionPage extends Page
 
             case 'unidades':
                 $headers = ['ID', 'Unidad de medida', 'Acciones'];
-                $unidades = UnidadMedida::orderBy('nombre')->limit(25)->get();
+                $unidadesQ = UnidadMedida::orderBy('nombre');
+                if ($term !== '') {
+                    $unidadesQ->where('nombre', 'like', "%{$term}%");
+                }
+                $unidades = $unidadesQ->limit(25)->get();
                 foreach ($unidades as $u) {
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $u->id_unidad . '</span>',
@@ -335,7 +427,16 @@ class ConfiguracionPage extends Page
 
             case 'proveedores':
                 $headers = ['ID', 'Proveedor', 'RFC', 'Contacto', 'Acciones'];
-                $proveedores = Proveedor::orderBy('nombre_empresa')->limit(25)->get();
+                $proveedoresQ = Proveedor::orderBy('nombre_empresa');
+                if ($term !== '') {
+                    $proveedoresQ->where(function ($q) use ($term) {
+                        $q->where('nombre_empresa', 'like', "%{$term}%")
+                          ->orWhere('rfc', 'like', "%{$term}%")
+                          ->orWhere('contacto_nombre', 'like', "%{$term}%")
+                          ->orWhere('contacto_email', 'like', "%{$term}%");
+                    });
+                }
+                $proveedores = $proveedoresQ->limit(25)->get();
                 foreach ($proveedores as $p) {
                     $contacto = trim(($p->contacto_nombre ? $p->contacto_nombre . ' · ' : '') . ($p->contacto_telefono ?? '') . ' ' . ($p->contacto_email ?? ''));
                     $rows[] = [
@@ -350,7 +451,20 @@ class ConfiguracionPage extends Page
 
             case 'receptores':
                 $headers = ['ID', 'Receptor', 'Área', 'Contacto', 'Acciones'];
-                $receptores = Receptor::with('area')->orderBy('nombre')->limit(25)->get();
+                $receptoresQ = Receptor::with('area.departamento')->orderBy('nombre');
+                if ($term !== '') {
+                    $receptoresQ->where(function ($q) use ($term) {
+                        $q->where('nombre', 'like', "%{$term}%")
+                          ->orWhere('apellido_paterno', 'like', "%{$term}%")
+                          ->orWhere('cargo', 'like', "%{$term}%")
+                          ->orWhere('email', 'like', "%{$term}%")
+                          ->orWhereHas('area', fn ($aq) => $aq->where('nombre', 'like', "%{$term}%"));
+                    });
+                }
+                if ($this->filtroDepartamento !== '') {
+                    $receptoresQ->whereHas('area', fn ($aq) => $aq->where('id_departamento', $this->filtroDepartamento));
+                }
+                $receptores = $receptoresQ->limit(25)->get();
                 foreach ($receptores as $r) {
                     $nombreCompleto = trim("{$r->nombre} {$r->apellido_paterno} {$r->apellido_materno}");
                     $contacto = trim(($r->telefono ?? '') . ' ' . ($r->email ?? ''));
@@ -366,7 +480,21 @@ class ConfiguracionPage extends Page
 
             case 'usuarios':
                 $headers = ['ID', 'Usuario', 'Correo electrónico', 'No. control', 'Rol', 'Estado', 'Acciones'];
-                $usuarios = User::with('roles')->orderBy('name')->limit(25)->get();
+                $usuariosQ = User::with('roles')->orderBy('name');
+                if ($term !== '') {
+                    $usuariosQ->where(function ($q) use ($term) {
+                        $q->where('name', 'like', "%{$term}%")
+                          ->orWhere('email', 'like', "%{$term}%")
+                          ->orWhere('num_control', 'like', "%{$term}%");
+                    });
+                }
+                if ($this->filtroRol !== '') {
+                    $usuariosQ->whereHas('roles', fn ($rq) => $rq->where('name', $this->filtroRol));
+                }
+                if ($this->filtroEstadoUsuario !== '') {
+                    $usuariosQ->where('activo', (bool) $this->filtroEstadoUsuario);
+                }
+                $usuarios = $usuariosQ->limit(25)->get();
                 foreach ($usuarios as $u) {
                     $nombreCompleto = trim("{$u->name} {$u->apellido_paterno} {$u->apellido_materno}");
                     $rol = $u->roles->first()?->name ?? $u->tipo_usuario ?? 'Sin rol';

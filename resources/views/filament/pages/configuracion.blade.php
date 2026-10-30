@@ -78,6 +78,64 @@
                     </div>
                 </div>
 
+                {{-- Barra de búsqueda y filtros contextuales del catálogo activo --}}
+                <div class="sigem-bitacora-filters" style="border-bottom: 1px solid var(--sig-border); margin-bottom: 0; padding: 10px 16px;">
+                    <input type="text"
+                           wire:model.live.debounce.300ms="catalogoSearch"
+                           placeholder="{{ $this->getPlaceholderCatalogo() }}"
+                           style="min-width: 240px; flex: 1;">
+
+                    @if ($catActivo['id'] === 'areas')
+                        <select wire:model.live="filtroDepartamento" style="min-width: 180px;">
+                            <option value="">Todos los departamentos</option>
+                            @foreach (\App\Models\Departamento::orderBy('nombre')->get() as $dep)
+                                <option value="{{ $dep->id_departamento }}">{{ $dep->nombre }}</option>
+                            @endforeach
+                        </select>
+                    @elseif ($catActivo['id'] === 'materiales')
+                        <select wire:model.live="filtroTipoMaterial" style="min-width: 170px;">
+                            <option value="">Todos los tipos</option>
+                            @foreach (\App\Models\TipoMaterial::orderBy('nombre')->get() as $tipo)
+                                <option value="{{ $tipo->id_tipodematerial }}">{{ $tipo->nombre }}</option>
+                            @endforeach
+                        </select>
+                        <select wire:model.live="filtroMarca" style="min-width: 150px;">
+                            <option value="">Todas las marcas</option>
+                            @foreach (\App\Models\MarcaMaterial::orderBy('nombre')->get() as $marca)
+                                <option value="{{ $marca->id_marca }}">{{ $marca->nombre }}</option>
+                            @endforeach
+                        </select>
+                    @elseif ($catActivo['id'] === 'receptores')
+                        <select wire:model.live="filtroDepartamento" style="min-width: 180px;">
+                            <option value="">Todos los departamentos</option>
+                            @foreach (\App\Models\Departamento::orderBy('nombre')->get() as $dep)
+                                <option value="{{ $dep->id_departamento }}">{{ $dep->nombre }}</option>
+                            @endforeach
+                        </select>
+                    @elseif ($catActivo['id'] === 'usuarios')
+                        <select wire:model.live="filtroRol" style="min-width: 150px;">
+                            <option value="">Todos los roles</option>
+                            @foreach (\Spatie\Permission\Models\Role::all() as $role)
+                                <option value="{{ $role->name }}">{{ $role->name }}</option>
+                            @endforeach
+                        </select>
+                        <select wire:model.live="filtroEstadoUsuario" style="min-width: 140px;">
+                            <option value="">Todos los estados</option>
+                            <option value="1">Activos</option>
+                            <option value="0">Inactivos</option>
+                        </select>
+                    @endif
+
+                    @if ($this->tieneFiltrosCatalogoActivos())
+                        <button type="button"
+                                wire:click="limpiarFiltrosCatalogo"
+                                class="sigem-rep-btn-sec"
+                                title="Restablecer filtros">
+                            ✕ Quitar filtros
+                        </button>
+                    @endif
+                </div>
+
                 @if (count($catActivo['rows']) > 0)
                     <div class="sigem-rep-table-wrap">
                         <table class="fi-ta-table sigem-cat-table sigem-cat-{{ $catActivo['id'] }}">

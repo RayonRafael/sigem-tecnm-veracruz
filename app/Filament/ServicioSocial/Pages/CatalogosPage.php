@@ -76,6 +76,21 @@ class CatalogosPage extends Page
         }
     }
 
+    public function getPlaceholder(): string
+    {
+        return match ($this->catalogoActivo) {
+            'departamentos' => 'Buscar por nombre del departamento...',
+            'areas' => 'Buscar por nombre o departamento...',
+            'materiales' => 'Buscar por nombre, modelo, marca o tipo...',
+            'marcas' => 'Buscar por nombre de la marca...',
+            'tipos' => 'Buscar por nombre del tipo...',
+            'unidades' => 'Buscar por nombre de la unidad...',
+            'proveedores' => 'Buscar por empresa, RFC, contacto o correo...',
+            'receptores' => 'Buscar por nombre, cargo, área o correo...',
+            default => 'Buscar en este catálogo...',
+        };
+    }
+
     protected function getCatalogosConfig(): array
     {
         return [

@@ -136,7 +136,7 @@ class UserResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')->wrap(false)->limit(30)->grow(false)->label('Nombre')
                     ->label('Nombre')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('email')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)->label('Correo electrónico')
                     ->label('Correo electrónico')
@@ -171,6 +171,7 @@ class UserResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
+            ->searchPlaceholder('Buscar por nombre, correo o número de control...')
             ->defaultPaginationPageOption(10)
             ->filters([
                 Tables\Filters\SelectFilter::make('tipo_usuario')

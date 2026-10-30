@@ -61,9 +61,10 @@ class DepartamentoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)->label('Nombre')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)->label('Nombre')->searchable(isIndividual: true)->sortable(),
             ])
             ->defaultSort('nombre', 'asc')
+            ->searchPlaceholder('Buscar por nombre del departamento...')
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([

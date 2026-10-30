@@ -81,7 +81,7 @@ class AreaResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('departamento.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Departamento')
@@ -94,6 +94,7 @@ class AreaResource extends Resource
             ])
             ->defaultSort('nombre', 'asc')
             ->striped()
+            ->searchPlaceholder('Buscar por nombre o departamento...')
             ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),

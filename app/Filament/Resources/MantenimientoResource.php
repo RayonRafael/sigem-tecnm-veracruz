@@ -16,6 +16,7 @@ use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class MantenimientoResource extends Resource
 {
@@ -176,32 +177,29 @@ class MantenimientoResource extends Resource
                     ->fontFamily('mono')
                     ->weight(FontWeight::Bold)
                     ->extraAttributes(['class' => 'sigem-td-folio'])
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->description(fn (Mantenimiento $record): ?string => $record->inventario?->material?->nombre),
                 Tables\Columns\TextColumn::make('inventario.material.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Material')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('tipo_mantenimiento')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(isIndividual: true),
+                Tables\Columns\TextColumn::make('tipo_mantenimiento')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo mantenimiento')
                     ->badge()
+                    ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : '—')
                     ->colors([
                         'success' => 'Preventivo',
                         'danger' => 'Correctivo',
                         'primary' => 'Mejora',
                     ])
-                    ->icons([
-                        'heroicon-m-shield-check' => 'Preventivo',
-                        'heroicon-m-exclamation-triangle' => 'Correctivo',
-                        'heroicon-m-arrow-trending-up' => 'Mejora',
-                    ])
-                    ->searchable(),
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where('tipo_mantenimiento', $search);
+                    }, isIndividual: true),
                 Tables\Columns\TextColumn::make('tipo_servicio')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo servicio')
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('nombre_tecnico')->wrap(false)->limit(30)->grow(false)
                     ->label('Técnico')
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)->label('Estado')
                     ->formatStateUsing(fn ($state) => match ($state) {
                         'Pendiente Revision Admin' => 'En revisión',
@@ -216,10 +214,19 @@ class MantenimientoResource extends Resource
                         'success' => ['Terminado', 'Completado'],
                         'danger'  => ['Rechazado', 'Cancelado'],
                         'gray'    => 'otros',
-                    ]),
+                    ])
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where('estado', $search);
+                    }, isIndividual: true),
                 Tables\Columns\TextColumn::make('fecha_solicitud')->wrap(false)->limit(30)->grow(false)->label('Fecha de solicitud')
                     ->label('Fecha sol.')
                     ->date('d/m/Y')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', trim($search), $m)) {
+                            $search = sprintf('%04d-%02d-%02d', $m[3], $m[2], $m[1]);
+                        }
+                        return $query->where('fecha_solicitud', 'like', "%{$search}%");
+                    }, isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('fecha_inicio')->wrap(false)->limit(30)->grow(false)->label('Fecha de inicio')
                     ->label('Fecha inicio')
@@ -234,26 +241,21 @@ class MantenimientoResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
+            ->searchPlaceholder('Buscar por equipo, técnico o tipo de servicio...')
             ->defaultPaginationPageOption(fn () => \App\Support\SigemPagination::getPageOption())
             ->paginationPageOptions(fn () => \App\Support\SigemPagination::getPageOptions())
-            ->filters([
-                Tables\Filters\SelectFilter::make('estado')->label('Estado')
-                    ->options([
-                        'Solicitado' => 'Solicitado',
-                        'En proceso' => 'En proceso',
-                        'Pendiente Revision Admin' => 'En revisión',
-                        'Completado' => 'Completado',
-                        'Cancelado' => 'Cancelado',
-                    ]),
-                Tables\Filters\SelectFilter::make('tipo_mantenimiento')
-                    ->label('Tipo de mantenimiento')
-                    ->options([
-                        'Preventivo' => 'Preventivo',
-                        'Correctivo' => 'Correctivo',
-                        'Mejora' => 'Mejora',
-                    ]),
-            ])
-
+            ->filters([])
+            ->modifyQueryUsing(function (Builder $query, $livewire): Builder {
+                $desde = $livewire->tableColumnSearches['fecha_desde'] ?? null;
+                $hasta = $livewire->tableColumnSearches['fecha_hasta'] ?? null;
+                if (filled($desde)) {
+                    $query->whereDate('fecha_solicitud', '>=', $desde);
+                }
+                if (filled($hasta)) {
+                    $query->whereDate('fecha_solicitud', '<=', $hasta);
+                }
+                return $query;
+            })
             ->emptyStateHeading('No hay registros')
             ->emptyStateDescription('Cuando se creen registros, aparecerán aquí.')
             ->emptyStateIcon('heroicon-o-document-text')

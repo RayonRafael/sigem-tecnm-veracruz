@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -152,27 +153,28 @@ class MantenimientoResource extends Resource
                 Tables\Columns\TextColumn::make('inventario.num_serie')->wrap(false)->limit(30)->grow(false)
                     ->label('No. serie (activo)')
                     ->fontFamily('mono')
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('inventario.material.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Material')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('tipo_mantenimiento')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(isIndividual: true),
+                Tables\Columns\TextColumn::make('tipo_mantenimiento')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo mantenimiento')
                     ->badge()
+                    ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : '—')
                     ->colors([
                         'success' => 'Preventivo',
                         'danger' => 'Correctivo',
                         'primary' => 'Mejora',
                     ])
-                    ->icons([
-                        'heroicon-m-shield-check' => 'Preventivo',
-                        'heroicon-m-exclamation-triangle' => 'Correctivo',
-                        'heroicon-m-arrow-trending-up' => 'Mejora',
-                    ])
-                    ->searchable(),
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where('tipo_mantenimiento', $search);
+                    }, isIndividual: true),
+                Tables\Columns\TextColumn::make('tipo_servicio')->wrap(false)->limit(30)->grow(false)
+                    ->label('Tipo servicio')
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('nombre_tecnico')->wrap(false)->limit(30)->grow(false)
                     ->label('Técnico')
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)
                     ->formatStateUsing(fn ($state) => $state === 'Pendiente Revision Admin' ? 'En revisión' : $state)
                     ->badge()
@@ -188,23 +190,37 @@ class MantenimientoResource extends Resource
                         'heroicon-m-wrench-screwdriver' => 'En proceso',
                         'heroicon-m-check-badge' => 'Completado',
                         'heroicon-m-x-circle' => 'Cancelado',
-                    ]),
+                    ])
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where('estado', $search);
+                    }, isIndividual: true),
                 Tables\Columns\TextColumn::make('fecha_solicitud')->wrap(false)->limit(30)->grow(false)
                     ->label('Fecha sol.')
                     ->date('d/m/Y')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', trim($search), $m)) {
+                            $search = sprintf('%04d-%02d-%02d', $m[3], $m[2], $m[1]);
+                        }
+                        return $query->where('fecha_solicitud', 'like', "%{$search}%");
+                    }, isIndividual: true)
                     ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
+            ->searchPlaceholder('Buscar por equipo, técnico o tipo de servicio...')
             ->defaultPaginationPageOption(10)
-            ->filters([
-                Tables\Filters\SelectFilter::make('estado')
-                    ->options([
-                        'Solicitado' => 'Solicitado',
-                        'En proceso' => 'En proceso',
-                        'Pendiente Revision Admin' => 'En revisión',
-                    ]),
-            ])
+            ->filters([])
+            ->modifyQueryUsing(function (Builder $query, $livewire): Builder {
+                $desde = $livewire->tableColumnSearches['fecha_desde'] ?? null;
+                $hasta = $livewire->tableColumnSearches['fecha_hasta'] ?? null;
+                if (filled($desde)) {
+                    $query->whereDate('fecha_solicitud', '>=', $desde);
+                }
+                if (filled($hasta)) {
+                    $query->whereDate('fecha_solicitud', '<=', $hasta);
+                }
+                return $query;
+            })
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([

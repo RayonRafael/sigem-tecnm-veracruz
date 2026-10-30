@@ -105,7 +105,7 @@ class ReceptorResource extends Resource
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
                     ->description(fn (Receptor $record): ?string => $record->cargo)
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('cargo')->wrap(false)->limit(30)->grow(false)
                     ->label('Cargo / Puesto')
                     ->searchable()
@@ -133,6 +133,7 @@ class ReceptorResource extends Resource
             ])
             ->defaultSort('nombre', 'asc')
             ->striped()
+            ->searchPlaceholder('Buscar por nombre, cargo, área o correo...')
             ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),

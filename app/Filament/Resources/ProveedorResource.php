@@ -102,7 +102,7 @@ class ProveedorResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre_empresa')->wrap(false)->limit(30)->grow(false)
                     ->label('Empresa')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('rfc')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Rfc')
@@ -130,6 +130,7 @@ class ProveedorResource extends Resource
             ])
             ->defaultSort('nombre_empresa', 'asc')
             ->striped()
+            ->searchPlaceholder('Buscar por empresa, RFC, contacto o correo...')
             ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),
