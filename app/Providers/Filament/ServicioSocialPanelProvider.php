@@ -70,7 +70,7 @@ class ServicioSocialPanelProvider extends PanelProvider
     $path = request()->path();
     $section = match(true) {
         str_contains($path, "inventarios") => "Inventario general",
-        str_contains($path, "solicituds") => "Solicitud de Material/Equipo",
+        str_contains($path, "solicituds") => "Lista de solicitudes de materiales",
         str_contains($path, "mantenimientos") => "Mantenimiento",
         str_contains($path, "catalogos") => "Catálogos",
         str_contains($path, "reportes") => "Reportes",

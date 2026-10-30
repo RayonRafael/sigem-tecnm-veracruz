@@ -17,7 +17,7 @@ class ListSolicituds extends ListRecords
 
     public function getTitle(): string
     {
-        return '📋 Solicitud de Material/Equipo';
+        return '📋 Lista de solicitudes de materiales';
     }
 
     public function getSubheading(): ?string
