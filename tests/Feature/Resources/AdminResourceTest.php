@@ -485,6 +485,260 @@ class AdminResourceTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertStringContainsString('text/csv', (string) $response->headers->get('content-type'));
     }
+
+    public function test_exportar_reporte_inventario_categoria_csv_content(): void
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $user = $this->getAdminUser();
+
+        $unidad = UnidadMedida::firstOrCreate(['nombre' => 'Pieza']);
+        $marca = MarcaMaterial::firstOrCreate(['nombre' => 'Lenovo CSV']);
+        $tipo = TipoMaterial::firstOrCreate(['nombre' => 'Laptops CSV Test']);
+        $material = Material::create([
+            'nombre' => 'ThinkPad T14 CSV',
+            'id_unidad' => $unidad->id_unidad,
+            'id_marca' => $marca->id_marca,
+            'id_tipodematerial' => $tipo->id_tipodematerial,
+            'stock_actual' => 2,
+            'requiere_control_individual' => 1,
+        ]);
+
+        Inventario::create([
+            'num_serie' => 'LNV-CSV-001',
+            'id_producto' => $material->id_producto,
+            'id_usuario' => $user->id,
+            'estado' => 'Disponible',
+            'estado_registro' => 'Aprobado',
+            'tipo_propiedad' => 'Propio',
+            'ubicacion_fisica' => 'Edificio Central',
+            'fecha_registro' => now(),
+        ]);
+
+        Inventario::create([
+            'num_serie' => 'LNV-CSV-002',
+            'id_producto' => $material->id_producto,
+            'id_usuario' => $user->id,
+            'estado' => 'Asignado',
+            'estado_registro' => 'Aprobado',
+            'tipo_propiedad' => 'Rentado',
+            'ubicacion_fisica' => 'Edificio Central',
+            'fecha_registro' => now(),
+        ]);
+
+        $testable = \Livewire\Livewire::actingAs($user)->test(ReportesPage::class);
+        $response = $testable->instance()->exportarReporte('inventario_categoria');
+
+        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
+
+        ob_start();
+        $response->sendContent();
+        $csv = (string) ob_get_clean();
+
+        $this->assertNotEmpty($csv);
+        $cleanCsv = preg_replace('/^\xEF\xBB\xBF/', '', $csv);
+        $lines = array_values(array_filter(explode("\n", str_replace(["\r\n", "\r"], "\n", $cleanCsv))));
+
+        $headers = str_getcsv(array_shift($lines));
+        $this->assertEquals(['Categoría / Tipo', 'Total', 'Propio', 'Renta', 'Disponibles', 'Asignados', 'En Mantenimiento', 'Dañados / Baja'], $headers);
+
+        $matchingRow = null;
+        foreach ($lines as $line) {
+            $row = str_getcsv($line);
+            if (isset($row[0]) && $row[0] === 'Laptops CSV Test') {
+                $matchingRow = $row;
+                break;
+            }
+        }
+
+        $this->assertNotNull($matchingRow, 'No se encontró la fila de la categoría en el CSV.');
+        $this->assertEquals('2', $matchingRow[1]); // Total
+        $this->assertEquals('1', $matchingRow[2]); // Propio
+        $this->assertEquals('1', $matchingRow[3]); // Renta
+        $this->assertEquals('1', $matchingRow[4]); // Disponibles
+        $this->assertEquals('1', $matchingRow[5]); // Asignados
+        $this->assertEquals('0', $matchingRow[6]); // En Mantenimiento
+        $this->assertEquals('0', $matchingRow[7]); // Dañados / Baja
+    }
+
+    public function test_exportar_reporte_equipos_area_csv_content(): void
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $user = $this->getAdminUser();
+
+        $depto = Departamento::firstOrCreate(['nombre' => 'Depto CSV Área Test']);
+        $area = Area::firstOrCreate([
+            'nombre' => 'Área CSV Redes Test',
+            'id_departamento' => $depto->id_departamento,
+        ]);
+
+        $unidad = UnidadMedida::firstOrCreate(['nombre' => 'Pieza']);
+        $marca = MarcaMaterial::firstOrCreate(['nombre' => 'Cisco CSV']);
+        $tipo = TipoMaterial::firstOrCreate(['nombre' => 'Switches CSV']);
+        $material = Material::create([
+            'nombre' => 'Catalyst CSV',
+            'id_unidad' => $unidad->id_unidad,
+            'id_marca' => $marca->id_marca,
+            'id_tipodematerial' => $tipo->id_tipodematerial,
+            'stock_actual' => 2,
+            'requiere_control_individual' => 1,
+        ]);
+
+        Inventario::create([
+            'num_serie' => 'CSCO-CSV-001',
+            'id_producto' => $material->id_producto,
+            'id_usuario' => $user->id,
+            'estado' => 'Disponible',
+            'estado_registro' => 'Aprobado',
+            'tipo_propiedad' => 'Propio',
+            'ubicacion_fisica' => 'Área CSV Redes Test - Rack 1',
+            'fecha_registro' => now(),
+        ]);
+
+        Inventario::create([
+            'num_serie' => 'CSCO-CSV-002',
+            'id_producto' => $material->id_producto,
+            'id_usuario' => $user->id,
+            'estado' => 'Asignado',
+            'estado_registro' => 'Aprobado',
+            'tipo_propiedad' => 'Rentado',
+            'ubicacion_fisica' => 'Área CSV Redes Test - Rack 2',
+            'especificaciones' => ['area_id' => (string) $area->id_area],
+            'fecha_registro' => now(),
+        ]);
+
+        $testable = \Livewire\Livewire::actingAs($user)->test(ReportesPage::class);
+        $response = $testable->instance()->exportarReporte('equipos_area');
+
+        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
+
+        ob_start();
+        $response->sendContent();
+        $csv = (string) ob_get_clean();
+
+        $this->assertNotEmpty($csv);
+        $cleanCsv = preg_replace('/^\xEF\xBB\xBF/', '', $csv);
+        $lines = array_values(array_filter(explode("\n", str_replace(["\r\n", "\r"], "\n", $cleanCsv))));
+
+        $headers = str_getcsv(array_shift($lines));
+        $this->assertEquals(['Departamento', 'Área', 'Total Activos', 'Propio', 'Renta', 'Disponibles', 'Asignados'], $headers);
+
+        $matchingRow = null;
+        foreach ($lines as $line) {
+            $row = str_getcsv($line);
+            if (isset($row[1]) && $row[1] === 'Área CSV Redes Test') {
+                $matchingRow = $row;
+                break;
+            }
+        }
+
+        $this->assertNotNull($matchingRow, 'No se encontró la fila del área en el CSV.');
+        $this->assertEquals('Depto CSV Área Test', $matchingRow[0]); // Departamento
+        $this->assertEquals('Área CSV Redes Test', $matchingRow[1]); // Área
+        $this->assertEquals('2', $matchingRow[2]); // Total Activos
+        $this->assertEquals('1', $matchingRow[3]); // Propio
+        $this->assertEquals('1', $matchingRow[4]); // Renta
+        $this->assertEquals('1', $matchingRow[5]); // Disponibles
+        $this->assertEquals('1', $matchingRow[6]); // Asignados
+    }
+
+    public function test_exportar_reporte_solicitudes_csv_content(): void
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $user = $this->getAdminUser();
+
+        $depto = Departamento::firstOrCreate(['nombre' => 'Depto Solicitudes CSV']);
+        $area = Area::firstOrCreate([
+            'nombre' => 'Área Solicitudes CSV',
+            'id_departamento' => $depto->id_departamento,
+        ]);
+        $receptor = Receptor::firstOrCreate([
+            'nombre' => 'María',
+            'apellido_paterno' => 'Hernández',
+            'apellido_materno' => 'Ruiz',
+            'id_area' => $area->id_area,
+        ]);
+
+        $solicitud = Solicitud::create([
+            'id_usuario' => $user->id,
+            'id_receptor' => $receptor->id_receptor,
+            'tipo_movimiento' => 'Asignacion Temporal',
+            'estado' => 'Autorizado',
+            'fecha_solicitud' => now(),
+            'observaciones' => 'Solicitud prueba export CSV',
+        ]);
+
+        $testable = \Livewire\Livewire::actingAs($user)->test(ReportesPage::class);
+        $response = $testable->instance()->exportarReporte('solicitudes_tipo_estado');
+
+        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
+
+        ob_start();
+        $response->sendContent();
+        $csv = (string) ob_get_clean();
+
+        $this->assertNotEmpty($csv);
+        $cleanCsv = preg_replace('/^\xEF\xBB\xBF/', '', $csv);
+        $lines = array_values(array_filter(explode("\n", str_replace(["\r\n", "\r"], "\n", $cleanCsv))));
+
+        $headers = str_getcsv(array_shift($lines));
+        $this->assertEquals(['Folio', 'Tipo Movimiento', 'Solicitante', 'Receptor', 'Departamento', 'Fecha', 'Estado'], $headers);
+
+        $folioEsperado = 'FOLIO-' . str_pad($solicitud->id_solicitud, 5, '0', STR_PAD_LEFT);
+        $matchingRow = null;
+        foreach ($lines as $line) {
+            $row = str_getcsv($line);
+            if (isset($row[0]) && $row[0] === $folioEsperado) {
+                $matchingRow = $row;
+                break;
+            }
+        }
+
+        $this->assertNotNull($matchingRow, 'No se encontró la fila de la solicitud en el CSV.');
+        $this->assertEquals($folioEsperado, $matchingRow[0]);
+        $this->assertStringContainsString('Asignacion Temporal', $matchingRow[1]); // Tipo Movimiento
+        $this->assertEquals($user->name, $matchingRow[2]); // Solicitante
+        $this->assertEquals('María', $matchingRow[3]); // Receptor
+        $this->assertEquals('Depto Solicitudes CSV', $matchingRow[4]); // Departamento
+        $this->assertEquals('Autorizado', $matchingRow[6]); // Estado
+    }
+
+    public function test_search_field_override_exists_with_sigem_markers(): void
+    {
+        $path = resource_path('views/vendor/filament-tables/components/search-field.blade.php');
+        $this->assertFileExists($path, 'El override de search-field.blade.php no existe.');
+
+        $content = file_get_contents($path);
+
+        // Verificar marcadores SIGEM
+        $this->assertStringContainsString('SIGEM: INICIO detección de dropdowns', $content);
+        $this->assertStringContainsString('SIGEM: INICIO toolbar', $content);
+        $this->assertStringContainsString('SIGEM: INICIO Quitar filtros', $content);
+
+        // Verificar lógica clave
+        $this->assertStringContainsString('IndividualSearchHelper', $content);
+        $this->assertStringContainsString('fecha_desde', $content);
+        $this->assertStringContainsString('sigem-toolbar-search', $content);
+    }
+
+    public function test_filament_search_field_vendor_has_not_changed(): void
+    {
+        $vendorPath = base_path('vendor/filament/tables/resources/views/components/search-field.blade.php');
+        $this->assertFileExists($vendorPath);
+
+        $hash = md5_file($vendorPath);
+
+        // HASH ACTUAL del archivo de vendor — actualizar si se actualiza Filament
+        // Si este test falla, Filament actualizó search-field.blade.php base.
+        // Compara el override con el nuevo original y re-aplica los cambios SIGEM.
+        $expectedHash = 'f8b7278963db774a6abf407c4e5838d2';
+
+        $this->assertEquals(
+            $expectedHash,
+            $hash,
+            '⚠️ Filament actualizó search-field.blade.php base. ' .
+            'Compara el override con el nuevo vendor y re-aplica los cambios SIGEM.'
+        );
+    }
 }
 
 

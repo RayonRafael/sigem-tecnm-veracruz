@@ -1,3 +1,20 @@
+{{--
+    ⚠️ OVERRIDE DE FILAMENT — NO BORRAR NI SOBRESCRIBIR
+    Archivo original: vendor/filament/tables/resources/views/components/search-field.blade.php
+    Versión base: v3.3.57
+
+    Qué hace este override:
+    - Genera inputs de texto para columnas de texto libre (isIndividual)
+    - Genera dropdowns para columnas de enum/relación via IndividualSearchHelper
+    - Toolbar con buscador + datepickers Desde/Hasta + botón Quitar filtros
+    - Placeholders contextuales por tabla
+
+    Si actualizas Filament:
+    1. Comparar este archivo con el original de vendor (git diff o VS Code)
+    2. Verificar si Filament cambió el archivo original
+    3. Re-aplicar nuestros cambios (marcados con SIGEM)
+    4. El test "test_filament_search_field_vendor_has_not_changed" fallará si algo cambia
+--}}
 @php
     use Illuminate\View\ComponentAttributeBag;
     use App\Support\IndividualSearchHelper;
@@ -39,6 +56,7 @@
     );
 @endphp
 
+{{-- SIGEM: INICIO detección de dropdowns por columna --}}
 @if ($isIndividual && is_array($options))
     <div
         x-id="['select']"
@@ -59,6 +77,7 @@
             @endforeach
         </select>
     </div>
+{{-- SIGEM: FIN detección de dropdowns --}}
 @elseif ($isIndividual)
     <div
         x-id="['input']"
@@ -93,6 +112,7 @@
     </div>
 @else
     {{-- TOOLBAR PRINCIPAL: [Buscador] + [Desde 📅] + [Hasta 📅] + [✕ Quitar filtros] --}}
+    {{-- SIGEM: INICIO toolbar con datepickers --}}
     <div class="sigem-table-toolbar-group">
         <div
             x-id="['input']"
@@ -151,7 +171,9 @@
                 />
             </div>
         @endif
+    {{-- SIGEM: FIN toolbar --}}
 
+        {{-- SIGEM: INICIO Quitar filtros --}}
         <button
             type="button"
             x-data
@@ -163,5 +185,6 @@
         >
             ✕ Quitar filtros
         </button>
+        {{-- SIGEM: FIN Quitar filtros --}}
     </div>
 @endif
