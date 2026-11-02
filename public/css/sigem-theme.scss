@@ -1,0 +1,5686 @@
+/* =========================================
+   SIGEM - FILAMENT GLOBAL THEME OVERRIDES
+   ========================================= */
+
+/* ===== 0. TOPBAR EN EL DASHBOARD Y PANEL ===== */
+body:has(.sigem-professional) .fi-topbar {
+  display: flex !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  background: var(--sig-surface) !important;
+  border-bottom: 1px solid var(--sig-border) !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+body:has(.sigem-professional) .fi-main {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  min-height: calc(100vh - 64px) !important;
+}
+
+body:has(.sigem-professional) .fi-main-ctn {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+body:has(.sigem-professional) .fi-header {
+  padding-top: 1.5rem !important;
+}
+
+/* ===== 1. FONDO GENERAL Y APP ===== */
+body,
+.fi-body,
+html {
+  background-color: var(--sig-bg) !important;
+  background: var(--sig-bg) !important;
+  background-image: none !important;
+}
+
+/* ===== 2. CARDS Y CONTENEDORES ===== */
+.fi-main,
+.fi-main-ctn,
+.fi-ta-ctn,
+.fi-fo-component-ctn,
+.fi-section {
+  background: var(--sig-surface) !important;
+}
+
+.fi-ta-ctn,
+.fi-fo-component-ctn,
+.fi-section {
+  border-radius: 12px !important;
+  border: 1px solid var(--sig-border) !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .05) !important;
+}
+
+.fi-ta-ctn::before,
+.fi-fo-component-ctn::before,
+.fi-section::before {
+  display: none !important;
+  /* Quitar la barra de gradiente superior anterior */
+}
+
+.fi-panel-servicio-social {
+  .fi-ta-ctn,
+  .fi-ta-content,
+  .fi-ta-table tbody tr {
+    background-color: var(--sig-surface, #ffffff) !important;
+    background: var(--sig-surface, #ffffff) !important;
+    border-color: var(--sig-border, #e2e8f0) !important;
+  }
+
+  .fi-ta-table tbody tr:hover {
+    background: #f8fafc !important;
+  }
+}
+
+/* Padding en secciones */
+.fi-section-content {
+  padding: 1.5rem !important;
+}
+
+/* ===== 3. TÍTULOS DE PÁGINA ===== */
+h1,
+.fi-header-heading,
+.fi-panel-servicio-social .fi-header-heading,
+.fi-panel-servicio-social h1 {
+  color: var(--sig-text, #0f172a) !important;
+  font-weight: 700 !important;
+  font-size: 1.875rem !important;
+  letter-spacing: -0.025em !important;
+}
+
+/* Ocultar header nativo duplicado de Filament en páginas que tienen su propio encabezado InvGate */
+.fi-page:has(.sigem-rep-header) .fi-header,
+.fi-page:has(.sigem-rep-header) .fi-header-heading,
+.fi-page:has(.sigem-rep-header) .fi-header-subheading {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  border: none !important;
+}
+
+/* ===== 4. TABLAS DE LISTADO ===== */
+.fi-ta table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+
+.fi-ta-header-cell,
+th {
+  background-color: #fafbfc !important;
+  border-bottom: 1px solid var(--sig-border) !important;
+}
+
+.fi-ta-header-cell *,
+th * {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+.fi-ta-row,
+tr {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  transition: background-color 0.2s;
+}
+
+.fi-ta-row:hover,
+tr:hover {
+  background-color: #f8fafc !important;
+}
+
+.fi-ta-row:nth-child(even),
+tr:nth-child(even) {
+  background-color: #ffffff !important;
+}
+
+/* ===== 5. INPUTS, SELECTS, TEXTAREAS ===== */
+.fi-input,
+.fi-select-input,
+textarea,
+select {
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  color: #0f172a !important;
+  transition: all 0.2s;
+}
+
+.fi-input:focus,
+.fi-select-input:focus,
+textarea:focus,
+select:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
+}
+
+/* ===== 5.1 RADIO, CHECKBOX, TOGGLES (CORREGIDO) ===== */
+
+/* 1. Toggle Buttons (Usados en Estados de Inventario) */
+.fi-fo-toggle-buttons label.fi-btn {
+  border: 1px solid #e2e8f0 !important;
+  background-color: #ffffff !important;
+  color: #334155 !important;
+  opacity: 1 !important;
+}
+
+
+.fi-fo-toggle-buttons input[type="radio"]:checked+label.fi-btn,
+.fi-fo-toggle-buttons input[type="checkbox"]:checked+label.fi-btn {
+  border: 2px solid #2563eb !important;
+  background-color: #eff6ff !important;
+  color: #1e40af !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+
+.fi-fo-toggle-buttons input[type="radio"]:checked+label.fi-btn *,
+.fi-fo-toggle-buttons input[type="checkbox"]:checked+label.fi-btn * {
+  color: #1e40af !important;
+}
+
+/* 2. Radio Buttons clásicos */
+.fi-fo-radio label {
+  border: 1px solid #e2e8f0 !important;
+  background-color: #ffffff !important;
+  padding: 12px 16px !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+}
+
+.fi-fo-radio label:has(input[type="radio"]:checked) {
+  border: 2px solid #2563eb !important;
+  background-color: #eff6ff !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+
+.fi-fo-radio label:has(input[type="radio"]:checked) * {
+  color: #1e40af !important;
+}
+
+.fi-fo-radio input[type="radio"]:checked {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+/* 3. Checkboxes nativos */
+.fi-checkbox-input:checked {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+  background-image: url("data:image/svg+xml,%3csvg viewBox=\'0 0 16 16\' fill=\'white\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z\'/%3e%3c/svg%3e") !important;
+}
+
+/* 4. Toggle switches */
+button[role="switch"][aria-checked="true"] {
+  background-color: #2563eb !important;
+}
+
+/* ===== 6. LABELS DE CAMPOS ===== */
+.fi-fo-field-wrp-label {
+  &,
+  * {
+    color: #334155 !important;
+    font-weight: 600 !important;
+  }
+}
+
+/* ===== 7. BOTONES ===== */
+.fi-btn {
+  border-radius: 8px !important;
+  transition: all 0.2s ease-in-out !important;
+  font-weight: 500 !important;
+}
+
+/* Primario */
+.fi-btn-color-primary,
+.btn-primary {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.fi-btn-color-primary *,
+.btn-primary * {
+  color: #ffffff !important;
+}
+
+.fi-btn-color-primary:hover,
+.btn-primary:hover {
+  background-color: #1d4ed8 !important;
+}
+
+/* Éxito */
+.fi-btn-color-success {
+  background-color: #10b981 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.fi-btn-color-success * {
+  color: #ffffff !important;
+}
+
+.fi-btn-color-success:hover {
+  background-color: #059669 !important;
+}
+
+/* Peligro */
+.fi-btn-color-danger,
+.btn-danger {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.fi-btn-color-danger *,
+.btn-danger * {
+  color: #ffffff !important;
+}
+
+.fi-btn-color-danger:hover,
+.btn-danger:hover {
+  background-color: #dc2626 !important;
+}
+
+/* Advertencia */
+.fi-btn-color-warning {
+  background-color: #f59e0b !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.fi-btn-color-warning * {
+  color: #ffffff !important;
+}
+
+.fi-btn-color-warning:hover {
+  background-color: #d97706 !important;
+}
+
+/* Info */
+.fi-btn-color-info {
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.fi-btn-color-info * {
+  color: #ffffff !important;
+}
+
+.fi-btn-color-info:hover {
+  background-color: #2563eb !important;
+}
+
+/* Secundario / Gris */
+.fi-btn-color-gray,
+.btn-secondary {
+  background-color: #f8fafc !important;
+  color: #334155 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.fi-btn-color-gray *,
+.btn-secondary * {
+  color: #334155 !important;
+}
+
+.fi-btn-color-gray:hover,
+.btn-secondary:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* ===== 8. BADGES Y ETIQUETAS ===== */
+.fi-badge {
+  border-radius: 999px !important;
+  font-weight: 500 !important;
+}
+
+.fi-badge-color-success {
+  background-color: #d1fae5 !important;
+  color: #059669 !important;
+}
+
+.fi-badge-color-warning {
+  background-color: #fef3c7 !important;
+  color: #d97706 !important;
+}
+
+.fi-badge-color-danger {
+  background-color: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+
+.fi-badge-color-info {
+  background-color: #dbeafe !important;
+  color: #2563eb !important;
+}
+
+.fi-badge-color-gray {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+}
+
+/* ===== 9. BREADCRUMBS INTERNOS (OCULTOS — se usa "SIGEM › Sección" en topbar) ===== */
+.fi-breadcrumbs {
+  display: none !important;
+}
+
+/* ===== 10. PAGINACIÓN ===== */
+.fi-pagination-item {
+  border-radius: 8px !important;
+  margin: 0 2px !important;
+}
+
+
+/* ===== 11. FILTROS Y BÚSQUEDA ===== */
+.fi-ta-filters,
+.fi-ta-search,
+.fi-global-search {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+}
+
+/* ===== 12. NOTIFICACIONES Y TOASTS ===== */
+.fi-no-notification {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+  background-color: #ffffff !important;
+}
+
+
+/* ===== 13. MODALES NATIVOS DE FILAMENT ===== */
+.fi-modal-window {
+  border-radius: 12px !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+.fi-modal-header {
+  background-color: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+/* ===== 14. BOTONES DE ACCIÓN EN TABLAS ===== */
+.fi-ta-actions .fi-icon-btn {
+  border-radius: 8px !important;
+  transition: background-color 0.2s !important;
+}
+
+
+/* ===== 16. SELECTS CON BÚSQUEDA ===== */
+.choices {
+  &__list--dropdown {
+    background-color: #ffffff !important;
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+  }
+
+  &__item--choice:hover {
+    background-color: #f8fafc !important;
+  }
+
+  &__item--selectable.is-highlighted {
+    background-color: #dbeafe !important;
+    color: #2563eb !important;
+  }
+}
+
+/* ===== 18. TABLAS VACÍAS ===== */
+.fi-ta-empty-state-heading {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+.fi-ta-empty-state-icon {
+  color: #cbd5e1 !important;
+}
+
+/* ===== TOPBAR ====== */
+body:has(.sigem-professional) .fi-topbar nav,
+.fi-topbar nav {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  width: 100% !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.fi-topbar nav .ms-auto,
+.fi-topbar nav>div:has(.fi-user-menu),
+.fi-topbar nav>div:has(.sigem-topbar-search) {
+  margin-left: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+}
+
+/* ===== DROPDOWN / MENU DE USUARIO ===== */
+.fi-dropdown-panel,
+.fi-dropdown-list,
+.fi-dropdown-list-item,
+.fi-user-menu {
+  background-color: #ffffff !important;
+}
+
+.fi-dropdown-panel *,
+.fi-dropdown-list-item * {
+  color: #1a1a2e !important;
+}
+
+.fi-dropdown-list-item:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* ===== LINKS INTERACTIVOS (TEXTO) ===== */
+.fi-main a:not([class*="btn"]),
+.fi-ta-text-item-label a {
+  color: #1b65d4 !important;
+  transition: color 0.2s;
+}
+
+.fi-main a:not([class*="btn"]):hover,
+.fi-ta-text-item-label a:hover {
+  color: #0d47a1 !important;
+}
+
+/* JetBrains Mono */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap");
+
+.font-mono,
+.fi-ta-text-item-label code,
+.fi-ta-text-item-label[style*="monospace"] {
+  font-family: "JetBrains Mono", monospace !important;
+}
+
+/* ===== LOGIN CUSTOMIZATION ===== */
+.fi-simple-layout {
+  background-image: url("../images/fondo.jpg") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-attachment: fixed !important;
+  position: relative;
+  z-index: 1;
+}
+
+.fi-simple-layout::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(11, 29, 58, 0.75) !important;
+  z-index: -1;
+}
+
+.fi-simple-main-ctn>div {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(8px) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ===== SIDEBAR RESTAURADO PARA FASE 2.5 ===== */
+
+/* ===== DASHBOARD: Componentes base ===== */
+/* Ocultar header nativo de Filament solo en esta pagina */
+body:has(.sigem-professional) .fi-header {
+  display: none !important;
+}
+
+body:has(.sigem-professional) .sigem-topbar-brand {
+  display: none !important;
+}
+
+.sigem-professional {
+  /* Color Palette */
+  --brand-50: #eff6ff;
+  --brand-100: #dbeafe;
+  --brand-500: #3b82f6;
+  --brand-600: #2563eb;
+  --brand-700: #1d4ed8;
+  --slate-50: #f8fafc;
+  --slate-100: #f1f5f9;
+  --slate-200: #e2e8f0;
+  --slate-600: #475569;
+  --slate-700: #334155;
+  --slate-900: #0f172a;
+  --emerald-50: #ecfdf5;
+  --emerald-500: #10b981;
+  --emerald-600: #059669;
+  --amber-50: #fffbeb;
+  --amber-500: #f59e0b;
+  --amber-600: #d97706;
+  --red-50: #fef2f2;
+  --red-500: #ef4444;
+  --red-600: #dc2626;
+  --cyan-500: #06b6d4;
+  --indigo-500: #6366f1;
+  --violet-500: #8b5cf6;
+  --rose-500: #f43f5e;
+  --purple-500: #a855f7;
+  --fuchsia-500: #d946ef;
+  --teal-500: #14b8a6;
+
+  font-family: 'DM Sans', sans-serif;
+  color: var(--slate-900);
+  background-color: transparent;
+  padding-bottom: 40px;
+}
+
+.sigem-professional * {
+  box-sizing: border-box;
+}
+
+/* Scrollbar */
+.sigem-professional ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.sigem-professional ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sigem-professional ::-webkit-scrollbar-thumb {
+  background: var(--slate-200);
+  border-radius: 3px;
+}
+
+.sigem-professional ::-webkit-scrollbar-thumb:hover {
+  background: var(--slate-600);
+}
+
+[x-cloak] {
+  display: none !important;
+}
+
+.text-muted-util {
+  color: var(--slate-500);
+}
+
+/* ==================================================== */
+/* FASE 1: LIENZO GLOBAL "INVGATE STYLE"                */
+/* ==================================================== */
+
+:root {
+  --sig-bg: #f4f6f9;
+  --sig-surface: #ffffff;
+  --sig-border: #e5e7eb;
+  --sig-text: #111827;
+  --sig-muted: #6b7280;
+  --sig-light: #9ca3af;
+  --sig-primary: #1b65d4;
+  --sig-primary-dark: #1557b0;
+  --sig-primary-light: #e8f0fe;
+  --sig-radius: 14px;
+  --sig-radius-sm: 9px;
+  --mod-inv: #7c3aed;
+  --mod-inv-l: #efe7fd;
+  --mod-sol: #0d9488;
+  --mod-sol-l: #dcf5f2;
+  --mod-mant: #ea580c;
+  --mod-mant-l: #fdeadd;
+  --mod-rep: #ca8a04;
+  --mod-rep-l: #fdf3d7;
+  --mod-cfg: #475569;
+  --mod-cfg-l: #e8ecf1;
+  --mod-cat: #c026d3;
+  --mod-cat-l: #fae8ff;
+  --sig-info: #0284c7;
+  --sig-info-light: #e0f2fe;
+}
+
+body,
+.fi-body {
+  color: var(--sig-text);
+  font-family: 'DM Sans', sans-serif !important;
+}
+
+main.fi-main,
+.fi-main,
+.fi-main-ctn {
+  background: var(--sig-surface) !important;
+  color: var(--sig-text);
+}
+
+
+.fi-sidebar,
+aside.fi-sidebar {
+  background: var(--sig-surface) !important;
+  border-right: 1px solid var(--sig-border) !important;
+}
+
+
+.fi-sidebar-item {
+  &,
+  &-button {
+    border-radius: var(--sig-radius-sm) !important;
+  }
+
+  .fi-icon,
+  .fi-sidebar-item-icon,
+  &-icon {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 11px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
+    padding: 7px !important;
+    border: 1.5px solid transparent !important;
+    transition: all .15s ease-in-out !important;
+    overflow: visible !important;
+  }
+
+  &:hover {
+    .fi-icon,
+    .fi-sidebar-item-icon {
+      transform: translateY(-1px);
+    }
+  }
+
+  // Íconos en estado NO activo
+  &:not(.fi-active):not(.fi-sidebar-item-active) {
+    .fi-sidebar-item-icon,
+    .fi-icon {
+      stroke: currentColor;
+      fill: none;
+    }
+
+    svg path,
+    .fi-icon svg path,
+    .fi-sidebar-item-icon svg path {
+      stroke: currentColor;
+      fill: none;
+    }
+  }
+
+  .fi-icon svg,
+  .fi-sidebar-item-icon svg,
+  svg {
+    stroke: currentColor;
+    fill: none;
+  }
+
+  // Fallback de color para ítems generales del sidebar
+  a {
+    .fi-sidebar-item-icon,
+    .fi-icon {
+      background: var(--mod-cfg-l);
+      color: var(--mod-cfg);
+      border-color: color-mix(in srgb, var(--mod-cfg) 45%, transparent);
+    }
+  }
+}
+
+/* Colores por módulo según la URL del ítem de navegación (inactivo) */
+.fi-sidebar-item {
+  a:is([href$="/admin"], [href$="/admin/"]) :is(.fi-sidebar-item-icon, .fi-icon) {
+    background: var(--sig-primary-light) !important;
+    color: var(--sig-primary) !important;
+    border-color: color-mix(in srgb, var(--sig-primary) 45%, transparent) !important;
+  }
+
+  a[href*="inventario"] :is(.fi-sidebar-item-icon, .fi-icon) {
+    background: var(--mod-inv-l) !important;
+    color: var(--mod-inv) !important;
+    border-color: color-mix(in srgb, var(--mod-inv) 45%, transparent) !important;
+  }
+
+  a[href*="solicitud"] :is(.fi-sidebar-item-icon, .fi-icon) {
+    background: var(--mod-sol-l) !important;
+    color: var(--mod-sol) !important;
+    border-color: color-mix(in srgb, var(--mod-sol) 45%, transparent) !important;
+  }
+
+  a[href*="mantenimiento"] :is(.fi-sidebar-item-icon, .fi-icon) {
+    background: var(--mod-mant-l) !important;
+    color: var(--mod-mant) !important;
+    border-color: color-mix(in srgb, var(--mod-mant) 45%, transparent) !important;
+  }
+
+  a[href*="reporte"] :is(.fi-sidebar-item-icon, .fi-icon) {
+    background: var(--mod-rep-l) !important;
+    color: var(--mod-rep) !important;
+    border-color: color-mix(in srgb, var(--mod-rep) 45%, transparent) !important;
+  }
+
+  a:is([href*="catalogo"], [href*="configuracion"], [href*="area"], [href*="departamento"],
+    [href*="material"], [href*="proveedor"], [href*="receptor"], [href*="unidad-medida"], [href*="user"]) :is(.fi-sidebar-item-icon, .fi-icon) {
+    background: var(--mod-cfg-l) !important;
+    color: var(--mod-cfg) !important;
+    border-color: color-mix(in srgb, var(--mod-cfg) 45%, transparent) !important;
+  }
+}
+
+/* Estado activo del ícono en el sidebar por módulo (Fondo de color + borde) */
+.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active) {
+  a:is([href$="/admin"], [href$="/admin/"]) :is(.fi-sidebar-item-icon, .fi-icon) {
+    background: var(--sig-primary) !important;
+    border-color: var(--sig-primary) !important;
+    color: #ffffff !important;
+  }
+
+  a[href*="inventario"] :is(.fi-sidebar-item-icon, .fi-icon) {
+    background: var(--mod-inv) !important;
+    border-color: var(--mod-inv) !important;
+    color: #ffffff !important;
+  }
+
+  a[href*="solicitud"] :is(.fi-sidebar-item-icon, .fi-icon) {
+    background: var(--mod-sol) !important;
+    border-color: var(--mod-sol) !important;
+    color: #ffffff !important;
+  }
+
+  a[href*="mantenimiento"] :is(.fi-sidebar-item-icon, .fi-icon) {
+    background: var(--mod-mant) !important;
+    border-color: var(--mod-mant) !important;
+    color: #ffffff !important;
+  }
+
+  a[href*="reporte"] :is(.fi-sidebar-item-icon, .fi-icon) {
+    background: var(--mod-rep) !important;
+    border-color: var(--mod-rep) !important;
+    color: #ffffff !important;
+  }
+
+  a:is([href*="catalogo"], [href*="configuracion"], [href*="area"], [href*="departamento"],
+    [href*="material"], [href*="proveedor"], [href*="receptor"], [href*="unidad-medida"], [href*="user"]) :is(.fi-sidebar-item-icon, .fi-icon) {
+    background: var(--mod-cfg) !important;
+    border-color: var(--mod-cfg) !important;
+    color: #ffffff !important;
+  }
+}
+
+/* Estado activo: ICONO BLANCO VISIBLE universal de máxima especificidad */
+.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active, [aria-current="page"]) :is(.fi-sidebar-item-icon, .fi-icon, svg),
+.fi-sidebar-item a[aria-current="page"] :is(.fi-sidebar-item-icon, svg) {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+
+.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active, [aria-current="page"]) svg :is(path, *),
+.fi-sidebar-item a[aria-current="page"] svg :is(path, *) {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+  fill: none !important;
+}
+
+/* Badge en items de navegación */
+.fi-sidebar-item .fi-badge {
+  background: #dc2626 !important;
+  color: #fff !important;
+  font-size: 12.5px !important;
+  font-weight: 700 !important;
+  min-width: 19px !important;
+  height: 19px !important;
+  border-radius: 9px !important;
+  border: 2px solid var(--sig-surface) !important;
+}
+
+/* Topbar y Header */
+.fi-topbar,
+.fi-topbar nav,
+.fi-header {
+  background: var(--sig-surface) !important;
+  border-bottom: 1px solid var(--sig-border) !important;
+}
+
+/* Encabezados de tablas */
+.fi-ta-header th,
+th.fi-ta-header-cell span,
+.fi-ta-table thead th span {
+  color: var(--sig-muted) !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  letter-spacing: .06em !important;
+}
+
+/* Botones Primarios */
+.fi-btn.fi-color-primary:not(.fi-btn-outlined),
+.fi-btn.fi-btn-color-primary:not(.fi-btn-outlined) {
+  background: var(--sig-primary) !important;
+  border-radius: var(--sig-radius-sm) !important;
+  font-weight: 600 !important;
+}
+
+.fi-btn.fi-color-primary:not(.fi-btn-outlined):hover,
+.fi-btn.fi-btn-color-primary:not(.fi-btn-outlined):hover {
+  background: var(--sig-primary-dark) !important;
+  box-shadow: 0 4px 12px rgba(27, 101, 212, .35) !important;
+}
+
+/* ==================================================== */
+/* FASE 2: BLOQUE SUPERIOR DEL DASHBOARD "INVGATE STYLE"*/
+/* ==================================================== */
+
+/* Hero del dashboard */
+.sigem-hero {
+  background: linear-gradient(120deg, #1b65d4 0%, #1e40af 100%);
+  border-radius: 18px;
+  padding: 26px 28px;
+  color: #fff;
+  margin-bottom: 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  box-shadow: 0 10px 30px rgba(27, 101, 212, .28);
+
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: #fff !important;
+  }
+
+  p {
+    font-size: 16.5px;
+    opacity: .9;
+    max-width: 520px;
+    color: #fff !important;
+  }
+}
+
+/* Rejillas */
+.sigem-quick-grid,
+.sigem-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 22px
+}
+
+/* Acción rápida */
+.sigem-quick {
+  background: var(--sig-surface);
+  border: 1px solid var(--sig-border);
+  border-radius: var(--sig-radius);
+  padding: 16px;
+  cursor: pointer;
+  position: relative;
+  transition: all .18s;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .05);
+  text-decoration: none;
+  display: block;
+  color: inherit;
+
+  &:hover {
+    border-color: var(--sig-primary);
+    box-shadow: 0 6px 18px rgba(16, 24, 40, .09);
+    transform: translateY(-2px);
+    text-decoration: none;
+
+    .arrow {
+      color: var(--sig-primary);
+      transform: translateX(2px);
+    }
+
+    .sigem-quick-desc {
+      max-height: 80px;
+      opacity: 1;
+      margin-top: 4px;
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--sig-primary);
+    outline-offset: 2px;
+  }
+
+  &:focus-within {
+    .sigem-quick-desc {
+      max-height: 80px;
+      opacity: 1;
+      margin-top: 4px;
+    }
+  }
+
+  .arrow {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    color: var(--sig-light);
+    font-size: 16px;
+    transition: all .18s;
+  }
+
+  &-ico {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 11px;
+  }
+
+  &-title {
+    font-size: 16.5px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--sig-text);
+  }
+
+  &-desc {
+    font-size: 14.5px;
+    color: var(--sig-muted);
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin-top: 0;
+    transition: max-height .25s ease, opacity .2s ease, margin-top .2s ease;
+  }
+}
+
+@media(hover:none) {
+  .sigem-quick-desc {
+    max-height: none;
+    opacity: 1;
+    margin-top: 4px;
+  }
+}
+
+/* Badge rojo de conteo */
+.sigem-qbadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #dc2626;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 0 5px
+}
+
+/* KPI */
+.sigem-stat {
+  background: var(--sig-surface);
+  border: 1px solid var(--sig-border);
+  border-radius: var(--sig-radius);
+  padding: 16px 18px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .05);
+
+  &-ico {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+  }
+
+  &-label {
+    font-size: 15.5px;
+    color: var(--sig-muted);
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  &-hint {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 9px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 99px;
+  }
+}
+
+/* Variantes de color de íconos y píldoras */
+.sigem-i {
+  &-primary {
+    background: #e8f0fe;
+    color: #1b65d4;
+  }
+
+  &-success {
+    background: #d1fae5;
+    color: #059669;
+  }
+
+  &-warning {
+    background: #fef3c7;
+    color: #d97706;
+  }
+
+  &-info {
+    background: #cffafe;
+    color: #0891b2;
+  }
+
+  &-danger {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+}
+
+.sigem-h {
+  &-ok {
+    background: #d1fae5;
+    color: #059669;
+  }
+
+  &-warn {
+    background: #fef3c7;
+    color: #d97706;
+  }
+
+  &-info {
+    background: #cffafe;
+    color: #0891b2;
+  }
+}
+
+@media(max-width:1100px) {
+
+  .sigem-quick-grid,
+  .sigem-stats-grid {
+    grid-template-columns: repeat(2, 1fr)
+  }
+}
+
+/* ==================================================== */
+/* FASE 4: SIDEBAR INVGATE (ICON-ONLY CON TOOLTIPS)      */
+/* ==================================================== */
+.fi-sidebar {
+  width: 64px !important;
+
+  .fi-sidebar-item-label,
+  .fi-sidebar-nav-item-label,
+  .fi-sidebar-group-button {
+    display: none !important;
+  }
+
+  .fi-sidebar-item {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 44px !important;
+    margin-bottom: 4px !important;
+    border-radius: 9px !important;
+    position: relative !important;
+    width: 100% !important;
+
+    &:hover {
+      background: var(--sig-bg);
+    }
+
+    .fi-badge {
+      position: absolute !important;
+      top: 0px !important;
+      right: 0px !important;
+      z-index: 10 !important;
+    }
+  }
+
+  .fi-sidebar-item-button {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    margin: 0 auto !important;
+    background: transparent !important;
+
+    &:hover {
+      background: var(--sig-bg) !important;
+    }
+  }
+
+  .fi-sidebar-nav {
+    padding: 14px 10px !important;
+  }
+}
+
+/* Estructura fija en Desktop */
+@media (min-width: 1024px) {
+
+  .fi-sidebar,
+  aside.fi-sidebar {
+    width: 64px !important;
+    min-width: 64px !important;
+    max-width: 64px !important;
+    display: flex !important;
+    transform: none !important;
+    position: sticky !important;
+    top: 0 !important;
+    height: 100vh !important;
+    background: var(--sig-surface) !important;
+    border-right: 1px solid var(--sig-border) !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Marca */
+.sigem-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 8px;
+  border-bottom: 1px solid var(--sig-border);
+  text-align: center;
+  width: 100%;
+
+  &-logo {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1b65d4, #1e40af);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 19px;
+    flex-shrink: 0;
+    user-select: none;
+  }
+
+  :is(.fi-simple-main, .fi-simple-layout) & {
+    border-bottom: none !important;
+    padding: 0 !important;
+  }
+}
+
+img.sigem-brand-logo {
+  background: transparent !important;
+  border-radius: 0 !important;
+  object-fit: contain !important;
+  width: 36px !important;
+  height: 36px !important;
+}
+
+.fi-sidebar-header {
+  padding: 0 !important;
+  height: auto !important;
+  min-height: 64px !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  justify-content: center !important;
+
+  > div,
+  a,
+  .fi-logo {
+    width: 100% !important;
+    height: auto !important;
+    display: flex !important;
+    justify-content: center !important;
+    text-decoration: none !important;
+  }
+
+  button,
+  .fi-icon-btn {
+    display: none !important;
+  }
+}
+
+/* Tooltip al hover */
+.fi-sidebar-item {
+  &::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%) scale(.92);
+    background: #0f172a;
+    color: #fff;
+    padding: 6px 11px;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .22);
+    pointer-events: none;
+    opacity: 0;
+    transition: all .15s ease;
+    z-index: 999;
+  }
+
+  &:hover::after {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+
+  &:not([data-tooltip])::after,
+  &[data-tooltip=""]::after {
+    display: none !important;
+  }
+}
+
+/* Pie de usuario */
+.sigem-user-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  border-top: 1px solid var(--sig-border);
+  margin-top: auto;
+  background: var(--sig-surface);
+}
+
+.sigem-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e8f0fe;
+  color: #1b65d4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.sigem-logout {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sig-surface);
+  border: 1px solid var(--sig-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--sig-muted);
+  text-decoration: none;
+  padding: 0;
+  line-height: 1;
+  outline: none;
+  transition: all .15s ease;
+
+  &:hover {
+    background: var(--sig-bg);
+    color: #dc2626;
+  }
+}
+
+/* Los tooltips no deben recortarse */
+.fi-sidebar,
+aside.fi-sidebar,
+.fi-sidebar>div,
+.fi-sidebar .overflow-x-clip,
+.fi-sidebar .fi-sidebar-nav,
+.fi-sidebar-nav-groups,
+.fi-sidebar-group,
+.fi-sidebar-group-items {
+  overflow: visible !important;
+}
+
+.fi-sidebar-nav-groups {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  gap: 6px !important;
+}
+
+.fi-sidebar-group-items {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  list-style: none !important;
+}
+
+/* ==================================================== */
+/* FASE 5: TABLA DE INVENTARIO ESTILO INVGATE           */
+/* ==================================================== */
+.fi-ta-table thead th * {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .06em !important;
+  color: #6b7280 !important;
+}
+
+
+.fi-ta-table .fi-ta-text-item-label {
+  font-weight: 600 !important;
+}
+
+
+/* Píldoras de estado (punto + texto) */
+.sigem-pill,
+.fi-ta-table .fi-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  padding: 3.5px 10px !important;
+  border-radius: 99px !important;
+  white-space: nowrap !important;
+  line-height: 1.2 !important;
+}
+
+.sigem-pill::before,
+.fi-ta-table .fi-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.fi-ta-table .fi-badge svg {
+  display: none !important;
+}
+
+.sigem-pill.ok,
+.fi-ta-table .fi-badge.fi-color-success,
+.fi-ta-table .fi-badge-color-success {
+  background: #d1fae5 !important;
+  color: #059669 !important;
+}
+
+.sigem-pill.warn,
+.fi-ta-table .fi-badge.fi-color-warning,
+.fi-ta-table .fi-badge-color-warning {
+  background: #fef3c7 !important;
+  color: #d97706 !important;
+}
+
+.sigem-pill.danger,
+.fi-ta-table .fi-badge.fi-color-danger,
+.fi-ta-table .fi-badge-color-danger {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+
+.sigem-pill.info,
+.fi-ta-table .fi-badge.fi-color-info,
+.fi-ta-table .fi-badge-color-info {
+  background: #cffafe !important;
+  color: #0891b2 !important;
+}
+
+.sigem-pill.reassign,
+.fi-badge.fi-color-reassign,
+.fi-ta-table .fi-badge.fi-color-reassign,
+.fi-ta-table .fi-badge-color-reassign {
+  background: #ede9fe !important;
+  color: #8b5cf6 !important;
+}
+
+.sigem-pill.neutral,
+.fi-ta-table .fi-badge.fi-color-gray,
+.fi-ta-table .fi-badge-color-gray {
+  background: var(--sig-bg) !important;
+  color: var(--sig-muted) !important;
+}
+
+/* Filtros por columna */
+.fi-ta-filters {
+  input,
+  select {
+    width: 100%;
+    min-width: 84px;
+    height: 31px;
+    font: inherit;
+    font-size: 15.5px;
+    padding: 0 8px;
+    border: 1px solid var(--sig-border);
+    border-radius: 7px;
+    background: var(--sig-surface);
+    color: var(--sig-text);
+  }
+}
+
+/* Panel lateral "Resumen del inventario" */
+.sigem-inv-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 18px;
+  align-items: start;
+}
+
+.sigem-inv-side {
+  position: sticky;
+  top: 72px;
+  max-height: calc(100vh - 90px);
+  overflow: auto;
+  background: var(--sig-surface);
+  border: 1px solid var(--sig-border);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+
+.sigem-inv-side-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+/* Dona SVG */
+.sigem-donut {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+}
+
+.sigem-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
+}
+
+.sigem-donut-center b {
+  font-size: 27px;
+  font-variant-numeric: tabular-nums;
+}
+
+.sigem-donut-center span {
+  font-size: 13.5px;
+  color: var(--sig-muted);
+  font-weight: 600;
+}
+
+/* Leyenda de estados */
+.sigem-lg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15.5px;
+  padding: 3px 6px;
+  border-radius: 6px;
+}
+
+.sigem-lg i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.sigem-lg b {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Barras por categoría */
+.sigem-cb {
+  display: grid;
+  grid-template-columns: 116px 1fr 18px;
+  gap: 8px;
+  align-items: center;
+  font-size: 15px;
+  margin: 5px 0;
+}
+
+.sigem-cb>span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sigem-cb div {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--sig-border);
+  overflow: hidden;
+}
+
+.sigem-cb div span {
+  display: block;
+  height: 100%;
+  background: var(--sig-primary);
+  border-radius: 99px;
+}
+
+@media (max-width: 1099px) {
+  .sigem-inv-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sigem-inv-side {
+    position: static;
+    max-height: none;
+  }
+}
+
+/* ===== Fase 6: Solicitudes y Mantenimiento ===== */
+
+/* Filtros de columna (aplica si no se aplicaron en Fase 5) */
+:is(.fi-ta-table .fi-ta-filters, .fi-ta-filters) {
+  input,
+  select {
+    width: 100%;
+    min-width: 84px;
+    height: 31px;
+    font: inherit;
+    font-size: 15.5px;
+    padding: 0 8px;
+    border: 1px solid var(--sig-border);
+    border-radius: 7px;
+    background: var(--sig-surface);
+    color: var(--sig-text);
+
+    &:focus-visible {
+      outline: 2px solid var(--sig-primary);
+      outline-offset: 1px;
+    }
+  }
+
+  .on {
+    border-color: var(--sig-primary) !important;
+    background: var(--sig-primary-light) !important;
+    color: var(--sig-primary-dark) !important;
+    font-weight: 600 !important;
+  }
+}
+
+/* Folio / código en negrita */
+.sigem-td-folio {
+  font-weight: 700 !important;
+  font-variant-numeric: tabular-nums
+}
+
+/* ===== Fase 7: Reportes ===== */
+.sigem-rep {
+  &-header {
+    margin-bottom: 14px;
+
+    h1 {
+      font-size: 22px !important;
+      font-weight: 700 !important;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 4px;
+      color: var(--sig-text, #0f172a) !important;
+      line-height: 1.25 !important;
+    }
+
+    p {
+      font-size: 13px !important;
+      color: var(--sig-muted);
+      margin: 0;
+      line-height: 1.4 !important;
+    }
+  }
+
+  &-note {
+    font-size: 13px !important;
+    color: var(--sig-muted);
+    margin: -4px 0 14px;
+  }
+
+  &-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  &-card {
+    background: var(--sig-surface);
+    border: 1px solid var(--sig-border);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, .05);
+    transition: transform .15s, box-shadow .15s;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .06);
+    }
+  }
+
+  &-ico {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: #fdf3d7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+
+  &-t {
+    font-weight: 700 !important;
+    font-size: 15px !important;
+    color: var(--sig-text);
+    line-height: 1.3 !important;
+  }
+
+  &-d {
+    font-size: 13px !important;
+    color: var(--sig-muted);
+    line-height: 1.45;
+    flex: 1;
+  }
+}
+
+.sigem-rep-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+/* Switch */
+.sigem-sw {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 12.5px !important;
+  font-weight: 600;
+  color: var(--sig-muted);
+  position: relative;
+  user-select: none;
+}
+
+.sigem-sw input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.sigem-sw-ui {
+  width: 32px;
+  height: 18px;
+  border-radius: 20px;
+  background: var(--sig-border);
+  position: relative;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+
+.sigem-sw-ui::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+  transition: transform .15s;
+}
+
+.sigem-sw input:checked+.sigem-sw-ui {
+  background: #059669;
+}
+
+.sigem-sw input:checked+.sigem-sw-ui::after {
+  transform: translateX(14px);
+}
+
+.sigem-sw input:focus-visible+.sigem-sw-ui {
+  outline: 2px solid var(--sig-primary);
+  outline-offset: 2px;
+}
+
+.sigem-sw input:checked~.sigem-sw-l {
+  color: #059669;
+}
+
+.sigem-sw-l {
+  font-size: 12.5px !important;
+  font-weight: 600;
+}
+
+/* Botones reporte */
+.sigem-rep {
+  &-btn-primary {
+    padding: 5px 12px !important;
+    border-radius: 6px !important;
+    background: var(--sig-primary);
+    color: #fff;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all .15s;
+
+    &:hover {
+      background: var(--sig-primary-dark);
+      box-shadow: 0 3px 9px rgba(27, 101, 212, .32);
+    }
+  }
+
+  &-btn-sec {
+    padding: 5px 12px !important;
+    border-radius: 6px !important;
+    background: var(--sig-surface);
+    color: var(--sig-text);
+    border: 1px solid var(--sig-border);
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all .15s;
+
+    &:hover {
+      background: var(--sig-bg);
+      border-color: var(--sig-border-strong);
+    }
+  }
+
+  // Visor de reporte
+  &-view {
+    background: var(--sig-surface);
+    border: 1px solid var(--sig-border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+
+  &-vh {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--sig-border);
+    flex-wrap: wrap;
+
+    h3 {
+      font-size: 15px !important;
+      margin: 0 0 3px;
+      font-weight: 700 !important;
+      color: var(--sig-text);
+      line-height: 1.3 !important;
+    }
+
+    .sigem-rep-meta {
+      font-size: 12.5px !important;
+      color: var(--sig-muted);
+    }
+  }
+
+  &-empty {
+    background: var(--sig-surface);
+    border: 1px dashed var(--sig-border);
+    border-radius: 12px;
+    padding: 28px;
+    text-align: center;
+    color: var(--sig-muted);
+    font-size: 14px !important;
+  }
+
+  &-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+
+// Tablas en visor de reporte y catálogos
+:is(.sigem-rep-table-wrap, .sigem-rep-view, .sigem-rep-table-wrap .fi-ta-table) thead th {
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .05em !important;
+  color: var(--sig-muted, #64748b) !important;
+  background: var(--sig-bg, #f4f6f8) !important;
+  padding: 6px 10px !important;
+}
+
+:is(.sigem-rep-table-wrap, .sigem-rep-view) thead th * {
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+}
+
+:is(.sigem-rep-table-wrap, .sigem-rep-view, .sigem-rep-table-wrap .fi-ta-table) tbody td {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  padding: 6px 10px !important;
+  line-height: 1.35 !important;
+}
+
+/* ===== Fase 8: Configuración, Catálogos, Bitácora, Preferencias ===== */
+
+/* Pestañas (Tabs principales) */
+.sigem-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--sig-border);
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.sigem-tab {
+  padding: 9px 14px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: var(--sig-muted);
+  cursor: pointer;
+  border: 0;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -1px;
+  background: transparent;
+  font-family: inherit;
+  transition: all .15s;
+}
+
+.sigem-tab:hover {
+  color: var(--sig-text);
+}
+
+.sigem-tab.active {
+  color: var(--sig-primary);
+  border-bottom-color: var(--sig-primary);
+}
+
+/* Franja informativa */
+.sigem-note-strip {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px !important;
+  line-height: 1.5;
+  padding: 10px 14px;
+  border-radius: var(--sig-radius, 8px);
+  background: #cffafe;
+  color: #0e7490;
+  margin-bottom: 14px;
+}
+
+/* Chips de catálogo */
+.sigem-cat {
+  &-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  &-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    padding: 5px 11px !important;
+    border-radius: 99px;
+    border: 1px solid var(--sig-border);
+    background: var(--sig-surface);
+    cursor: pointer;
+    transition: all .15s;
+    color: var(--sig-muted);
+    font-family: inherit;
+
+    &:hover {
+      border-color: var(--sig-primary);
+      color: var(--sig-primary);
+    }
+
+    &.active {
+      background: var(--sig-primary);
+      border-color: var(--sig-primary);
+      color: #fff;
+
+      b {
+        background: rgba(255, 255, 255, .25);
+        border-color: transparent;
+        color: #fff;
+      }
+    }
+
+    b {
+      font-size: 11.5px !important;
+      background: var(--sig-bg);
+      border: 1px solid var(--sig-border);
+      border-radius: 99px;
+      padding: 1px 6px;
+      color: var(--sig-muted);
+      font-weight: 700;
+    }
+  }
+}
+
+/* Píldora de rol */
+.sigem-rol-pill {
+  font-size: 12px !important;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.sigem-rol-pill.adm {
+  background: #e8f0fe;
+  color: #1b65d4;
+}
+
+.sigem-rol-pill.ss {
+  background: #cffafe;
+  color: #0891b2;
+}
+
+/* Preferencias */
+.sigem-pref-card {
+  padding: 18px 20px;
+  background: var(--sig-surface);
+  border: 1px solid var(--sig-border);
+  border-radius: 12px;
+}
+
+.sigem-pref-row {
+  display: flex;
+  gap: 16px 28px;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.sigem-pref-t {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  margin-bottom: 4px;
+  color: var(--sig-text);
+  line-height: 1.3 !important;
+}
+
+.sigem-pref-d {
+  font-size: 13px !important;
+  color: var(--sig-muted);
+  max-width: 460px;
+  line-height: 1.45;
+}
+
+.sigem-pref-chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sigem-pref-chips button {
+  font: inherit;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  height: 30px !important;
+  min-width: 44px;
+  padding: 0 10px !important;
+  border-radius: 99px;
+  border: 1px solid var(--sig-border);
+  background: var(--sig-surface);
+  color: var(--sig-text);
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.sigem-pref-chips button.on {
+  background: var(--sig-primary-light);
+  border-color: var(--sig-primary);
+  color: var(--sig-primary-dark);
+}
+
+.sigem-pref-in {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 13px !important;
+  color: var(--sig-muted);
+}
+
+.sigem-pref-in input {
+  font: inherit;
+  font-size: 13px !important;
+  width: 88px;
+  height: 30px !important;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid var(--sig-border);
+  background: var(--sig-surface);
+  color: var(--sig-text);
+}
+
+.sigem-pref-msg {
+  font-size: 13px !important;
+  min-height: 18px;
+}
+
+.sigem-pref-msg.err {
+  color: #dc2626;
+}
+
+.sigem-pref-msg.ok {
+  color: #059669;
+}
+
+/* Barra de filtros y encabezado de Bitácora */
+.fi-page:has(.sigem-bitacora-filters) h3,
+div:has(> .sigem-bitacora-filters) h3 {
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  margin: 0 0 4px !important;
+  color: var(--sig-text) !important;
+}
+
+.fi-page:has(.sigem-bitacora-filters) p,
+div:has(> .sigem-bitacora-filters) p {
+  font-size: 13px !important;
+  color: var(--sig-muted) !important;
+  margin: 0 !important;
+}
+
+.sigem-bitacora-filters {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  background: var(--sig-surface);
+  padding: 10px 12px;
+  border: 1px solid var(--sig-border);
+  border-radius: 10px;
+}
+
+.sigem-bitacora-filters input,
+.sigem-bitacora-filters select {
+  height: 30px !important;
+  padding: 0 8px !important;
+  border: 1px solid var(--sig-border);
+  border-radius: 6px;
+  font-size: 13px !important;
+  background: var(--sig-surface);
+  color: var(--sig-text);
+}
+
+.sigem-bitacora-filters input:focus,
+.sigem-bitacora-filters select:focus {
+  outline: 2px solid var(--sig-primary);
+  outline-offset: 1px;
+}
+
+/* ===== Fase 9: Buscador global (Buscar en SIGEM) ===== */
+.sigem-pal-ov {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, .45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 700;
+  display: none;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 11vh
+}
+
+.sigem-pal-ov.show {
+  display: flex
+}
+
+.sigem-pal {
+  background: var(--sig-surface);
+  width: 640px;
+  max-width: 94vw;
+  border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .28);
+  overflow: hidden
+}
+
+.sigem-pal-in {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 15px 18px;
+  border-bottom: 1px solid var(--sig-border);
+  font-size: 18px
+}
+
+.sigem-pal-in input {
+  flex: 1;
+  border: 0;
+  outline: none;
+  font: inherit;
+  background: transparent;
+  color: var(--sig-text);
+  font-size: 17px
+}
+
+.sigem-pal-list {
+  max-height: 52vh;
+  overflow-y: auto;
+  padding: 6px 8px 8px
+}
+
+.sigem-pal-g {
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--sig-light);
+  padding: 10px 10px 4px
+}
+
+.sigem-pal-i {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background .1s
+}
+
+.sigem-pal-i.sel {
+  background: var(--sig-primary-light)
+}
+
+.sigem-pal-ico {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--sig-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0
+}
+
+.sigem-pal-t {
+  font-size: 16.5px;
+  font-weight: 600;
+  color: var(--sig-text)
+}
+
+.sigem-pal-s {
+  font-size: 14.5px;
+  color: var(--sig-muted)
+}
+
+.sigem-pal-foot {
+  display: flex;
+  gap: 16px;
+  padding: 9px 16px;
+  border-top: 1px solid var(--sig-border);
+  background: var(--sig-bg);
+  font-size: 14.5px;
+  color: var(--sig-muted);
+  align-items: center
+}
+
+.sigem-pal-foot kbd {
+  font-size: 13.5px;
+  background: var(--sig-surface);
+  border: 1px solid var(--sig-border);
+  border-radius: 5px;
+  padding: 1px 6px
+}
+
+/* Campo de búsqueda del topbar */
+.sigem-topbar-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--sig-bg);
+  border: 1px solid var(--sig-border);
+  border-radius: 10px;
+  padding: 8px 13px;
+  color: var(--sig-light);
+  font-size: 15px;
+  cursor: pointer;
+  min-width: 220px;
+  transition: all .15s;
+  user-select: none;
+  margin-left: auto !important;
+  margin-right: 8px
+}
+
+.sigem-topbar-search:hover {
+  border-color: var(--sig-primary);
+  color: var(--sig-muted)
+}
+
+@media (max-width:640px) {
+  .sigem-topbar-search {
+    min-width: auto;
+    padding: 6px 10px;
+    font-size: 13.5px
+  }
+}
+
+/* ===== Fase 10: Pulido final, Focus visible y Estados interactivos ===== */
+.sigem-lg {
+  cursor: pointer;
+  transition: all .15s;
+  margin: 0 -6px
+}
+
+.sigem-lg:hover {
+  background: var(--sig-primary-light)
+}
+
+.sigem-lg.active {
+  background: var(--sig-primary-light);
+  font-weight: 700
+}
+
+.sigem-cb {
+  cursor: pointer;
+  transition: all .15s;
+  border-radius: 6px;
+  padding: 2px 6px;
+  margin: 0 -6px
+}
+
+.sigem-cb:hover {
+  background: var(--sig-primary-light)
+}
+
+.sigem-cb.active {
+  background: var(--sig-primary-light)
+}
+
+/* Focus visible universal y accesible */
+:is(button, input, select, textarea, [role="button"], .sigem-tab, .sigem-cat-tab, .sigem-pref-chips button, .sigem-topbar-search, .sigem-lg, .sigem-cb, .sigem-rep-card, .fi-btn, .fi-icon-btn):focus-visible {
+  outline: 2px solid var(--sig-primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* Adaptación responsive para pantallas grandes (1280px, 1440px, 1920px) */
+@media (min-width:1440px) {
+  .sigem-rep-grid {
+    grid-template-columns: repeat(3, 1fr)
+  }
+}
+
+/* Encabezado de sección del dashboard */
+.sigem-section-head {
+  margin: 8px 0 16px
+}
+
+.sigem-section-head h2 {
+  font-size: 21px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 4px;
+  color: var(--sig-text)
+}
+
+.sigem-section-head p {
+  font-size: 15px;
+  color: var(--sig-muted);
+  margin: 0
+}
+
+/* Tabla de inventario en dashboard (ancho completo sin panel lateral) */
+.sigem-dash-table {
+  .fi-ta-table {
+    thead th {
+      background: #fafbfc;
+    }
+
+    tbody td {
+      padding: 8px 12px;
+    }
+  }
+}
+
+/* Enlace "Ver todo" al pie de la tabla */
+.sigem-dash-more {
+  display: flex;
+  justify-content: center;
+  padding: 14px;
+  border-top: 1px solid var(--sig-border);
+
+  a {
+    color: var(--sig-primary);
+    font-weight: 600;
+    font-size: 15.5px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+/* ===== Ajuste de ancho: aprovechar toda la pantalla ===== */
+
+/* Contenedor principal de contenido: ancho completo */
+.fi-main,
+.fi-main-ctn,
+main.fi-main {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+/* Quitar max-width de cualquier contenedor interno de Filament */
+.fi-page {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Header de página: ancho completo */
+.fi-header,
+.fi-page-header {
+  max-width: none !important;
+  width: 100% !important;
+}
+
+/* Tablas: ocupar todo el ancho, sin overflow innecesario */
+.fi-ta-ctn,
+.sigem-rep-view,
+.sigem-dash-table {
+  max-width: none !important;
+  width: 100% !important;
+  overflow-x: auto;
+}
+
+.fi-ta-table,
+table {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* Columnas de tabla: contenido flexible */
+.fi-ta-table {
+  tbody td,
+  thead th {
+    white-space: nowrap;
+  }
+
+  td:nth-child(2),
+  th:nth-child(2) {
+    max-width: 320px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Panel lateral de Inventario (dona): proporción ajustada */
+.sigem-inv-layout {
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 14px;
+  width: 100%;
+}
+
+/* En pantallas grandes: el contenido llena de verdad */
+@media (min-width: 1600px) {
+
+  .fi-main,
+  .fi-main-ctn,
+  main.fi-main {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  .sigem-inv-layout {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+}
+
+/* Hero, quick-grid y stats-grid: ancho completo */
+.sigem-hero,
+.sigem-quick-grid,
+.sigem-stats-grid {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Responsive: en pantallas medianas */
+@media (max-width: 1200px) {
+  .sigem-inv-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sigem-inv-side {
+    position: static;
+    max-height: none;
+  }
+}
+
+/* ===== Pulido Final: Buscador, Header de sección y Acciones de icono ===== */
+/* Ocultar buscador global nativo de Filament */
+.fi-topbar .fi-global-search,
+[wire\:id*="global-search"] {
+  display: none !important;
+}
+
+/* Header de sección con botones (Dashboard y módulos) */
+.sigem-section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.sigem-section-head>div:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.sigem-section-head>div:last-child {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+/* Botón primario general estilo SIGEM */
+.sigem-btn-primary {
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: var(--sig-primary);
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all .15s;
+  text-decoration: none;
+}
+
+.sigem-btn-primary:hover {
+  background: var(--sig-primary-dark);
+  box-shadow: 0 3px 9px rgba(27, 101, 212, .32);
+  color: #fff !important;
+}
+
+/* Acciones de tabla como iconos */
+.fi-ta-actions .fi-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+}
+
+.fi-ta-actions .fi-icon-btn:hover {
+  background: var(--sig-bg);
+}
+
+/* Acciones de página / encabezado (Fase final) */
+.sigem-page-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Estado sin gráfica para layout de inventario (Dashboard y ListInventarios) */
+.sigem-inv-no-chart {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.sigem-inv-no-chart .sigem-inv-side {
+  display: none !important;
+}
+
+
+/* ==========================================================================
+   SLIDE-OVER INVENTARIO & PANELES LATERALES (Corrección 1 y 2)
+   ========================================================================== */
+
+/* 1. Dimensiones, posición y apariencia del panel InvGate */
+.fi-modal-slide-over-window {
+  width: min(620px, 92vw) !important;
+  max-width: 620px !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  box-shadow: -6px 0 18px rgba(15, 23, 42, .08) !important;
+  border-left: 1px solid var(--sig-border) !important;
+  background: #ffffff !important;
+
+  .fi-modal-content>form,
+  .fi-modal-content>.fi-fo-component-ctn,
+  .fi-fo-wizard>.fi-fo-component-ctn,
+  .fi-fo-component-ctn .fi-fo-component-ctn {
+    padding: 0 !important;
+  }
+
+  // 2. Grid de 2 columnas dentro del slide-over
+  [class*="grid"],
+  [style*="--cols"] {
+    column-gap: 16px !important;
+    row-gap: 14px !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  @media (min-width: 640px) {
+
+    [style*="--cols-lg: repeat(2"],
+    [style*="--cols-default: repeat(2"],
+    [style*="--cols-lg: repeat(3"],
+    [style*="--cols-default: repeat(3"],
+    [style*="--cols-lg: repeat(4"],
+    [style*="--cols-default: repeat(4"] {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+  }
+
+  // Toggle buttons en fila
+  .fi-fo-toggle-buttons {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+
+    label.fi-btn {
+      margin: 0 !important;
+      white-space: nowrap !important;
+    }
+  }
+
+  // Secciones tipo card (borde + fondo blanco)
+  .fi-section,
+  section.fi-section {
+    background: var(--sig-surface, #ffffff) !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+    margin-bottom: 14px !important;
+    overflow: hidden !important;
+  }
+
+  .fi-section-header {
+    padding: 12px 18px !important;
+    border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+    background: #f8fafc !important;
+    overflow: hidden !important;
+    min-width: 0 !important;
+
+    /* Restaurar botón chevron de secciones (FIX 5) */
+    button svg,
+    .fi-icon-btn svg {
+      display: block !important;
+      visibility: visible !important;
+      color: var(--sig-muted, #94a3b8) !important;
+    }
+  }
+
+  .fi-section-header>div,
+  .fi-section-header-description {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+  }
+
+  // Ocultar SVGs monocromáticos de headers de sección dentro del slide-over
+  .fi-section-header>svg,
+  .fi-section-header>div>svg,
+  .fi-section-header-icon {
+    display: none !important;
+  }
+
+  .fi-section-header-heading {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: var(--sig-text, #0f172a) !important;
+    display: flex !important;
+    align-items: center !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+
+    &::before {
+      font-size: 16px !important;
+      margin-right: 8px !important;
+      display: inline-block !important;
+      line-height: 1 !important;
+    }
+  }
+
+  // Emojis con color por sección mediante ::before
+  .fi-section[id*="red-y-conectividad"] .fi-section-header-heading::before,
+  .fi-section[id*="conectividad"] .fi-section-header-heading::before,
+  .fi-section:has([id*="ip_ethernet"]) .fi-section-header-heading::before {
+    content: "🌐" !important;
+  }
+
+  .fi-section[id*="especificaciones-tecnicas"] .fi-section-header-heading::before,
+  .fi-section[id*="especificaciones"] .fi-section-header-heading::before,
+  .fi-section:has([id*="ram"]) .fi-section-header-heading::before {
+    content: "⚙️" !important;
+  }
+
+  .fi-section[id*="ubicacion-y-responsable"] .fi-section-header-heading::before,
+  .fi-section[id*="ubicacion"] .fi-section-header-heading::before,
+  .fi-section:has([id*="departamento_id"]) .fi-section-header-heading::before {
+    content: "📍" !important;
+  }
+
+  .fi-section[id*="hardware-y-componentes"] .fi-section-header-heading::before,
+  .fi-section[id*="hardware"] .fi-section-header-heading::before,
+  .fi-section:has([id*="cpu"]) .fi-section-header-heading::before {
+    content: "💻" !important;
+  }
+
+  .fi-section[id*="identificacion-del-equipo"] .fi-section-header-heading::before,
+  .fi-section[id*="identificacion"] .fi-section-header-heading::before,
+  .fi-section:has([id*="num_serie"]) .fi-section-header-heading::before {
+    content: "🏷️" !important;
+  }
+
+  .fi-section[id*="datos-generales"] .fi-section-header-heading::before,
+  .fi-section[id*="general"] .fi-section-header-heading::before {
+    content: "📋" !important;
+  }
+
+  .fi-section[id*="contacto-y-ubicacion"] .fi-section-header-heading::before,
+  .fi-section[id*="contacto"] .fi-section-header-heading::before,
+  .fi-section:has([id*="contacto_nombre"]) .fi-section-header-heading::before {
+    content: "👤" !important;
+  }
+
+  .fi-section[id*="control-de-stock"] .fi-section-header-heading::before,
+  .fi-section[id*="stock"] .fi-section-header-heading::before {
+    content: "📦" !important;
+  }
+
+  .fi-section[id*="adquisicion-y-garantia"] .fi-section-header-heading::before,
+  .fi-section[id*="garantia"] .fi-section-header-heading::before,
+  .fi-section:has([id*="garantia"]) .fi-section-header-heading::before {
+    content: "🛡️" !important;
+  }
+
+  .fi-section[id*="facturacion-y-compra"] .fi-section-header-heading::before,
+  .fi-section:has([id*="num_factura"]) .fi-section-header-heading::before {
+    content: "🧾" !important;
+  }
+
+  .fi-section[id*="detalles-adicionales"] .fi-section-header-heading::before,
+  .fi-section[id*="adicional"] .fi-section-header-heading::before {
+    content: "📝" !important;
+  }
+
+  // Fallback para el wizard por orden si no coincide slug de id
+  .fi-fo-wizard>div>div>.fi-fo-component-ctn>.fi-section:nth-of-type(1) .fi-section-header-heading::before {
+    content: "🏷️" !important;
+  }
+
+  .fi-fo-wizard>div>div>.fi-fo-component-ctn>.fi-section:nth-of-type(2) .fi-section-header-heading::before {
+    content: "⚙️" !important;
+  }
+
+  .fi-section-content {
+    padding: 16px 18px 18px !important;
+  }
+
+  // Inputs y wrappers al 100% del ancho de columna
+  .fi-fo-field-wrp,
+  .fi-input-wrp,
+  .fi-select,
+  .choices,
+  .choices__inner,
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  select,
+  textarea {
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  textarea {
+    resize: vertical !important;
+    min-height: 80px !important;
+  }
+
+  input[type="checkbox"] {
+    width: 18px !important;
+    height: 18px !important;
+    flex-shrink: 0 !important;
+  }
+
+  // Los items del grid no deben colapsar (BUG 2) y etiquetas legibles
+  .fi-fo-field-wrp {
+    min-width: 0 !important;
+
+    &-label {
+      min-width: 0 !important;
+      max-width: 100% !important;
+      white-space: normal !important;
+      word-break: normal !important;
+      overflow-wrap: normal !important;
+      line-height: 1.35 !important;
+
+      label {
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        color: var(--sig-text, #0f172a) !important;
+      }
+    }
+  }
+
+  // Inputs y selects al 100% del espacio disponible sin desbordar
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  input[type="date"],
+  select,
+  .fi-select {
+    height: 40px !important;
+    min-height: 40px !important;
+    font-size: 14px !important;
+  }
+
+  input:not(:focus) {
+    border-color: #d1d5db !important;
+    box-shadow: none !important;
+  }
+
+  input:focus {
+    border-color: var(--sig-primary, #1e3a5f) !important;
+    box-shadow: 0 0 0 1px var(--sig-primary, #1e3a5f) !important;
+  }
+
+  .fi-input-wrp input::placeholder {
+    color: var(--sig-muted, #94a3b8) !important;
+    font-size: 13.5px !important;
+  }
+
+  // Choices.js: máximo 2 líneas, altura controlada y desplegable accesible
+  .choices {
+    margin-bottom: 0 !important;
+    font-size: 14px !important;
+    position: relative !important;
+    overflow: visible !important;
+
+    &__inner {
+      min-height: 40px !important;
+      max-height: 64px !important;
+      padding: 4px 8px !important;
+      border-radius: 8px !important;
+      border: 1px solid #d1d5db !important;
+      background: #ffffff !important;
+      font-size: 13.5px !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+
+    &__list--single {
+      padding: 0 4px !important;
+      max-height: 52px !important;
+      overflow: hidden !important;
+      display: -webkit-box !important;
+      -webkit-line-clamp: 2 !important;
+      line-clamp: 2 !important;
+      -webkit-box-orient: vertical !important;
+      line-height: 1.35 !important;
+      white-space: normal !important;
+      word-break: break-word !important;
+    }
+
+    &__placeholder {
+      color: var(--sig-muted, #94a3b8) !important;
+      opacity: 1 !important;
+    }
+
+    // Dropdown de Choices con fondo blanco sólido y z-index alto para montarse sobre el footer
+    &__list--dropdown {
+      z-index: 9999 !important;
+      background: #ffffff !important;
+      background-color: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      border-radius: 8px !important;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
+      overflow: visible !important;
+      max-height: 280px !important;
+
+      .choices__list {
+        max-height: 280px !important;
+        overflow-y: auto !important;
+      }
+    }
+  }
+
+  // Mensajes de validación compactos y bordes de error sin descuadre
+  .fi-fo-field-wrp-error-message {
+    font-size: 11.5px !important;
+    line-height: 1.25 !important;
+    margin-top: 3px !important;
+    margin-bottom: 0 !important;
+    color: #dc2626 !important;
+    font-weight: 500 !important;
+  }
+
+  .fi-fo-field-wrp:has(.fi-fo-field-wrp-error-message) {
+
+    .fi-input-wrp,
+    .choices__inner {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 1px #ef4444 !important;
+    }
+  }
+
+  // ==========================================================================
+  // SLIDE-OVER DETALLE DE EQUIPO (INFOLIST & TABS)
+  // ==========================================================================
+
+  // Pestañas (Tabs) dentro del slide-over
+  .fi-tabs {
+    margin-bottom: 16px !important;
+    border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+  }
+
+  .fi-tabs-item {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    padding: 8px 14px !important;
+  }
+
+  // Separadores horizontales entre campos y contención de textos
+  .fi-in-entry-wrp {
+    padding-bottom: 8px !important;
+    border-bottom: 1px solid var(--sig-border, #f1f5f9) !important;
+    margin-bottom: 8px !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-wrap: break-word !important;
+    word-break: break-word !important;
+
+    dt,
+    .fi-in-entry-wrp-label {
+      font-size: 12px !important;
+      color: var(--sig-muted, #64748b) !important;
+      font-weight: 500 !important;
+      margin-bottom: 2px !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      overflow-wrap: break-word !important;
+      word-break: break-word !important;
+    }
+
+    dd {
+      font-size: 13.5px !important;
+      font-weight: 600 !important;
+      color: var(--sig-text, #0f172a) !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      overflow-wrap: break-word !important;
+      word-break: break-word !important;
+    }
+  }
+
+  // Secciones colapsables con chevron sutil (sin cuadro con borde)
+  .fi-section-header .fi-icon-btn {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  // Header modal: estilo dinámico del detalle y protección contra colisión con botón cerrar
+  .fi-modal-header {
+    padding-right: 56px !important;
+    min-width: 0 !important;
+
+    .fi-modal-heading {
+      font-size: 16px !important;
+      font-weight: 700 !important;
+      color: var(--sig-text, #0f172a) !important;
+      line-height: 1.3 !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      overflow-wrap: break-word !important;
+      word-break: break-word !important;
+    }
+
+    .fi-modal-description {
+      font-size: 12.5px !important;
+      color: var(--sig-muted, #64748b) !important;
+      margin-top: 3px !important;
+      font-weight: 500 !important;
+      min-width: 0 !important;
+      max-width: 100% !important;
+      overflow-wrap: break-word !important;
+      word-break: break-word !important;
+    }
+  }
+
+  // Secciones y wizards ocupan ambas columnas
+  .fi-section,
+  .fi-fo-wizard,
+  [class*="col-span-full"],
+  [class*="col-span-3"],
+  [class*="col-span-4"] {
+    grid-column: 1 / -1 !important;
+  }
+}
+
+/* Stepper del wizard adaptado a panel compacto (620px) (FIX 1 y FIX 3) */
+.fi-fo-wizard-header,
+.fi-modal-slide-over-window .fi-fo-wizard-header {
+  display: flex !important;
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  flex-wrap: nowrap !important;
+  scrollbar-width: none !important;
+}
+
+.fi-fo-wizard-header::-webkit-scrollbar,
+.fi-modal-slide-over-window .fi-fo-wizard-header::-webkit-scrollbar {
+  display: none !important;
+}
+
+.fi-fo-wizard-header-step,
+.fi-modal-slide-over-window .fi-fo-wizard-header-step {
+  flex: 1 1 0% !important;
+  min-width: 0 !important;
+}
+
+.fi-fo-wizard-header-step-button,
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-button {
+  padding: 8px 4px !important;
+  gap: 4px !important;
+}
+
+/* Quitar círculo del icono del paso del wizard (TODOS) */
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-icon-ctn,
+.fi-fo-wizard-header-step-icon-ctn,
+.fi-modal-slide-over .fi-fo-wizard-header-step-icon-ctn {
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  width: auto !important;
+  height: auto !important;
+  min-width: auto !important;
+  min-height: auto !important;
+  box-shadow: none !important;
+  --tw-ring-color: transparent !important;
+  --tw-ring-shadow: none !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.fi-fo-wizard-header-step-icon-ctn svg,
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-icon-ctn svg {
+  display: none !important;
+}
+
+.fi-fo-wizard-header-step-icon-ctn::before,
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-icon-ctn::before {
+  font-size: 15px !important;
+  line-height: 1 !important;
+}
+
+.fi-fo-wizard-header-step:nth-child(1) .fi-fo-wizard-header-step-icon-ctn::before,
+.fi-modal-slide-over-window .fi-fo-wizard-header-step:nth-child(1) .fi-fo-wizard-header-step-icon-ctn::before {
+  content: "📋" !important;
+}
+
+.fi-fo-wizard-header-step:nth-child(2) .fi-fo-wizard-header-step-icon-ctn::before,
+.fi-modal-slide-over-window .fi-fo-wizard-header-step:nth-child(2) .fi-fo-wizard-header-step-icon-ctn::before {
+  content: "🧾" !important;
+}
+
+.fi-fo-wizard-header-step:nth-child(3) .fi-fo-wizard-header-step-icon-ctn::before,
+.fi-modal-slide-over-window .fi-fo-wizard-header-step:nth-child(3) .fi-fo-wizard-header-step-icon-ctn::before {
+  content: "🛡️" !important;
+}
+
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-button>div,
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-button [class*="grid"],
+.fi-fo-wizard-header-step-label,
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-label {
+  font-size: 11.5px !important;
+  white-space: normal !important;
+  max-width: 100% !important;
+  line-height: 1.15 !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
+  display: block !important;
+}
+
+.fi-fo-wizard-header-step-description,
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-description,
+.fi-fo-wizard-header-step-separator,
+.fi-modal-slide-over-window .fi-fo-wizard-header-step-separator {
+  display: none !important;
+}
+
+/* 3. Desplazamiento del contenido principal y overlay transparente (Corrección 2) */
+.fi-main,
+.fi-topbar {
+  transition: width .25s cubic-bezier(.4, 0, .2, 1),
+    max-width .25s cubic-bezier(.4, 0, .2, 1),
+    margin-right .25s cubic-bezier(.4, 0, .2, 1);
+}
+
+html,
+body {
+  overflow-x: hidden !important;
+}
+
+@media (min-width: 1000px) {
+
+  /* Cuando el slide-over está abierto: el contenido usa calc para restar el ancho del panel */
+  body.slide-over-open .fi-main,
+  body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-main,
+  body:has(.fi-modal.fi-modal-open .fi-modal-slide-over-window) .fi-main {
+    width: calc(100% - min(620px, 92vw)) !important;
+    max-width: calc(100% - min(620px, 92vw)) !important;
+    margin-right: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  body.slide-over-open .fi-topbar,
+  body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar,
+  body:has(.fi-modal.fi-modal-open .fi-modal-slide-over-window) .fi-topbar {
+    width: calc(100% - min(620px, 92vw)) !important;
+    max-width: calc(100% - min(620px, 92vw)) !important;
+    margin-right: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Ocultar el overlay oscuro para que el contenido comprimido sea visible */
+  .fi-modal:has(.fi-modal-slide-over-window) .fi-modal-close-overlay,
+  .fi-modal-slide-over-window~.fi-modal-close-overlay,
+  body.slide-over-open .fi-modal-close-overlay,
+  body:has(.fi-modal-slide-over-window) .fi-modal-close-overlay {
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    pointer-events: none !important;
+  }
+
+  /* Scroll del contenido principal con el panel abierto:
+     x-trap.noscroll de Filament pone overflow:hidden inline en <html> y los
+     contenedores fixed inset-0 del modal capturan la rueda del mouse. */
+  html:has(.fi-modal-open .fi-modal-slide-over-window),
+  body.slide-over-open {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .fi-modal:has(.fi-modal-slide-over-window)>[role="dialog"]>div:not(.fi-modal-close-overlay),
+  .fi-modal:has(.fi-modal-slide-over-window) [x-ref="modalContainer"] {
+    pointer-events: none !important;
+  }
+
+  .fi-modal-slide-over-window {
+    pointer-events: auto !important;
+  }
+}
+
+
+
+/* ==========================================================================
+   Slide-over: sin scroll horizontal (todo el contenido cabe en el panel)
+   ========================================================================== */
+
+.fi-modal-slide-over-window {
+  .fi-fo-component-ctn {
+    overflow: visible !important;
+    max-width: 100% !important;
+    max-height: none !important;
+  }
+
+  // Contenedores internos no deben desbordar.
+  // Nota: no se usa overflow-x:hidden aqui para no recortar los desplegables
+  // de los selects (overflow-x distinto de visible fuerza overflow-y:auto).
+  .fi-fo-component-ctn>*,
+  .grid,
+  .fi-section,
+  .fi-fo-wizard {
+    max-width: 100% !important;
+  }
+
+  .fi-fo-field,
+  .fi-fo-field-wrp {
+    width: 100% !important;
+  }
+
+  // El padding interno no debe causar overflow
+  .fi-modal-content>*,
+  .fi-modal-content>*>* {
+    max-width: 100% !important;
+  }
+
+  // ==========================================================================
+  // Slide-over universal: campos que no colapsan, un solo scroll vertical
+  // ==========================================================================
+  [class*="fi-fo-field"],
+  [class*="fi-select"],
+  [class*="fi-textarea"] {
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  // Scrollbar discreta solo en el panel (el stepper conserva la suya)
+  *:not(.fi-fo-wizard-header)::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  *:not(.fi-fo-wizard-header) {
+    scrollbar-width: none;
+  }
+
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px !important;
+
+    &-thumb {
+      background: #cbd5e1 !important;
+      border-radius: 3px !important;
+    }
+  }
+}
+
+/* ==========================================================================
+   ToggleButtons: Estados claro / seleccionado / hover (Problema 3)
+   - NO seleccionado: borde gris, texto gris, fondo blanco
+   - SELECCIONADO: fondo azul, texto blanco, borde azul
+   - HOVER (no seleccionado): borde azul suave, fondo azul claro
+   ========================================================================== */
+.fi-fo-toggle-buttons label.fi-btn,
+.fi-fo-toggle-buttons input:not(:checked)+label.fi-btn,
+.fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn {
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background-color: var(--sig-surface, #ffffff) !important;
+  background: var(--sig-surface, #ffffff) !important;
+  color: var(--sig-muted, #64748b) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  opacity: 1 !important;
+  transition: all 0.15s ease !important;
+}
+
+.fi-fo-toggle-buttons label.fi-btn *,
+.fi-fo-toggle-buttons input:not(:checked)+label.fi-btn *,
+.fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn * {
+  color: var(--sig-muted, #64748b) !important;
+}
+
+/* HOVER en NO seleccionado */
+.fi-fo-toggle-buttons input:not(:checked)+label.fi-btn:hover,
+.fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn:hover {
+  border-color: #93c5fd !important;
+  background-color: #eff6ff !important;
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  box-shadow: none !important;
+}
+
+.fi-fo-toggle-buttons input:not(:checked)+label.fi-btn:hover *,
+.fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn:hover * {
+  color: #1d4ed8 !important;
+}
+
+/* SELECCIONADO */
+.fi-fo-toggle-buttons input:checked+label.fi-btn,
+.fi-fo-toggle-buttons div:has(input:checked)>label.fi-btn {
+  background-color: var(--sig-primary, #002855) !important;
+  background: var(--sig-primary, #002855) !important;
+  border: 1px solid var(--sig-primary, #002855) !important;
+  border-color: var(--sig-primary, #002855) !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.fi-fo-toggle-buttons input:checked+label.fi-btn *,
+.fi-fo-toggle-buttons div:has(input:checked)>label.fi-btn * {
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   Slide-over: Acciones / Footer integrados al contenido (Problema 4)
+   ========================================================================== */
+.fi-modal-slide-over-window .fi-modal-footer-actions,
+.fi-modal-slide-over-window .fi-form-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+/* Botones dentro del footer de slide-over */
+.fi-modal-slide-over-window {
+
+  .fi-modal-footer .fi-btn,
+  .fi-form-actions .fi-btn {
+    border-radius: 8px !important;
+    padding: 9px 20px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    line-height: 1.4 !important;
+    cursor: pointer !important;
+  }
+
+  // Botón primario
+  .fi-modal-footer .fi-btn-color-primary,
+  .fi-modal-footer .fi-color-primary,
+  .fi-form-actions .fi-btn-color-primary {
+    background-color: var(--sig-primary, #002855) !important;
+    border: 1px solid var(--sig-primary, #002855) !important;
+    color: #ffffff !important;
+  }
+
+  .fi-modal-footer .fi-btn-color-primary:hover,
+  .fi-modal-footer .fi-color-primary:hover {
+    background-color: #001f42 !important;
+  }
+
+  // Botones secundarios / cancelar (gris)
+  .fi-modal-footer .fi-btn-color-gray,
+  .fi-modal-footer .fi-color-gray,
+  .fi-form-actions .fi-btn-color-gray {
+    background-color: #ffffff !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    color: #334155 !important;
+  }
+
+  .fi-modal-footer .fi-btn-color-gray:hover,
+  .fi-modal-footer .fi-color-gray:hover,
+  .fi-form-actions .fi-btn-color-gray:hover {
+    background-color: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  // Navegación al final de wizards dentro de slide-over
+  .fi-fo-wizard>div:last-child {
+    margin-top: 24px !important;
+    padding-top: 16px !important;
+    border-top: 1px solid var(--sig-border, #e2e8f0) !important;
+  }
+}
+
+/* ==========================================================================
+   FIX 1: Sin scroll horizontal en el topbar con el slide-over abierto
+   ========================================================================== */
+
+body.slide-over-open .fi-topbar,
+body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar {
+  overflow-x: hidden !important;
+}
+
+body.slide-over-open .fi-topbar nav,
+body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+}
+
+.fi-topbar * {
+  max-width: 100% !important;
+}
+
+.fi-topbar .sigem-topbar-search {
+  min-width: 120px !important;
+  flex-shrink: 1 !important;
+}
+
+/* ==========================================================================
+   FIX 2: Botones de accion DENTRO del contenido del panel (no pegados al borde)
+   En Filament v3 el pie del modal es .fi-modal-footer > .fi-modal-footer-actions
+   ========================================================================== */
+.fi-modal-slide-over-window .fi-modal-footer-actions,
+.fi-modal-slide-over-window .fi-form-actions {
+  gap: 10px !important;
+  position: relative !important;
+  bottom: auto !important;
+}
+
+.fi-modal-slide-over-window .fi-modal-footer .fi-btn,
+.fi-modal-slide-over-window .fi-form-actions .fi-btn {
+  font-weight: 600 !important;
+}
+
+
+/* ==========================================================================
+   Mejora de diseño de formularios e infolists en slide-over + Botones catálogo
+   ========================================================================== */
+
+/* Botones de acción en tablas de catálogo (Ver / Editar / Eliminar) */
+.fi-icon-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--sig-muted, #64748b);
+  background: var(--sig-surface, #ffffff);
+  border: 1px solid var(--sig-border, #e2e8f0);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fi-icon-btn:hover {
+  color: var(--sig-primary, #1b65d4);
+  background: var(--sig-bg, #f8fafc);
+  border-color: var(--sig-border-strong, #cbd5e1);
+}
+
+.fi-icon-btn-danger {
+  color: var(--sig-muted, #64748b) !important;
+}
+
+.fi-icon-btn-danger:hover {
+  color: #dc2626 !important;
+  background: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+}
+
+/* Los grupos de campos sin doble recuadro */
+.fi-modal-slide-over-window {
+
+  .fi-fo-component-ctn .fi-fieldset,
+  .fi-fo-component-ctn [class*="fieldset"] {
+    border: none !important;
+    padding: 0 !important;
+    margin-bottom: 16px !important;
+  }
+
+  // Mejor espaciado de campos
+  .fi-fo-field-wrp {
+    margin-bottom: 14px !important;
+  }
+
+  // Iconos de inputs con color primario (FIX 4)
+  .fi-input-wrp>div:first-child,
+  .fi-input-wrp svg {
+    color: var(--sig-primary, #1b65d4) !important;
+  }
+
+  .fi-input-wrp .fi-input-wrp-prefix,
+  .fi-input-wrp .fi-input-wrp-icon {
+    color: var(--sig-primary, #1b65d4) !important;
+    padding-left: 10px !important;
+  }
+
+  // FIX 1: Eliminar doble recuadro en formularios dentro del slide-over
+  :is(.fi-fo-component-ctn, form) {
+    :is(.fi-section, section.fi-section) {
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      padding: 0 !important;
+      margin-bottom: 0 !important;
+      overflow: visible !important;
+    }
+
+    .fi-section-header {
+      border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+      padding: 0 0 10px 0 !important;
+      margin-bottom: 14px !important;
+      background: transparent !important;
+    }
+
+    .fi-section-content {
+      padding: 0 !important;
+    }
+  }
+
+  .fi-fo-wizard {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+    overflow: visible !important;
+  }
+
+  .fi-fo-wizard-header {
+    border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+    margin-bottom: 16px !important;
+  }
+
+  // FIX 2: Footer bipolar — Cancelar (izq) + Confirmar (der)
+  .fi-modal-footer-actions {
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+  }
+
+  // En formularios Crear/Editar: Cancelar a la izquierda, Confirmar a la derecha
+  &:has(.fi-fo-component-ctn) .fi-modal-footer-actions button.fi-btn-color-gray,
+  &:has(.fi-fo-component-ctn) .fi-modal-footer-actions button[x-on\:click*="close"],
+  &:has(form) .fi-modal-footer-actions button.fi-btn-color-gray,
+  &:has(form) .fi-modal-footer-actions button[x-on\:click*="close"] {
+    order: -1 !important;
+    margin-right: auto !important;
+    margin-left: 0 !important;
+  }
+
+  &:has(.fi-fo-component-ctn) .fi-modal-footer-actions button.fi-btn-color-primary,
+  &:has(.fi-fo-component-ctn) .fi-modal-footer-actions button[type="submit"],
+  &:has(form) .fi-modal-footer-actions button.fi-btn-color-primary,
+  &:has(form) .fi-modal-footer-actions button[type="submit"] {
+    order: 2 !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+
+  // En vista Detalle/Ver: Atajos de acción (Editar/Eliminar) a la izquierda, Cerrar a la derecha
+  .fi-modal-footer-actions button.fi-btn-color-warning,
+  .fi-modal-footer-actions button.fi-btn-color-danger {
+    order: -2 !important;
+    margin-left: 0 !important;
+    margin-right: 8px !important;
+  }
+
+  &:not(:has(.fi-fo-component-ctn)) .fi-modal-footer-actions button[x-on\:click*="close"],
+  &:not(:has(.fi-fo-component-ctn)) .fi-modal-footer-actions button.fi-btn-color-gray {
+    order: 2 !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+}
+
+/* ===== TAREA: Sidebar Fijo Flexbox ===== */
+/* Evita scroll en el contenedor maestro */
+.fi-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden !important;
+}
+
+/* Fijar el sidebar a la izquierda usando sticky sobre flex */
+.fi-sidebar {
+  height: 100vh !important;
+  position: sticky !important;
+  top: 0;
+  flex-shrink: 0;
+  overflow-y: visible !important;
+  /* Permitir que los tooltips salgan del borde */
+}
+
+/* Contenedor que agrupa topbar y main en flexbox */
+.fi-main-ctn {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden !important;
+  margin-left: 0 !important;
+}
+
+/* Permitir scroll SÓLO en el contenido principal */
+.fi-main {
+  flex-grow: 1;
+  height: 100vh;
+  overflow-y: auto !important;
+  margin-left: 0 !important;
+}
+
+/* Mantener el Topbar fijo sobre el contenido que hace scroll */
+.fi-topbar {
+  position: sticky !important;
+  top: 0;
+  z-index: 40;
+  margin-left: 0 !important;
+}
+
+/* Fallback: Ocultar el botón ☰ nativo si persiste por alguna clase residual */
+.fi-sidebar-group-collapse-button,
+button.fi-icon-btn[x-on\:click="isSidebarOpen = ! isSidebarOpen"],
+button.fi-icon-btn[x-on\:click*="sidebar"] {
+  display: none !important;
+}
+
+/* Garantizar visibilidad de avatar y logout */
+.fi-sidebar {
+  .sigem-user-card,
+  .sigem-avatar,
+  .sigem-logout {
+    display: flex !important;
+  }
+}
+
+/* ==================================================== */
+/* DISEÑO INVGATE: PANEL SERVICIO SOCIAL                */
+/* ==================================================== */
+
+/* Banner de rol en topbar */
+.sigem-role-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--sig-info-light);
+  color: var(--sig-info);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+/* Role pill en avatar del sidebar */
+.sigem-role-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--sig-info-light);
+  color: var(--sig-info);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Píldora solo lectura */
+.sigem-pill.ro {
+  background: var(--sig-info-light);
+  color: var(--sig-info);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 99px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Sidebar colores Servicio Social: Dashboard */
+.fi-sidebar-item a[href$="/servicio-social"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href$="/servicio-social/"] .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href$="/servicio-social"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href$="/servicio-social/"]) .fi-sidebar-item-icon {
+  background: var(--sig-primary-light) !important;
+  color: var(--sig-primary) !important;
+  border-color: color-mix(in srgb, var(--sig-primary) 45%, transparent) !important;
+}
+
+.fi-sidebar-item.fi-active a[href$="/servicio-social"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href$="/servicio-social"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href$="/servicio-social"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href$="/servicio-social"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href$="/servicio-social"]) .fi-sidebar-item-icon {
+  background: var(--sig-primary) !important;
+  border-color: var(--sig-primary) !important;
+  color: #ffffff !important;
+}
+
+/* Solicitudes SS: #0d9488 (verde agua) */
+.fi-sidebar-item {
+  a[href*="/servicio-social/solicitud"] .fi-sidebar-item-icon {
+    background: var(--mod-sol-l) !important;
+    color: var(--mod-sol) !important;
+    border-color: color-mix(in srgb, var(--mod-sol) 45%, transparent) !important;
+  }
+
+  &:is(.fi-active, .fi-sidebar-item-active) a[href*="/servicio-social/solicitud"] .fi-sidebar-item-icon,
+  a[href*="/servicio-social/solicitud"][aria-current="page"] .fi-sidebar-item-icon {
+    background: var(--mod-sol) !important;
+    border-color: var(--mod-sol) !important;
+    color: #ffffff !important;
+  }
+
+  // Mantenimiento SS: #ea580c (naranja)
+  a[href*="/servicio-social/mantenimiento"] .fi-sidebar-item-icon {
+    background: var(--mod-mant-l) !important;
+    color: var(--mod-mant) !important;
+    border-color: color-mix(in srgb, var(--mod-mant) 45%, transparent) !important;
+  }
+
+  &:is(.fi-active, .fi-sidebar-item-active) a[href*="/servicio-social/mantenimiento"] .fi-sidebar-item-icon,
+  a[href*="/servicio-social/mantenimiento"][aria-current="page"] .fi-sidebar-item-icon {
+    background: var(--mod-mant) !important;
+    border-color: var(--mod-mant) !important;
+    color: #ffffff !important;
+  }
+
+  // Inventario SS: #7c3aed (morado)
+  a[href*="/servicio-social/inventario"] .fi-sidebar-item-icon {
+    background: var(--mod-inv-l) !important;
+    color: var(--mod-inv) !important;
+    border-color: color-mix(in srgb, var(--mod-inv) 45%, transparent) !important;
+  }
+
+  &:is(.fi-active, .fi-sidebar-item-active) a[href*="/servicio-social/inventario"] .fi-sidebar-item-icon,
+  a[href*="/servicio-social/inventario"][aria-current="page"] .fi-sidebar-item-icon {
+    background: var(--mod-inv) !important;
+    border-color: var(--mod-inv) !important;
+    color: #ffffff !important;
+  }
+
+  // Catálogos SS: #c026d3 (magenta)
+  a:is([href*="/servicio-social/catalogo"], [href*="/servicio-social/materials"],
+    [href*="/servicio-social/areas"], [href*="/servicio-social/receptors"],
+    [href*="/servicio-social/marca-materials"], [href*="/servicio-social/tipo-materials"],
+    [href*="/servicio-social/unidad-medidas"]) .fi-sidebar-item-icon {
+    background: var(--mod-cat-l) !important;
+    color: var(--mod-cat) !important;
+    border-color: color-mix(in srgb, var(--mod-cat) 45%, transparent) !important;
+  }
+
+  &:is(.fi-active, .fi-sidebar-item-active) a:is([href*="/servicio-social/catalogo"], [href*="/servicio-social/materials"],
+    [href*="/servicio-social/areas"], [href*="/servicio-social/receptors"],
+    [href*="/servicio-social/marca-materials"], [href*="/servicio-social/tipo-materials"],
+    [href*="/servicio-social/unidad-medidas"]) .fi-sidebar-item-icon,
+  a:is([href*="/servicio-social/catalogo"], [href*="/servicio-social/materials"],
+    [href*="/servicio-social/areas"], [href*="/servicio-social/receptors"],
+    [href*="/servicio-social/marca-materials"], [href*="/servicio-social/tipo-materials"],
+    [href*="/servicio-social/unidad-medidas"])[aria-current="page"] .fi-sidebar-item-icon {
+    background: var(--mod-cat) !important;
+    border-color: var(--mod-cat) !important;
+    color: #ffffff !important;
+  }
+
+  // Reportes SS: #ca8a04 (ámbar)
+  a[href*="/servicio-social/reporte"] .fi-sidebar-item-icon {
+    background: var(--mod-rep-l) !important;
+    color: var(--mod-rep) !important;
+    border-color: color-mix(in srgb, var(--mod-rep) 45%, transparent) !important;
+  }
+
+  &:is(.fi-active, .fi-sidebar-item-active) a[href*="/servicio-social/reporte"] .fi-sidebar-item-icon,
+  a[href*="/servicio-social/reporte"][aria-current="page"] .fi-sidebar-item-icon {
+    background: var(--mod-rep) !important;
+    border-color: var(--mod-rep) !important;
+    color: #ffffff !important;
+  }
+}
+
+/* FIX 1: Quitar topbar duplicado en Servicio Social */
+
+body:has(.sigem-role-banner) .sigem-topbar-brand {
+  display: none !important;
+}
+
+body:has(.sigem-role-banner) .fi-topbar:first-of-type .sigem-topbar-brand {
+  display: none !important;
+}
+
+/* FIX B: Logout compacto — diagnóstico real (intento 2) */
+.fi-sidebar,
+aside.fi-sidebar {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+
+.fi-sidebar {
+  nav,
+  .fi-sidebar-nav {
+    flex: 1 1 auto !important;
+    overflow: visible !important;
+    min-height: 0 !important;
+  }
+}
+
+.fi-sidebar-footer,
+.fi-sidebar .fi-sidebar-footer {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: max-content !important;
+  padding: 6px 6px !important;
+  margin-top: auto !important;
+}
+
+.sigem-user-card {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: max-content !important;
+  padding: 6px 4px !important;
+  gap: 3px !important;
+  margin-top: auto !important;
+  justify-content: center !important;
+}
+
+.sigem-avatar {
+  width: 30px !important;
+  height: 30px !important;
+  font-size: 14px !important;
+  flex: 0 0 auto !important;
+}
+
+.sigem-role-pill {
+  font-size: 10px !important;
+  padding: 1px 4px !important;
+  line-height: 1.2 !important;
+  flex: 0 0 auto !important;
+}
+
+.sigem-logout {
+  width: 20px !important;
+  height: 20px !important;
+  font-size: 12px !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  flex: 0 0 auto !important;
+}
+
+.sigem-user-card {
+  form {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: auto !important;
+    flex: 0 0 auto !important;
+  }
+}
+
+/* FIX 3: Dashboard SS y Admin — 4 acciones + 4 KPIs en 2 filas de 4 */
+.sigem-quick-grid,
+.sigem-stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 14px !important;
+  margin-bottom: 22px !important;
+}
+
+@media (max-width: 1200px) {
+
+  .sigem-quick-grid,
+  .sigem-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 640px) {
+
+  .sigem-quick-grid,
+  .sigem-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* FIX 4: Topbar sticky (permanece al hacer scroll en ambos paneles) */
+.fi-topbar {
+  top: 0 !important;
+  z-index: 40 !important;
+}
+
+.fi-layout,
+.fi-main-ctn {
+  overflow: visible !important;
+}
+
+/* FIX 5: Banner de rol en Admin */
+.sigem-role-admin {
+  background: var(--sig-primary-light);
+  color: var(--sig-primary);
+}
+
+/* ===== FIX: Desbordamiento de Menú de Usuario y Sidebar ===== */
+
+/* 1. Restringir el ancho del menú desplegable superior (Logout/Tema) */
+.fi-topbar .fi-dropdown-panel {
+  max-width: 240px !important;
+  width: max-content !important;
+  left: auto !important;
+  right: 16px !important;
+  /* Alineación segura a la derecha */
+}
+
+/* Revertir reglas globales previas que deforman el contenido del menú */
+.fi-topbar .fi-dropdown-panel * {
+  max-width: none !important;
+}
+
+/* 2. Eliminar barra de desplazamiento horizontal en el sidebar y su footer */
+.fi-sidebar {
+  overflow-x: hidden !important;
+}
+
+/* 3. Asegurar que la tarjeta de usuario encaje perfectamente en los 64px */
+.sigem-user-card {
+  width: 100% !important;
+  max-width: 64px !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+  padding-left: 2px !important;
+  padding-right: 2px !important;
+}
+
+/* ===== FIX: Barras de desplazamiento redundantes ===== */
+
+/* 1. Eliminar doble scroll vertical en la página */
+html,
+body {
+  overflow: hidden !important;
+  /* Bloquea el scroll nativo del navegador */
+}
+
+.fi-layout {
+  height: 100vh !important;
+}
+
+/* El scroll vertical debe existir ÚNICAMENTE en el contenido principal */
+.fi-main {
+  height: 100vh !important;
+  overflow-x: hidden !important;
+}
+
+/* 2. Eliminar scroll horizontal en el menú lateral y proteger tooltips */
+/* En CSS, si usas overflow-y: auto, el navegador fuerza overflow-x: auto. 
+   Debemos forzar 'visible' para evitar barras y no recortar los tooltips. */
+
+/* Asegurar que los ítems no empujen el contenedor más allá de los 64px */
+.fi-sidebar {
+  .fi-sidebar-item {
+    max-width: 64px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  // Ocultar visualmente cualquier barra de scroll residual en el sidebar
+  &::-webkit-scrollbar,
+  nav::-webkit-scrollbar,
+  .fi-sidebar-nav::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  &,
+  nav {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+}
+
+/* ITEM 4: Estado Reasignado */
+.sigem-pill.reassign {
+  background: #ede9fe;
+  color: #8b5cf6
+}
+
+
+.fi-fo-toggle-buttons [data-color="reassign"],
+.fi-fo-toggle-buttons .fi-color-reassign {
+  --color-50: 237, 233, 254;
+  --color-100: 237, 233, 254;
+  --color-500: 139, 92, 246;
+  --color-600: 124, 58, 237;
+}
+
+/* ============================================
+   PASO 1: Fondo gris + topbar mockup
+   ============================================ */
+
+/* 1. Fondo gris en el contenido */
+.fi-main,
+.fi-main-ctn,
+main.fi-main {
+  background-color: #f4f6f8 !important;
+}
+
+/* 2. Sidebar y topbar blancos */
+.fi-sidebar {
+  background-color: #ffffff !important;
+}
+
+.fi-topbar {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* 3. Topbar delgado (~50px) */
+.fi-topbar,
+header.fi-topbar {
+  min-height: 50px !important;
+  height: 50px !important;
+  padding: 0 16px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* 4. Sin gap entre sidebar y topbar */
+.fi-topbar {
+  border-left: none !important;
+}
+
+/* 5. Tarjetas blancas sobre el gris */
+.sigem-quick,
+.sigem-stat,
+.fi-ta-ctn,
+.fi-section {
+  background-color: #ffffff !important;
+}
+
+/* ============================================
+   PASO 2: Densidad compacta (hero, cards, tabla)
+   ============================================ */
+
+/* 1. Hero más compacto */
+.sigem-hero,
+.hero {
+  padding: 14px 20px !important;
+  margin-bottom: 12px !important;
+}
+
+.sigem-hero {
+  h1 {
+    line-height: 1.25 !important;
+  }
+
+  p {
+    margin-bottom: 0 !important;
+  }
+}
+
+.sigem-quick-desc {
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+}
+
+.sigem-stat-ico {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+}
+
+/* 5. Texto secundario en filas */
+.fi-ta-table tbody td .fi-ta-text-description {
+  font-size: 12.5px !important;
+  line-height: 1.2 !important;
+  margin-top: 1px !important;
+}
+
+/* ============================================
+   PASO 3: Emojis en iconos
+   ============================================ */
+
+/* Emojis en quick cards y KPIs */
+.sigem-quick-ico,
+.sigem-stat-ico {
+  font-size: 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Ocultar SVGs dentro de iconos si quedaron */
+.sigem-quick-ico svg,
+.sigem-stat-ico svg {
+  display: none !important;
+}
+
+/* Reemplazar iconos SVG de acciones por emojis (solo en celdas y filas de tabla) */
+:is(.fi-ta-table tbody .fi-ta-actions, .fi-ta-actions-cell) :is(button, .fi-icon-btn) svg,
+.sigem-row-actions button svg,
+:is(button, .fi-icon-btn):is([title*="Ver"], [title*="Ver detalle"], [title*="Editar"], [title*="Eliminar"]) svg {
+  display: none !important;
+}
+
+:is(.fi-ta-actions button, .fi-icon-btn):is([title*="Ver"], [x-tooltip*="Ver"], [x-tooltip*="Detalle"])::before,
+button:is([title*="Ver detalle"], [title*="Ver equipo"])::before,
+.fi-ta-actions button:is([wire\:click*="ver"], [wire\:click*="view"])::before {
+  content: "👁" !important;
+  font-size: 16px !important;
+}
+
+:is(.fi-ta-actions button, .fi-icon-btn):is([title*="Edit"], [title*="Editar"], [x-tooltip*="Edit"], [x-tooltip*="Editar"])::before,
+button[title*="Editar"]::before,
+.fi-ta-actions button[wire\:click*="edit"]::before {
+  content: "✏️" !important;
+  font-size: 16px !important;
+}
+
+:is(.fi-ta-actions button, .fi-icon-btn):is([title*="Eliminar"], [x-tooltip*="Eliminar"])::before,
+button[title*="Eliminar"]::before,
+.fi-ta-actions button[wire\:click*="delete"]::before {
+  content: "🗑️" !important;
+  font-size: 16px !important;
+}
+
+/* ============================================
+   PASO 5: Badges, bordes y breadcrumb
+   ============================================ */
+
+/* Badges de estado */
+.fi-badge,
+.sigem-pill {
+  border-radius: 99px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 3px 10px !important;
+}
+
+/* Disponible — verde */
+.fi-badge.fi-color-success,
+.sigem-pill.ok {
+  background-color: #dcfce7 !important;
+  color: #059669 !important;
+}
+
+/* Asignado — celeste */
+.fi-badge.fi-color-info,
+.sigem-pill.info {
+  background-color: #cffafe !important;
+  color: #0891b2 !important;
+}
+
+/* Reasignado — violeta */
+.fi-badge.fi-color-reassign,
+.sigem-pill.reassign {
+  background-color: #ede9fe !important;
+}
+
+/* En Mantenimiento — ámbar */
+.fi-badge.fi-color-warning,
+.sigem-pill.warn {
+  background-color: #fef3c7 !important;
+  color: #d97706 !important;
+}
+
+/* Dañado — rojo */
+.fi-badge.fi-color-danger,
+.sigem-pill.danger {
+  background-color: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+
+/* Baja — gris */
+.fi-badge.fi-color-gray,
+.sigem-pill.neutral {
+  background-color: #f3f4f6 !important;
+  color: #6b7280 !important;
+}
+
+/* Tarjetas con sombra sutil */
+.sigem-quick,
+.sigem-stat,
+.fi-ta-ctn,
+.fi-section {
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04) !important;
+  border-radius: 12px !important;
+}
+
+/* Hover sutil en quick cards */
+.sigem-quick:hover {
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.07) !important;
+  transform: translateY(-1px) !important;
+  transition: all 0.15s ease !important;
+}
+
+/* Breadcrumb en topbar */
+.fi-topbar nav>div.ms-auto,
+header.fi-topbar nav>div.ms-auto,
+.fi-topbar nav>div:has(.sigem-crumb) {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  justify-content: flex-end !important;
+}
+
+.sigem-crumb {
+  font-size: 15px !important;
+  color: var(--sig-muted) !important;
+  margin-right: auto !important;
+  white-space: nowrap !important;
+}
+
+.sigem-crumb b {
+  color: var(--sig-text) !important;
+  font-weight: 700 !important;
+}
+
+/* ============================================
+   PASO 4a: Checkboxes de selección en tabla
+   ============================================ */
+.fi-ta-selection-cell {
+  width: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  padding: 5px 10px !important;
+}
+
+.fi-ta-selection-cell input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  accent-color: var(--sig-primary) !important;
+}
+
+/* ============================================
+   TOOLBAR DE TABLAS: fila única (Acciones + Buscador + Fechas + Quitar)
+   ============================================ */
+.fi-ta-header-toolbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  min-height: 36px !important;
+  padding: 4px 10px !important;
+  background: var(--sig-bg, #f4f6f8) !important;
+}
+
+.fi-ta-header-toolbar>.ms-auto {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex: 1 1 auto !important;
+  justify-content: flex-start !important;
+}
+
+.sigem-table-toolbar-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  justify-content: flex-start !important;
+
+  .sigem-toolbar-search {
+    flex: 0 1 450px !important;
+    min-width: 280px !important;
+    max-width: 550px !important;
+    margin-left: 10px !important;
+
+    // Fechas y botón a la derecha
+    + .sigem-toolbar-date {
+      margin-left: auto !important;
+    }
+  }
+}
+
+.sigem-toolbar-date {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-shrink: 0 !important;
+
+  &-label {
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .05em !important;
+    color: var(--sig-muted, #64748b) !important;
+  }
+
+  &-input {
+    height: 36px !important;
+    width: 135px !important;
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    background: var(--sig-surface, #ffffff) !important;
+    color: var(--sig-text, #0f172a) !important;
+    outline: none !important;
+    transition: all 0.15s ease !important;
+
+    &:focus {
+      border-color: var(--sig-primary, #1b65d4) !important;
+      box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+    }
+  }
+}
+
+.sigem-toolbar-reset-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  height: 36px !important;
+  padding: 0 12px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: transparent !important;
+  color: var(--sig-muted, #64748b) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  transition: all 0.15s ease !important;
+
+  &:hover {
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    color: var(--sig-text, #0f172a) !important;
+  }
+}
+
+/* ============================================
+   PASO 4c: Barra de acciones de tabla
+   ============================================ */
+.fi-ta-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+}
+
+.fi-ta-search {
+  flex: 1 1 300px !important;
+}
+
+.fi-ta-search input {
+  border-radius: 10px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  padding: 8px 12px !important;
+}
+
+/* ============================================
+   FIX: Quitar pill del centro + densidad excesiva
+   ============================================ */
+
+/* FIX 1: Pill "👑 Administrador" fuera del centro */
+
+/* FIX 2: Hero aún más compacto */
+.sigem-hero,
+.hero {
+  padding: 10px 16px !important;
+  margin-bottom: 10px !important;
+  border-radius: 12px !important;
+}
+
+.sigem-hero {
+  h1 {
+    font-size: 18px !important;
+    margin-bottom: 1px !important;
+  }
+
+  p {
+    font-size: 12.5px !important;
+    line-height: 1.25 !important;
+  }
+}
+
+/* FIX 3: Quick cards y KPIs aún más compactos */
+.sigem-quick-grid,
+.sigem-stats-grid {
+  gap: 10px !important;
+  margin-bottom: 10px !important;
+}
+
+.sigem-quick {
+  padding: 10px 12px !important;
+}
+
+.sigem-quick-ico {
+  width: 30px !important;
+  height: 30px !important;
+  min-width: 30px !important;
+  min-height: 30px !important;
+  margin-bottom: 5px !important;
+}
+
+.sigem-quick-title {
+  font-size: 14px !important;
+}
+
+.sigem-stat {
+  padding: 10px 12px !important;
+}
+
+.sigem-stat-label {
+  font-size: 14px !important;
+}
+
+.sigem-stat-hint {
+  margin-top: 4px !important;
+  padding: 2px 6px !important;
+  font-size: 11.5px !important;
+}
+
+/* ============================================
+   FIX: Topbar pegado al sidebar, sidebar a borde, KPIs lado derecho, sombras
+   ============================================ */
+
+/* FIX 1+2: Unir Topbar, Sidebar y Contenido (sin huecos) */
+.fi-layout {
+  gap: 0 !important;
+  padding: 0 !important;
+}
+
+.fi-sidebar {
+  border: none !important;
+  border-right: 1px solid #e5e7eb !important;
+  box-shadow: none !important;
+}
+
+.fi-topbar {
+  margin: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+
+.fi-topbar>nav {
+  border-radius: 0 !important;
+}
+
+body:has(.sigem-professional) .fi-main-ctn,
+.fi-main-ctn {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-top: 0 !important;
+}
+
+
+/* FIX 3: Números KPI a la derecha del contenido */
+.sigem-stat,
+.fi-wi-stats-overview-stat {
+  display: grid !important;
+  grid-template-columns: auto 1fr auto !important;
+  grid-template-rows: auto auto !important;
+  align-items: center !important;
+  column-gap: 10px !important;
+  row-gap: 6px !important;
+}
+
+.sigem-stat-ico,
+.fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-icon {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  margin: 0 !important;
+}
+
+.sigem-stat-label,
+.fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-label {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.sigem-stat-val,
+.fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-value {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  font-size: 28px !important;
+  font-weight: 700 !important;
+  text-align: right !important;
+  line-height: 1 !important;
+}
+
+.sigem-stat-hint,
+.fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-description {
+  grid-column: 1 / -1 !important;
+  grid-row: 2 !important;
+  margin-top: 4px !important;
+  justify-self: start !important;
+  width: fit-content !important;
+}
+
+/* FIX 4: Elementos más prominentes (más "al frente") */
+.sigem-quick,
+.sigem-stat,
+.fi-ta-ctn,
+.fi-section {
+  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.08) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.sigem-hero {
+  box-shadow: 0 4px 12px rgba(27, 101, 212, 0.2) !important;
+}
+
+/* ============================================
+   DISEÑO SOLICITUDES: Badges y Densidad
+   ============================================ */
+/* En Solicitudes: badge tipo sin punto, badge estado usa el punto ● de PHP */
+.fi-table-cell-tipo-movimiento .fi-badge::before,
+.fi-table-cell-estado .fi-badge::before {
+  display: none !important;
+}
+
+/* ============================================
+   Encabezado global transparente y compacto
+   ============================================ */
+/* Encabezado sin fondo blanco ni contenedor */
+body:has(.sigem-professional) .fi-header,
+header.fi-header,
+.fi-header {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-bottom: none !important;
+}
+
+/* Título de la página */
+header.fi-header h1,
+header.fi-header h1.fi-header-heading,
+.fi-header h1,
+.fi-header h1.fi-header-heading {
+  font-size: 20px !important;
+  line-height: 1.25 !important;
+}
+
+/* Subtítulo de la página */
+header.fi-header p,
+header.fi-header p.fi-header-subheading,
+.fi-header p,
+.fi-header p.fi-header-subheading {
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+  color: var(--sig-muted, #6b7280) !important;
+}
+
+/* ============================================
+   Espacio compacto: topbar → título → tabla
+   ============================================ */
+
+/* Reducir padding general del área de trabajo manteniendo topbar pegado */
+.fi-main-ctn {
+  padding: 0 !important;
+}
+
+.fi-main,
+main.fi-main,
+body:has(.sigem-professional) .fi-main {
+  padding: 12px 16px !important;
+}
+
+/* Anular la separación (gap) nativa entre encabezado y tabla */
+.fi-page {
+  gap: 8px !important;
+}
+
+/* Encabezado compacto */
+header.fi-header,
+.fi-header {
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+header.fi-header h1,
+header.fi-header h1.fi-header-heading,
+.fi-header h1,
+.fi-header h1.fi-header-heading {
+  font-size: 17px !important;
+  margin-bottom: 0 !important;
+}
+
+header.fi-header p,
+header.fi-header p.fi-header-subheading,
+.fi-header p,
+.fi-header p.fi-header-subheading {
+  font-size: 12.5px !important;
+  line-height: 1.2 !important;
+  margin-top: 2px !important;
+}
+
+/* ============================================
+   ESCALA TIPOGRÁFICA COMPLETA DEL SISTEMA
+   ============================================ */
+
+/* Títulos de página */
+header.fi-header h1.fi-header-heading,
+.fi-header h1.fi-header-heading {
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+}
+
+/* Subtítulos de página */
+header.fi-header p.fi-header-subheading,
+.fi-header p.fi-header-subheading {
+  font-size: 13.5px !important;
+  font-weight: 400 !important;
+}
+
+/* Títulos de sección (clases seguras, NO h2 global) */
+.sigem-section-head h2,
+.fi-section-header-heading {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+}
+
+/* Títulos de tarjetas */
+.sigem-quick-title {
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+}
+
+/* Descripciones de tarjetas */
+.sigem-quick-desc {
+  font-weight: 400 !important;
+}
+
+/* KPIs */
+.sigem-stat-val {
+  line-height: 1.1 !important;
+  font-variant-numeric: tabular-nums;
+  color: var(--sig-text);
+}
+
+.sigem-stat-label {
+  font-weight: 400 !important;
+  line-height: 1.3 !important;
+}
+
+.sigem-stat-hint {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+}
+
+/* Tablas — texto secundario */
+.fi-ta-table tbody td .fi-ta-text-description {
+  font-weight: 400 !important;
+}
+
+/* Badges */
+.fi-badge,
+.sigem-pill {
+  line-height: 1.2 !important;
+}
+
+/* Botones */
+.fi-btn,
+.sigem-btn-primary {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+/* Breadcrumb del topbar */
+.sigem-crumb {
+  font-weight: 500 !important;
+}
+
+.sigem-crumb b {
+  font-size: 15px !important;
+}
+
+/* Inputs y búsqueda (clases de Filament, NO tags globales) */
+.fi-ta-search input,
+.fi-input,
+.fi-select {
+  font-size: 14px !important;
+  font-weight: 400 !important;
+}
+
+/* Labels de formularios (clases de Filament v3) */
+.fi-fo-field-wrp-label {
+  &,
+  span {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+  }
+}
+
+.fg label {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+}
+
+/* Hero */
+.sigem-hero {
+  h1 {
+    font-weight: 700 !important;
+  }
+
+  p {
+    font-size: 13px !important;
+    font-weight: 400 !important;
+  }
+}
+
+/* Sidebar labels */
+.fi-sidebar-item-label {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+  line-height: 1.2 !important;
+}
+
+/* ============================================
+   Topbar y contenido más pegados: diagnóstico de .fi-page > section
+   ============================================ */
+.fi-main,
+main.fi-main,
+body:has(.sigem-professional) .fi-main {
+  padding: 12px 16px 12px !important;
+}
+
+/* Anular el py-8 (padding 32px) y gap-y-8 nativo del section interno de Filament */
+.fi-page>section {
+  padding-top: 0 !important;
+  padding-bottom: 12px !important;
+  gap: 8px !important;
+  row-gap: 8px !important;
+}
+
+/* ============================================
+   DISEÑO INVENTARIO: Toolbar compacta y acciones emoji
+   ============================================ */
+
+/* 1. Toolbar compacta */
+.fi-ta-header {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  min-height: auto !important;
+}
+
+/* 2. Emojis en acciones de fila (Aprobar, Autorizar, Rechazar, Completar, Detalle, Editar, Eliminar) */
+.fi-ta-actions-cell :is(button, a):is([title*="Aprobar"], [title*="Autorizar"], [x-tooltip*="Aprobar"], [x-tooltip*="Autorizar"])::before {
+  content: "✅" !important;
+  font-size: 14px !important;
+}
+
+.fi-ta-actions-cell button[title*="Rechazar"]::before,
+.fi-ta-actions-cell button[x-tooltip*="Rechazar"]::before,
+.fi-ta-actions-cell a[title*="Rechazar"]::before {
+  content: "❌" !important;
+  font-size: 14px !important;
+}
+
+.fi-ta-actions-cell button[title*="Completar"]::before,
+.fi-ta-actions-cell button[x-tooltip*="Completar"]::before,
+.fi-ta-actions-cell a[title*="Completar"]::before {
+  content: "🏁" !important;
+  font-size: 14px !important;
+}
+
+.fi-ta-actions-cell :is(button, a):is([title*="Ver detalle"], [title*="Detalle"], [x-tooltip*="Ver"], [x-tooltip*="Detalle"])::before {
+  content: "👁" !important;
+  font-size: 14px !important;
+}
+
+.fi-ta-actions-cell button[title*="Editar"]::before,
+.fi-ta-actions-cell button[x-tooltip*="Editar"]::before,
+.fi-ta-actions-cell button[x-tooltip*="Edit"]::before,
+.fi-ta-actions-cell a[title*="Editar"]::before {
+  content: "✏️" !important;
+  font-size: 14px !important;
+}
+
+.fi-ta-actions-cell button[title*="Eliminar"]::before,
+.fi-ta-actions-cell button[x-tooltip*="Eliminar"]::before,
+.fi-ta-actions-cell button[wire\:click*="delete"]::before,
+.fi-ta-actions-cell a[title*="Eliminar"]::before {
+  content: "🗑️" !important;
+  font-size: 14px !important;
+}
+
+/* Ocultar iconos SVG dentro de botones de acción para dejar ver el emoji limpio */
+.fi-ta-actions-cell :is(button, a):is([title*="Aprobar"], [x-tooltip*="Aprobar"],
+  [title*="Autorizar"], [x-tooltip*="Autorizar"],
+  [title*="Rechazar"], [x-tooltip*="Rechazar"],
+  [title*="Completar"], [x-tooltip*="Completar"],
+  [title*="Ver detalle"], [title*="Detalle"], [x-tooltip*="Ver"], [x-tooltip*="Detalle"],
+  [title*="Editar"], [x-tooltip*="Editar"], [x-tooltip*="Edit"],
+  [title*="Eliminar"], [x-tooltip*="Eliminar"]) svg {
+  display: none !important;
+}
+
+/* ============================================
+   Tabla Inventario Lista = Tabla Dashboard
+   ============================================ */
+
+/* Contenedor y tabla adaptiva — que no desborde */
+.fi-ta-ctn {
+  overflow: hidden !important;
+}
+
+.fi-ta-header-cell {
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1.2 !important;
+  color: var(--sig-muted) !important;
+  padding: 5px 8px !important;
+  background: var(--sig-bg, #f4f6f8) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.fi-ta-table {
+  table-layout: fixed !important;
+
+  // Headers compactos (consolidado)
+  thead th {
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    line-height: 1.2 !important;
+    color: var(--sig-muted) !important;
+    padding: 5px 8px !important;
+    background: var(--sig-bg, #f4f6f8) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+
+    button,
+    .fi-ta-header-cell-label {
+      font-size: 11.5px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      color: var(--sig-muted) !important;
+      padding: 0 !important;
+    }
+
+    &:last-child:empty::after,
+    &.fi-ta-actions-cell:empty::after,
+    &.fi-ta-actions-header-cell:empty::after {
+      content: 'ACCIONES' !important;
+      font-size: 11.5px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      color: var(--sig-muted) !important;
+      display: block !important;
+      text-align: center !important;
+    }
+  }
+
+  // Filas ultra compactas (consolidado)
+  tbody td {
+    padding: 4px 8px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    line-height: 1.3 !important;
+    border-bottom: 1px solid var(--sig-border) !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Checkboxes: sin desbordar */
+.fi-ta-selection-cell,
+.fi-ta-table th.fi-ta-selection-cell,
+.fi-ta-table td.fi-ta-selection-cell {
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  overflow: hidden !important;
+  padding: 4px 0 !important;
+  text-align: center !important;
+}
+
+.fi-ta-selection-cell>div,
+.fi-ta-selection-cell label {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.fi-ta-selection-cell input[type="checkbox"] {
+  margin: 0 !important;
+}
+
+/* Anular padding interno excesivo de celdas en Filament */
+.fi-ta-table thead th.fi-ta-selection-cell,
+.fi-ta-table thead th.fi-ta-selection-cell>div,
+.fi-ta-table thead th>div,
+.fi-ta-table tbody td.fi-ta-selection-cell,
+.fi-ta-table tbody td.fi-ta-selection-cell>div,
+.fi-ta-table tbody td .fi-ta-text,
+.fi-ta-table tbody td .fi-ta-col-wrp>div,
+.fi-ta-table tbody td.fi-ta-actions-cell>div {
+  padding: 1px 0 !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+/* Columna EQUIPO: gap mínimo entre título y S/N */
+.fi-ta-table tbody td .fi-ta-text {
+  gap: 0 !important;
+  row-gap: 0 !important;
+}
+
+/* Columna CÓDIGO — texto bold, tamaño normal */
+.fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2),
+.fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2) *,
+.fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2),
+.fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2) * {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--sig-text, #0f172a) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Solo en tablas CON checkbox de selección */
+.fi-ta-table:has(.fi-ta-selection-cell) thead th:nth-child(2),
+.fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2),
+.fi-ta-table:has(.fi-ta-record-checkbox) thead th:nth-child(2),
+.fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2) {
+  width: 145px !important;
+  min-width: 145px !important;
+}
+
+/* En tablas SIN checkbox (SS), distribuir normalmente */
+.fi-ta-table:not(:has(.fi-ta-selection-cell)):not(:has(.fi-ta-record-checkbox)) thead th:nth-child(2),
+.fi-ta-table:not(:has(.fi-ta-selection-cell)):not(:has(.fi-ta-record-checkbox)) tbody td:nth-child(2) {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+/* EQUIPO: reducir ancho y controlar desborde */
+.fi-ta-table tbody td:nth-child(3),
+.fi-ta-table thead th:nth-child(3) {
+  max-width: 260px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.fi-ta-table tbody td .fi-ta-text-item-label,
+.fi-ta-table tbody td:nth-child(3) .fi-ta-text-item-label {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  color: var(--sig-text, #0f172a) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  display: block !important;
+}
+
+.fi-ta-table tbody td .fi-ta-text p,
+.fi-ta-table tbody td:nth-child(3) p {
+  font-size: 11.5px !important;
+  color: var(--sig-muted, #64748b) !important;
+  line-height: 1.15 !important;
+  margin-top: 1px !important;
+  margin-bottom: 0 !important;
+  font-weight: 400 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Badges compactos (CATEGORÍA y ESTADO) */
+.fi-ta-table tbody td .fi-badge {
+  font-size: 11px !important;
+  padding: 2px 8px !important;
+  border-radius: 99px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+}
+
+/* ÁREA: texto normal gris */
+.fi-ta-table tbody td:nth-child(6),
+.fi-ta-table tbody td:nth-child(6) * {
+  color: var(--sig-muted, #64748b) !important;
+  font-weight: 400 !important;
+  font-size: 13px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Acciones de FILA: botones sin encimarse (SOLO en las celdas de la tabla, NO en toolbar ni bulk actions) */
+.fi-ta-actions-cell,
+.fi-ta-table thead th:last-child,
+.fi-ta-table thead th.fi-ta-actions-cell,
+.fi-ta-table thead th.fi-ta-actions-header-cell {
+  min-width: 100px !important;
+  width: 100px !important;
+  max-width: 100px !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+
+.fi-ta-actions-cell {
+  padding: 4px 6px !important;
+
+  .fi-ta-actions {
+    gap: 3px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+  }
+}
+
+.fi-ta-actions-cell .fi-ta-actions button,
+.fi-ta-actions-cell button {
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  min-height: 26px !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  background: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+/* Toolbar: compactar Exportar + Buscar + Filtros */
+.fi-ta-header {
+  padding: 4px 10px !important;
+  min-height: 36px !important;
+}
+
+/* Botón Exportar en la toolbar: texto completo sin truncar */
+.fi-ta-header .fi-ta-actions,
+.fi-ta-header-toolbar .fi-ta-actions {
+  display: flex !important;
+  gap: 8px !important;
+  width: auto !important;
+}
+
+.fi-ta-header .fi-btn,
+.fi-ta-header-toolbar .fi-btn,
+.fi-ta-header button.fi-btn {
+  width: auto !important;
+  min-width: fit-content !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 4px 12px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  background: #ffffff !important;
+  color: var(--sig-text, #0f172a) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Indicador de selección y Bulk Actions: dropdown limpio de una sola línea */
+.fi-ta-selection-indicator {
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+}
+
+@media (min-width: 640px) {
+
+  .fi-ta-header-ctn button.sm\:hidden,
+  .fi-ta-header-ctn .sm\:hidden,
+  .fi-ta-header-ctn button[title="Abrir acciones"].sm\:hidden {
+    display: none !important;
+  }
+}
+
+.fi-ta-header-ctn .fi-dropdown-trigger button.sm\:inline-grid,
+.fi-ta-header-ctn .fi-dropdown-trigger button.fi-ac-btn-group:not(.sm\:hidden),
+.fi-ta-header-ctn button.fi-ac-btn-group:not(.sm\:hidden) {
+  width: auto !important;
+  min-width: fit-content !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 4px 12px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  background: #ffffff !important;
+  color: var(--sig-text, #0f172a) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.fi-ta-header-ctn .fi-dropdown-trigger button.fi-ac-btn-group .fi-btn-label {
+  white-space: nowrap !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--sig-text, #0f172a) !important;
+  line-height: 1 !important;
+}
+
+.fi-ta-header-ctn .fi-dropdown-trigger button.fi-ac-btn-group svg {
+  color: var(--sig-muted, #64748b) !important;
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Ocultar badge flotante de filtros activos en la toolbar */
+.fi-ta-filters-dropdown .fi-icon-btn-badge-ctn,
+.fi-ta-filters-dropdown .fi-badge,
+.fi-ta-header .fi-ta-filters-dropdown .fi-icon-btn-badge-ctn,
+.fi-ta-header-toolbar .fi-ac-btn-group .fi-badge {
+  display: none !important;
+}
+
+/* Restaurar iconos SVG en botones de la toolbar (Filtros, Alternar columnas, etc.) */
+.fi-ta-header-toolbar .fi-icon-btn svg,
+.fi-ta-header-toolbar button svg,
+.fi-ta-header-ctn .fi-icon-btn svg,
+.fi-ta-header-ctn .fi-ta-filters-dropdown svg,
+.fi-ta-header-ctn .fi-ta-col-toggle svg {
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Dashboard: tabla de inventario y botones de acción compactos */
+.sigem-dash-table {
+  .fi-ta-table {
+    table-layout: fixed !important;
+    width: 100% !important;
+
+    tbody tr {
+      background: var(--sig-surface, #ffffff) !important;
+
+      &:hover {
+        background: #f8fafc !important;
+      }
+    }
+
+    thead th:first-child,
+    tbody td:first-child {
+      width: 130px !important;
+      max-width: 130px !important;
+    }
+
+    thead th:last-child,
+    tbody td:last-child {
+      width: 104px !important;
+      min-width: 104px !important;
+      max-width: 104px !important;
+      text-align: center !important;
+      padding: 4px 6px !important;
+    }
+  }
+}
+
+.sigem-dash-btn {
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  min-height: 26px !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  background: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  line-height: 1 !important;
+
+  &:hover {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  &::before {
+    font-size: 13px !important;
+    line-height: 1 !important;
+  }
+}
+
+/* Tablas de Catálogos (Configuración) */
+.sigem-cat-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+
+  tbody tr {
+    background: var(--sig-surface, #ffffff) !important;
+
+    &:hover {
+      background: #f8fafc !important;
+    }
+  }
+
+  .sigem-col-id,
+  thead th.sigem-col-id,
+  tbody td.sigem-col-id {
+    width: 55px !important;
+    min-width: 55px !important;
+    max-width: 65px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+
+  .sigem-col-actions,
+  thead th.sigem-col-actions,
+  tbody td.sigem-col-actions {
+    width: 104px !important;
+    min-width: 104px !important;
+    max-width: 104px !important;
+    text-align: center !important;
+    padding: 4px 6px !important;
+  }
+
+  thead th:nth-child(2),
+  tbody td:nth-child(2) {
+    width: auto !important;
+    max-width: none !important;
+  }
+}
+
+.sigem-rep-table-wrap .fi-ta-table tbody tr {
+  background: var(--sig-surface, #ffffff) !important;
+
+  &:hover {
+    background: #f8fafc !important;
+  }
+}
+
+/* Botones de acción compactos de 26px en catálogos */
+.sigem-cat-btn {
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  min-height: 26px !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  background: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  line-height: 1 !important;
+
+  &:hover {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  svg {
+    display: none !important;
+  }
+
+  &::before {
+    font-size: 13px !important;
+    line-height: 1 !important;
+  }
+
+  &[title*="Ver"]::before,
+  &[title*="Ver detalle"]::before {
+    content: "👁" !important;
+  }
+
+  &[title*="Editar"]::before {
+    content: "✏️" !important;
+  }
+
+  &[title*="Eliminar"]::before {
+    content: "🗑️" !important;
+  }
+}
+
+
+/* ==========================================================================
+   Slide-over Infolists y Modales: Eliminación de doble recuadro y footer
+   ========================================================================== */
+/* ==========================================================================
+   Slide-over Infolists y Modales: Eliminación de doble recuadro y footer
+   ========================================================================== */
+.fi-modal-slide-over-window {
+
+  .fi-section,
+  section.fi-section {
+    border: none !important;
+    box-shadow: none !important;
+    --tw-ring-color: transparent !important;
+    --tw-ring-shadow: none !important;
+    --tw-ring-offset-shadow: none !important;
+    --tw-shadow: 0 0 #0000 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+
+    .fi-section-header {
+      border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+      padding: 0 0 10px 0 !important;
+      margin-bottom: 14px !important;
+      background: transparent !important;
+    }
+
+    .fi-section-content {
+      padding: 0 !important;
+    }
+  }
+
+  // En vista Detalle/Ver: Atajos de acción (Editar/Eliminar/Cambio/Baja/Modificar) a la izquierda, Cerrar a la derecha
+  .fi-modal-footer-actions button:is(.fi-btn-color-info, .fi-color-info) {
+    order: -2 !important;
+    margin-left: 0 !important;
+    margin-right: 8px !important;
+  }
+
+  // Botón Cerrar en modales sin botón submit de formulario: siempre a la derecha
+  .fi-modal-footer-actions:not(:has(button[type="submit"], button.fi-btn-color-primary)) button:is(.fi-btn-color-gray, [x-on\:click*="close"]),
+  .fi-modal-footer-actions:has(> button:only-of-type) button,
+  .fi-modal-footer-actions:has(> :only-child) button,
+  &:has(.fi-fo-component-ctn) .fi-modal-footer-actions:has(> button:only-of-type) button,
+  &:has(.fi-fo-component-ctn) .fi-modal-footer-actions:has(> :only-child) button {
+    order: 2 !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+
+  // ============================================
+  // FIX: Eliminar doble recuadro completo + espacio bajo footer
+  // ============================================
+  // 1. Limpiar bordes, sombras y rings en contenedores de infolists y wizards
+  .fi-fo-component-ctn,
+  .fi-fo-wizard,
+  .fi-fo-wizard.fi-contained,
+  .fi-in-tabs,
+  .fi-in-tabs.fi-contained,
+  .fi-in-tabs-tab {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    --tw-ring-color: transparent !important;
+    --tw-ring-shadow: none !important;
+    --tw-ring-offset-shadow: none !important;
+    --tw-shadow: 0 0 #0000 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+
+  // 2. Quitar padding redundante del tab panel y wizard step
+  .fi-in-tabs-tab,
+  .fi-fo-wizard-step {
+    padding: 16px 0 0 0 !important;
+    scroll-margin-top: 160px !important;
+  }
+
+  scroll-padding-top: 160px !important;
+
+  // 3. Contenido crece para ocupar el alto disponible (consolidado)
+  .fi-modal-content {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 16px 20px !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+    max-height: none !important;
+  }
+
+  // 4. Footer pegado abajo (sticky + margin-top auto, consolidado)
+  .fi-modal-footer {
+    padding: 16px 20px 20px !important;
+    border-top: 1px solid var(--sig-border, #e2e8f0) !important;
+    background: var(--sig-surface, #ffffff) !important;
+    box-shadow: none !important;
+    margin-top: auto !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 10 !important;
+    display: flex !important;
+    width: 100% !important;
+  }
+}
+
+/* Tablas de reportes: layout libre sin restricciones de Filament */
+.sigem-rep-table {
+  width: 100% !important;
+  min-width: 850px;
+  table-layout: auto !important;
+  border-collapse: collapse;
+
+  thead th {
+    white-space: normal !important;
+    max-width: none !important;
+    width: auto !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    line-height: 1.25 !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .05em !important;
+    color: var(--sig-muted) !important;
+    padding: 6px 10px !important;
+    background: var(--sig-bg, #f4f6f8) !important;
+  }
+
+  tbody {
+    td {
+      white-space: nowrap !important;
+      max-width: none !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      padding: 6px 10px !important;
+    }
+
+    tr {
+      background: var(--sig-surface, #ffffff) !important;
+
+      &:hover {
+        background: #f8fafc !important;
+      }
+    }
+  }
+
+  thead th:last-child,
+  tbody td:last-child {
+    min-width: auto !important;
+    max-width: none !important;
+    width: auto !important;
+  }
+}
+
+/* Inputs de búsqueda por columna (isIndividual) */
+:is(.fi-table-individual-search-cell, [class*="fi-table-individual-search-cell"]) {
+  padding: 4px 8px !important;
+  background: var(--sig-bg, #f4f6f8) !important;
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+
+  input {
+    font-size: 12.5px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 4px 10px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    background: var(--sig-surface, #ffffff) !important;
+
+    &:focus {
+      border-color: var(--sig-primary, #1b65d4) !important;
+      box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+      outline: none !important;
+    }
+
+    &::placeholder {
+      color: var(--sig-muted, #64748b) !important;
+      font-size: 11.5px !important;
+    }
+  }
+
+  select {
+    width: 100% !important;
+    font-size: 12.5px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 4px 28px 4px 10px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    background: var(--sig-surface, #ffffff) !important;
+    appearance: auto !important;
+    cursor: pointer !important;
+    color: var(--sig-text, #0f172a) !important;
+
+    &:focus {
+      border-color: var(--sig-primary, #1b65d4) !important;
+      box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+      outline: none !important;
+    }
+  }
+}
+
+.fi-table-individual-search-select {
+  width: 100% !important;
+  font-size: 12.5px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 4px 28px 4px 10px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: var(--sig-surface, #ffffff) !important;
+  appearance: auto !important;
+  cursor: pointer !important;
+  color: var(--sig-text, #0f172a) !important;
+
+  &:focus {
+    border-color: var(--sig-primary, #1b65d4) !important;
+    box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+    outline: none !important;
+  }
+}
+
+/* ============================================
+   FIX 2: Fondo gris uniforme (sin huecos blancos)
+   ============================================ */
+.fi-ta-ctn,
+.fi-ta-header-ctn,
+.fi-ta-header,
+.fi-ta-header-toolbar,
+.fi-ta-content,
+.fi-ta-table thead,
+.fi-ta-table thead tr,
+.fi-ta-table thead th,
+.fi-table-individual-search-cell,
+[class*="fi-table-individual-search-cell"] {
+  background: var(--sig-bg, #f4f6f8) !important;
+}
+
+.fi-ta-header-ctn {
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+}
+
+/* Filas de la tabla: fondo blanco limpio con hover */
+.fi-ta-table tbody tr {
+  background: #ffffff !important;
+
+  &:hover {
+    background: #f8fafc !important;
+  }
+}
+
+/* ============================================
+   FIX 4: Eliminar icono de 3 barras (toggle de columnas)
+   ============================================ */
+.fi-ta-col-toggle,
+.fi-ta-header-toolbar button[class*="column-toggle"],
+.fi-ta-header-toolbar .fi-ta-col-toggle,
+.fi-ta-header-toolbar button:has(svg[class*="view-columns"]),
+.fi-ta-header-toolbar button:has(svg[data-slot="icon"][class*="columns"]) {
+  display: none !important;
+}
+
+/* ============================================
+   FILTROS DASHBOARD: inputs y botón reset
+   ============================================ */
+.sigem-dash-filter {
+  &-row th {
+    background: var(--sig-bg, #f4f6f8) !important;
+    border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+  }
+
+  &-input {
+    width: 100% !important;
+    font-size: 12.5px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 4px 10px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    background: var(--sig-surface, #ffffff) !important;
+    color: var(--sig-text, #0f172a) !important;
+
+    &:focus {
+      border-color: var(--sig-primary, #1b65d4) !important;
+      box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+      outline: none !important;
+    }
+
+    &::placeholder {
+      color: var(--sig-muted, #64748b) !important;
+      font-size: 11.5px !important;
+    }
+  }
+
+  &-clear {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    background: #ffffff !important;
+    color: var(--sig-muted, #64748b) !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+
+    &:hover {
+      background: #fee2e2 !important;
+      color: #ef4444 !important;
+      border-color: #fca5a5 !important;
+    }
+  }
+}
+
+
+
+
+/* FIX: huecos blancos + emoji lupa */
+.fi-table-individual-search-cell,
+.fi-table-individual-search-cell:empty,
+.fi-ta-table thead th:last-child,
+.fi-ta-table thead th:last-child *,
+.fi-ta-table thead tr th,
+.fi-ta-table thead tr td,
+[class*="fi-table-individual-search-cell"] {
+  background: var(--sig-bg, #f4f6f8) !important;
+}
+
+.sigem-search-emoji {
+  font-size: 15px !important;
+  line-height: 1 !important;
+  background: transparent !important;
+}
+
+
+.fi-ta-table thead,
+.fi-ta-table thead tr,
+.fi-ta-table thead th,
+.fi-ta-table thead td,
+.fi-ta-table thead th.fi-ta-selection-cell,
+.fi-ta-table thead td.fi-ta-selection-cell,
+.fi-ta-table thead th.fi-ta-actions-header-cell,
+.fi-ta-table thead th>div,
+.fi-ta-table thead th.fi-ta-selection-cell>div {
+  background: var(--sig-bg, #f4f6f8) !important;
+}
+
+
+/* FIX (DOM real): la fila de filtros es <tr class="fi-ta-row"> dentro de TBODY (no thead); se identifica por contener .fi-ta-search-field */
+.fi-ta-table tbody tr.fi-ta-row {
+  &:has(.fi-ta-search-field) {
+    &,
+    &:hover,
+    > td {
+      background: var(--sig-bg, #f4f6f8) !important;
+      background-color: var(--sig-bg, #f4f6f8) !important;
+    }
+
+    > td:last-child:empty {
+      text-align: center !important;
+      vertical-align: middle !important;
+      min-width: 52px !important;
+
+      &::after {
+        content: "\2715";
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 26px !important;
+        height: 26px !important;
+        border-radius: 6px !important;
+        border: 1px solid var(--sig-border, #e2e8f0) !important;
+        background: var(--sig-surface, #ffffff) !important;
+        color: var(--sig-muted, #64748b) !important;
+        font-size: 13px !important;
+        opacity: 0.5 !important;
+        pointer-events: none !important;
+      }
+    }
+  }
+
+  // Celdas de datos: volver a blanco (la regla [class*=individual-search-cell] anterior tambien las alcanzaba)
+  &:not(:has(.fi-ta-search-field)) > td {
+    background: transparent !important;
+  }
+}
+
+
+/* Toolbar del Dashboard (reutiliza .sigem-table-toolbar-group etc.) */
+.sigem-dash-toolbar {
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+
+  .fi-input-wrp {
+    display: flex !important;
+    align-items: center !important;
+    background: var(--sig-surface, #ffffff) !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    border-radius: 8px !important;
+    height: 36px !important;
+    padding-left: 10px !important;
+  }
+
+  .sigem-dash-search-input {
+    flex: 1 !important;
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    font-size: 13px !important;
+    padding: 0 10px 0 6px !important;
+  }
+}
