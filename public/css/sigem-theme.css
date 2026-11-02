@@ -47,16 +47,14 @@ html {
 .fi-main-ctn,
 .fi-ta-ctn,
 .fi-fo-component-ctn,
-.fi-section,
-.fi-card {
+.fi-section {
   background-color: var(--sig-surface) !important;
   background: var(--sig-surface) !important;
 }
 
 .fi-ta-ctn,
 .fi-fo-component-ctn,
-.fi-section,
-.fi-card {
+.fi-section {
   border-radius: 12px !important;
   border: 1px solid var(--sig-border) !important;
   box-shadow: 0 1px 2px rgba(16, 24, 40, .05) !important;
@@ -64,8 +62,7 @@ html {
 
 .fi-ta-ctn::before,
 .fi-fo-component-ctn::before,
-.fi-section::before,
-.fi-card::before {
+.fi-section::before {
   display: none !important;
   /* Quitar la barra de gradiente superior anterior */
 }
@@ -269,20 +266,17 @@ button[role="switch"][aria-checked="true"] {
 }
 
 /* Éxito */
-.fi-btn-color-success,
-.btn-success {
+.fi-btn-color-success {
   background-color: #10b981 !important;
   color: #ffffff !important;
   border: none !important;
 }
 
-.fi-btn-color-success *,
-.btn-success * {
+.fi-btn-color-success * {
   color: #ffffff !important;
 }
 
-.fi-btn-color-success:hover,
-.btn-success:hover {
+.fi-btn-color-success:hover {
   background-color: #059669 !important;
 }
 
@@ -305,38 +299,32 @@ button[role="switch"][aria-checked="true"] {
 }
 
 /* Advertencia */
-.fi-btn-color-warning,
-.btn-warning {
+.fi-btn-color-warning {
   background-color: #f59e0b !important;
   color: #ffffff !important;
   border: none !important;
 }
 
-.fi-btn-color-warning *,
-.btn-warning * {
+.fi-btn-color-warning * {
   color: #ffffff !important;
 }
 
-.fi-btn-color-warning:hover,
-.btn-warning:hover {
+.fi-btn-color-warning:hover {
   background-color: #d97706 !important;
 }
 
 /* Info */
-.fi-btn-color-info,
-.btn-info {
+.fi-btn-color-info {
   background-color: #3b82f6 !important;
   color: #ffffff !important;
   border: none !important;
 }
 
-.fi-btn-color-info *,
-.btn-info * {
+.fi-btn-color-info * {
   color: #ffffff !important;
 }
 
-.fi-btn-color-info:hover,
-.btn-info:hover {
+.fi-btn-color-info:hover {
   background-color: #2563eb !important;
 }
 
@@ -400,25 +388,6 @@ button[role="switch"][aria-checked="true"] {
   margin: 0 2px !important;
 }
 
-.fi-pagination-item-active,
-.fi-pagination-item-active button {
-  background-color: #2563eb !important;
-  color: #ffffff !important;
-}
-
-.fi-pagination-item-active * {
-  color: #ffffff !important;
-}
-
-.fi-pagination-item:not(.fi-pagination-item-active),
-.fi-pagination-item:not(.fi-pagination-item-active) button {
-  background-color: #ffffff !important;
-  color: #475569 !important;
-}
-
-.fi-pagination-item:not(.fi-pagination-item-active):hover {
-  background-color: #f8fafc !important;
-}
 
 /* ===== 11. FILTROS Y BÚSQUEDA ===== */
 .fi-ta-filters,
@@ -436,17 +405,6 @@ button[role="switch"][aria-checked="true"] {
   background-color: #ffffff !important;
 }
 
-.fi-no-notification-status-success {
-  border-left: 4px solid #10b981 !important;
-}
-
-.fi-no-notification-status-danger {
-  border-left: 4px solid #ef4444 !important;
-}
-
-.fi-no-notification-status-info {
-  border-left: 4px solid #3b82f6 !important;
-}
 
 /* ===== 13. MODALES NATIVOS DE FILAMENT ===== */
 .fi-modal-window {
@@ -466,38 +424,8 @@ button[role="switch"][aria-checked="true"] {
   transition: background-color 0.2s !important;
 }
 
-.fi-ta-actions .fi-icon-btn-color-primary:hover {
-  background-color: rgba(37, 99, 235, 0.1) !important;
-}
-
-.fi-ta-actions .fi-icon-btn-color-danger:hover {
-  background-color: rgba(239, 68, 68, 0.1) !important;
-}
-
-/* ===== 15. WIZARD ===== */
-.fi-wizard {
-  background-color: #ffffff !important;
-  border-radius: 12px !important;
-  border: 1px solid #e2e8f0 !important;
-}
-
-.fi-wizard-step-active .fi-wizard-step-icon {
-  background-color: #2563eb !important;
-  color: #fff !important;
-}
-
-.fi-wizard-step-completed .fi-wizard-step-icon {
-  background-color: #10b981 !important;
-  color: #fff !important;
-}
-
-.fi-wizard-step-pending .fi-wizard-step-icon {
-  background-color: #f8fafc !important;
-  color: #94a3b8 !important;
-}
 
 /* ===== 16. SELECTS CON BÚSQUEDA ===== */
-.fi-select-input-dropdown,
 .choices__list--dropdown {
   background-color: #ffffff !important;
   border-radius: 8px !important;
@@ -505,12 +433,10 @@ button[role="switch"][aria-checked="true"] {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
 }
 
-.fi-select-input-option:hover,
 .choices__item--choice:hover {
   background-color: #f8fafc !important;
 }
 
-.fi-select-input-option-selected,
 .choices__item--selectable.is-highlighted {
   background-color: #dbeafe !important;
   color: #2563eb !important;
@@ -726,7 +652,6 @@ body:has(.sigem-professional) .sigem-topbar-brand {
 
 body,
 .fi-body {
-  background: var(--sig-bg) !important;
   color: var(--sig-text);
   font-family: 'DM Sans', sans-serif !important;
 }
@@ -738,13 +663,9 @@ main.fi-main,
   color: var(--sig-text);
 }
 
-.fi-card,
 .fi-section,
 .fi-ta-ctn {
-  border: 1px solid var(--sig-border) !important;
   border-radius: var(--sig-radius) !important;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, .05) !important;
-  background: var(--sig-surface) !important;
 }
 
 .fi-sidebar,
@@ -1057,7 +978,6 @@ th.fi-ta-header-cell span,
 }
 
 /* Botones Primarios */
-.fi-btn-primary,
 .fi-btn.fi-color-primary:not(.fi-btn-outlined),
 .fi-btn.fi-btn-color-primary:not(.fi-btn-outlined) {
   background: var(--sig-primary) !important;
@@ -1065,7 +985,6 @@ th.fi-ta-header-cell span,
   font-weight: 600 !important;
 }
 
-.fi-btn-primary:hover,
 .fi-btn.fi-color-primary:not(.fi-btn-outlined):hover,
 .fi-btn.fi-btn-color-primary:not(.fi-btn-outlined):hover {
   background: var(--sig-primary-dark) !important;
@@ -1568,14 +1487,6 @@ aside.fi-sidebar,
   font-weight: 600 !important;
 }
 
-.fi-ta-table .fi-ta-text-item-description {
-  font-size: 14.5px !important;
-  color: var(--sig-muted) !important;
-  margin-top: 1px !important;
-  max-width: 260px !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-}
 
 /* Píldoras de estado (punto + texto) */
 .sigem-pill,
@@ -1649,8 +1560,6 @@ aside.fi-sidebar,
 }
 
 /* Filtros por columna */
-.fi-table-filters input,
-.fi-table-filters select,
 .fi-ta-filters input,
 .fi-ta-filters select {
   width: 100%;
@@ -1663,7 +1572,6 @@ aside.fi-sidebar,
   border-radius: 7px;
   background: var(--sig-surface);
   color: var(--sig-text);
-  box-sizing: border-box;
 }
 
 /* Panel lateral "Resumen del inventario" */
@@ -1800,7 +1708,6 @@ aside.fi-sidebar,
   border-radius: 7px;
   background: var(--sig-surface);
   color: var(--sig-text);
-  box-sizing: border-box
 }
 
 .fi-ta-filters input:focus-visible,
@@ -2501,8 +2408,6 @@ div:has(> .sigem-bitacora-filters) p {
 .sigem-lg {
   cursor: pointer;
   transition: all .15s;
-  border-radius: 6px;
-  padding: 3px 6px;
   margin: 0 -6px
 }
 
@@ -2623,9 +2528,7 @@ main.fi-main {
 }
 
 /* Quitar max-width de cualquier contenedor interno de Filament */
-.fi-page,
-.fi-page-ctn,
-.fi-content-ctn {
+.fi-page {
   max-width: none !important;
   width: 100% !important;
 }
@@ -2791,35 +2694,12 @@ table {
   display: none !important;
 }
 
-/* Consistencia de botones de acción en encabezados de página */
-.fi-header-actions .sigem-rep-btn-sec {
-  background: var(--sig-surface) !important;
-  color: var(--sig-text) !important;
-  border: 1px solid var(--sig-border) !important;
-  box-shadow: none !important;
-}
-
-.fi-header-actions .sigem-rep-btn-sec:hover {
-  background: var(--sig-bg) !important;
-  border-color: var(--sig-border-strong) !important;
-}
-
-.fi-header-actions .sigem-btn-primary {
-  background: var(--sig-primary) !important;
-  color: #fff !important;
-  border: none !important;
-}
-
-.fi-header-actions .sigem-btn-primary:hover {
-  background: var(--sig-primary-dark) !important;
-}
 
 /* ==========================================================================
    SLIDE-OVER INVENTARIO & PANELES LATERALES (Corrección 1 y 2)
    ========================================================================== */
 
 /* 1. Dimensiones, posición y apariencia del panel InvGate */
-.fi-slide-over,
 .fi-modal-slide-over-window {
   width: min(620px, 92vw) !important;
   max-width: 620px !important;
@@ -2830,7 +2710,6 @@ table {
   background: #ffffff !important;
 }
 
-.fi-slide-over .fi-fo-component-ctn,
 .fi-modal-slide-over-window .fi-modal-content>form,
 .fi-modal-slide-over-window .fi-modal-content>.fi-fo-component-ctn,
 .fi-modal-slide-over-window .fi-fo-wizard>.fi-fo-component-ctn,
@@ -2845,7 +2724,6 @@ table {
   row-gap: 14px !important;
   max-width: 100% !important;
   min-width: 0 !important;
-  box-sizing: border-box !important;
 }
 
 @media (min-width: 640px) {
@@ -2863,7 +2741,6 @@ table {
 /* Toggle buttons en fila */
 .fi-modal-slide-over-window .fi-fo-toggle-buttons {
   display: flex !important;
-  flex-direction: row !important;
   flex-wrap: wrap !important;
   gap: 8px !important;
   width: 100% !important;
@@ -2891,7 +2768,6 @@ table {
   background: #f8fafc !important;
   overflow: hidden !important;
   min-width: 0 !important;
-  box-sizing: border-box !important;
 }
 
 .fi-modal-slide-over-window .fi-section-header>div,
@@ -2911,8 +2787,7 @@ table {
 
 /* Restaurar botón chevron de secciones (FIX 5) */
 .fi-modal-slide-over-window .fi-section-header button svg,
-.fi-modal-slide-over-window .fi-section-header .fi-icon-btn svg,
-.fi-modal-slide-over-window .fi-section-header .fi-section-collapse-btn svg {
+.fi-modal-slide-over-window .fi-section-header .fi-icon-btn svg {
   display: block !important;
   visibility: visible !important;
   color: var(--sig-muted, #94a3b8) !important;
@@ -3043,12 +2918,10 @@ table {
 .fi-modal-slide-over-window .fi-fo-field-wrp {
   min-width: 0 !important;
   max-width: 100% !important;
-  box-sizing: border-box !important;
 }
 
 /* Etiquetas legibles: sin word-break (causaba texto vertical letra por letra) */
 .fi-modal-slide-over-window label,
-.fi-modal-slide-over-window .fi-fo-field-label,
 .fi-modal-slide-over-window .fi-fo-field-wrp-label {
   white-space: normal !important;
   word-break: normal !important;
@@ -3067,7 +2940,6 @@ table {
 .fi-modal-slide-over-window .fi-select {
   width: 100% !important;
   min-width: 0 !important;
-  box-sizing: border-box !important;
 }
 
 .fi-modal-slide-over-window input:not(:focus) {
@@ -3093,7 +2965,6 @@ table {
   width: 100% !important;
   max-width: 100% !important;
   overflow: visible !important;
-  box-sizing: border-box !important;
 }
 
 .fi-modal-slide-over-window .choices__inner {
@@ -3102,7 +2973,6 @@ table {
   max-height: 50px !important;
   padding: 5px 10px !important;
   overflow: hidden !important;
-  box-sizing: border-box !important;
   display: flex !important;
   align-items: center !important;
   border-radius: 6px !important;
@@ -3117,7 +2987,6 @@ table {
   width: 100% !important;
   min-width: 0 !important;
   padding: 0 22px 0 0 !important;
-  box-sizing: border-box !important;
   line-height: 1.35 !important;
 }
 
@@ -3137,7 +3006,6 @@ table {
   max-width: 100% !important;
   width: 100% !important;
   min-width: 0 !important;
-  box-sizing: border-box !important;
 }
 
 /* Dropdown de Choices con fondo blanco sólido y z-index alto para montarse sobre campos inferiores */
@@ -3189,8 +3057,6 @@ table {
 }
 
 /* Separadores horizontales entre campos y contención de textos */
-.fi-modal-slide-over-window .fi-in-text-entry,
-.fi-modal-slide-over-window .fi-in-badge-entry,
 .fi-modal-slide-over-window .fi-in-entry-wrp {
   padding-bottom: 8px !important;
   border-bottom: 1px solid var(--sig-border, #f1f5f9) !important;
@@ -3199,14 +3065,11 @@ table {
   max-width: 100% !important;
   overflow-wrap: break-word !important;
   word-break: break-word !important;
-  box-sizing: border-box !important;
 }
 
 /* Labels grises pequeños */
 .fi-modal-slide-over-window .fi-in-entry-wrp dt,
-.fi-modal-slide-over-window .fi-in-entry-wrp-label,
-.fi-modal-slide-over-window .fi-in-text-entry-label,
-.fi-modal-slide-over-window .fi-in-badge-entry-label {
+.fi-modal-slide-over-window .fi-in-entry-wrp-label {
   font-size: 12px !important;
   color: var(--sig-muted, #64748b) !important;
   font-weight: 500 !important;
@@ -3218,10 +3081,7 @@ table {
 }
 
 /* Valores bold con ajuste de palabras largas */
-.fi-modal-slide-over-window .fi-in-entry-wrp dd,
-.fi-modal-slide-over-window .fi-in-entry-wrp-content,
-.fi-modal-slide-over-window .fi-in-text-entry-data,
-.fi-modal-slide-over-window .fi-in-badge-entry-data {
+.fi-modal-slide-over-window .fi-in-entry-wrp dd {
   font-size: 13.5px !important;
   font-weight: 600 !important;
   color: var(--sig-text, #0f172a) !important;
@@ -3232,8 +3092,7 @@ table {
 }
 
 /* Secciones colapsables con chevron sutil (sin cuadro con borde) */
-.fi-modal-slide-over-window .fi-section-header .fi-icon-btn,
-.fi-modal-slide-over-window .fi-section-header .fi-section-collapse-btn {
+.fi-modal-slide-over-window .fi-section-header .fi-icon-btn {
   border: none !important;
   background: transparent !important;
   box-shadow: none !important;
@@ -3243,7 +3102,6 @@ table {
 .fi-modal-slide-over-window .fi-modal-header {
   padding-right: 56px !important;
   min-width: 0 !important;
-  box-sizing: border-box !important;
 }
 
 .fi-modal-slide-over-window .fi-modal-header .fi-modal-heading {
@@ -3450,27 +3308,21 @@ body {
    Nota: no se usa overflow-x:hidden aqui para no recortar los desplegables
    de los selects (overflow-x distinto de visible fuerza overflow-y:auto). */
 .fi-modal-slide-over-window .fi-fo-component-ctn>*,
-.fi-modal-slide-over-window .fi-fo-grid,
 .fi-modal-slide-over-window .grid,
 .fi-modal-slide-over-window .fi-section,
 .fi-modal-slide-over-window .fi-fo-wizard {
   max-width: 100% !important;
-  box-sizing: border-box !important;
 }
 
 .fi-modal-slide-over-window .fi-fo-field,
 .fi-modal-slide-over-window .fi-fo-field-wrp {
-  min-width: 0 !important;
-  max-width: 100% !important;
   width: 100% !important;
-  box-sizing: border-box !important;
 }
 
 
 /* El padding interno no debe causar overflow */
 .fi-modal-slide-over-window .fi-modal-content>*,
 .fi-modal-slide-over-window .fi-modal-content>*>* {
-  box-sizing: border-box !important;
   max-width: 100% !important;
 }
 
@@ -3482,7 +3334,6 @@ body {
 .fi-modal-slide-over-window [class*="fi-textarea"] {
   min-width: 0 !important;
   max-width: 100% !important;
-  box-sizing: border-box !important;
 }
 
 
@@ -3517,7 +3368,6 @@ body {
    - HOVER (no seleccionado): borde azul suave, fondo azul claro
    ========================================================================== */
 .fi-fo-toggle-buttons label.fi-btn,
-.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option,
 .fi-fo-toggle-buttons input:not(:checked)+label.fi-btn,
 .fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn {
   border: 1px solid var(--sig-border, #e2e8f0) !important;
@@ -3531,7 +3381,6 @@ body {
 }
 
 .fi-fo-toggle-buttons label.fi-btn *,
-.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option *,
 .fi-fo-toggle-buttons input:not(:checked)+label.fi-btn *,
 .fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn * {
   color: var(--sig-muted, #64748b) !important;
@@ -3539,8 +3388,7 @@ body {
 
 /* HOVER en NO seleccionado */
 .fi-fo-toggle-buttons input:not(:checked)+label.fi-btn:hover,
-.fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn:hover,
-.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option:not(.fi-active):not(:has(input:checked)):hover {
+.fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn:hover {
   border-color: #93c5fd !important;
   background-color: #eff6ff !important;
   background: #eff6ff !important;
@@ -3549,17 +3397,13 @@ body {
 }
 
 .fi-fo-toggle-buttons input:not(:checked)+label.fi-btn:hover *,
-.fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn:hover *,
-.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option:not(.fi-active):not(:has(input:checked)):hover * {
+.fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn:hover * {
   color: #1d4ed8 !important;
 }
 
 /* SELECCIONADO */
 .fi-fo-toggle-buttons input:checked+label.fi-btn,
-.fi-fo-toggle-buttons div:has(input:checked)>label.fi-btn,
-.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option.fi-active,
-.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option[aria-pressed="true"],
-.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option:has(input:checked) {
+.fi-fo-toggle-buttons div:has(input:checked)>label.fi-btn {
   background-color: var(--sig-primary, #002855) !important;
   background: var(--sig-primary, #002855) !important;
   border: 1px solid var(--sig-primary, #002855) !important;
@@ -3569,10 +3413,7 @@ body {
 }
 
 .fi-fo-toggle-buttons input:checked+label.fi-btn *,
-.fi-fo-toggle-buttons div:has(input:checked)>label.fi-btn *,
-.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option.fi-active *,
-.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option[aria-pressed="true"] *,
-.fi-fo-toggle-buttons .fi-fo-toggle-buttons-option:has(input:checked) * {
+.fi-fo-toggle-buttons div:has(input:checked)>label.fi-btn * {
   color: #ffffff !important;
 }
 
@@ -3580,7 +3421,6 @@ body {
    Slide-over: Acciones / Footer integrados al contenido (Problema 4)
    ========================================================================== */
 .fi-modal-slide-over-window .fi-modal-footer-actions,
-.fi-modal-slide-over-window .fi-modal-actions,
 .fi-modal-slide-over-window .fi-form-actions {
   display: flex !important;
   flex-direction: row !important;
@@ -3593,7 +3433,6 @@ body {
 
 /* Botones dentro del footer de slide-over */
 .fi-modal-slide-over-window .fi-modal-footer .fi-btn,
-.fi-modal-slide-over-window .fi-modal-actions .fi-btn,
 .fi-modal-slide-over-window .fi-form-actions .fi-btn {
   border-radius: 8px !important;
   padding: 9px 20px !important;
@@ -3606,8 +3445,6 @@ body {
 /* Botón primario */
 .fi-modal-slide-over-window .fi-modal-footer .fi-btn-color-primary,
 .fi-modal-slide-over-window .fi-modal-footer .fi-color-primary,
-.fi-modal-slide-over-window .fi-modal-footer .fi-btn-primary,
-.fi-modal-slide-over-window .fi-form-actions .fi-btn-primary,
 .fi-modal-slide-over-window .fi-form-actions .fi-btn-color-primary {
   background-color: var(--sig-primary, #002855) !important;
   border: 1px solid var(--sig-primary, #002855) !important;
@@ -3615,9 +3452,7 @@ body {
 }
 
 .fi-modal-slide-over-window .fi-modal-footer .fi-btn-color-primary:hover,
-.fi-modal-slide-over-window .fi-modal-footer .fi-color-primary:hover,
-.fi-modal-slide-over-window .fi-modal-footer .fi-btn-primary:hover,
-.fi-modal-slide-over-window .fi-form-actions .fi-btn-primary:hover {
+.fi-modal-slide-over-window .fi-modal-footer .fi-color-primary:hover {
   background-color: #001f42 !important;
 }
 
@@ -3673,28 +3508,17 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
    En Filament v3 el pie del modal es .fi-modal-footer > .fi-modal-footer-actions
    ========================================================================== */
 .fi-modal-slide-over-window .fi-modal-footer-actions,
-.fi-modal-slide-over-window .fi-modal-actions,
 .fi-modal-slide-over-window .fi-form-actions {
-  padding: 0 !important;
-  justify-content: flex-start !important;
   gap: 10px !important;
   position: relative !important;
   bottom: auto !important;
 }
 
 .fi-modal-slide-over-window .fi-modal-footer .fi-btn,
-.fi-modal-slide-over-window .fi-modal-actions .fi-btn,
 .fi-modal-slide-over-window .fi-form-actions .fi-btn {
-  border-radius: 8px !important;
-  padding: 9px 20px !important;
   font-weight: 600 !important;
 }
 
-.fi-modal-slide-over-window .fi-modal-footer .fi-btn-gray,
-.fi-modal-slide-over-window .fi-form-actions .fi-btn-gray {
-  border: 1px solid var(--sig-border, #e2e8f0) !important;
-  background: var(--sig-surface, #ffffff) !important;
-}
 
 /* ==========================================================================
    Mejora de diseño de formularios e infolists en slide-over + Botones catálogo
@@ -3751,10 +3575,8 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
   color: var(--sig-primary, #1b65d4) !important;
 }
 
-.fi-modal-slide-over-window .fi-input-wrp .fi-input-prefix,
 .fi-modal-slide-over-window .fi-input-wrp .fi-input-wrp-prefix,
-.fi-modal-slide-over-window .fi-input-wrp .fi-input-wrp-icon,
-.fi-modal-slide-over-window .fi-select .fi-select-prefix {
+.fi-modal-slide-over-window .fi-input-wrp .fi-input-wrp-icon {
   color: var(--sig-primary, #1b65d4) !important;
   padding-left: 10px !important;
 }
@@ -3793,12 +3615,8 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
 
 /* FIX 2: Footer bipolar — Cancelar (izq) + Confirmar (der) */
 .fi-modal-slide-over-window .fi-modal-footer-actions {
-  display: flex !important;
-  width: 100% !important;
   justify-content: space-between !important;
-  align-items: center !important;
   flex-wrap: wrap !important;
-  gap: 12px !important;
 }
 
 /* En formularios Crear/Editar: Cancelar a la izquierda, Confirmar a la derecha */
@@ -3845,7 +3663,6 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
 
 /* Fijar el sidebar a la izquierda usando sticky sobre flex */
 .fi-sidebar {
-  width: 64px !important;
   height: 100vh !important;
   position: sticky !important;
   top: 0;
@@ -3881,8 +3698,6 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
 }
 
 /* Fallback: Ocultar el botón ☰ nativo si persiste por alguna clase residual */
-.fi-sidebar-collapse-btn,
-.fi-sidebar-collapse-button,
 .fi-sidebar-group-collapse-button,
 button.fi-icon-btn[x-on\:click="isSidebarOpen = ! isSidebarOpen"],
 button.fi-icon-btn[x-on\:click*="sidebar"] {
@@ -4092,11 +3907,6 @@ button.fi-icon-btn[x-on\:click*="sidebar"] {
 }
 
 /* FIX 1: Quitar topbar duplicado en Servicio Social */
-body:has(.sigem-role-banner) .top-header,
-.sigem-professional .top-header,
-header.top-header {
-  display: none !important;
-}
 
 body:has(.sigem-role-banner) .sigem-topbar-brand {
   display: none !important;
@@ -4202,11 +4012,8 @@ aside.fi-sidebar {
 
 /* FIX 4: Topbar sticky (permanece al hacer scroll en ambos paneles) */
 .fi-topbar {
-  position: sticky !important;
   top: 0 !important;
   z-index: 40 !important;
-  background: var(--sig-surface) !important;
-  border-bottom: 1px solid var(--sig-border) !important;
 }
 
 .fi-layout,
@@ -4237,8 +4044,7 @@ aside.fi-sidebar {
 }
 
 /* 2. Eliminar barra de desplazamiento horizontal en el sidebar y su footer */
-.fi-sidebar,
-.fi-sidebar-footer {
+.fi-sidebar {
   overflow-x: hidden !important;
 }
 
@@ -4263,24 +4069,17 @@ body {
 
 .fi-layout {
   height: 100vh !important;
-  overflow: hidden !important;
 }
 
 /* El scroll vertical debe existir ÚNICAMENTE en el contenido principal */
 .fi-main {
   height: 100vh !important;
-  overflow-y: auto !important;
   overflow-x: hidden !important;
 }
 
 /* 2. Eliminar scroll horizontal en el menú lateral y proteger tooltips */
 /* En CSS, si usas overflow-y: auto, el navegador fuerza overflow-x: auto. 
    Debemos forzar 'visible' para evitar barras y no recortar los tooltips. */
-.fi-sidebar nav,
-.fi-sidebar .fi-sidebar-nav {
-  overflow: visible !important;
-  flex: 1 1 auto !important;
-}
 
 /* Asegurar que los ítems no empujen el contenedor más allá de los 64px */
 .fi-sidebar .fi-sidebar-item {
@@ -4312,12 +4111,6 @@ body {
   color: #8b5cf6
 }
 
-.fi-badge.fi-color-reassign,
-.fi-ta-table .fi-badge.fi-color-reassign,
-.fi-ta-table .fi-badge-color-reassign {
-  background: #ede9fe !important;
-  color: #8b5cf6 !important;
-}
 
 .fi-fo-toggle-buttons [data-color="reassign"],
 .fi-fo-toggle-buttons .fi-color-reassign {
@@ -4359,10 +4152,7 @@ header.fi-topbar {
 }
 
 /* 4. Sin gap entre sidebar y topbar */
-.fi-topbar,
-.fi-topbar-wrap,
-.fi-topbar-ctn {
-  margin-left: 0 !important;
+.fi-topbar {
   border-left: none !important;
 }
 
@@ -4562,7 +4352,6 @@ button[title*="Eliminar"]::before,
 .fi-badge.fi-color-reassign,
 .sigem-pill.reassign {
   background-color: #ede9fe !important;
-  color: #8b5cf6 !important;
 }
 
 /* En Mantenimiento — ámbar */
@@ -4606,8 +4395,7 @@ button[title*="Eliminar"]::before,
 /* Breadcrumb en topbar */
 .fi-topbar nav>div.ms-auto,
 header.fi-topbar nav>div.ms-auto,
-.fi-topbar nav>div:has(.sigem-crumb),
-.fi-topbar-ctn>div:last-child {
+.fi-topbar nav>div:has(.sigem-crumb) {
   flex: 1 1 auto !important;
   width: 100% !important;
   justify-content: flex-end !important;
@@ -4766,9 +4554,6 @@ header.fi-topbar nav>div.ms-auto,
    ============================================ */
 
 /* FIX 1: Pill "👑 Administrador" fuera del centro */
-.sigem-crumb {
-  margin-right: auto !important;
-}
 
 /* FIX 2: Hero aún más compacto */
 .sigem-hero,
@@ -4846,7 +4631,6 @@ header.fi-topbar nav>div.ms-auto,
 .fi-topbar {
   margin: 0 !important;
   padding: 0 !important;
-  border-bottom: 1px solid #e5e7eb !important;
   box-shadow: none !important;
 }
 
@@ -4859,7 +4643,6 @@ body:has(.sigem-professional) .fi-main-ctn,
   padding-left: 0 !important;
   padding-right: 0 !important;
   padding-top: 0 !important;
-  margin: 0 !important;
 }
 
 body:has(.sigem-professional) .fi-main,
@@ -4979,7 +4762,6 @@ header.fi-header p.fi-header-subheading,
 /* Reducir padding general del área de trabajo manteniendo topbar pegado */
 .fi-main-ctn {
   padding: 0 !important;
-  margin: 0 !important;
 }
 
 .fi-main,
@@ -5027,7 +4809,6 @@ header.fi-header h1.fi-header-heading,
   font-size: 22px !important;
   font-weight: 700 !important;
   line-height: 1.2 !important;
-  margin-bottom: 0 !important;
 }
 
 /* Subtítulos de página */
@@ -5035,7 +4816,6 @@ header.fi-header p.fi-header-subheading,
 .fi-header p.fi-header-subheading {
   font-size: 13.5px !important;
   font-weight: 400 !important;
-  line-height: 1.3 !important;
 }
 
 /* Títulos de sección (clases seguras, NO h2 global) */
@@ -5048,29 +4828,23 @@ header.fi-header p.fi-header-subheading,
 
 /* Títulos de tarjetas */
 .sigem-quick-title {
-  font-size: 15px !important;
   font-weight: 700 !important;
   line-height: 1.25 !important;
 }
 
 /* Descripciones de tarjetas */
 .sigem-quick-desc {
-  font-size: 13px !important;
   font-weight: 400 !important;
-  line-height: 1.3 !important;
 }
 
 /* KPIs */
 .sigem-stat-val {
-  font-size: 28px !important;
-  font-weight: 700 !important;
   line-height: 1.1 !important;
   font-variant-numeric: tabular-nums;
   color: var(--sig-text);
 }
 
 .sigem-stat-label {
-  font-size: 15px !important;
   font-weight: 400 !important;
   line-height: 1.3 !important;
 }
@@ -5083,16 +4857,12 @@ header.fi-header p.fi-header-subheading,
 
 /* Tablas — texto secundario */
 .fi-ta-table tbody td .fi-ta-text-description {
-  font-size: 12.5px !important;
   font-weight: 400 !important;
-  line-height: 1.2 !important;
 }
 
 /* Badges */
 .fi-badge,
 .sigem-pill {
-  font-size: 13px !important;
-  font-weight: 600 !important;
   line-height: 1.2 !important;
 }
 
@@ -5105,21 +4875,17 @@ header.fi-header p.fi-header-subheading,
 
 /* Breadcrumb del topbar */
 .sigem-crumb {
-  font-size: 15px !important;
   font-weight: 500 !important;
 }
 
 .sigem-crumb b {
   font-size: 15px !important;
-  font-weight: 700 !important;
 }
 
 /* Inputs y búsqueda (clases de Filament, NO tags globales) */
 .fi-ta-search input,
-.fi-global-search-input,
 .fi-input,
-.fi-select,
-.fi-textarea {
+.fi-select {
   font-size: 14px !important;
   font-weight: 400 !important;
 }
@@ -5134,7 +4900,6 @@ header.fi-header p.fi-header-subheading,
 
 /* Hero */
 .sigem-hero h1 {
-  font-size: 20px !important;
   font-weight: 700 !important;
 }
 
@@ -5176,7 +4941,6 @@ body:has(.sigem-professional) .fi-main {
   padding-top: 4px !important;
   padding-bottom: 4px !important;
   min-height: auto !important;
-  gap: 8px !important;
 }
 
 /* 2. Emojis en acciones de fila (Aprobar, Autorizar, Rechazar, Completar, Detalle, Editar, Eliminar) */
@@ -5263,7 +5027,6 @@ body:has(.sigem-professional) .fi-main {
 
 .fi-ta-table {
   table-layout: fixed !important;
-  width: 100% !important;
 }
 
 /* Headers compactos (consolidado) */
@@ -5368,8 +5131,6 @@ body:has(.sigem-professional) .fi-main {
 }
 
 /* Columna CÓDIGO — texto bold, tamaño normal */
-.fi-ta-table tbody td.fi-table-cell-num-serie,
-.fi-ta-table tbody td.fi-table-cell-num-serie *,
 .fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2),
 .fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2) *,
 .fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2),
@@ -5401,16 +5162,13 @@ body:has(.sigem-professional) .fi-main {
 
 /* EQUIPO: reducir ancho y controlar desborde */
 .fi-ta-table tbody td:nth-child(3),
-.fi-ta-table thead th:nth-child(3),
-.fi-ta-table tbody td.fi-table-cell-material\.nombre,
-.fi-ta-table thead th.fi-table-cell-material\.nombre {
+.fi-ta-table thead th:nth-child(3) {
   max-width: 260px !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
 
 .fi-ta-table tbody td .fi-ta-text-item-label,
-.fi-ta-table tbody td.fi-table-cell-material\.nombre .fi-ta-text-item-label,
 .fi-ta-table tbody td:nth-child(3) .fi-ta-text-item-label {
   font-size: 13.5px !important;
   font-weight: 600 !important;
@@ -5422,9 +5180,7 @@ body:has(.sigem-professional) .fi-main {
   display: block !important;
 }
 
-.fi-ta-table tbody td .fi-ta-text-description,
 .fi-ta-table tbody td .fi-ta-text p,
-.fi-ta-table tbody td.fi-table-cell-material\.nombre p,
 .fi-ta-table tbody td:nth-child(3) p {
   font-size: 11.5px !important;
   color: var(--sig-muted, #64748b) !important;
@@ -5447,8 +5203,6 @@ body:has(.sigem-professional) .fi-main {
 }
 
 /* ÁREA: texto normal gris */
-.fi-ta-table tbody td.fi-table-cell-ubicacion-fisica,
-.fi-ta-table tbody td.fi-table-cell-ubicacion-fisica *,
 .fi-ta-table tbody td:nth-child(6),
 .fi-ta-table tbody td:nth-child(6) * {
   color: var(--sig-muted, #64748b) !important;
@@ -5504,7 +5258,6 @@ body:has(.sigem-professional) .fi-main {
 .fi-ta-header {
   padding: 4px 10px !important;
   min-height: 36px !important;
-  gap: 8px !important;
 }
 
 /* Botón Exportar en la toolbar: texto completo sin truncar */
@@ -5590,8 +5343,6 @@ body:has(.sigem-professional) .fi-main {
 /* Ocultar badge flotante de filtros activos en la toolbar */
 .fi-ta-filters-dropdown .fi-icon-btn-badge-ctn,
 .fi-ta-filters-dropdown .fi-badge,
-.fi-ta-filters-trigger .fi-badge,
-.fi-ta-header-toolbar .fi-ta-filters-indicator-count,
 .fi-ta-header .fi-ta-filters-dropdown .fi-icon-btn-badge-ctn,
 .fi-ta-header-toolbar .fi-ac-btn-group .fi-badge {
   display: none !important;
@@ -5764,10 +5515,7 @@ body:has(.sigem-professional) .fi-main {
    ========================================================================== */
 .fi-modal-slide-over-window .fi-section,
 .fi-modal-slide-over-window section.fi-section,
-.fi-modal-slide-over-window .fi-fo-component-ctn .fi-section,
-.fi-modal-slide-over-window .fi-infolist .fi-section,
-.fi-modal-slide-over-window .fi-tabs-content .fi-section,
-.fi-modal-slide-over-window .fi-infolist-component-ctn .fi-section {
+.fi-modal-slide-over-window .fi-fo-component-ctn .fi-section {
   border: none !important;
   box-shadow: none !important;
   --tw-ring-color: transparent !important;
@@ -5780,18 +5528,14 @@ body:has(.sigem-professional) .fi-main {
   margin-bottom: 0 !important;
 }
 
-.fi-modal-slide-over-window .fi-section .fi-section-header,
-.fi-modal-slide-over-window .fi-infolist .fi-section-header,
-.fi-modal-slide-over-window .fi-tabs-content .fi-section-header {
+.fi-modal-slide-over-window .fi-section .fi-section-header {
   border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
   padding: 0 0 10px 0 !important;
   margin-bottom: 14px !important;
   background: transparent !important;
 }
 
-.fi-modal-slide-over-window .fi-section .fi-section-content,
-.fi-modal-slide-over-window .fi-infolist .fi-section-content,
-.fi-modal-slide-over-window .fi-tabs-content .fi-section-content {
+.fi-modal-slide-over-window .fi-section .fi-section-content {
   padding: 0 !important;
 }
 
@@ -5988,7 +5732,6 @@ body:has(.sigem-professional) .fi-main {
 .fi-ta-header,
 .fi-ta-header-toolbar,
 .fi-ta-content,
-.fi-ta-table-ctn,
 .fi-ta-table thead,
 .fi-ta-table thead tr,
 .fi-ta-table thead th,
@@ -6014,7 +5757,6 @@ body:has(.sigem-professional) .fi-main {
    FIX 4: Eliminar icono de 3 barras (toggle de columnas)
    ============================================ */
 .fi-ta-col-toggle,
-.fi-ta-column-toggle-btn,
 .fi-ta-header-toolbar button[class*="column-toggle"],
 .fi-ta-header-toolbar .fi-ta-col-toggle,
 .fi-ta-header-toolbar button:has(svg[class*="view-columns"]),
@@ -6040,7 +5782,6 @@ body:has(.sigem-professional) .fi-main {
   border: 1px solid var(--sig-border, #e2e8f0) !important;
   background: var(--sig-surface, #ffffff) !important;
   color: var(--sig-text, #0f172a) !important;
-  box-sizing: border-box !important;
 }
 
 .sigem-dash-filter-input:focus {
