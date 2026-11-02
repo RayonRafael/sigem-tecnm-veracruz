@@ -51,6 +51,7 @@ class ServicioSocialPanelProvider extends PanelProvider
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <link rel="stylesheet" href="{{ asset(\'css/sigem-theme.css\') }}">
+<script src="{{ asset(\'js/sigem-network.js\') }}" defer></script>
 ')
             )
             ->renderHook(
@@ -96,8 +97,8 @@ class ServicioSocialPanelProvider extends PanelProvider
                 fn (): string => Blade::render('
 <div class="flex justify-center items-center gap-4 mb-6">
     <img src="{{ asset(\'images/sigem-logo.svg\') }}" alt="SIGEM" style="height: 40px; object-fit: contain;">
-    <img src="{{ asset(\'images/tecnm-logo.png\') }}" alt="TecNM" style="height: 40px; object-fit: contain;">
-    <img src="{{ asset(\'images/itv-logo.png\') }}" alt="ITV" style="height: 40px; object-fit: contain;">
+    <img src="{{ asset(\'images/tecnm-logo.png\') }}" alt="TecNM" loading="lazy" style="height: 40px; object-fit: contain;">
+    <img src="{{ asset(\'images/itv-logo.png\') }}" alt="ITV" loading="lazy" style="height: 40px; object-fit: contain;">
 </div>
 ')
             )

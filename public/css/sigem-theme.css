@@ -5211,3 +5211,211 @@ body:has(.sigem-professional) .fi-main {
   font-size: 13px !important;
   padding: 0 10px 0 6px !important;
 }
+
+/* ==========================================================================
+   FASE 1 RED LENTA: Skeleton Loading Indicators
+   ========================================================================== */
+@keyframes sigem-skeleton-pulse {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+.sigem-skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: sigem-skeleton-pulse 1.5s ease-in-out infinite;
+  border-radius: 6px;
+  display: block;
+}
+
+.sigem-skeleton-row {
+  display: flex;
+  gap: 12px;
+  padding: 8px 12px;
+  align-items: center;
+}
+
+.sigem-skeleton-cell {
+  height: 14px;
+  border-radius: 4px;
+}
+
+.sigem-skeleton-card {
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--sig-surface, #ffffff);
+  border: 1px solid var(--sig-border, #e2e8f0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.sigem-skeleton-w-full {
+  width: 100%;
+}
+
+.sigem-skeleton-w-3-4 {
+  width: 75%;
+}
+
+.sigem-skeleton-w-1-2 {
+  width: 50%;
+}
+
+.sigem-skeleton-w-1-4 {
+  width: 25%;
+}
+
+tr.sigem-skeleton-tr {
+  background: transparent !important;
+  pointer-events: none;
+}
+tr.sigem-skeleton-tr:hover {
+  background: transparent !important;
+}
+tr.sigem-skeleton-tr td {
+  padding: 12px 14px !important;
+  vertical-align: middle !important;
+  background: transparent !important;
+}
+
+.sigem-quick-grid.sigem-skeleton-grid,
+.sigem-stats-grid.sigem-skeleton-grid {
+  pointer-events: none;
+  user-select: none;
+}
+.sigem-quick-grid.sigem-skeleton-grid[style*="display: none"], .sigem-quick-grid.sigem-skeleton-grid[style*="display:none"],
+.sigem-stats-grid.sigem-skeleton-grid[style*="display: none"],
+.sigem-stats-grid.sigem-skeleton-grid[style*="display:none"] {
+  display: none !important;
+}
+
+.sigem-quick-grid[style*="display: none"],
+.sigem-quick-grid[style*="display:none"],
+.sigem-stats-grid[style*="display: none"],
+.sigem-stats-grid[style*="display:none"] {
+  display: none !important;
+}
+
+.sigem-skeleton-quick {
+  min-height: 84px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sigem-skeleton-stat {
+  min-height: 98px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.fi-ta.animate-pulse {
+  animation: sigem-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.fi-ta-loading-indicator,
+.fi-ta-content-ctn .flex.h-32.items-center.justify-center {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(2px);
+  border-radius: 8px;
+  padding: 24px;
+  gap: 12px;
+  color: var(--sig-primary, #0f172a);
+}
+
+/* ==========================================================================
+   FASE 1 RED LENTA: Spinners en Botones (Batch 2A)
+   ========================================================================== */
+@keyframes sigem-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.sigem-btn-spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  animation: sigem-spin 0.75s linear infinite;
+  flex-shrink: 0;
+  margin-right: 0.375rem;
+}
+.sigem-btn-spinner circle {
+  stroke-dasharray: 80;
+  stroke-dashoffset: 60;
+}
+
+.sigem-btn-loading-content {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.375rem !important;
+}
+
+.fi-btn.is-loading, .fi-btn[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])), .fi-btn[disabled]:has(svg.animate-spin:not([style*="display: none"])) {
+  cursor: wait !important;
+  opacity: 0.85 !important;
+}
+.fi-btn.is-loading .fi-btn-loading-indicator,
+.fi-btn.is-loading svg.animate-spin, .fi-btn[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])) .fi-btn-loading-indicator,
+.fi-btn[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])) svg.animate-spin, .fi-btn[disabled]:has(svg.animate-spin:not([style*="display: none"])) .fi-btn-loading-indicator,
+.fi-btn[disabled]:has(svg.animate-spin:not([style*="display: none"])) svg.animate-spin {
+  display: inline-block !important;
+  width: 1.1em !important;
+  height: 1.1em !important;
+  animation: sigem-spin 0.75s linear infinite !important;
+  margin-inline-end: 0.375rem !important;
+}
+.fi-btn.is-loading .fi-btn-loading-indicator[style*="display: none"], .fi-btn.is-loading .fi-btn-loading-indicator[style*="display:none"],
+.fi-btn.is-loading svg.animate-spin[style*="display: none"],
+.fi-btn.is-loading svg.animate-spin[style*="display:none"], .fi-btn[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])) .fi-btn-loading-indicator[style*="display: none"], .fi-btn[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])) .fi-btn-loading-indicator[style*="display:none"],
+.fi-btn[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])) svg.animate-spin[style*="display: none"],
+.fi-btn[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])) svg.animate-spin[style*="display:none"], .fi-btn[disabled]:has(svg.animate-spin:not([style*="display: none"])) .fi-btn-loading-indicator[style*="display: none"], .fi-btn[disabled]:has(svg.animate-spin:not([style*="display: none"])) .fi-btn-loading-indicator[style*="display:none"],
+.fi-btn[disabled]:has(svg.animate-spin:not([style*="display: none"])) svg.animate-spin[style*="display: none"],
+.fi-btn[disabled]:has(svg.animate-spin:not([style*="display: none"])) svg.animate-spin[style*="display:none"] {
+  display: none !important;
+}
+
+.fi-btn svg.sigem-spinner-duplicate,
+.fi-btn svg[style*="display: none"],
+.fi-btn svg[style*="display:none"],
+button svg.sigem-spinner-duplicate,
+button svg[style*="display: none"],
+button svg[style*="display:none"],
+[role=button] svg.sigem-spinner-duplicate,
+[role=button] svg[style*="display: none"],
+[role=button] svg[style*="display:none"] {
+  display: none !important;
+}
+.fi-btn svg.animate-spin ~ svg.animate-spin,
+.fi-btn svg.animate-spin ~ svg.sigem-btn-spinner,
+.fi-btn svg.sigem-btn-spinner ~ svg.sigem-btn-spinner,
+.fi-btn svg.sigem-btn-spinner ~ svg.animate-spin,
+.fi-btn .sigem-btn-spinner ~ .sigem-btn-spinner,
+button svg.animate-spin ~ svg.animate-spin,
+button svg.animate-spin ~ svg.sigem-btn-spinner,
+button svg.sigem-btn-spinner ~ svg.sigem-btn-spinner,
+button svg.sigem-btn-spinner ~ svg.animate-spin,
+button .sigem-btn-spinner ~ .sigem-btn-spinner,
+[role=button] svg.animate-spin ~ svg.animate-spin,
+[role=button] svg.animate-spin ~ svg.sigem-btn-spinner,
+[role=button] svg.sigem-btn-spinner ~ svg.sigem-btn-spinner,
+[role=button] svg.sigem-btn-spinner ~ svg.animate-spin,
+[role=button] .sigem-btn-spinner ~ .sigem-btn-spinner {
+  display: none !important;
+}
+
+.sigem-rep-btn-primary.is-loading, .sigem-rep-btn-primary[disabled],
+.sigem-rep-btn-sec.is-loading,
+.sigem-rep-btn-sec[disabled],
+.sigem-btn-primary.is-loading,
+.sigem-btn-primary[disabled] {
+  cursor: wait !important;
+  opacity: 0.85 !important;
+}

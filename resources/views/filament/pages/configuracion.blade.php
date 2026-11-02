@@ -292,8 +292,13 @@
                                    placeholder="5 - 500">
                             <button type="button"
                                     wire:click="guardarPreferencias"
+                                    wire:loading.attr="disabled"
                                     class="sigem-rep-btn-primary">
-                                Guardar
+                                <span wire:loading.remove wire:target="guardarPreferencias">Guardar</span>
+                                <span wire:loading wire:target="guardarPreferencias" style="display: none;" class="sigem-btn-loading-content">
+                                    <svg class="sigem-btn-spinner" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"></circle><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path></svg>
+                                    Guardando...
+                                </span>
                             </button>
                         </div>
 

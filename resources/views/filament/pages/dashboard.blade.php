@@ -10,6 +10,7 @@
             $nombreCorto = explode(' ', $user->name ?? 'Usuario')[0];
             $porcentajeDisponibles = ($totalActivos ?? 0) > 0 ? round((($inventarioDisponibles ?? 0) / $totalActivos) * 100) : 0;
             $requierenAtencion = ($materialesStockBajoCount ?? 0) + ($inventarioDanados ?? 0);
+            $isSkeletonPreview = request()->boolean('skeleton');
         @endphp
 
         <!-- 1. HERO -->
@@ -21,85 +22,115 @@
         </div>
 
         <!-- 2. ACCIONES RÁPIDAS (4 CARDS) -->
-        <div class="sigem-quick-grid">
-            <!-- 1. Autorizar mantenimiento -->
-            <a class="sigem-quick" href="{{ url('/admin/mantenimientos') }}">
-                <div class="arrow">→</div>
-                <div class="sigem-quick-ico sigem-i-warning">🔧</div>
-                <div class="sigem-quick-title">
-                    Autorizar mantenimiento
-                    @if(($mantenimientosPendientes ?? 0) > 0)
-                        <span class="sigem-qbadge">{{ $mantenimientosPendientes }}</span>
-                    @endif
-                </div>
-                <div class="sigem-quick-desc">Hay reportes esperando tu revisión</div>
-            </a>
+        @if($isSkeletonPreview)
+            {{-- SKELETON PREVIEW: ACCIONES RÁPIDAS (4 CARDS) --}}
+            <div class="sigem-quick-grid sigem-skeleton-grid">
+                @for($i = 0; $i < 4; $i++)
+                    <div class="sigem-skeleton-card sigem-skeleton-quick">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                            <span class="sigem-skeleton" style="width: 36px; height: 36px; border-radius: 10px;"></span>
+                            <span class="sigem-skeleton" style="width: 14px; height: 14px; border-radius: 4px;"></span>
+                        </div>
+                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 65%; height: 16px; margin-bottom: 6px;"></span>
+                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 85%; height: 12px;"></span>
+                    </div>
+                @endfor
+            </div>
+        @else
+            <div class="sigem-quick-grid">
+                <!-- 1. Autorizar mantenimiento -->
+                <a class="sigem-quick" href="{{ url('/admin/mantenimientos') }}">
+                    <div class="arrow">→</div>
+                    <div class="sigem-quick-ico sigem-i-warning">🔧</div>
+                    <div class="sigem-quick-title">
+                        Autorizar mantenimiento
+                        @if(($mantenimientosPendientes ?? 0) > 0)
+                            <span class="sigem-qbadge">{{ $mantenimientosPendientes }}</span>
+                        @endif
+                    </div>
+                    <div class="sigem-quick-desc">Hay reportes esperando tu revisión</div>
+                </a>
 
-            <!-- 2. Revisar solicitudes -->
-            <a class="sigem-quick" href="{{ url('/admin/solicituds') }}">
-                <div class="arrow">→</div>
-                <div class="sigem-quick-ico sigem-i-primary">📋</div>
-                <div class="sigem-quick-title">
-                    Revisar solicitudes
-                    @if(($solicitudesPendientes ?? 0) > 0)
-                        <span class="sigem-qbadge">{{ $solicitudesPendientes }}</span>
-                    @endif
-                </div>
-                <div class="sigem-quick-desc">Solicitudes de material por autorizar</div>
-            </a>
+                <!-- 2. Revisar solicitudes -->
+                <a class="sigem-quick" href="{{ url('/admin/solicituds') }}">
+                    <div class="arrow">→</div>
+                    <div class="sigem-quick-ico sigem-i-primary">📋</div>
+                    <div class="sigem-quick-title">
+                        Revisar solicitudes
+                        @if(($solicitudesPendientes ?? 0) > 0)
+                            <span class="sigem-qbadge">{{ $solicitudesPendientes }}</span>
+                        @endif
+                    </div>
+                    <div class="sigem-quick-desc">Solicitudes de material por autorizar</div>
+                </a>
 
-            <!-- 3. Registrar activo -->
-            <a class="sigem-quick" href="javascript:void(0)" wire:click="mountAction('registrarEquipo')">
-                <div class="arrow">→</div>
-                <div class="sigem-quick-ico sigem-i-success">＋</div>
-                <div class="sigem-quick-title">Registrar activo</div>
-                <div class="sigem-quick-desc">Alta de nuevo equipo en inventario</div>
-            </a>
+                <!-- 3. Registrar activo -->
+                <a class="sigem-quick" href="javascript:void(0)" wire:click="mountAction('registrarEquipo')">
+                    <div class="arrow">→</div>
+                    <div class="sigem-quick-ico sigem-i-success">＋</div>
+                    <div class="sigem-quick-title">Registrar activo</div>
+                    <div class="sigem-quick-desc">Alta de nuevo equipo en inventario</div>
+                </a>
 
-            <!-- 4. Ver bitácora -->
-            {{-- Fase 10: Enlazado a la pestaña Bitácora de Configuración y Catálogos (/admin/configuracion) --}}
-            <a class="sigem-quick" href="{{ url('/admin/configuracion') }}">
-                <div class="arrow">→</div>
-                <div class="sigem-quick-ico sigem-i-info">🕘</div>
-                <div class="sigem-quick-title">Ver bitácora</div>
-                <div class="sigem-quick-desc">Registro de actividad y movimientos</div>
-            </a>
-        </div>
+                <!-- 4. Ver bitácora -->
+                {{-- Fase 10: Enlazado a la pestaña Bitácora de Configuración y Catálogos (/admin/configuracion) --}}
+                <a class="sigem-quick" href="{{ url('/admin/configuracion') }}">
+                    <div class="arrow">→</div>
+                    <div class="sigem-quick-ico sigem-i-info">🕘</div>
+                    <div class="sigem-quick-title">Ver bitácora</div>
+                    <div class="sigem-quick-desc">Registro de actividad y movimientos</div>
+                </a>
+            </div>
+        @endif
 
         <!-- 3. KPIS (4 MÉTRICAS) -->
-        <div class="sigem-stats-grid">
-            <!-- 1. Equipos registrados -->
-            <div class="sigem-stat">
-                <div class="sigem-stat-ico sigem-i-primary">📦</div>
-                <div class="sigem-stat-val">{{ $totalActivos ?? 0 }}</div>
-                <div class="sigem-stat-label">Equipos registrados</div>
-                <div class="sigem-stat-hint sigem-h-ok">↗ {{ $creadosEsteMes ?? 0 }} nuevos este mes</div>
+        @if($isSkeletonPreview)
+            {{-- SKELETON PREVIEW: KPIS (4 MÉTRICAS) --}}
+            <div class="sigem-stats-grid sigem-skeleton-grid">
+                @for($i = 0; $i < 4; $i++)
+                    <div class="sigem-skeleton-card sigem-skeleton-stat">
+                        <span class="sigem-skeleton" style="width: 36px; height: 36px; border-radius: 10px; margin-bottom: 10px;"></span>
+                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 45%; height: 26px; margin-bottom: 6px;"></span>
+                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 65%; height: 14px; margin-bottom: 6px;"></span>
+                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 50%; height: 12px;"></span>
+                    </div>
+                @endfor
             </div>
+        @else
+            <div class="sigem-stats-grid">
+                <!-- 1. Equipos registrados -->
+                <div class="sigem-stat">
+                    <div class="sigem-stat-ico sigem-i-primary">📦</div>
+                    <div class="sigem-stat-val">{{ $totalActivos ?? 0 }}</div>
+                    <div class="sigem-stat-label">Equipos registrados</div>
+                    <div class="sigem-stat-hint sigem-h-ok">↗ {{ $creadosEsteMes ?? 0 }} nuevos este mes</div>
+                </div>
 
-            <!-- 2. Disponibles -->
-            <div class="sigem-stat">
-                <div class="sigem-stat-ico sigem-i-success">✓</div>
-                <div class="sigem-stat-val">{{ $inventarioDisponibles ?? 0 }}</div>
-                <div class="sigem-stat-label">Disponibles para uso</div>
-                <div class="sigem-stat-hint sigem-h-info">{{ $porcentajeDisponibles }}% del parque</div>
-            </div>
+                <!-- 2. Disponibles -->
+                <div class="sigem-stat">
+                    <div class="sigem-stat-ico sigem-i-success">✓</div>
+                    <div class="sigem-stat-val">{{ $inventarioDisponibles ?? 0 }}</div>
+                    <div class="sigem-stat-label">Disponibles para uso</div>
+                    <div class="sigem-stat-hint sigem-h-info">{{ $porcentajeDisponibles }}% del parque</div>
+                </div>
 
-            <!-- 3. En mantenimiento -->
-            <div class="sigem-stat">
-                <div class="sigem-stat-ico sigem-i-warning">🔧</div>
-                <div class="sigem-stat-val">{{ $inventarioEnMantenimiento ?? 0 }}</div>
-                <div class="sigem-stat-label">En mantenimiento</div>
-                <div class="sigem-stat-hint sigem-h-warn">{{ $mantenimientosPendientes ?? 0 }} pendientes de revisión</div>
-            </div>
+                <!-- 3. En mantenimiento -->
+                <div class="sigem-stat">
+                    <div class="sigem-stat-ico sigem-i-warning">🔧</div>
+                    <div class="sigem-stat-val">{{ $inventarioEnMantenimiento ?? 0 }}</div>
+                    <div class="sigem-stat-label">En mantenimiento</div>
+                    <div class="sigem-stat-hint sigem-h-warn">{{ $mantenimientosPendientes ?? 0 }} pendientes de revisión</div>
+                </div>
 
-            <!-- 4. Requieren atención -->
-            <div class="sigem-stat">
-                <div class="sigem-stat-ico sigem-i-danger">⚠️</div>
-                <div class="sigem-stat-val">{{ $requierenAtencion }}</div>
-                <div class="sigem-stat-label">Requieren atención</div>
-                <div class="sigem-stat-hint sigem-h-warn">{{ $materialesStockBajoCount ?? 0 }} stock bajo · {{ $inventarioDanados ?? 0 }} dañados</div>
+                <!-- 4. Requieren atención -->
+                <div class="sigem-stat">
+                    <div class="sigem-stat-ico sigem-i-danger">⚠️</div>
+                    <div class="sigem-stat-val">{{ $requierenAtencion }}</div>
+                    <div class="sigem-stat-label">Requieren atención</div>
+                    <div class="sigem-stat-hint sigem-h-warn">{{ $materialesStockBajoCount ?? 0 }} stock bajo · {{ $inventarioDanados ?? 0 }} dañados</div>
+                </div>
             </div>
-        </div>
+        @endif
 
         <!-- 4. REGISTROS DE INVENTARIO -->
         <div class="sigem-quick-desc-none"></div> <!-- separación limpia -->
@@ -246,80 +277,148 @@
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @php
-                                        $inventariosTabla = collect($inventariosCompletos ?? [])->take(10);
-                                    @endphp
-                                    @forelse($inventariosTabla as $inv)
+                                @if($isSkeletonPreview)
+                                    {{-- SKELETON: TABLA INVENTARIO (5 FILAS × 6 CELDAS) --}}
+                                    <tbody>
+                                        @for($i = 0; $i < 5; $i++)
+                                            <tr class="sigem-skeleton-tr">
+                                                <td>
+                                                    <span class="sigem-skeleton sigem-skeleton-cell" style="width: 80px;"></span>
+                                                </td>
+                                                <td>
+                                                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                                                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 140px; height: 16px;"></span>
+                                                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 90px; height: 12px;"></span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="sigem-skeleton sigem-skeleton-cell" style="width: 75px; height: 22px; border-radius: 9999px;"></span>
+                                                </td>
+                                                <td>
+                                                    <span class="sigem-skeleton sigem-skeleton-cell" style="width: 95px; height: 22px; border-radius: 9999px;"></span>
+                                                </td>
+                                                <td>
+                                                    <span class="sigem-skeleton sigem-skeleton-cell" style="width: 105px;"></span>
+                                                </td>
+                                                <td class="fi-ta-actions-cell" style="width: 104px; text-align: center; white-space: nowrap;">
+                                                    <div style="display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                                                        <span class="sigem-skeleton" style="width: 26px; height: 26px; border-radius: 6px;"></span>
+                                                        <span class="sigem-skeleton" style="width: 26px; height: 26px; border-radius: 6px;"></span>
+                                                        <span class="sigem-skeleton" style="width: 26px; height: 26px; border-radius: 6px;"></span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endfor
+                                    </tbody>
+                                @else
+                                    <tbody wire:loading.remove wire:target="tableColumnSearches, resetTableColumnSearches">
                                         @php
-                                            $codigo = $inv->num_serie ?: ('#' . $inv->id_inventario);
-                                            $nombreEquipo = $inv->material?->nombre ?? 'Equipo general';
-                                            $serieSub = $inv->num_serie ? 'S/N: ' . $inv->num_serie : 'Sin número de serie';
-                                            $categoria = $inv->material?->tipo?->nombre ?? 'General';
-                                            $areaUbicacion = $inv->ubicacion_fisica ?: 'Sin área asignada';
-                                            $estado = $inv->estado ?? 'Sin estado';
-
-                                            $pillCls = match ($estado) {
-                                                'Disponible' => 'ok',
-                                                'Asignado' => 'info',
-                                                'Reasignado' => 'reassign',
-                                                'En Mantenimiento' => 'warn',
-                                                'Dañado' => 'danger',
-                                                default => 'neutral',
-                                            };
+                                            $inventariosTabla = collect($inventariosCompletos ?? [])->take(10);
                                         @endphp
-                                        <tr>
-                                            <td>
-                                                <span class="sigem-td-folio" style="font-weight: 700;">{{ $codigo }}</span>
-                                            </td>
-                                            <td>
-                                                <div style="display: flex; flex-direction: column;">
-                                                    <strong style="color: var(--sig-text);">{{ $nombreEquipo }}</strong>
-                                                    <span style="font-size: 13px; color: var(--sig-muted);">{{ $serieSub }}</span>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="sigem-pill neutral" style="font-weight: 500;">{{ $categoria }}</span>
-                                            </td>
-                                            <td>
-                                                <span class="sigem-pill {{ $pillCls }}">
-                                                    <span class="sigem-dot"></span>{{ $estado }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <span style="font-size: 14px; color: var(--sig-muted);">{{ $areaUbicacion }}</span>
-                                            </td>
-                                            <td class="fi-ta-actions-cell" style="width: 104px; text-align: center; white-space: nowrap;">
-                                                <div class="fi-ta-actions" style="display: inline-flex; align-items: center; justify-content: center; gap: 3px;">
-                                                    <button type="button"
-                                                            wire:click="verEquipo({{ $inv->id_inventario }})"
-                                                            class="fi-icon-btn sigem-dash-btn"
-                                                            title="Ver detalle"
-                                                            aria-label="Ver detalle">
-                                                    </button>
-                                                    <button type="button"
-                                                            wire:click="editarEquipo({{ $inv->id_inventario }})"
-                                                            class="fi-icon-btn sigem-dash-btn"
-                                                            title="Editar"
-                                                            aria-label="Editar">
-                                                    </button>
-                                                    <button type="button"
-                                                            wire:click="eliminarEquipo({{ $inv->id_inventario }})"
-                                                            class="fi-icon-btn sigem-dash-btn"
-                                                            title="Eliminar"
-                                                            aria-label="Eliminar">
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="6" style="text-align: center; padding: 32px; color: var(--sig-muted);">
-                                                No hay equipos registrados en el inventario.
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
+                                        @forelse($inventariosTabla as $inv)
+                                            @php
+                                                $codigo = $inv->num_serie ?: ('#' . $inv->id_inventario);
+                                                $nombreEquipo = $inv->material?->nombre ?? 'Equipo general';
+                                                $serieSub = $inv->num_serie ? 'S/N: ' . $inv->num_serie : 'Sin número de serie';
+                                                $categoria = $inv->material?->tipo?->nombre ?? 'General';
+                                                $areaUbicacion = $inv->ubicacion_fisica ?: 'Sin área asignada';
+                                                $estado = $inv->estado ?? 'Sin estado';
+
+                                                $pillCls = match ($estado) {
+                                                    'Disponible' => 'ok',
+                                                    'Asignado' => 'info',
+                                                    'Reasignado' => 'reassign',
+                                                    'En Mantenimiento' => 'warn',
+                                                    'Dañado' => 'danger',
+                                                    default => 'neutral',
+                                                };
+                                            @endphp
+                                            <tr>
+                                                <td>
+                                                    <span class="sigem-td-folio" style="font-weight: 700;">{{ $codigo }}</span>
+                                                </td>
+                                                <td>
+                                                    <div style="display: flex; flex-direction: column;">
+                                                        <strong style="color: var(--sig-text);">{{ $nombreEquipo }}</strong>
+                                                        <span style="font-size: 13px; color: var(--sig-muted);">{{ $serieSub }}</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="sigem-pill neutral" style="font-weight: 500;">{{ $categoria }}</span>
+                                                </td>
+                                                <td>
+                                                    <span class="sigem-pill {{ $pillCls }}">
+                                                        <span class="sigem-dot"></span>{{ $estado }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span style="font-size: 14px; color: var(--sig-muted);">{{ $areaUbicacion }}</span>
+                                                </td>
+                                                <td class="fi-ta-actions-cell" style="width: 104px; text-align: center; white-space: nowrap;">
+                                                    <div class="fi-ta-actions" style="display: inline-flex; align-items: center; justify-content: center; gap: 3px;">
+                                                        <button type="button"
+                                                                wire:click="verEquipo({{ $inv->id_inventario }})"
+                                                                class="fi-icon-btn sigem-dash-btn"
+                                                                title="Ver detalle"
+                                                                aria-label="Ver detalle">
+                                                        </button>
+                                                        <button type="button"
+                                                                wire:click="editarEquipo({{ $inv->id_inventario }})"
+                                                                class="fi-icon-btn sigem-dash-btn"
+                                                                title="Editar"
+                                                                aria-label="Editar">
+                                                        </button>
+                                                        <button type="button"
+                                                                wire:click="eliminarEquipo({{ $inv->id_inventario }})"
+                                                                class="fi-icon-btn sigem-dash-btn"
+                                                                title="Eliminar"
+                                                                aria-label="Eliminar">
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="6" style="text-align: center; padding: 32px; color: var(--sig-muted);">
+                                                    No hay equipos registrados en el inventario.
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+
+                                    {{-- SKELETON: TABLA INVENTARIO (5 FILAS × 6 CELDAS) --}}
+                                    <tbody wire:loading wire:target="tableColumnSearches, resetTableColumnSearches" style="display: none;">
+                                        @for($i = 0; $i < 5; $i++)
+                                            <tr class="sigem-skeleton-tr">
+                                                <td>
+                                                    <span class="sigem-skeleton sigem-skeleton-cell" style="width: 80px;"></span>
+                                                </td>
+                                                <td>
+                                                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                                                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 140px; height: 16px;"></span>
+                                                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 90px; height: 12px;"></span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="sigem-skeleton sigem-skeleton-cell" style="width: 75px; height: 22px; border-radius: 9999px;"></span>
+                                                </td>
+                                                <td>
+                                                    <span class="sigem-skeleton sigem-skeleton-cell" style="width: 95px; height: 22px; border-radius: 9999px;"></span>
+                                                </td>
+                                                <td>
+                                                    <span class="sigem-skeleton sigem-skeleton-cell" style="width: 105px;"></span>
+                                                </td>
+                                                <td class="fi-ta-actions-cell" style="width: 104px; text-align: center; white-space: nowrap;">
+                                                    <div style="display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                                                        <span class="sigem-skeleton" style="width: 26px; height: 26px; border-radius: 6px;"></span>
+                                                        <span class="sigem-skeleton" style="width: 26px; height: 26px; border-radius: 6px;"></span>
+                                                        <span class="sigem-skeleton" style="width: 26px; height: 26px; border-radius: 6px;"></span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endfor
+                                    </tbody>
+                                @endif
                             </table>
                         </div>
 

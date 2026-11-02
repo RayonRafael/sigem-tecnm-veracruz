@@ -5684,3 +5684,212 @@ body:has(.sigem-professional) .fi-main {
     padding: 0 10px 0 6px !important;
   }
 }
+/* ==========================================================================
+   FASE 1 RED LENTA: Skeleton Loading Indicators
+   ========================================================================== */
+
+// Animacion de shimmer/pulso suave para skeletons
+@keyframes sigem-skeleton-pulse {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Bloque base de skeleton con degradado shimmer
+.sigem-skeleton {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: sigem-skeleton-pulse 1.5s ease-in-out infinite;
+  border-radius: 6px;
+  display: block;
+}
+
+// Skeleton de fila de tabla (flex o standalone)
+.sigem-skeleton-row {
+  display: flex;
+  gap: 12px;
+  padding: 8px 12px;
+  align-items: center;
+}
+
+// Celda individual de skeleton
+.sigem-skeleton-cell {
+  height: 14px;
+  border-radius: 4px;
+}
+
+// Skeleton de tarjeta (KPI, quick card)
+.sigem-skeleton-card {
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--sig-surface, #ffffff);
+  border: 1px solid var(--sig-border, #e2e8f0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+// Variantes de ancho utilitarias
+.sigem-skeleton-w-full { width: 100%; }
+.sigem-skeleton-w-3-4  { width: 75%; }
+.sigem-skeleton-w-1-2  { width: 50%; }
+.sigem-skeleton-w-1-4  { width: 25%; }
+
+// Fila de tabla skeleton dentro de table > tbody
+tr.sigem-skeleton-tr {
+  background: transparent !important;
+  pointer-events: none;
+
+  &:hover {
+    background: transparent !important;
+  }
+
+  td {
+    padding: 12px 14px !important;
+    vertical-align: middle !important;
+    background: transparent !important;
+  }
+}
+
+// Rejillas de skeleton para Dashboard (conservan dimensiones exactas de grid)
+.sigem-quick-grid.sigem-skeleton-grid,
+.sigem-stats-grid.sigem-skeleton-grid {
+  pointer-events: none;
+  user-select: none;
+
+  &[style*="display: none"],
+  &[style*="display:none"] {
+    display: none !important;
+  }
+}
+
+.sigem-quick-grid[style*="display: none"],
+.sigem-quick-grid[style*="display:none"],
+.sigem-stats-grid[style*="display: none"],
+.sigem-stats-grid[style*="display:none"] {
+  display: none !important;
+}
+
+.sigem-skeleton-quick {
+  min-height: 84px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sigem-skeleton-stat {
+  min-height: 98px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+// Tablas de Filament (Opcion B: Mejora estetica del loading indicator y contenedor nativo)
+.fi-ta.animate-pulse {
+  animation: sigem-skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.fi-ta-loading-indicator,
+.fi-ta-content-ctn .flex.h-32.items-center.justify-center {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(2px);
+  border-radius: 8px;
+  padding: 24px;
+  gap: 12px;
+  color: var(--sig-primary, #0f172a);
+}
+
+/* ==========================================================================
+   FASE 1 RED LENTA: Spinners en Botones (Batch 2A)
+   ========================================================================== */
+
+// Animacion de rotacion para spinners
+@keyframes sigem-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Spinner inline para botones de accion y formularios
+.sigem-btn-spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  animation: sigem-spin 0.75s linear infinite;
+  flex-shrink: 0;
+  margin-right: 0.375rem;
+
+  circle {
+    stroke-dasharray: 80;
+    stroke-dashoffset: 60;
+  }
+}
+
+// Contenedor de contenido en botones con spinner
+.sigem-btn-loading-content {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.375rem !important;
+}
+
+// Estilos de botones de Filament al estar en estado de carga
+.fi-btn {
+  &.is-loading,
+  &[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])),
+  &[disabled]:has(svg.animate-spin:not([style*="display: none"])) {
+    cursor: wait !important;
+    opacity: 0.85 !important;
+
+    .fi-btn-loading-indicator,
+    svg.animate-spin {
+      display: inline-block !important;
+      width: 1.1em !important;
+      height: 1.1em !important;
+      animation: sigem-spin 0.75s linear infinite !important;
+      margin-inline-end: 0.375rem !important;
+
+      &[style*="display: none"],
+      &[style*="display:none"] {
+        display: none !important;
+      }
+    }
+  }
+}
+
+// FIX: Deduplicacion estricta de spinners en todos los botones del sistema
+// Garantiza que cada boton muestre MAXIMO 1 solo spinner (elimina segundo spinner nativo o inyectado)
+.fi-btn,
+button,
+[role="button"] {
+  svg.sigem-spinner-duplicate,
+  svg[style*="display: none"],
+  svg[style*="display:none"] {
+    display: none !important;
+  }
+
+  // Si hay dos spinners contiguos o hermanos, ocultar absolutamente el segundo
+  svg.animate-spin ~ svg.animate-spin,
+  svg.animate-spin ~ svg.sigem-btn-spinner,
+  svg.sigem-btn-spinner ~ svg.sigem-btn-spinner,
+  svg.sigem-btn-spinner ~ svg.animate-spin,
+  .sigem-btn-spinner ~ .sigem-btn-spinner {
+    display: none !important;
+  }
+}
+
+// Estilos para botones de reportes y configuracion
+.sigem-rep-btn-primary,
+.sigem-rep-btn-sec,
+.sigem-btn-primary {
+  &.is-loading,
+  &[disabled] {
+    cursor: wait !important;
+    opacity: 0.85 !important;
+  }
+}

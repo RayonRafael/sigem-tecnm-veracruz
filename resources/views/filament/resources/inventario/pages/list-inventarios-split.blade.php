@@ -66,7 +66,52 @@
             <div style="display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap;">
                 <!-- Tabla a la izquierda -->
                 <div style="flex: 1 1 {{ $activeRecord ? '62%' : '100%' }}; min-width: 0;">
-                    {{ $this->table }}
+                    @if(request()->boolean('skeleton'))
+                        {{-- SKELETON PREVIEW: TABLA INVENTARIO (5 FILAS × 7 CELDAS) --}}
+                        <div class="fi-ta-ctn sigem-skeleton-table-preview" style="background: var(--sig-surface); border: 1px solid var(--sig-border); border-radius: 12px; overflow: hidden;">
+                            <div class="sigem-rep-table-wrap">
+                                <table class="fi-ta-table" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 120px;">CÓDIGO</th>
+                                            <th>EQUIPO</th>
+                                            <th style="width: 125px;">CATEGORÍA</th>
+                                            <th style="width: 130px;">ESTADO</th>
+                                            <th style="width: 110px;">PROPIEDAD</th>
+                                            <th style="width: 130px;">ÁREA</th>
+                                            <th style="width: 104px; text-align: center;">ACCIONES</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for($i = 0; $i < 5; $i++)
+                                            <tr class="sigem-skeleton-tr">
+                                                <td><span class="sigem-skeleton sigem-skeleton-cell" style="width: 75px;"></span></td>
+                                                <td>
+                                                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                                                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 150px; height: 16px;"></span>
+                                                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 90px; height: 12px;"></span>
+                                                    </div>
+                                                </td>
+                                                <td><span class="sigem-skeleton sigem-skeleton-cell" style="width: 75px; height: 22px; border-radius: 9999px;"></span></td>
+                                                <td><span class="sigem-skeleton sigem-skeleton-cell" style="width: 90px; height: 22px; border-radius: 9999px;"></span></td>
+                                                <td><span class="sigem-skeleton sigem-skeleton-cell" style="width: 70px; height: 14px;"></span></td>
+                                                <td><span class="sigem-skeleton sigem-skeleton-cell" style="width: 95px; height: 14px;"></span></td>
+                                                <td class="fi-ta-actions-cell" style="width: 104px; text-align: center;">
+                                                    <div style="display: inline-flex; align-items: center; justify-content: center; gap: 4px;">
+                                                        <span class="sigem-skeleton" style="width: 26px; height: 26px; border-radius: 6px;"></span>
+                                                        <span class="sigem-skeleton" style="width: 26px; height: 26px; border-radius: 6px;"></span>
+                                                        <span class="sigem-skeleton" style="width: 26px; height: 26px; border-radius: 6px;"></span>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endfor
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    @else
+                        {{ $this->table }}
+                    @endif
                 </div>
                 
                 <!-- Panel de Infolist a la derecha (cuando hay registro seleccionado) -->
