@@ -15,6 +15,16 @@ class ListInventarios extends ListRecords
 
     protected static string $resource = InventarioResource::class;
 
+    public function getTitle(): string
+    {
+        return '💻 Inventario general';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Busca, filtra y gestiona los equipos registrados en el sistema.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

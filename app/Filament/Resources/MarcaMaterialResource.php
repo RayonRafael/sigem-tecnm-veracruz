@@ -7,6 +7,8 @@ use App\Models\MarcaMaterial;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -48,6 +50,7 @@ class MarcaMaterialResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
                             ->label('Nombre de la marca')
+                            ->placeholder('Ej. Dell, HP, Cisco')
                             ->required()
                             ->prefixIcon('heroicon-m-tag')
                             ->maxLength(100),
@@ -61,7 +64,7 @@ class MarcaMaterialResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)->label('Fecha de creación')
                     ->dateTime('d/m/Y')
@@ -70,6 +73,7 @@ class MarcaMaterialResource extends Resource
             ])
             ->defaultSort('nombre', 'asc')
             ->striped()
+            ->searchPlaceholder('Buscar por nombre de la marca...')
             ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),
@@ -80,6 +84,7 @@ class MarcaMaterialResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Marca actualizada correctamente'),
+                Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -92,9 +97,20 @@ class MarcaMaterialResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos de la marca')
-                    ->schema([
-                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-tag'),
+                Tabs::make('Detalle')
+                    ->tabs([
+                        Tab::make('Información')
+                            ->icon('heroicon-m-tag')
+                            ->schema([
+                                Section::make('Datos de la marca')
+                                    ->schema([
+                                        TextEntry::make('nombre')->label('Nombre de la marca')->icon('heroicon-m-tag'),
+                                        TextEntry::make('materiales_count')
+                                            ->label('Materiales asociados')
+                                            ->state(fn (MarcaMaterial $record): string => $record->materiales()->count() . ' registrados')
+                                            ->icon('heroicon-m-cube'),
+                                    ])->columns(2),
+                            ]),
                     ]),
             ]);
     }

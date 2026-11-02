@@ -7,8 +7,6 @@ use App\Filament\ServicioSocial\Resources\MantenimientoResource\Pages;
 use App\Models\Mantenimiento;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -48,6 +46,7 @@ class MantenimientoResource extends Resource
                         ->schema([
                             Forms\Components\Select::make('id_inventario')
                                 ->label('Equipo a reparar')
+                                ->placeholder('Selecciona...')
                                 ->relationship(
                                     name: 'inventario',
                                     titleAttribute: 'num_serie',
@@ -63,12 +62,14 @@ class MantenimientoResource extends Resource
                                 ->schema([
                                     Forms\Components\TextInput::make('nombre_tecnico')
                                         ->label('Técnico / alumno')
+                                        ->placeholder('Ej. Juan Pérez López')
                                         ->required()
                                         ->default(fn () => auth()->user() ? trim(auth()->user()->name.' '.auth()->user()->apellido_paterno.' '.auth()->user()->apellido_materno) : null)
                                         ->prefixIcon('heroicon-m-user')
                                         ->maxLength(150),
                                     Forms\Components\TextInput::make('num_control_tecnico')
                                         ->label('Número de control técnico')
+                                        ->placeholder('Ej. 21020123')
                                         ->default(fn () => auth()->user()?->num_control)
                                         ->prefixIcon('heroicon-m-identification')
                                         ->maxLength(100),
@@ -131,10 +132,12 @@ class MantenimientoResource extends Resource
                                 ->prefixIcon('heroicon-m-calendar'),
                             Forms\Components\Textarea::make('descripcion_falla')
                                 ->label('Descripción de la falla')
+                                ->placeholder('Ej. El equipo no enciende o presenta pantalla azul...')
                                 ->rows(3)
                                 ->columnSpanFull(),
                             Forms\Components\Textarea::make('observaciones')
                                 ->label('Observaciones')
+                                ->placeholder('Ej. Observaciones adicionales del servicio...')
                                 ->rows(3)
                                 ->columnSpanFull(),
                         ]),
@@ -149,27 +152,28 @@ class MantenimientoResource extends Resource
                 Tables\Columns\TextColumn::make('inventario.num_serie')->wrap(false)->limit(30)->grow(false)
                     ->label('No. serie (activo)')
                     ->fontFamily('mono')
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('inventario.material.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Material')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('tipo_mantenimiento')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(isIndividual: true),
+                Tables\Columns\TextColumn::make('tipo_mantenimiento')->wrap(false)->limit(30)->grow(false)
                     ->label('Tipo mantenimiento')
                     ->badge()
+                    ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : '—')
                     ->colors([
                         'success' => 'Preventivo',
                         'danger' => 'Correctivo',
                         'primary' => 'Mejora',
                     ])
-                    ->icons([
-                        'heroicon-m-shield-check' => 'Preventivo',
-                        'heroicon-m-exclamation-triangle' => 'Correctivo',
-                        'heroicon-m-arrow-trending-up' => 'Mejora',
-                    ])
-                    ->searchable(),
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where('tipo_mantenimiento', $search);
+                    }, isIndividual: true),
+                Tables\Columns\TextColumn::make('tipo_servicio')->wrap(false)->limit(30)->grow(false)
+                    ->label('Tipo servicio')
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('nombre_tecnico')->wrap(false)->limit(30)->grow(false)
                     ->label('Técnico')
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)
                     ->formatStateUsing(fn ($state) => $state === 'Pendiente Revision Admin' ? 'En revisión' : $state)
                     ->badge()
@@ -185,89 +189,67 @@ class MantenimientoResource extends Resource
                         'heroicon-m-wrench-screwdriver' => 'En proceso',
                         'heroicon-m-check-badge' => 'Completado',
                         'heroicon-m-x-circle' => 'Cancelado',
-                    ]),
+                    ])
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where('estado', $search);
+                    }, isIndividual: true),
                 Tables\Columns\TextColumn::make('fecha_solicitud')->wrap(false)->limit(30)->grow(false)
                     ->label('Fecha sol.')
                     ->date('d/m/Y')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        if (preg_match('/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/', trim($search), $m)) {
+                            $search = sprintf('%04d-%02d-%02d', $m[3], $m[2], $m[1]);
+                        }
+                        return $query->where('fecha_solicitud', 'like', "%{$search}%");
+                    }, isIndividual: true)
                     ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
+            ->searchPlaceholder('Buscar por equipo, técnico o tipo de servicio...')
             ->defaultPaginationPageOption(10)
-            ->filters([
-                Tables\Filters\SelectFilter::make('estado')
-                    ->options([
-                        'Solicitado' => 'Solicitado',
-                        'En proceso' => 'En proceso',
-                        'Pendiente Revision Admin' => 'En revisión',
-                    ]),
-            ])
+            ->filters([])
+            ->modifyQueryUsing(function (Builder $query, $livewire): Builder {
+                $desde = $livewire->tableColumnSearches['fecha_desde'] ?? null;
+                $hasta = $livewire->tableColumnSearches['fecha_hasta'] ?? null;
+                if (filled($desde)) {
+                    $query->whereDate('fecha_solicitud', '>=', $desde);
+                }
+                if (filled($hasta)) {
+                    $query->whereDate('fecha_solicitud', '<=', $hasta);
+                }
+                return $query;
+            })
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->slideOver()->successNotificationTitle('Mantenimiento actualizado correctamente'),
+                Tables\Actions\ViewAction::make()
+                    ->iconButton()
+                    ->tooltip('Ver detalle')
+                    ->extraAttributes(['title' => 'Ver detalle'])
+                    ->slideOver()
+                    ->modalHeading(fn (?Mantenimiento $record) => $record?->inventario?->material?->nombre ?? 'Detalle de mantenimiento')
+                    ->modalDescription(fn (?Mantenimiento $record) => new \Illuminate\Support\HtmlString(
+                        'No. Serie: ' . e($record?->inventario?->num_serie ?? '—') . ' · ' . e($record?->tipo_servicio ?? 'Mantenimiento')
+                    ))
+                    ->modalCancelActionLabel('Cerrar'),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Editar')
+                    ->extraAttributes(['title' => 'Editar'])
+                    ->slideOver()
+                    ->modalHeading(fn (?Mantenimiento $record) => 'Editar: ' . ($record?->inventario?->material?->nombre ?? 'mantenimiento'))
+                    ->modalDescription(fn (?Mantenimiento $record) => new \Illuminate\Support\HtmlString(
+                        'No. Serie: ' . e($record?->inventario?->num_serie ?? '—') . ' · ' . e($record?->tipo_servicio ?? '')
+                    ))
+                    ->successNotificationTitle('Mantenimiento actualizado correctamente'),
             ])
             ->bulkActions([]);
     }
 
     public static function infolist(Infolist $infolist): Infolist
     {
-        return $infolist
-            ->schema([
-                Section::make('Equipo y técnico')
-                    ->schema([
-                        TextEntry::make('inventario.num_serie')->label('No. serie')
-                            ->fontFamily('mono')
-                            ->icon('heroicon-m-qr-code'),
-                        TextEntry::make('inventario.material.nombre')->label('Material')->icon('heroicon-m-cube'),
-                        TextEntry::make('nombre_tecnico')->label('Técnico')->icon('heroicon-m-user'),
-                        TextEntry::make('num_control_tecnico')->label('No. control')->icon('heroicon-m-identification'),
-                    ])->columns(4),
-                Section::make('Detalles del servicio')
-                    ->schema([
-                        TextEntry::make('tipo_servicio')->label('Servicio')->badge(),
-                        TextEntry::make('tipo_mantenimiento')->label('Tipo')
-                            ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                'Preventivo' => 'success',
-                                'Correctivo' => 'danger',
-                                'Mejora' => 'info',
-                                default => 'gray',
-                            })
-                            ->icon(fn (string $state): string => match ($state) {
-                                'Preventivo' => 'heroicon-m-shield-check',
-                                'Correctivo' => 'heroicon-m-exclamation-triangle',
-                                'Mejora' => 'heroicon-m-arrow-trending-up',
-                                default => 'heroicon-m-minus',
-                            }),
-                        TextEntry::make('estado')->label('Estado')
-                            ->formatStateUsing(fn ($state) => $state === 'Pendiente Revision Admin' ? 'En revisión' : $state)
-                            ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                'Solicitado' => 'warning',
-                                'En proceso' => 'primary',
-                                'Pendiente Revision Admin' => 'info',
-                                'Completado' => 'success',
-                                'Cancelado' => 'danger',
-                                default => 'gray',
-                            })
-                            ->icon(fn (string $state): string => match ($state) {
-                                'Solicitado' => 'heroicon-m-clock',
-                                'En proceso' => 'heroicon-m-wrench-screwdriver',
-                                'Pendiente Revision Admin' => 'heroicon-m-clock',
-                                'Completado' => 'heroicon-m-check-badge',
-                                'Cancelado' => 'heroicon-m-x-circle',
-                                default => 'heroicon-m-minus',
-                            }),
-                    ])->columns(3),
-                Section::make('Fechas y reportes')
-                    ->schema([
-                        TextEntry::make('fecha_solicitud')->label('Solicitud')->date('d/m/Y')->icon('heroicon-m-calendar'),
-                        TextEntry::make('descripcion_falla')->label('Falla')->columnSpanFull(),
-                        TextEntry::make('observaciones')->label('Observaciones')->columnSpanFull(),
-                    ])->columns(3),
-            ]);
+        return \App\Filament\Resources\MantenimientoResource::infolist($infolist);
     }
 
     public static function getRelations(): array

@@ -24,6 +24,8 @@ use Filament\Actions;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Pages\Page;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\HtmlString;
 
 class CatalogosPage extends Page
 {
@@ -39,9 +41,19 @@ class CatalogosPage extends Page
 
     protected static ?string $slug = 'catalogos';
 
-    protected static ?string $title = 'Catálogos';
+    protected static ?string $title = '📁 Catálogos';
 
     protected static string $view = 'filament.servicio-social.pages.catalogos';
+
+    public function getTitle(): string
+    {
+        return '📁 Catálogos';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return null;
+    }
 
     public string $catalogoActivo = 'departamentos';
 
@@ -62,6 +74,21 @@ class CatalogosPage extends Page
             $this->catalogoActivo = $catalogo;
             $this->search = '';
         }
+    }
+
+    public function getPlaceholder(): string
+    {
+        return match ($this->catalogoActivo) {
+            'departamentos' => 'Buscar por nombre del departamento...',
+            'areas' => 'Buscar por nombre o departamento...',
+            'materiales' => 'Buscar por nombre, modelo, marca o tipo...',
+            'marcas' => 'Buscar por nombre de la marca...',
+            'tipos' => 'Buscar por nombre del tipo...',
+            'unidades' => 'Buscar por nombre de la unidad...',
+            'proveedores' => 'Buscar por empresa, RFC, contacto o correo...',
+            'receptores' => 'Buscar por nombre, cargo, área o correo...',
+            default => 'Buscar en este catálogo...',
+        };
     }
 
     protected function getCatalogosConfig(): array
@@ -205,19 +232,20 @@ class CatalogosPage extends Page
 
             case 'proveedores':
                 $headers = ['ID', 'Proveedor', 'Contacto / Teléfono', 'Detalle'];
-                $query = Proveedor::orderBy('nombre');
+                $query = Proveedor::orderBy('nombre_empresa');
                 if ($term !== '') {
                     $query->where(function ($q) use ($term) {
-                        $q->where('nombre', 'like', "%{$term}%")
-                          ->orWhere('contacto', 'like', "%{$term}%")
-                          ->orWhere('telefono', 'like', "%{$term}%");
+                        $q->where('nombre_empresa', 'like', "%{$term}%")
+                          ->orWhere('contacto_nombre', 'like', "%{$term}%")
+                          ->orWhere('contacto_telefono', 'like', "%{$term}%");
                     });
                 }
                 foreach ($query->limit(25)->get() as $p) {
+                    $contacto = trim(($p->contacto_nombre ? $p->contacto_nombre . ' · ' : '') . ($p->contacto_telefono ?? ''));
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $p->id_proveedor . '</span>',
-                        '<strong>' . e($p->nombre) . '</strong>',
-                        e($p->contacto ?? ($p->telefono ?? 'N/A')),
+                        '<strong>' . e($p->nombre_empresa) . '</strong>',
+                        e($contacto ?: 'N/A'),
                         $this->renderActionButtons('verProveedor', $p->getKey()),
                     ];
                 }
@@ -233,9 +261,10 @@ class CatalogosPage extends Page
                     });
                 }
                 foreach ($query->limit(25)->get() as $r) {
+                    $nombreCompleto = trim("{$r->nombre} {$r->apellido_paterno} {$r->apellido_materno}");
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $r->id_receptor . '</span>',
-                        '<strong>' . e($r->nombre) . '</strong>',
+                        '<strong>' . e($nombreCompleto ?: $r->nombre) . '</strong>',
                         e($r->area?->nombre ?? 'N/A'),
                         $this->renderActionButtons('verReceptor', $r->getKey()),
                     ];
@@ -256,7 +285,17 @@ class CatalogosPage extends Page
 
     protected function renderActionButtons(string $accionVer, int|string $id): string
     {
-        return '<button type="button" wire:click="mountAction(\'' . $accionVer . '\', { record: ' . $id . ' })" class="sigem-btn-icon" title="Ver detalles">👁</button>';
+        return '
+          <div class="sigem-row-actions" style="display:inline-flex;align-items:center;justify-content:center;gap:3px;">
+            <button type="button" wire:click="mountAction(\'' . $accionVer . '\', { record: ' . json_encode($id) . ' })"
+                    class="fi-icon-btn sigem-cat-btn" title="Ver detalle" aria-label="Ver detalle">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;">
+                <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+                <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd" />
+              </svg>
+            </button>
+          </div>
+        ';
     }
 
     // Acciones de Slide-Over para visualización (solo lectura)
@@ -275,7 +314,32 @@ class CatalogosPage extends Page
 
         $action = Actions\ViewAction::make($nombre)
             ->model($model)
-            ->modalHeading('Detalle de ' . $singular . ' (Solo lectura)')
+            ->modalHeading(function (?Model $record, array $arguments = []) use ($model) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                if ($rec instanceof Receptor) {
+                    return trim(($rec->nombre ?? '') . ' ' . ($rec->apellido_paterno ?? '') . ' ' . ($rec->apellido_materno ?? '')) ?: 'Detalle de receptor';
+                }
+
+                return trim($rec?->nombre ?? $rec?->nombre_empresa ?? 'Detalle');
+            })
+            ->modalDescription(function (?Model $record, array $arguments = []) use ($model, $singular) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                if ($rec instanceof Proveedor) {
+                    return new HtmlString(
+                        e($rec->contacto_email ?? '—') . ' · ID: #' . e($rec->getKey())
+                    );
+                }
+                if ($rec instanceof Receptor) {
+                    return new HtmlString(
+                        e($rec->cargo ?? '—') . ' · ID: #' . e($rec->getKey())
+                    );
+                }
+
+                return new HtmlString(
+                    '🏢 ' . e($singular) . ' · 👁 Solo lectura · ID: #' . e($rec?->getKey())
+                );
+            })
+            ->modalCancelActionLabel('Cerrar')
             ->record(fn (array $arguments) => $model::find($arguments['record'] ?? null))
             ->authorize(true)
             ->slideOver();

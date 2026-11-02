@@ -15,6 +15,16 @@ class ListMantenimientos extends ListRecords
 
     protected static string $resource = MantenimientoResource::class;
 
+    public function getTitle(): string
+    {
+        return '🔧 Mantenimientos';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Reportes de servicio técnico. Clic en el ojo 👁 o en la fila para desplegar el detalle en el panel lateral.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

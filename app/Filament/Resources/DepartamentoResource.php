@@ -7,6 +7,8 @@ use App\Models\Departamento;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -47,6 +49,7 @@ class DepartamentoResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
                             ->label('Nombre')
+                            ->placeholder('Ej. Departamento de Ciencias Básicas')
                             ->required()
                             ->prefixIcon('heroicon-m-tag')
                             ->maxLength(100),
@@ -58,14 +61,16 @@ class DepartamentoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)->label('Nombre')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)->label('Nombre')->searchable(isIndividual: true)->sortable(),
             ])
             ->defaultSort('nombre', 'asc')
+            ->searchPlaceholder('Buscar por nombre del departamento...')
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Departamento actualizado correctamente'),
+                Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -78,9 +83,20 @@ class DepartamentoResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos del departamento')
-                    ->schema([
-                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-building-office-2'),
+                Tabs::make('Detalle')
+                    ->tabs([
+                        Tab::make('Información')
+                            ->icon('heroicon-m-tag')
+                            ->schema([
+                                Section::make('Datos del departamento')
+                                    ->schema([
+                                        TextEntry::make('nombre')->label('Nombre del departamento')->icon('heroicon-m-building-office-2'),
+                                        TextEntry::make('areas_count')
+                                            ->label('Áreas adscritas')
+                                            ->state(fn (Departamento $record): string => $record->areas()->count() . ' registradas')
+                                            ->icon('heroicon-m-map-pin'),
+                                    ])->columns(2),
+                            ]),
                     ]),
             ]);
     }

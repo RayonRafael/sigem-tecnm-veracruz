@@ -11,6 +11,7 @@ use App\Filament\Resources\ProveedorResource;
 use App\Filament\Resources\ReceptorResource;
 use App\Filament\Resources\TipoMaterialResource;
 use App\Filament\Resources\UnidadMedidaResource;
+use App\Filament\Resources\UserResource;
 use App\Models\Area;
 use App\Models\Departamento;
 use App\Models\MarcaMaterial;
@@ -27,6 +28,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\HtmlString;
 use Spatie\Activitylog\Models\Activity;
 
 class ConfiguracionPage extends Page
@@ -41,9 +43,24 @@ class ConfiguracionPage extends Page
 
     protected static ?string $slug = 'configuracion';
 
-    protected static ?string $title = 'Configuración y Catálogos';
+    protected static ?string $title = '⚙️ Configuración y Catálogos';
 
     protected static string $view = 'filament.pages.configuracion';
+
+    public function getTitle(): string
+    {
+        return '⚙️ Configuración y Catálogos';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return null;
+    }
+
+    public function getBreadcrumbs(): array
+    {
+        return [];
+    }
 
     /**
      * id de catálogo => sufijo de las acciones de página (crear{X}Action / editar{X}Action).
@@ -57,11 +74,25 @@ class ConfiguracionPage extends Page
         'unidades' => 'Unidad',
         'proveedores' => 'Proveedor',
         'receptores' => 'Receptor',
+        'usuarios' => 'Usuario',
     ];
 
     public string $tabActiva = 'catalogos';
 
     public string $catalogoActivo = 'departamentos';
+
+    // Filtros de Catálogos
+    public string $catalogoSearch = '';
+
+    public string $filtroDepartamento = '';
+
+    public string $filtroTipoMaterial = '';
+
+    public string $filtroMarca = '';
+
+    public string $filtroRol = '';
+
+    public string $filtroEstadoUsuario = '';
 
     // Filtros de Bitácora
     public string $bitacoraSearch = '';
@@ -105,6 +136,43 @@ class ConfiguracionPage extends Page
     public function setCatalogo(string $cat): void
     {
         $this->catalogoActivo = $cat;
+        $this->limpiarFiltrosCatalogo();
+    }
+
+    public function limpiarFiltrosCatalogo(): void
+    {
+        $this->catalogoSearch = '';
+        $this->filtroDepartamento = '';
+        $this->filtroTipoMaterial = '';
+        $this->filtroMarca = '';
+        $this->filtroRol = '';
+        $this->filtroEstadoUsuario = '';
+    }
+
+    public function getPlaceholderCatalogo(): string
+    {
+        return match ($this->catalogoActivo) {
+            'departamentos' => 'Buscar por nombre del departamento...',
+            'areas' => 'Buscar por nombre o departamento...',
+            'materiales' => 'Buscar por nombre, modelo, marca o tipo...',
+            'marcas' => 'Buscar por nombre de la marca...',
+            'tipos' => 'Buscar por nombre del tipo...',
+            'unidades' => 'Buscar por nombre de la unidad...',
+            'proveedores' => 'Buscar por empresa, RFC, contacto o correo...',
+            'receptores' => 'Buscar por nombre, cargo, área o correo...',
+            'usuarios' => 'Buscar por nombre, correo o número de control...',
+            default => 'Buscar en este catálogo...',
+        };
+    }
+
+    public function tieneFiltrosCatalogoActivos(): bool
+    {
+        return filled($this->catalogoSearch)
+            || filled($this->filtroDepartamento)
+            || filled($this->filtroTipoMaterial)
+            || filled($this->filtroMarca)
+            || filled($this->filtroRol)
+            || filled($this->filtroEstadoUsuario);
     }
 
     public function limpiarFiltrosBitacora(): void
@@ -213,6 +281,14 @@ class ConfiguracionPage extends Page
                 'total' => Receptor::count(),
                 'resource' => ReceptorResource::class,
             ],
+            [
+                'id' => 'usuarios',
+                'emoji' => '👥',
+                'nombre' => 'Usuarios',
+                'singular' => 'usuario',
+                'total' => User::count(),
+                'resource' => UserResource::class,
+            ],
         ];
     }
 
@@ -227,12 +303,17 @@ class ConfiguracionPage extends Page
         $rows = [];
         $crearAccion = 'crear' . self::ENTIDADES_CATALOGO[$cat['id']];
         $indexUrl = $cat['resource']::getUrl('index');
+        $term = trim($this->catalogoSearch);
 
         // TODO [Fase 10 - Documentado]: Vista previa embebida en pestaña Catálogos; cada catálogo redirige a su ListRecords nativo completo al hacer clic.
         switch ($cat['id']) {
             case 'departamentos':
                 $headers = ['ID', 'Nombre del departamento', 'Acciones'];
-                $deptos = Departamento::orderBy('nombre')->limit(25)->get();
+                $deptosQ = Departamento::orderBy('nombre');
+                if ($term !== '') {
+                    $deptosQ->where('nombre', 'like', "%{$term}%");
+                }
+                $deptos = $deptosQ->limit(25)->get();
                 foreach ($deptos as $d) {
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $d->id_departamento . '</span>',
@@ -244,7 +325,17 @@ class ConfiguracionPage extends Page
 
             case 'areas':
                 $headers = ['ID', 'Área', 'Departamento', 'Acciones'];
-                $areas = Area::with('departamento')->orderBy('nombre')->limit(25)->get();
+                $areasQ = Area::with('departamento')->orderBy('nombre');
+                if ($term !== '') {
+                    $areasQ->where(function ($q) use ($term) {
+                        $q->where('nombre', 'like', "%{$term}%")
+                          ->orWhereHas('departamento', fn ($dq) => $dq->where('nombre', 'like', "%{$term}%"));
+                    });
+                }
+                if ($this->filtroDepartamento !== '') {
+                    $areasQ->where('id_departamento', $this->filtroDepartamento);
+                }
+                $areas = $areasQ->limit(25)->get();
                 foreach ($areas as $a) {
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $a->id_area . '</span>',
@@ -257,7 +348,22 @@ class ConfiguracionPage extends Page
 
             case 'materiales':
                 $headers = ['Modelo / ID', 'Material / Equipo', 'Marca', 'Tipo', 'Stock', 'Acciones'];
-                $materiales = Material::with(['marca', 'tipo'])->orderBy('nombre')->limit(25)->get();
+                $materialesQ = Material::with(['marca', 'tipo'])->orderBy('nombre');
+                if ($term !== '') {
+                    $materialesQ->where(function ($q) use ($term) {
+                        $q->where('nombre', 'like', "%{$term}%")
+                          ->orWhere('modelo', 'like', "%{$term}%")
+                          ->orWhereHas('marca', fn ($mq) => $mq->where('nombre', 'like', "%{$term}%"))
+                          ->orWhereHas('tipo', fn ($tq) => $tq->where('nombre', 'like', "%{$term}%"));
+                    });
+                }
+                if ($this->filtroTipoMaterial !== '') {
+                    $materialesQ->where('id_tipodematerial', $this->filtroTipoMaterial);
+                }
+                if ($this->filtroMarca !== '') {
+                    $materialesQ->where('id_marca', $this->filtroMarca);
+                }
+                $materiales = $materialesQ->limit(25)->get();
                 foreach ($materiales as $m) {
                     $codigo = $m->modelo ?: ('#' . $m->id_producto);
                     $rows[] = [
@@ -273,7 +379,11 @@ class ConfiguracionPage extends Page
 
             case 'marcas':
                 $headers = ['ID', 'Marca de material', 'Acciones'];
-                $marcas = MarcaMaterial::orderBy('nombre')->limit(25)->get();
+                $marcasQ = MarcaMaterial::orderBy('nombre');
+                if ($term !== '') {
+                    $marcasQ->where('nombre', 'like', "%{$term}%");
+                }
+                $marcas = $marcasQ->limit(25)->get();
                 foreach ($marcas as $mc) {
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $mc->id_marca . '</span>',
@@ -285,7 +395,11 @@ class ConfiguracionPage extends Page
 
             case 'tipos':
                 $headers = ['ID', 'Tipo de material', 'Acciones'];
-                $tipos = TipoMaterial::orderBy('nombre')->limit(25)->get();
+                $tiposQ = TipoMaterial::orderBy('nombre');
+                if ($term !== '') {
+                    $tiposQ->where('nombre', 'like', "%{$term}%");
+                }
+                $tipos = $tiposQ->limit(25)->get();
                 foreach ($tipos as $t) {
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $t->id_tipodematerial . '</span>',
@@ -297,7 +411,11 @@ class ConfiguracionPage extends Page
 
             case 'unidades':
                 $headers = ['ID', 'Unidad de medida', 'Acciones'];
-                $unidades = UnidadMedida::orderBy('nombre')->limit(25)->get();
+                $unidadesQ = UnidadMedida::orderBy('nombre');
+                if ($term !== '') {
+                    $unidadesQ->where('nombre', 'like', "%{$term}%");
+                }
+                $unidades = $unidadesQ->limit(25)->get();
                 foreach ($unidades as $u) {
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $u->id_unidad . '</span>',
@@ -309,7 +427,16 @@ class ConfiguracionPage extends Page
 
             case 'proveedores':
                 $headers = ['ID', 'Proveedor', 'RFC', 'Contacto', 'Acciones'];
-                $proveedores = Proveedor::orderBy('nombre_empresa')->limit(25)->get();
+                $proveedoresQ = Proveedor::orderBy('nombre_empresa');
+                if ($term !== '') {
+                    $proveedoresQ->where(function ($q) use ($term) {
+                        $q->where('nombre_empresa', 'like', "%{$term}%")
+                          ->orWhere('rfc', 'like', "%{$term}%")
+                          ->orWhere('contacto_nombre', 'like', "%{$term}%")
+                          ->orWhere('contacto_email', 'like', "%{$term}%");
+                    });
+                }
+                $proveedores = $proveedoresQ->limit(25)->get();
                 foreach ($proveedores as $p) {
                     $contacto = trim(($p->contacto_nombre ? $p->contacto_nombre . ' · ' : '') . ($p->contacto_telefono ?? '') . ' ' . ($p->contacto_email ?? ''));
                     $rows[] = [
@@ -324,7 +451,20 @@ class ConfiguracionPage extends Page
 
             case 'receptores':
                 $headers = ['ID', 'Receptor', 'Área', 'Contacto', 'Acciones'];
-                $receptores = Receptor::with('area')->orderBy('nombre')->limit(25)->get();
+                $receptoresQ = Receptor::with('area.departamento')->orderBy('nombre');
+                if ($term !== '') {
+                    $receptoresQ->where(function ($q) use ($term) {
+                        $q->where('nombre', 'like', "%{$term}%")
+                          ->orWhere('apellido_paterno', 'like', "%{$term}%")
+                          ->orWhere('cargo', 'like', "%{$term}%")
+                          ->orWhere('email', 'like', "%{$term}%")
+                          ->orWhereHas('area', fn ($aq) => $aq->where('nombre', 'like', "%{$term}%"));
+                    });
+                }
+                if ($this->filtroDepartamento !== '') {
+                    $receptoresQ->whereHas('area', fn ($aq) => $aq->where('id_departamento', $this->filtroDepartamento));
+                }
+                $receptores = $receptoresQ->limit(25)->get();
                 foreach ($receptores as $r) {
                     $nombreCompleto = trim("{$r->nombre} {$r->apellido_paterno} {$r->apellido_materno}");
                     $contacto = trim(($r->telefono ?? '') . ' ' . ($r->email ?? ''));
@@ -334,6 +474,53 @@ class ConfiguracionPage extends Page
                         e($r->area?->nombre ?? 'N/A'),
                         e($contacto ?: 'Sin datos'),
                         $this->renderActionButtons('editarReceptor', 'verReceptor', 'eliminarReceptor', $r->getKey()),
+                    ];
+                }
+                break;
+
+            case 'usuarios':
+                $headers = ['ID', 'Usuario', 'Correo electrónico', 'No. control', 'Rol', 'Estado', 'Acciones'];
+                $usuariosQ = User::with('roles')->orderBy('name');
+                if ($term !== '') {
+                    $usuariosQ->where(function ($q) use ($term) {
+                        $q->where('name', 'like', "%{$term}%")
+                          ->orWhere('email', 'like', "%{$term}%")
+                          ->orWhere('num_control', 'like', "%{$term}%");
+                    });
+                }
+                if ($this->filtroRol !== '') {
+                    $usuariosQ->whereHas('roles', fn ($rq) => $rq->where('name', $this->filtroRol));
+                }
+                if ($this->filtroEstadoUsuario !== '') {
+                    $usuariosQ->where('activo', (bool) $this->filtroEstadoUsuario);
+                }
+                $usuarios = $usuariosQ->limit(25)->get();
+                foreach ($usuarios as $u) {
+                    $nombreCompleto = trim("{$u->name} {$u->apellido_paterno} {$u->apellido_materno}");
+                    $rol = $u->roles->first()?->name ?? $u->tipo_usuario ?? 'Sin rol';
+                    $esAdmin = $u->hasRole(RoleEnum::ADMIN->value) || $u->tipo_usuario === RoleEnum::ADMIN->value;
+                    $esServicio = $u->hasRole(RoleEnum::SERVICIO_SOCIAL->value) || $u->tipo_usuario === RoleEnum::SERVICIO_TIPO->value;
+
+                    $rolBadge = match (true) {
+                        $esAdmin => '<span class="sigem-pill ok">👑 ' . e($rol) . '</span>',
+                        $esServicio => '<span class="sigem-pill info">🎓 ' . e($rol) . '</span>',
+                        default => '<span class="sigem-pill">● ' . e($rol) . '</span>',
+                    };
+
+                    $estadoBadge = $u->activo
+                        ? '<span class="sigem-pill ok">● Activo</span>'
+                        : '<span class="sigem-pill danger">● Inactivo</span>';
+
+                    $puedeEliminar = $u->email !== 'admin@tecnm.edu.mx';
+
+                    $rows[] = [
+                        '<span class="sigem-td-folio">#' . $u->id . '</span>',
+                        '<strong>' . e($nombreCompleto ?: $u->name) . '</strong>',
+                        e($u->email),
+                        e($u->num_control ?: '—'),
+                        $rolBadge,
+                        $estadoBadge,
+                        $this->renderActionButtons('editarUsuario', 'verUsuario', 'eliminarUsuario', $u->getKey(), $puedeEliminar),
                     ];
                 }
                 break;
@@ -499,12 +686,28 @@ class ConfiguracionPage extends Page
 
     public function eliminarReceptorAction(): Actions\DeleteAction { return $this->accionEliminar('eliminarReceptor', ReceptorResource::class, 'Receptor eliminado', 'receptor'); }
 
+    public function crearUsuarioAction(): Actions\CreateAction { return $this->accionCrear('crearUsuario', UserResource::class, 'Usuario creado exitosamente', 'usuario'); }
+
+    public function editarUsuarioAction(): Actions\EditAction { return $this->accionEditar('editarUsuario', UserResource::class, 'Usuario actualizado exitosamente', 'usuario'); }
+
+    public function verUsuarioAction(): Actions\ViewAction { return $this->accionVer('verUsuario', UserResource::class, 'usuario'); }
+
+    public function eliminarUsuarioAction(): Actions\DeleteAction { return $this->accionEliminar('eliminarUsuario', UserResource::class, 'Usuario eliminado exitosamente', 'usuario'); }
+
     protected function accionCrear(string $nombre, string $resource, string $mensaje, string $singular): Actions\CreateAction
     {
         return Actions\CreateAction::make($nombre)
             ->model($resource::getModel())
-            ->modalHeading('Crear ' . $singular)
+            ->modalHeading(fn () => '+ Nuevo ' . $singular)
+            ->modalDescription(fn () => 'Da de alta un registro en el catálogo institucional.')
             ->form(fn (Form $form): Form => $resource::form($form))
+            ->mutateFormDataUsing(function (array $data) use ($resource): array {
+                if ($resource === UserResource::class && isset($data['roles'])) {
+                    $data['tipo_usuario'] = UserResource::mapRoleToTipoUsuario($data['roles']);
+                }
+
+                return $data;
+            })
             ->slideOver()
             ->createAnother(false)
             ->successNotificationTitle($mensaje)
@@ -517,9 +720,47 @@ class ConfiguracionPage extends Page
 
         return Actions\EditAction::make($nombre)
             ->model($model)
-            ->modalHeading('Editar ' . $singular)
+            ->modalHeading(function (?Model $record, array $arguments = []) use ($model) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                if ($rec instanceof User) {
+                    return 'Editar: ' . ($rec->name ?? 'usuario');
+                }
+                if ($rec instanceof Receptor) {
+                    return 'Editar: ' . (trim(($rec->nombre ?? '') . ' ' . ($rec->apellido_paterno ?? '')) ?: 'receptor');
+                }
+
+                return 'Editar: ' . trim($rec?->nombre ?? $rec?->nombre_empresa ?? 'registro');
+            })
+            ->modalDescription(function (?Model $record, array $arguments = []) use ($model) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                if ($rec instanceof User) {
+                    $rol = $rec->getRoleNames()->first() ?? $rec->tipo_usuario ?? 'Sin rol';
+                    return new HtmlString(
+                        e($rec->email ?? '—') . ' · ' . e($rol) . ' · ID: #' . e($rec->getKey())
+                    );
+                }
+                if ($rec instanceof Proveedor) {
+                    return new HtmlString(
+                        e($rec->contacto_email ?? '—') . ' · ID: #' . e($rec->getKey())
+                    );
+                }
+                if ($rec instanceof Receptor) {
+                    return new HtmlString(
+                        e($rec->cargo ?? '—') . ' · ID: #' . e($rec->getKey())
+                    );
+                }
+
+                return new HtmlString('ID: #' . e($rec?->getKey()));
+            })
             ->record(fn (array $arguments) => $model::find($arguments['record'] ?? null))
             ->form(fn (Form $form): Form => $resource::form($form))
+            ->mutateFormDataUsing(function (array $data) use ($resource): array {
+                if ($resource === UserResource::class && isset($data['roles'])) {
+                    $data['tipo_usuario'] = UserResource::mapRoleToTipoUsuario($data['roles']);
+                }
+
+                return $data;
+            })
             ->slideOver()
             ->successNotificationTitle($mensaje)
             ->after(fn () => $this->refreshCatalogoData());
@@ -528,10 +769,46 @@ class ConfiguracionPage extends Page
     protected function accionVer(string $nombre, string $resource, string $singular): Actions\ViewAction
     {
         $model = $resource::getModel();
+        $entidad = str_replace('ver', '', $nombre);
 
         $action = Actions\ViewAction::make($nombre)
             ->model($model)
-            ->modalHeading('Detalle de ' . $singular)
+            ->modalHeading(function (?Model $record, array $arguments = []) use ($model) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                if ($rec instanceof User) {
+                    $nombre = trim(($rec->name ?? '') . ' ' . ($rec->apellido_paterno ?? ''));
+                    return $nombre ?: 'Detalle de usuario';
+                }
+                if ($rec instanceof Receptor) {
+                    return trim(($rec->nombre ?? '') . ' ' . ($rec->apellido_paterno ?? '') . ' ' . ($rec->apellido_materno ?? '')) ?: 'Detalle de receptor';
+                }
+
+                return trim($rec?->nombre ?? $rec?->nombre_empresa ?? 'Detalle');
+            })
+            ->modalDescription(function (?Model $record, array $arguments = []) use ($model, $singular) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                if ($rec instanceof User) {
+                    $rol = $rec->getRoleNames()->first() ?? $rec->tipo_usuario ?? 'Sin rol';
+                    return new HtmlString(
+                        e($rec->email ?? '—') . ' · ' . e($rol) . ' · ID: #' . e($rec->getKey())
+                    );
+                }
+                if ($rec instanceof Proveedor) {
+                    return new HtmlString(
+                        e($rec->contacto_email ?? '—') . ' · ID: #' . e($rec->getKey())
+                    );
+                }
+                if ($rec instanceof Receptor) {
+                    return new HtmlString(
+                        e($rec->cargo ?? '—') . ' · ID: #' . e($rec->getKey())
+                    );
+                }
+
+                return new HtmlString(
+                    '🏢 ' . e($singular) . ' · ID: #' . e($rec?->getKey())
+                );
+            })
+            ->modalCancelActionLabel('Cerrar')
             ->record(fn (array $arguments) => $model::find($arguments['record'] ?? null))
             ->slideOver();
 
@@ -540,6 +817,24 @@ class ConfiguracionPage extends Page
         }
 
         $action->form(fn (Form $form): Form => $resource::form($form));
+
+        $action->extraModalFooterActions([
+            Actions\Action::make('editar_desde_detalle')
+                ->label('Editar')
+                ->color('warning')
+                ->icon('heroicon-m-pencil-square')
+                ->action(fn ($record, $livewire) => $livewire->mountAction(
+                    'editar' . $entidad, ['record' => $record->getKey()]
+                )),
+            Actions\Action::make('eliminar_desde_detalle')
+                ->label('Eliminar')
+                ->color('danger')
+                ->icon('heroicon-m-trash')
+                ->hidden(fn (?Model $record): bool => $record instanceof User && $record->email === 'admin@tecnm.edu.mx')
+                ->action(fn ($record, $livewire) => $livewire->mountAction(
+                    'eliminar' . $entidad, ['record' => $record->getKey()]
+                )),
+        ]);
 
         return $action;
     }
@@ -550,11 +845,28 @@ class ConfiguracionPage extends Page
 
         return Actions\DeleteAction::make($nombre)
             ->model($model)
-            ->modalHeading('Eliminar ' . $singular)
+            ->modalHeading(function (?Model $record, array $arguments = []) use ($model) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                if ($rec instanceof User) {
+                    return '¿Eliminar usuario ' . ($rec->name ?? 'registro') . '?';
+                }
+                return '¿Eliminar ' . trim($rec?->nombre ?? $rec?->nombre_empresa ?? 'registro') . '?';
+            })
+            ->modalDescription(function (?Model $record, array $arguments = []) use ($model) {
+                $rec = $record ?? $model::find($arguments['record'] ?? null);
+                if ($rec instanceof User) {
+                    return new HtmlString(e($rec->email ?? '—') . ' · ID: #' . e($rec->getKey()) . ' · Esta acción no se puede deshacer');
+                }
+                return new HtmlString('ID: #' . e($rec?->getKey()) . ' · Esta acción no se puede deshacer');
+            })
             ->record(fn (array $arguments) => $model::find($arguments['record'] ?? null))
             ->hidden(static function (?Model $record = null): bool {
                 if (! $record) {
                     return false;
+                }
+
+                if ($record instanceof User && $record->email === 'admin@tecnm.edu.mx') {
+                    return true;
                 }
 
                 if (! method_exists($record, 'trashed')) {
@@ -598,41 +910,35 @@ class ConfiguracionPage extends Page
         $this->dispatch('catalogo-actualizado');
     }
 
-    protected function renderActionButtons(string $accionEditar, string $accionVer, string $accionEliminar, int|string $id): string
+    protected function renderActionButtons(string $accionEditar, string $accionVer, string $accionEliminar, int|string $id, bool $puedeEliminar = true): string
     {
+        $btnEliminar = $puedeEliminar ? '
+            <button type="button" wire:click="mountAction(\'' . $accionEliminar . '\', { record: ' . json_encode($id) . ' })"
+                    class="fi-icon-btn sigem-cat-btn fi-icon-btn-danger" title="Eliminar" aria-label="Eliminar">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;">
+                <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
+              </svg>
+            </button>
+        ' : '';
+
         return '
-          <div class="sigem-row-actions" style="display:inline-flex;align-items:center;gap:4px;">
+          <div class="sigem-row-actions" style="display:inline-flex;align-items:center;justify-content:center;gap:3px;">
             <button type="button" wire:click="mountAction(\'' . $accionVer . '\', { record: ' . json_encode($id) . ' })"
-                    class="fi-icon-btn" title="Ver detalle" aria-label="Ver detalle">
+                    class="fi-icon-btn sigem-cat-btn" title="Ver detalle" aria-label="Ver detalle">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;">
                 <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
                 <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd" />
               </svg>
             </button>
             <button type="button" wire:click="mountAction(\'' . $accionEditar . '\', { record: ' . json_encode($id) . ' })"
-                    class="fi-icon-btn" title="Editar" aria-label="Editar">
+                    class="fi-icon-btn sigem-cat-btn" title="Editar" aria-label="Editar">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;">
                 <path d="m5.433 13.917 1.262-3.155A4 4 0 0 1 7.58 9.42l6.92-6.918a2.121 2.121 0 0 1 3 3l-6.92 6.918c-.383.383-.84.685-1.343.886l-3.154 1.262a.5.5 0 0 1-.65-.65Z" />
                 <path d="M3.5 5.75c0-.69.56-1.25 1.25-1.25H10A.75.75 0 0 0 10 3H4.75A2.75 2.75 0 0 0 2 5.75v9.5A2.75 2.75 0 0 0 4.75 18h9.5A2.75 2.75 0 0 0 17 15.25V10a.75.75 0 0 0-1.5 0v5.25c0 .69-.56 1.25-1.25 1.25h-9.5c-.69 0-1.25-.56-1.25-1.25v-9.5Z" />
               </svg>
             </button>
-            <button type="button" wire:click="mountAction(\'' . $accionEliminar . '\', { record: ' . json_encode($id) . ' })"
-                    class="fi-icon-btn fi-icon-btn-danger" title="Eliminar" aria-label="Eliminar">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;">
-                <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
-              </svg>
-            </button>
+            ' . $btnEliminar . '
           </div>
         ';
-    }
-
-    protected function renderEditIconButton(string $accion, int|string $id): string
-    {
-        return $this->renderActionButtons(
-            $accion,
-            str_replace('editar', 'ver', $accion),
-            str_replace('editar', 'eliminar', $accion),
-            $id
-        );
     }
 }

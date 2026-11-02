@@ -15,6 +15,16 @@ class ListMarcaMaterials extends ListRecords
 
     protected static string $resource = MarcaMaterialResource::class;
 
+    public function getTitle(): string
+    {
+        return '🏷️ Marcas de Material';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Marcas registradas para la clasificación de consumibles y equipos.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

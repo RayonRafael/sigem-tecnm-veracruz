@@ -15,6 +15,16 @@ class ListProveedors extends ListRecords
 
     protected static string $resource = ProveedorResource::class;
 
+    public function getTitle(): string
+    {
+        return '🚚 Proveedores';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Proveedores registrados para compras y mantenimiento.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

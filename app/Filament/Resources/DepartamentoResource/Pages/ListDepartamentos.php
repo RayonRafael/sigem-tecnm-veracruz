@@ -15,6 +15,16 @@ class ListDepartamentos extends ListRecords
 
     protected static string $resource = DepartamentoResource::class;
 
+    public function getTitle(): string
+    {
+        return '🏢 Departamentos';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Departamentos y divisiones académicas del instituto.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

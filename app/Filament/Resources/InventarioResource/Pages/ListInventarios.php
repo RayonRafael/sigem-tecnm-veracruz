@@ -10,11 +10,7 @@ use Filament\Actions;
 use Filament\Infolists\Concerns\InteractsWithInfolists;
 use Filament\Infolists\Contracts\HasInfolists;
 use Filament\Infolists\Infolist;
-use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Table;
 
 class ListInventarios extends ListRecords implements HasInfolists
 {
@@ -28,9 +24,9 @@ class ListInventarios extends ListRecords implements HasInfolists
 
     public ?Inventario $activeRecord = null;
 
-    public function getHeading(): string
+    public function getTitle(): string
     {
-        return 'Registros de Inventario';
+        return '💻 Inventario general';
     }
 
     public function getSubheading(): ?string
@@ -71,48 +67,15 @@ class ListInventarios extends ListRecords implements HasInfolists
         $action->steps(InventarioResource::getFormSteps());
     }
 
-    public function table(Table $table): Table
-    {
-        return parent::table($table)
-            ->recordAction('ver_detalle')
-            ->actions([
-                Action::make('aprobar')
-                    ->label('Aprobar')
-                    ->icon('heroicon-o-check-circle')
-                    ->color('success')
-                    ->visible(fn (Inventario $record): bool => ! $record->aprobado && auth()->user()->can('aprobaciones.aprobar'))
-                    ->action(function (Inventario $record) {
-                        $record->update(['aprobado' => true, 'estado_registro' => 'Aprobado', 'aprobado_por' => auth()->id(), 'fecha_aprobacion' => now()]);
-                        Notification::make()->title('Registro aprobado exitosamente')->success()->send();
-                    })
-                    ->requiresConfirmation(),
-                Action::make('rechazar')
-                    ->label('Rechazar')
-                    ->icon('heroicon-o-x-circle')
-                    ->color('danger')
-                    ->visible(fn (Inventario $record): bool => ! $record->aprobado && auth()->user()->can('aprobaciones.rechazar'))
-                    ->action(function (Inventario $record) {
-                        $record->update([
-                            'estado_registro' => 'Rechazado',
-                            'aprobado' => false,
-                        ]);
-                        Notification::make()->title('Registro rechazado exitosamente')->success()->send();
-                    })
-                    ->requiresConfirmation(),
-                Action::make('ver_detalle')
-                    ->label('Detalle')
-                    ->icon('heroicon-m-eye')
-                    ->iconButton()
-                    ->tooltip('Ver detalle en panel lateral')
-                    ->action(fn (Inventario $record) => $this->activeRecord = $record),
-                EditAction::make()->iconButton()->slideOver()->tooltip('Editar')->successNotificationTitle('Registro de inventario actualizado correctamente'),
-            ]);
-    }
-
     public function infolist(Infolist $infolist): Infolist
     {
-        return InventarioResource::infolist($infolist)
-            ->record($this->activeRecord);
+        $infolist = InventarioResource::infolist($infolist);
+
+        if (! $infolist->getRecord() && $this->activeRecord) {
+            $infolist->record($this->activeRecord);
+        }
+
+        return $infolist;
     }
 
     public function filtrarPorEstado(?string $estado = null): void

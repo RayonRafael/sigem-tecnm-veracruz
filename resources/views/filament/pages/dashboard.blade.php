@@ -94,7 +94,7 @@
 
             <!-- 4. Requieren atención -->
             <div class="sigem-stat">
-                <div class="sigem-stat-ico sigem-i-danger">⚠</div>
+                <div class="sigem-stat-ico sigem-i-danger">⚠️</div>
                 <div class="sigem-stat-val">{{ $requierenAtencion }}</div>
                 <div class="sigem-stat-label">Requieren atención</div>
                 <div class="sigem-stat-hint sigem-h-warn">{{ $materialesStockBajoCount ?? 0 }} stock bajo · {{ $inventarioDanados ?? 0 }} dañados</div>
@@ -106,7 +106,7 @@
         <div x-data="{ showGrafica: false }" style="margin-top: 14px;">
             <div class="sigem-section-head">
                 <div>
-                    <h2>📋 Registros de Inventario</h2>
+                    <h2>💻 Inventario general</h2>
                     <p>Busca, filtra y gestiona los equipos registrados en el sistema.</p>
                 </div>
                 <div class="sigem-page-actions">
@@ -129,16 +129,121 @@
             <div class="sigem-inv-layout" :class="showGrafica ? '' : 'sigem-inv-no-chart'" style="margin-top: 14px;">
                 <div class="sigem-inv-main" style="min-width: 0;">
                     <div class="sigem-rep-view sigem-dash-table" style="margin-bottom: 0;">
-                        <div class="sigem-rep-table-wrap">
+                        {{-- TOOLBAR: [Buscador] + [Desde] + [Hasta] + [Quitar filtros] --}}
+                        <div class="fi-ta-header-toolbar sigem-dash-toolbar">
+                            <div class="sigem-table-toolbar-group">
+                                <div class="fi-ta-search-field sigem-toolbar-search">
+                                    <label for="sigem-dash-busqueda" class="sr-only">Buscar</label>
+                                    <div class="fi-input-wrp">
+                                        <div class="fi-input-wrp-prefix"><span class="sigem-search-emoji">🔍</span></div>
+                                        <input
+                                            id="sigem-dash-busqueda"
+                                            type="search"
+                                            autocomplete="off"
+                                            maxlength="1000"
+                                            wire:model.live.debounce.500ms="tableColumnSearches.busqueda"
+                                            placeholder="Buscar por equipo, código, IP, MAC, marca..."
+                                            class="fi-input sigem-dash-search-input"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="sigem-toolbar-date">
+                                    <span class="sigem-toolbar-date-label">Desde</span>
+                                    <input type="date" wire:model.live="tableColumnSearches.fecha_desde" class="sigem-toolbar-date-input" title="Filtrar desde fecha" />
+                                </div>
+                                <div class="sigem-toolbar-date">
+                                    <span class="sigem-toolbar-date-label">Hasta</span>
+                                    <input type="date" wire:model.live="tableColumnSearches.fecha_hasta" class="sigem-toolbar-date-input" title="Filtrar hasta fecha" />
+                                </div>
+
+                                <button
+                                    type="button"
+                                    x-data
+                                    x-show="Object.values($wire.tableColumnSearches || {}).some(v => Boolean(v))"
+                                    x-cloak
+                                    x-on:click="$wire.resetTableColumnSearches()"
+                                    class="sigem-toolbar-reset-btn"
+                                    title="Quitar todos los filtros"
+                                >
+                                    ✕ Quitar filtros
+                                </button>
+                            </div>
+                        </div>                        <div class="sigem-rep-table-wrap">
                             <table class="fi-ta-table">
                                 <thead>
                                     <tr>
-                                        <th>CÓDIGO</th>
+                                        <th style="width: 130px;">CÓDIGO</th>
                                         <th>EQUIPO</th>
-                                        <th>CATEGORÍA</th>
-                                        <th>ESTADO</th>
-                                        <th>ÁREA</th>
-                                        <th style="text-align: right;">ACCIONES</th>
+                                        <th style="width: 125px;">CATEGORÍA</th>
+                                        <th style="width: 130px;">ESTADO</th>
+                                        <th style="width: 130px;">ÁREA</th>
+                                        <th style="width: 104px; text-align: center;">ACCIONES</th>
+                                    </tr>
+                                    <tr class="sigem-dash-filter-row">
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <input
+                                                type="search"
+                                                wire:model.live.debounce.500ms="tableColumnSearches.num_serie"
+                                                placeholder="ej. BM6R..."
+                                                class="sigem-dash-filter-input"
+                                            />
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <input
+                                                type="search"
+                                                wire:model.live.debounce.500ms="tableColumnSearches.material_nombre"
+                                                placeholder="Filtrar..."
+                                                class="sigem-dash-filter-input"
+                                            />
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <select
+                                                wire:model.live="tableColumnSearches.material_tipo_nombre"
+                                                class="fi-table-individual-search-select"
+                                            >
+                                                @foreach (($categoriasFiltro ?? []) as $optVal => $optLbl)
+                                                    <option value="{{ $optVal }}">{{ $optLbl }}</option>
+                                                @endforeach
+                                            </select>
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <select
+                                                wire:model.live="tableColumnSearches.estado"
+                                                class="fi-table-individual-search-select"
+                                            >
+                                                <option value="">Todos</option>
+                                                <option value="Disponible">Disponible</option>
+                                                <option value="Asignado">Asignado</option>
+                                                <option value="Reasignado">Reasignado</option>
+                                                <option value="En Mantenimiento">En Mantenimiento</option>
+                                                <option value="Dañado">Dañado</option>
+                                                <option value="Baja">Baja</option>
+                                            </select>
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <select
+                                                wire:model.live="tableColumnSearches.ubicacion_fisica"
+                                                class="fi-table-individual-search-select"
+                                            >
+                                                @foreach (($areasFiltro ?? []) as $optVal => $optLbl)
+                                                    <option value="{{ $optVal }}">{{ $optLbl }}</option>
+                                                @endforeach
+                                            </select>
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px; text-align: center;">
+                                            <button
+                                                type="button"
+                                                x-data
+                                                x-show="Object.values($wire.tableColumnSearches || {}).some(v => Boolean(v))"
+                                                x-cloak
+                                                x-on:click="$wire.set('tableColumnSearches', {})"
+                                                class="sigem-dash-filter-clear"
+                                                title="Limpiar filtros"
+                                            >
+                                                ✕
+                                            </button>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -162,8 +267,6 @@
                                                 'Dañado' => 'danger',
                                                 default => 'neutral',
                                             };
-
-                                            $editUrl = \App\Filament\Resources\InventarioResource::getUrl('edit', ['record' => $inv]);
                                         @endphp
                                         <tr>
                                             <td>
@@ -186,13 +289,27 @@
                                             <td>
                                                 <span style="font-size: 14px; color: var(--sig-muted);">{{ $areaUbicacion }}</span>
                                             </td>
-                                            <td style="text-align: right;">
-                                                <a href="{{ $editUrl }}" class="sigem-rep-btn-sec fi-icon-btn" title="Ver detalle" aria-label="Ver detalle" style="width:32px;height:32px;padding:0;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:16px;height:16px;">
-                                                        <path d="M10 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
-                                                        <path fill-rule="evenodd" d="M.664 10.59a1.651 1.651 0 0 1 0-1.186A10.004 10.004 0 0 1 10 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0 1 10 17c-4.257 0-7.893-2.66-9.336-6.41ZM14 10a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </a>
+                                            <td class="fi-ta-actions-cell" style="width: 104px; text-align: center; white-space: nowrap;">
+                                                <div class="fi-ta-actions" style="display: inline-flex; align-items: center; justify-content: center; gap: 3px;">
+                                                    <button type="button"
+                                                            wire:click="verEquipo({{ $inv->id_inventario }})"
+                                                            class="fi-icon-btn sigem-dash-btn"
+                                                            title="Ver detalle"
+                                                            aria-label="Ver detalle">
+                                                    </button>
+                                                    <button type="button"
+                                                            wire:click="editarEquipo({{ $inv->id_inventario }})"
+                                                            class="fi-icon-btn sigem-dash-btn"
+                                                            title="Editar"
+                                                            aria-label="Editar">
+                                                    </button>
+                                                    <button type="button"
+                                                            wire:click="eliminarEquipo({{ $inv->id_inventario }})"
+                                                            class="fi-icon-btn sigem-dash-btn"
+                                                            title="Eliminar"
+                                                            aria-label="Eliminar">
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     @empty
@@ -275,6 +392,28 @@
                                 <b>{{ $seg['cant'] }}</b>
                             </div>
                         @endforeach
+                    </div>
+
+                    <!-- 3. Barras por categoría -->
+                    <div style="margin-top: 18px; border-top: 1px solid var(--sig-border); padding-top: 14px;">
+                        <div style="font-size: 13.5px; font-weight: 700; color: var(--sig-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px;">
+                            Por categoría
+                        </div>
+                        @forelse(($categoriasTop ?? []) as $catNom => $catCant)
+                            @php
+                                $pct = ($dashTotal ?? 0) > 0 ? round(($catCant / $dashTotal) * 100) : 0;
+                            @endphp
+                            <a href="{{ url('/admin/inventarios?tableSearch=' . urlencode($catNom)) }}"
+                               class="sigem-cb"
+                               style="text-decoration: none; color: inherit;"
+                               title="Ver {{ $catNom }} en inventario">
+                                <span title="{{ $catNom }}">{{ $catNom }}</span>
+                                <div><span style="width: {{ $pct }}%;"></span></div>
+                                <span style="text-align: right; font-weight: 600;">{{ $catCant }}</span>
+                            </a>
+                        @empty
+                            <div style="font-size: 13px; color: var(--sig-muted);">Sin categorías registradas</div>
+                        @endforelse
                     </div>
                 </aside>
             </div>

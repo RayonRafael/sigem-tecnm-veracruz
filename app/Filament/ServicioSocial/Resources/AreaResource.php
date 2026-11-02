@@ -6,8 +6,6 @@ use App\Filament\ServicioSocial\Resources\AreaResource\Pages;
 use App\Models\Area;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -71,7 +69,8 @@ class AreaResource extends Resource
                             ->required()
                             ->searchable()
                             ->preload()
-                            ->prefixIcon('heroicon-m-building-office-2'),
+                            ->prefixIcon('heroicon-m-building-office-2')
+                            ->columnSpanFull(),
                     ])->columns(2),
             ]);
     }
@@ -82,7 +81,7 @@ class AreaResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('departamento.nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Departamento')
@@ -95,6 +94,7 @@ class AreaResource extends Resource
             ])
             ->defaultSort('nombre', 'asc')
             ->striped()
+            ->searchPlaceholder('Buscar por nombre o departamento...')
             ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),
@@ -103,21 +103,16 @@ class AreaResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
+                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->slideOver(),
+                Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
             ])
             ->bulkActions([]);
     }
 
     public static function infolist(Infolist $infolist): Infolist
     {
-        return $infolist
-            ->schema([
-                Section::make('Datos del área')
-                    ->schema([
-                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-map-pin'),
-                        TextEntry::make('departamento.nombre')->label('Departamento')->icon('heroicon-m-building-office-2'),
-                    ])->columns(2),
-            ]);
+        return \App\Filament\Resources\AreaResource::infolist($infolist);
     }
 
     public static function getRelations(): array

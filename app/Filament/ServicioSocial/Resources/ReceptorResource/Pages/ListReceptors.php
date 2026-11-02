@@ -15,6 +15,16 @@ class ListReceptors extends ListRecords
 
     protected static string $resource = ReceptorResource::class;
 
+    public function getTitle(): string
+    {
+        return '👤 Receptores';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Personas que reciben material y equipos del centro de cómputo.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

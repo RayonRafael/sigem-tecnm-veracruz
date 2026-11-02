@@ -26,9 +26,24 @@ class ReportesPage extends Page
 
     protected static ?string $slug = 'reportes';
 
-    protected static ?string $title = 'Reportes';
+    protected static ?string $title = '📊 Reportes';
 
     protected static string $view = 'filament.pages.reportes';
+
+    public function getTitle(): string
+    {
+        return '📊 Reportes';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return null;
+    }
+
+    public function getBreadcrumbs(): array
+    {
+        return [];
+    }
 
     public ?string $reporteActivo = null;
 
@@ -134,8 +149,8 @@ class ReportesPage extends Page
             [
                 'id' => 'equipos_baja_danados',
                 'emoji' => '⚠️',
-                'titulo' => 'Equipos de baja o dañados',
-                'descripcion' => 'Listado de activos reportados con daño severo, dados de baja o con solicitudes rechazadas.',
+                'titulo' => 'Equipos con solicitud de baja / Equipos dados de baja',
+                'descripcion' => 'Listado de activos con solicitud de baja o dados de baja en el sistema, con daño severo o solicitudes rechazadas.',
             ],
             [
                 'id' => 'solicitudes_tipo_estado',
@@ -182,9 +197,14 @@ class ReportesPage extends Page
                 continue;
             }
 
+            $propios = $inventarios->where('tipo_propiedad', 'Propio')->count();
+            $rentados = $inventarios->where('tipo_propiedad', 'Rentado')->count();
+
             $rows[] = [
                 'categoria' => '<strong>' . e($tipo->nombre) . '</strong>',
                 'total' => '<span class="sigem-td-folio">' . $total . '</span>',
+                'propio' => $this->renderBadgeConteo($propios, 'ok'),
+                'renta' => $this->renderBadgeConteo($rentados, 'info'),
                 'disponibles' => $this->renderBadgeConteo($inventarios->where('estado', 'Disponible')->count(), 'ok'),
                 'asignados' => $this->renderBadgeConteo($inventarios->where('estado', 'Asignado')->count(), 'warn'),
                 'mantenimiento' => $this->renderBadgeConteo($inventarios->where('estado', 'En Mantenimiento')->count(), 'info'),
@@ -197,7 +217,7 @@ class ReportesPage extends Page
             'emoji' => '📦',
             'titulo' => 'Inventario por categoría',
             'fecha' => $fecha,
-            'headers' => ['Categoría / Tipo', 'Total', 'Disponibles', 'Asignados', 'En Mantenimiento', 'Dañados / Baja'],
+            'headers' => ['Categoría / Tipo', 'Total', 'Propio', 'Renta', 'Disponibles', 'Asignados', 'En Mantenimiento', 'Dañados / Baja'],
             'rows' => $rows,
         ];
     }
@@ -205,25 +225,38 @@ class ReportesPage extends Page
     protected function generarReporteEquiposArea(string $fecha): array
     {
         $areas = Area::with('departamento')->orderBy('nombre')->get();
+        $inventarios = Inventario::select(['id_inventario', 'ubicacion_fisica', 'especificaciones', 'tipo_propiedad', 'estado'])->get();
         $rows = [];
 
         foreach ($areas as $area) {
-            $inventarios = Inventario::where(function ($q) use ($area) {
-                $q->where('ubicacion_fisica', 'like', '%' . $area->nombre . '%')
-                    ->orWhere('especificaciones->area_id', (string) $area->id_area);
-            })->get();
+            $areaNombre = $area->nombre;
+            $areaIdStr = (string) $area->id_area;
 
-            $total = $inventarios->count();
+            $areaInventarios = $inventarios->filter(function ($inv) use ($areaNombre, $areaIdStr) {
+                if ($inv->ubicacion_fisica && stripos($inv->ubicacion_fisica, $areaNombre) !== false) {
+                    return true;
+                }
+                $espec = is_array($inv->especificaciones) ? $inv->especificaciones : json_decode($inv->especificaciones ?? '[]', true);
+
+                return isset($espec['area_id']) && (string) $espec['area_id'] === $areaIdStr;
+            });
+
+            $total = $areaInventarios->count();
             if ($total === 0) {
                 continue;
             }
+
+            $propios = $areaInventarios->where('tipo_propiedad', 'Propio')->count();
+            $rentados = $areaInventarios->where('tipo_propiedad', 'Rentado')->count();
 
             $rows[] = [
                 'depto' => e($area->departamento?->nombre ?? 'N/A'),
                 'area' => '<strong>' . e($area->nombre) . '</strong>',
                 'total' => '<span class="sigem-td-folio">' . $total . '</span>',
-                'disponibles' => $this->renderBadgeConteo($inventarios->where('estado', 'Disponible')->count(), 'ok'),
-                'asignados' => $this->renderBadgeConteo($inventarios->where('estado', 'Asignado')->count(), 'warn'),
+                'propio' => $this->renderBadgeConteo($propios, 'ok'),
+                'renta' => $this->renderBadgeConteo($rentados, 'info'),
+                'disponibles' => $this->renderBadgeConteo($areaInventarios->where('estado', 'Disponible')->count(), 'ok'),
+                'asignados' => $this->renderBadgeConteo($areaInventarios->where('estado', 'Asignado')->count(), 'warn'),
             ];
         }
 
@@ -232,7 +265,7 @@ class ReportesPage extends Page
             'emoji' => '🏢',
             'titulo' => 'Equipos por área',
             'fecha' => $fecha,
-            'headers' => ['Departamento', 'Área', 'Total Activos', 'Disponibles', 'Asignados'],
+            'headers' => ['Departamento', 'Área', 'Total Activos', 'Propio', 'Renta', 'Disponibles', 'Asignados'],
             'rows' => $rows,
         ];
     }
@@ -243,9 +276,15 @@ class ReportesPage extends Page
         $rows = [];
 
         foreach ($mantenimientos as $m) {
+            $esPropio = ($m->inventario?->tipo_propiedad ?? 'Propio') === 'Propio';
+            $badgePropiedad = $esPropio
+                ? '<span class="sigem-pill ok">● Propio</span>'
+                : '<span class="sigem-pill info">● Rentado</span>';
+
             $rows[] = [
                 'serie' => '<span class="sigem-td-folio">' . e($m->inventario?->num_serie ?? 'S/N') . '</span>',
                 'equipo' => e($m->inventario?->material?->nombre ?? 'N/A'),
+                'propiedad' => $badgePropiedad,
                 'servicio' => e($m->tipo_servicio),
                 'mantenimiento' => e($m->tipo_mantenimiento),
                 'tecnico' => e($m->nombre_tecnico),
@@ -259,7 +298,7 @@ class ReportesPage extends Page
             'emoji' => '🔧',
             'titulo' => 'Equipos en mantenimiento',
             'fecha' => $fecha,
-            'headers' => ['No. Serie', 'Equipo / Material', 'Servicio', 'Tipo', 'Técnico', 'Fecha', 'Estado'],
+            'headers' => ['No. Serie', 'Equipo / Material', 'Propiedad', 'Servicio', 'Tipo', 'Técnico', 'Fecha', 'Estado'],
             'rows' => $rows,
         ];
     }
@@ -278,9 +317,15 @@ class ReportesPage extends Page
         foreach ($inventarios as $i) {
             $fFecha = $i->fecha_baja ? $i->fecha_baja->format('d/m/Y') : ($i->fecha_registro ? $i->fecha_registro->format('d/m/Y') : 'N/A');
 
+            $esPropio = ($i->tipo_propiedad ?? 'Propio') === 'Propio';
+            $badgePropiedad = $esPropio
+                ? '<span class="sigem-pill ok">● Propio</span>'
+                : '<span class="sigem-pill info">● Rentado</span>';
+
             $rows[] = [
                 'serie' => '<span class="sigem-td-folio">' . e($i->num_serie ?? 'S/N') . '</span>',
                 'material' => e($i->material?->nombre ?? 'N/A'),
+                'propiedad' => $badgePropiedad,
                 'ubicacion' => e($i->ubicacion_fisica ?? 'No especificada'),
                 'estado' => $this->renderBadge($i->estado),
                 'registro' => $this->renderBadge($i->estado_registro ?? 'Pendiente'),
@@ -291,9 +336,9 @@ class ReportesPage extends Page
         return [
             'id' => 'equipos_baja_danados',
             'emoji' => '⚠️',
-            'titulo' => 'Equipos de baja o dañados',
+            'titulo' => 'Equipos con solicitud de baja / Equipos dados de baja',
             'fecha' => $fecha,
-            'headers' => ['No. Serie', 'Material', 'Ubicación', 'Estado', 'Registro', 'Fecha'],
+            'headers' => ['No. Serie', 'Material', 'Propiedad', 'Ubicación', 'Estado', 'Registro', 'Fecha'],
             'rows' => $rows,
         ];
     }
@@ -306,7 +351,7 @@ class ReportesPage extends Page
         foreach ($solicitudes as $s) {
             $rows[] = [
                 'folio' => '<span class="sigem-td-folio">FOLIO-' . str_pad($s->id_solicitud, 5, '0', STR_PAD_LEFT) . '</span>',
-                'tipo' => e($s->tipo_movimiento),
+                'tipo' => '<span class="sigem-pill info">● ' . e($s->tipo_movimiento) . '</span>',
                 'solicitante' => e($s->usuario?->name ?? 'N/A'),
                 'receptor' => e($s->receptor?->nombre ?? 'N/A'),
                 'departamento' => e($s->receptor?->area?->departamento?->nombre ?? 'N/A'),

@@ -6,8 +6,6 @@ use App\Filament\ServicioSocial\Resources\ReceptorResource\Pages;
 use App\Models\Receptor;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -52,16 +50,19 @@ class ReceptorResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
                             ->label('Nombre')
+                            ->placeholder('Ej. Roberto')
                             ->required()
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
                         Forms\Components\TextInput::make('apellido_paterno')
                             ->label('Apellido paterno')
+                            ->placeholder('Ej. Hernández')
                             ->required()
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
                         Forms\Components\TextInput::make('apellido_materno')
                             ->label('Apellido materno')
+                            ->placeholder('Ej. García')
                             ->required()
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
@@ -72,23 +73,27 @@ class ReceptorResource extends Resource
                             ->prefixIcon('heroicon-m-briefcase'),
                         Forms\Components\TextInput::make('email')
                             ->label('Correo electrónico')
+                            ->placeholder('Ej. receptor@veracruz.tecnm.mx')
                             ->email()
                             ->prefixIcon('heroicon-m-envelope')
                             ->maxLength(100)
                             ->default(null),
                         Forms\Components\TextInput::make('telefono')
                             ->label('Teléfono')
+                            ->placeholder('Ej. 229 123 4567')
                             ->tel()
                             ->prefixIcon('heroicon-m-device-phone-mobile')
                             ->maxLength(20)
                             ->default(null),
                         Forms\Components\Select::make('id_area')
                             ->label('Área')
+                            ->placeholder('Selecciona...')
                             ->relationship('area', 'nombre')
                             ->required()
                             ->searchable()
                             ->preload()
-                            ->prefixIcon('heroicon-m-building-office'),
+                            ->prefixIcon('heroicon-m-building-office')
+                            ->columnSpanFull(),
                     ])->columns(2),
             ]);
     }
@@ -100,7 +105,7 @@ class ReceptorResource extends Resource
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
                     ->description(fn (Receptor $record): ?string => $record->cargo)
-                    ->searchable(),
+                    ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('cargo')->wrap(false)->limit(30)->grow(false)
                     ->label('Cargo / Puesto')
                     ->searchable()
@@ -128,6 +133,7 @@ class ReceptorResource extends Resource
             ])
             ->defaultSort('nombre', 'asc')
             ->striped()
+            ->searchPlaceholder('Buscar por nombre, cargo, área o correo...')
             ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),
@@ -136,27 +142,34 @@ class ReceptorResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->slideOver(),
+                Tables\Actions\ViewAction::make()
+                    ->iconButton()
+                    ->tooltip('Ver detalle')
+                    ->extraAttributes(['title' => 'Ver detalle'])
+                    ->slideOver()
+                    ->modalHeading(fn (?Receptor $record) => trim(($record?->nombre ?? '') . ' ' . ($record?->apellido_paterno ?? '') . ' ' . ($record?->apellido_materno ?? '')) ?: 'Detalle de receptor')
+                    ->modalDescription(fn (?Receptor $record) => new \Illuminate\Support\HtmlString(
+                        e($record?->cargo ?? '—') . ' · ID: #' . e($record?->getKey())
+                    ))
+                    ->modalCancelActionLabel('Cerrar'),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Editar')
+                    ->extraAttributes(['title' => 'Editar'])
+                    ->slideOver()
+                    ->modalHeading(fn (?Receptor $record) => 'Editar: ' . trim(($record?->nombre ?? '') . ' ' . ($record?->apellido_paterno ?? '')))
+                    ->modalDescription(fn (?Receptor $record) => new \Illuminate\Support\HtmlString(
+                        e($record?->cargo ?? '—') . ' · ID: #' . e($record?->getKey())
+                    ))
+                    ->successNotificationTitle('Receptor actualizado correctamente'),
+                Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
             ])
             ->bulkActions([]);
     }
 
     public static function infolist(Infolist $infolist): Infolist
     {
-        return $infolist
-            ->schema([
-                Section::make('Datos del receptor')
-                    ->schema([
-                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-user'),
-                        TextEntry::make('apellido_paterno')->label('Apellido paterno')->icon('heroicon-m-user'),
-                        TextEntry::make('apellido_materno')->label('Apellido materno')->icon('heroicon-m-user'),
-                        TextEntry::make('cargo')->label('Cargo / Puesto')->icon('heroicon-m-briefcase')->placeholder('—'),
-                        TextEntry::make('email')->label('Email')->icon('heroicon-m-envelope'),
-                        TextEntry::make('telefono')->label('Teléfono')->icon('heroicon-m-device-phone-mobile'),
-                        TextEntry::make('area.nombre')->label('Área')->icon('heroicon-m-building-office'),
-                    ])->columns(3),
-            ]);
+        return \App\Filament\Resources\ReceptorResource::infolist($infolist);
     }
 
     public static function getRelations(): array

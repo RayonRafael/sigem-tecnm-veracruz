@@ -31,11 +31,12 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('SIGEM - TecNM Veracruz')
-            ->brandLogo(new HtmlString('<div class="sigem-brand"><div class="sigem-brand-logo">S</div></div>'))
+            ->brandLogo(new HtmlString('<div class="sigem-brand"><img src="' . asset('images/sigem-icon.svg') . '" alt="SIGEM" class="sigem-brand-logo"></div>'))
             ->brandLogoHeight('auto')
             ->favicon(asset('images/sigem-favicon.svg?v=2'))
             ->font('DM Sans')
             ->globalSearch(false)
+            ->darkMode(false)
             ->colors([
                 'primary' => Color::hex('#1b65d4'),
                 'success' => Color::hex('#059669'),
@@ -105,8 +106,19 @@ class AdminPanelProvider extends PanelProvider
                 PanelsRenderHook::USER_MENU_BEFORE,
                 fn (): string => Blade::render('
 @if (auth()->check())
-<span class="sigem-role-banner sigem-role-admin"
-      title="Acceso completo de administración">👑 Administrador</span>
+@php
+    $path = request()->path();
+    $section = match(true) {
+        str_contains($path, "inventarios") => "Inventario general",
+        str_contains($path, "solicituds") => "Lista de solicitudes de materiales",
+        str_contains($path, "mantenimientos") => "Mantenimiento",
+        str_contains($path, "configuracion") => "Configuración y Catálogos",
+        str_contains($path, "reportes") => "Reportes",
+        str_contains($path, "users") => "Usuarios",
+        default => "Panel principal",
+    };
+@endphp
+<span class="sigem-crumb">SIGEM › <b>{{ $section }}</b></span>
 {{-- Campo de búsqueda aparente en el topbar (Fase 9: Buscador global) --}}
 <div class="sigem-topbar-search"
      role="button"
@@ -117,6 +129,8 @@ class AdminPanelProvider extends PanelProvider
     <span>🔍</span>
     <span>Buscar en SIGEM…</span>
 </div>
+<span class="sigem-role-banner sigem-role-admin"
+      title="Acceso completo de administración">👑 Administrador</span>
 @endif
 ')
             )

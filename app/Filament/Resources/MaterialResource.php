@@ -8,6 +8,8 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -52,18 +54,22 @@ class MaterialResource extends Resource
                             Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\TextInput::make('nombre')
+                                        ->placeholder('Ej. Computadora de Escritorio OptiPlex')
                                         ->required()
                                         ->prefixIcon('heroicon-m-tag')
-                                        ->maxLength(150),
+                                        ->maxLength(150)
+                                        ->columnSpanFull(),
                                     Forms\Components\TextInput::make('modelo')
+                                        ->placeholder('Ej. OptiPlex 7090')
                                         ->prefixIcon('heroicon-m-qr-code')
                                         ->maxLength(100),
                                     Forms\Components\Textarea::make('descripcion')
                                         ->label('Descripción')
+                                        ->placeholder('Ej. Especificaciones y características generales del material...')
                                         ->rows(3)
                                         ->columnSpanFull(),
                                 ]),
-                            Forms\Components\Grid::make(3)
+                            Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\Select::make('id_marca')->placeholder('Selecciona...')
                                         ->label('Marca')
@@ -75,6 +81,7 @@ class MaterialResource extends Resource
                                         ->createOptionForm([
                                             Forms\Components\TextInput::make('nombre')
                                                 ->label('Nombre de la marca')
+                                                ->placeholder('Ej. Dell')
                                                 ->required()
                                                 ->maxLength(100),
                                         ]),
@@ -88,6 +95,7 @@ class MaterialResource extends Resource
                                         ->createOptionForm([
                                             Forms\Components\TextInput::make('nombre')
                                                 ->label('Nombre del tipo de material')
+                                                ->placeholder('Ej. Equipo de Cómputo')
                                                 ->required()
                                                 ->maxLength(100),
                                         ]),
@@ -98,9 +106,11 @@ class MaterialResource extends Resource
                                         ->searchable()
                                         ->preload()
                                         ->prefixIcon('heroicon-m-scale')
+                                        ->columnSpanFull()
                                         ->createOptionForm([
                                             Forms\Components\TextInput::make('nombre')
                                                 ->label('Nombre de la unidad de medida')
+                                                ->placeholder('Ej. Pieza')
                                                 ->required()
                                                 ->maxLength(100),
                                         ]),
@@ -119,6 +129,7 @@ class MaterialResource extends Resource
                             ->helperText('Calculado automáticamente'),
                         Forms\Components\TextInput::make('stock_minimo')
                             ->label('Stock mínimo')
+                            ->placeholder('Ej. 5')
                             ->numeric()
                             ->minValue(0)
                             ->default(0)
@@ -141,7 +152,7 @@ class MaterialResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('modelo')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Modelo')
@@ -179,6 +190,7 @@ class MaterialResource extends Resource
             ])
             ->defaultSort('nombre', 'asc')
             ->striped()
+            ->searchPlaceholder('Buscar por nombre, modelo, marca o tipo...')
             ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),
@@ -188,7 +200,16 @@ class MaterialResource extends Resource
             ->recordAction(null)
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Material actualizado correctamente'),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Editar')
+                    ->extraAttributes(['title' => 'Editar'])
+                    ->modalHeading(fn (?Material $record) => 'Editar: ' . ($record?->nombre ?? 'material'))
+                    ->modalDescription(fn (?Material $record) => new \Illuminate\Support\HtmlString(
+                        e($record?->tipo?->nombre ?? '—') . ' · ID: #' . e($record?->getKey())
+                    ))
+                    ->successNotificationTitle('Material actualizado correctamente'),
+                Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -201,40 +222,51 @@ class MaterialResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos del material')
-                    ->schema([
-                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-tag'),
-                        TextEntry::make('modelo')->label('Modelo')->icon('heroicon-m-qr-code'),
-                        TextEntry::make('descripcion')->label('Descripción')->columnSpanFull(),
-                    ])->columns(2),
-                Section::make('Clasificación')
-                    ->schema([
-                        TextEntry::make('marca.nombre')->label('Marca')->icon('heroicon-m-star'),
-                        TextEntry::make('tipo.nombre')->label('Tipo')->icon('heroicon-m-square-3-stack-3d'),
-                        TextEntry::make('unidad.nombre')->label('Unidad de medida')->icon('heroicon-m-scale'),
-                    ])->columns(3),
-                Section::make('Control de stock')
-                    ->schema([
-                        TextEntry::make('stock_actual')->label('Stock actual')->icon('heroicon-m-archive-box'),
-                        TextEntry::make('stock_minimo')->label('Stock mínimo')->icon('heroicon-m-bell-alert'),
-                        TextEntry::make('estado_stock')
-                            ->label('Estado')
-                            ->getStateUsing(fn ($record) => $record->stock_actual < $record->stock_minimo ? 'Stock bajo' : 'Normal')
-                            ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                'Stock bajo' => 'danger',
-                                'Normal' => 'success',
-                                default => 'gray',
-                            })
-                            ->icon(fn (string $state): string => match ($state) {
-                                'Stock bajo' => 'heroicon-m-exclamation-triangle',
-                                'Normal' => 'heroicon-m-check-circle',
-                                default => 'heroicon-m-minus',
-                            }),
-                        IconEntry::make('requiere_control_individual')
-                            ->label('Control individual')
-                            ->boolean(),
-                    ])->columns(4),
+                Tabs::make('Detalle')
+                    ->tabs([
+                        Tab::make('Información')
+                            ->icon('heroicon-m-tag')
+                            ->schema([
+                                Section::make('Datos del material')
+                                    ->schema([
+                                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-tag'),
+                                        TextEntry::make('modelo')->label('Modelo')->icon('heroicon-m-qr-code'),
+                                        TextEntry::make('descripcion')->label('Descripción')->columnSpanFull(),
+                                    ])->columns(2),
+                                Section::make('Clasificación')
+                                    ->schema([
+                                        TextEntry::make('marca.nombre')->label('Marca')->icon('heroicon-m-star'),
+                                        TextEntry::make('tipo.nombre')->label('Tipo')->icon('heroicon-m-square-3-stack-3d'),
+                                        TextEntry::make('unidad.nombre')->label('Unidad de medida')->icon('heroicon-m-scale'),
+                                    ])->columns(3),
+                            ]),
+                        Tab::make('Control de stock')
+                            ->icon('heroicon-m-chart-bar')
+                            ->schema([
+                                Section::make('Inventario y Existencias')
+                                    ->schema([
+                                        TextEntry::make('stock_actual')->label('Stock actual')->icon('heroicon-m-archive-box'),
+                                        TextEntry::make('stock_minimo')->label('Stock mínimo')->icon('heroicon-m-bell-alert'),
+                                        TextEntry::make('estado_stock')
+                                            ->label('Estado')
+                                            ->getStateUsing(fn ($record) => $record->stock_actual < $record->stock_minimo ? 'Stock bajo' : 'Normal')
+                                            ->badge()
+                                            ->color(fn (string $state): string => match ($state) {
+                                                'Stock bajo' => 'danger',
+                                                'Normal' => 'success',
+                                                default => 'gray',
+                                            })
+                                            ->icon(fn (string $state): string => match ($state) {
+                                                'Stock bajo' => 'heroicon-m-exclamation-triangle',
+                                                'Normal' => 'heroicon-m-check-circle',
+                                                default => 'heroicon-m-minus',
+                                            }),
+                                        IconEntry::make('requiere_control_individual')
+                                            ->label('Control individual')
+                                            ->boolean(),
+                                    ])->columns(4),
+                            ]),
+                    ]),
             ]);
     }
 

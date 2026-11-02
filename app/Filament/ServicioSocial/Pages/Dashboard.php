@@ -3,25 +3,26 @@
 namespace App\Filament\ServicioSocial\Pages;
 
 use App\Filament\ServicioSocial\Resources\InventarioResource;
-use App\Models\Area;
-use App\Models\Departamento;
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
-use App\Models\MarcaMaterial;
-use App\Models\Material;
-use App\Models\Proveedor;
-use App\Models\Receptor;
 use App\Models\Solicitud;
-use App\Models\TipoMaterial;
-use App\Models\UnidadMedida;
-use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Infolists\Infolist;
 use Filament\Pages\Dashboard as BaseDashboard;
-use Spatie\Activitylog\Models\Activity;
 
 class Dashboard extends BaseDashboard
 {
+    public array $tableColumnSearches = [];
+
+    public function resetTableColumnSearches(): void
+    {
+        $this->tableColumnSearches = [];
+    }
+
     protected static ?string $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $navigationLabel = 'Panel principal';
@@ -57,6 +58,88 @@ class Dashboard extends BaseDashboard
             ->successNotificationTitle('Registro creado exitosamente');
     }
 
+    public function verEquipoAction(): Action
+    {
+        return ViewAction::make('verEquipo')
+            ->label('Ver equipo')
+            ->modalHeading(fn (?Inventario $record) => $record?->material?->nombre ?? 'Detalle de equipo')
+            ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
+                'ID: ' . e($record?->num_serie ?? '—') . ' · ' . e($record?->material?->tipo?->nombre ?? 'Sin categoría')
+            ))
+            ->model(Inventario::class)
+            ->record(function (array $arguments) {
+                $id = $arguments['id'] ?? $arguments['record'] ?? null;
+                if ($id instanceof Inventario) {
+                    return $id;
+                }
+
+                return Inventario::with([
+                    'material.marca',
+                    'material.tipo',
+                    'proveedor',
+                    'usuario',
+                ])->find($id);
+            })
+            ->slideOver()
+            ->infolist(fn (Infolist $infolist): Infolist => InventarioResource::infolist($infolist))
+            ->modalCancelActionLabel('Cerrar')
+            ->extraModalFooterActions([
+                \Filament\Actions\Action::make('desde_detalle_editar')
+                    ->label('Modificar')
+                    ->color('warning')
+                    ->icon('heroicon-m-pencil-square')
+                    ->visible(fn (?Inventario $record) => $record && auth()->user()?->can('update', $record))
+                    ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedAction('editarEquipo', { id: '{$record?->getKey()}', record: '{$record?->getKey()}' })"),
+            ]);
+    }
+
+    public function verEquipo($id): void
+    {
+        $this->mountAction('verEquipo', ['id' => $id, 'record' => $id]);
+    }
+
+    public function editarEquipoAction(): Action
+    {
+        return EditAction::make('editarEquipo')
+            ->label('Editar equipo')
+            ->modalHeading(fn (?Inventario $record) => 'Editar: ' . ($record?->material?->nombre ?? 'equipo'))
+            ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
+                'ID: ' . e($record?->num_serie ?? '—')
+            ))
+            ->model(Inventario::class)
+            ->record(function (array $arguments) {
+                return Inventario::find($arguments['id'] ?? $arguments['record']);
+            })
+            ->steps(InventarioResource::getFormSteps())
+            ->slideOver()
+            ->successNotificationTitle('Registro actualizado correctamente');
+    }
+
+    public function editarEquipo($id): void
+    {
+        $this->mountAction('editarEquipo', ['id' => $id]);
+    }
+
+    public function eliminarEquipoAction(): Action
+    {
+        return DeleteAction::make('eliminarEquipo')
+            ->label('Eliminar equipo')
+            ->modalHeading(fn (?Inventario $record) => '¿Eliminar ' . ($record?->material?->nombre ?? 'equipo') . '?')
+            ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
+                'ID: ' . e($record?->num_serie ?? '—') . ' · Esta acción no se puede deshacer'
+            ))
+            ->model(Inventario::class)
+            ->record(function (array $arguments) {
+                return Inventario::find($arguments['id'] ?? $arguments['record']);
+            })
+            ->successNotificationTitle('Registro eliminado correctamente');
+    }
+
+    public function eliminarEquipo($id): void
+    {
+        $this->mountAction('eliminarEquipo', ['id' => $id]);
+    }
+
     public function getColumns(): int|string|array
     {
         return [
@@ -79,27 +162,54 @@ class Dashboard extends BaseDashboard
         $misMantenimientos = Mantenimiento::where('id_usuario_solicita', $userId)->count();
         $totalActivos = Inventario::count();
 
-        // Bitacora activity just for this user
-        $actividadReciente = Activity::with('causer')
-            ->where('causer_id', $userId)
-            ->where('causer_type', User::class)
-            ->latest()->limit(5)->get();
+        // Opciones de filtros para la tabla de inventario general
+        $categoriasFiltro = ['' => 'Todas'];
+        try {
+            $categoriasFiltro += \App\Models\TipoMaterial::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+        } catch (\Throwable $e) {}
 
-        // Colecciones limitadas (mini tablas) y completas (modales)
-        $inventariosCompletos = Inventario::with(['material', 'material.marca', 'material.tipo'])->latest('created_at')->take(50)->get();
-        $inventariosRecientes = $inventariosCompletos->take(3);
+        $areasFiltro = ['' => 'Todas'];
+        try {
+            $areasFiltro += \App\Models\Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+        } catch (\Throwable $e) {}
 
-        $solicitudesCompletas = Solicitud::with('usuario')->where('id_usuario', $userId)->latest('created_at')->take(50)->get();
-        $solicitudesRecientes = $solicitudesCompletas->where('estado', 'Pendiente')->take(3);
-        if ($solicitudesRecientes->isEmpty()) {
-            $solicitudesRecientes = $solicitudesCompletas->take(3);
+        // Inventarios para tabla principal del Dashboard (con filtros aplicados dinámicamente)
+        $invQuery = Inventario::with(['material', 'material.marca', 'material.tipo']);
+
+        if (filled($this->tableColumnSearches['num_serie'] ?? null)) {
+            $invQuery->where('num_serie', 'like', '%' . trim($this->tableColumnSearches['num_serie']) . '%');
+        }
+        if (filled($this->tableColumnSearches['material_nombre'] ?? null)) {
+            $invQuery->whereHas('material', fn ($q) => $q->where('nombre', 'like', '%' . trim($this->tableColumnSearches['material_nombre']) . '%'));
+        }
+        if (filled($this->tableColumnSearches['material_tipo_nombre'] ?? null)) {
+            $invQuery->whereHas('material.tipo', fn ($q) => $q->where('nombre', trim($this->tableColumnSearches['material_tipo_nombre'])));
+        }
+        if (filled($this->tableColumnSearches['estado'] ?? null)) {
+            $invQuery->where('estado', $this->tableColumnSearches['estado']);
+        }
+        if (filled($this->tableColumnSearches['ubicacion_fisica'] ?? null)) {
+            $invQuery->where('ubicacion_fisica', 'like', '%' . trim($this->tableColumnSearches['ubicacion_fisica']) . '%');
         }
 
-        $mantenimientosCompletos = Mantenimiento::with(['inventario', 'inventario.material', 'usuarioSolicita'])->where('id_usuario_solicita', $userId)->latest('created_at')->take(50)->get();
-        $mantenimientosRecientes = $mantenimientosCompletos->whereIn('estado', ['Pendiente', 'Solicitado', 'Pendiente Revision Admin', 'En proceso'])->take(3);
-        if ($mantenimientosRecientes->isEmpty()) {
-            $mantenimientosRecientes = $mantenimientosCompletos->take(3);
+        if (filled($this->tableColumnSearches['busqueda'] ?? null)) {
+            $term = '%' . trim($this->tableColumnSearches['busqueda']) . '%';
+            $invQuery->where(function ($q) use ($term) {
+                $q->where('num_serie', 'like', $term)
+                    ->orWhere('ubicacion_fisica', 'like', $term)
+                    ->orWhere('mac_address', 'like', $term)
+                    ->orWhere('ip_address', 'like', $term)
+                    ->orWhereHas('material', fn ($m) => $m->where('nombre', 'like', $term)
+                        ->orWhereHas('marca', fn ($b) => $b->where('nombre', 'like', $term)));
+            });
         }
+        if (filled($this->tableColumnSearches['fecha_desde'] ?? null)) {
+            $invQuery->whereDate('fecha_registro', '>=', $this->tableColumnSearches['fecha_desde']);
+        }
+        if (filled($this->tableColumnSearches['fecha_hasta'] ?? null)) {
+            $invQuery->whereDate('fecha_registro', '<=', $this->tableColumnSearches['fecha_hasta']);
+        }
+        $inventariosCompletos = $invQuery->latest('created_at')->take(50)->get();
 
         $inventarioDisponibles = Inventario::disponibles()->count();
         $inventarioAsignados = Inventario::asignados()->count();
@@ -107,26 +217,8 @@ class Dashboard extends BaseDashboard
         $inventarioDanados = Inventario::danados()->count();
 
         $mantenimientoEnRevision = Mantenimiento::where('id_usuario_solicita', $userId)->enRevision()->count();
-        $mantenimientoEnProceso = Mantenimiento::where('id_usuario_solicita', $userId)->enProceso()->count();
-        $mantenimientoCompletados = Mantenimiento::where('id_usuario_solicita', $userId)->completados()->count();
 
         $solicitudesAutorizadas = Solicitud::where('id_usuario', $userId)->autorizadas()->count();
-        $solicitudesRechazadas = Solicitud::where('id_usuario', $userId)->rechazadas()->count();
-
-        // Catálogos Completos (Read-only for SS)
-        $departamentosList = Departamento::latest()->take(50)->get();
-        $materialesList = Material::with(['tipo', 'unidad', 'marca'])->latest()->take(50)->get();
-        $areasList = Area::with('departamento')->latest()->take(50)->get();
-        $marcasList = MarcaMaterial::withCount('materiales')->latest()->take(50)->get();
-        $tiposList = TipoMaterial::latest()->take(50)->get();
-        $unidadesList = UnidadMedida::latest()->take(50)->get();
-        $proveedoresList = Proveedor::latest()->take(50)->get();
-        $receptoresList = Receptor::with('area.departamento')->latest()->take(50)->get();
-        $usuariosList = User::with('roles')->latest()->take(50)->get();
-
-        $totalRegistrosCatalogos = $departamentosList->count() + $materialesList->count() + $areasList->count() +
-                                   $marcasList->count() + $tiposList->count() + $unidadesList->count() +
-                                   $proveedoresList->count() + $receptoresList->count() + $usuariosList->count();
 
         return [
             'misSolicitudes' => $misSolicitudes,
@@ -134,39 +226,44 @@ class Dashboard extends BaseDashboard
             'misMantenimientos' => $misMantenimientos,
             'totalActivos' => $totalActivos,
 
-            'actividadReciente' => $actividadReciente,
-            'inventariosRecientes' => $inventariosRecientes,
-            'solicitudesRecientes' => $solicitudesRecientes,
-            'mantenimientosRecientes' => $mantenimientosRecientes,
-
-            // Variables para módulos
             'inventarioDisponibles' => $inventarioDisponibles,
             'inventarioAsignados' => $inventarioAsignados,
             'inventarioEnMantenimiento' => $inventarioEnMantenimiento,
             'inventarioDanados' => $inventarioDanados,
 
             'mantenimientoEnRevision' => $mantenimientoEnRevision,
-            'mantenimientoEnProceso' => $mantenimientoEnProceso,
-            'mantenimientoCompletados' => $mantenimientoCompletados,
-
             'solicitudesAutorizadas' => $solicitudesAutorizadas,
-            'solicitudesRechazadas' => $solicitudesRechazadas,
 
+            'categoriasFiltro' => $categoriasFiltro,
+            'areasFiltro' => $areasFiltro,
             'inventariosCompletos' => $inventariosCompletos,
-            'solicitudesCompletas' => $solicitudesCompletas,
-            'mantenimientosCompletos' => $mantenimientosCompletos,
+            'categoriasTop' => (function () {
+                $todasCategorias = Inventario::query()
+                    ->join('material', 'inventario.id_producto', '=', 'material.id_producto')
+                    ->leftJoin('tipo_material', 'material.id_tipodematerial', '=', 'tipo_material.id_tipodematerial')
+                    ->selectRaw("COALESCE(tipo_material.nombre, 'General') as cat, count(*) as total")
+                    ->groupBy('cat')
+                    ->orderByDesc('total')
+                    ->pluck('total', 'cat')
+                    ->toArray();
 
-            'departamentosList' => $departamentosList,
-            'materialesList' => $materialesList,
-            'areasList' => $areasList,
-            'marcasList' => $marcasList,
-            'tiposList' => $tiposList,
-            'unidadesList' => $unidadesList,
-            'proveedoresList' => $proveedoresList,
-            'receptoresList' => $receptoresList,
-            'usuariosList' => $usuariosList,
+                $top = [];
+                $otras = 0;
+                $idx = 0;
+                foreach ($todasCategorias as $catNom => $catCant) {
+                    if ($idx < 8) {
+                        $top[$catNom] = $catCant;
+                    } else {
+                        $otras += $catCant;
+                    }
+                    $idx++;
+                }
+                if ($otras > 0) {
+                    $top['Otras categorías'] = $otras;
+                }
 
-            'totalRegistrosCatalogos' => $totalRegistrosCatalogos,
+                return $top;
+            })(),
         ];
     }
 }

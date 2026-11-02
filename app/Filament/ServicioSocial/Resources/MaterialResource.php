@@ -6,9 +6,6 @@ use App\Filament\ServicioSocial\Resources\MaterialResource\Pages;
 use App\Models\Material;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -52,21 +49,26 @@ class MaterialResource extends Resource
                             Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\TextInput::make('nombre')
+                                        ->placeholder('Ej. Computadora de Escritorio OptiPlex')
                                         ->required()
                                         ->prefixIcon('heroicon-m-tag')
-                                        ->maxLength(150),
+                                        ->maxLength(150)
+                                        ->columnSpanFull(),
                                     Forms\Components\TextInput::make('modelo')
+                                        ->placeholder('Ej. OptiPlex 7090')
                                         ->prefixIcon('heroicon-m-qr-code')
                                         ->maxLength(100),
                                     Forms\Components\Textarea::make('descripcion')
                                         ->label('Descripción')
+                                        ->placeholder('Ej. Especificaciones y características generales del material...')
                                         ->rows(3)
                                         ->columnSpanFull(),
                                 ]),
-                            Forms\Components\Grid::make(3)
+                            Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\Select::make('id_marca')
                                         ->label('Marca')
+                                        ->placeholder('Selecciona...')
                                         ->relationship('marca', 'nombre')
                                         ->required()
                                         ->searchable()
@@ -74,6 +76,7 @@ class MaterialResource extends Resource
                                         ->prefixIcon('heroicon-m-star'),
                                     Forms\Components\Select::make('id_tipodematerial')
                                         ->label('Tipo de material')
+                                        ->placeholder('Selecciona...')
                                         ->relationship('tipo', 'nombre')
                                         ->required()
                                         ->searchable()
@@ -81,11 +84,13 @@ class MaterialResource extends Resource
                                         ->prefixIcon('heroicon-m-square-3-stack-3d'),
                                     Forms\Components\Select::make('id_unidad')
                                         ->label('Unidad de medida')
+                                        ->placeholder('Selecciona...')
                                         ->relationship('unidad', 'nombre')
                                         ->required()
                                         ->searchable()
                                         ->preload()
-                                        ->prefixIcon('heroicon-m-scale'),
+                                        ->prefixIcon('heroicon-m-scale')
+                                        ->columnSpanFull(),
                                 ]),
                         ]),
 
@@ -114,7 +119,7 @@ class MaterialResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('modelo')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Modelo')
@@ -151,6 +156,7 @@ class MaterialResource extends Resource
             ])
             ->defaultSort('nombre', 'asc')
             ->striped()
+            ->searchPlaceholder('Buscar por nombre, modelo, marca o tipo...')
             ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),
@@ -158,51 +164,25 @@ class MaterialResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->slideOver(),
+                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Editar')
+                    ->extraAttributes(['title' => 'Editar'])
+                    ->slideOver()
+                    ->modalHeading(fn (?Material $record) => 'Editar: ' . ($record?->nombre ?? 'material'))
+                    ->modalDescription(fn (?Material $record) => new \Illuminate\Support\HtmlString(
+                        e($record?->tipo?->nombre ?? '—') . ' · ID: #' . e($record?->getKey())
+                    ))
+                    ->successNotificationTitle('Material actualizado correctamente'),
+                Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
             ])
             ->bulkActions([]);
     }
 
     public static function infolist(Infolist $infolist): Infolist
     {
-        return $infolist
-            ->schema([
-                Section::make('Datos del material')
-                    ->schema([
-                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-tag'),
-                        TextEntry::make('modelo')->label('Modelo')->icon('heroicon-m-qr-code'),
-                        TextEntry::make('descripcion')->label('Descripción')->columnSpanFull(),
-                    ])->columns(2),
-                Section::make('Clasificación')
-                    ->schema([
-                        TextEntry::make('marca.nombre')->label('Marca')->icon('heroicon-m-star'),
-                        TextEntry::make('tipo.nombre')->label('Tipo')->icon('heroicon-m-square-3-stack-3d'),
-                        TextEntry::make('unidad.nombre')->label('Unidad de medida')->icon('heroicon-m-scale'),
-                    ])->columns(3),
-                Section::make('Control de stock')
-                    ->schema([
-                        TextEntry::make('stock_actual')->label('Stock actual')->icon('heroicon-m-archive-box'),
-                        TextEntry::make('stock_minimo')->label('Stock mínimo')->icon('heroicon-m-bell-alert'),
-                        TextEntry::make('estado_stock')
-                            ->label('Estado')
-                            ->getStateUsing(fn ($record) => $record->stock_actual < $record->stock_minimo ? 'Stock bajo' : 'Normal')
-                            ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                'Stock bajo' => 'danger',
-                                'Normal' => 'success',
-                                default => 'gray',
-                            })
-                            ->icon(fn (string $state): string => match ($state) {
-                                'Stock bajo' => 'heroicon-m-exclamation-triangle',
-                                'Normal' => 'heroicon-m-check-circle',
-                                default => 'heroicon-m-minus',
-                            }),
-                        IconEntry::make('requiere_control_individual')
-                            ->label('Control individual')
-                            ->boolean(),
-                    ])->columns(4),
-            ]);
+        return \App\Filament\Resources\MaterialResource::infolist($infolist);
     }
 
     public static function getRelations(): array

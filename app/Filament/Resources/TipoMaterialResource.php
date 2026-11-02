@@ -7,6 +7,8 @@ use App\Models\TipoMaterial;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -48,6 +50,7 @@ class TipoMaterialResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
                             ->label('Nombre del tipo')
+                            ->placeholder('Ej. Equipo de Cómputo')
                             ->required()
                             ->prefixIcon('heroicon-m-rectangle-stack')
                             ->maxLength(100),
@@ -61,7 +64,7 @@ class TipoMaterialResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
-                    ->searchable()
+                    ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)->label('Fecha de creación')
                     ->dateTime('d/m/Y')
@@ -70,6 +73,7 @@ class TipoMaterialResource extends Resource
             ])
             ->defaultSort('nombre', 'asc')
             ->striped()
+            ->searchPlaceholder('Buscar por nombre del tipo...')
             ->defaultPaginationPageOption(10)
             ->filters([
                 TrashedFilter::make(),
@@ -80,6 +84,7 @@ class TipoMaterialResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
                 Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Tipo de material actualizado correctamente'),
+                Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -92,9 +97,20 @@ class TipoMaterialResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Datos del tipo de material')
-                    ->schema([
-                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-rectangle-stack'),
+                Tabs::make('Detalle')
+                    ->tabs([
+                        Tab::make('Información')
+                            ->icon('heroicon-m-tag')
+                            ->schema([
+                                Section::make('Datos del tipo de material')
+                                    ->schema([
+                                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-rectangle-stack'),
+                                        TextEntry::make('materiales_count')
+                                            ->label('Materiales registrados')
+                                            ->state(fn (TipoMaterial $record): string => $record->materiales()->count() . ' registrados')
+                                            ->icon('heroicon-m-cube'),
+                                    ])->columns(2),
+                            ]),
                     ]),
             ]);
     }

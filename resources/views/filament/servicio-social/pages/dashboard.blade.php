@@ -118,16 +118,121 @@
             <div class="sigem-inv-layout" :class="showGrafica ? '' : 'sigem-inv-no-chart'" style="margin-top: 14px;">
                 <div class="sigem-inv-main" style="min-width: 0;">
                     <div class="sigem-rep-view sigem-dash-table" style="margin-bottom: 0;">
-                        <div class="sigem-rep-table-wrap">
+                        {{-- TOOLBAR: [Buscador] + [Desde] + [Hasta] + [Quitar filtros] --}}
+                        <div class="fi-ta-header-toolbar sigem-dash-toolbar">
+                            <div class="sigem-table-toolbar-group">
+                                <div class="fi-ta-search-field sigem-toolbar-search">
+                                    <label for="sigem-dash-busqueda" class="sr-only">Buscar</label>
+                                    <div class="fi-input-wrp">
+                                        <div class="fi-input-wrp-prefix"><span class="sigem-search-emoji">🔍</span></div>
+                                        <input
+                                            id="sigem-dash-busqueda"
+                                            type="search"
+                                            autocomplete="off"
+                                            maxlength="1000"
+                                            wire:model.live.debounce.500ms="tableColumnSearches.busqueda"
+                                            placeholder="Buscar por equipo, código, IP, MAC, marca..."
+                                            class="fi-input sigem-dash-search-input"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="sigem-toolbar-date">
+                                    <span class="sigem-toolbar-date-label">Desde</span>
+                                    <input type="date" wire:model.live="tableColumnSearches.fecha_desde" class="sigem-toolbar-date-input" title="Filtrar desde fecha" />
+                                </div>
+                                <div class="sigem-toolbar-date">
+                                    <span class="sigem-toolbar-date-label">Hasta</span>
+                                    <input type="date" wire:model.live="tableColumnSearches.fecha_hasta" class="sigem-toolbar-date-input" title="Filtrar hasta fecha" />
+                                </div>
+
+                                <button
+                                    type="button"
+                                    x-data
+                                    x-show="Object.values($wire.tableColumnSearches || {}).some(v => Boolean(v))"
+                                    x-cloak
+                                    x-on:click="$wire.resetTableColumnSearches()"
+                                    class="sigem-toolbar-reset-btn"
+                                    title="Quitar todos los filtros"
+                                >
+                                    ✕ Quitar filtros
+                                </button>
+                            </div>
+                        </div>                        <div class="sigem-rep-table-wrap">
                             <table class="fi-ta-table">
                                 <thead>
                                     <tr>
-                                        <th>CÓDIGO</th>
+                                        <th style="width: 130px;">CÓDIGO</th>
                                         <th>EQUIPO</th>
-                                        <th>CATEGORÍA</th>
-                                        <th>ESTADO</th>
-                                        <th>ÁREA</th>
-                                        <th style="text-align: right;">ACCIONES</th>
+                                        <th style="width: 125px;">CATEGORÍA</th>
+                                        <th style="width: 130px;">ESTADO</th>
+                                        <th style="width: 130px;">ÁREA</th>
+                                        <th style="width: 104px; text-align: center;">ACCIONES</th>
+                                    </tr>
+                                    <tr class="sigem-dash-filter-row">
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <input
+                                                type="search"
+                                                wire:model.live.debounce.500ms="tableColumnSearches.num_serie"
+                                                placeholder="ej. BM6R..."
+                                                class="sigem-dash-filter-input"
+                                            />
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <input
+                                                type="search"
+                                                wire:model.live.debounce.500ms="tableColumnSearches.material_nombre"
+                                                placeholder="Filtrar..."
+                                                class="sigem-dash-filter-input"
+                                            />
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <select
+                                                wire:model.live="tableColumnSearches.material_tipo_nombre"
+                                                class="fi-table-individual-search-select"
+                                            >
+                                                @foreach (($categoriasFiltro ?? []) as $optVal => $optLbl)
+                                                    <option value="{{ $optVal }}">{{ $optLbl }}</option>
+                                                @endforeach
+                                            </select>
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <select
+                                                wire:model.live="tableColumnSearches.estado"
+                                                class="fi-table-individual-search-select"
+                                            >
+                                                <option value="">Todos</option>
+                                                <option value="Disponible">Disponible</option>
+                                                <option value="Asignado">Asignado</option>
+                                                <option value="Reasignado">Reasignado</option>
+                                                <option value="En Mantenimiento">En Mantenimiento</option>
+                                                <option value="Dañado">Dañado</option>
+                                                <option value="Baja">Baja</option>
+                                            </select>
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                            <select
+                                                wire:model.live="tableColumnSearches.ubicacion_fisica"
+                                                class="fi-table-individual-search-select"
+                                            >
+                                                @foreach (($areasFiltro ?? []) as $optVal => $optLbl)
+                                                    <option value="{{ $optVal }}">{{ $optLbl }}</option>
+                                                @endforeach
+                                            </select>
+                                        </th>
+                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px; text-align: center;">
+                                            <button
+                                                type="button"
+                                                x-data
+                                                x-show="Object.values($wire.tableColumnSearches || {}).some(v => Boolean(v))"
+                                                x-cloak
+                                                x-on:click="$wire.set('tableColumnSearches', {})"
+                                                class="sigem-dash-filter-clear"
+                                                title="Limpiar filtros"
+                                            >
+                                                ✕
+                                            </button>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -152,8 +257,6 @@
                                                 'Baja' => 'neutral',
                                                 default => 'neutral',
                                             };
-
-                                            $viewUrl = url('/servicio-social/inventarios?abrir=edit&registro=' . $inv->id_inventario);
                                         @endphp
                                         <tr>
                                             <td>
@@ -174,10 +277,27 @@
                                             <td>
                                                 <span style="font-size: 14.5px; color: var(--sig-muted);">{{ $areaUbicacion }}</span>
                                             </td>
-                                            <td style="text-align: right;">
-                                                <a href="{{ $viewUrl }}" class="sigem-btn-icon" title="Ver equipo">
-                                                    👁
-                                                </a>
+                                            <td class="fi-ta-actions-cell" style="width: 104px; text-align: center; white-space: nowrap;">
+                                                <div class="fi-ta-actions" style="display: inline-flex; align-items: center; justify-content: center; gap: 3px;">
+                                                    <button type="button"
+                                                            wire:click="verEquipo({{ $inv->id_inventario }})"
+                                                            class="fi-icon-btn sigem-dash-btn"
+                                                            title="Ver detalle"
+                                                            aria-label="Ver detalle">
+                                                    </button>
+                                                    <button type="button"
+                                                            wire:click="editarEquipo({{ $inv->id_inventario }})"
+                                                            class="fi-icon-btn sigem-dash-btn"
+                                                            title="Editar"
+                                                            aria-label="Editar">
+                                                    </button>
+                                                    <button type="button"
+                                                            wire:click="eliminarEquipo({{ $inv->id_inventario }})"
+                                                            class="fi-icon-btn sigem-dash-btn"
+                                                            title="Eliminar"
+                                                            aria-label="Eliminar">
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     @empty
@@ -190,74 +310,100 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                </div>
 
-                {{-- Panel Lateral: Gráfica de Dona --}}
-                <div class="sigem-inv-side" x-show="showGrafica" x-transition.opacity style="display: none;">
-                    <div class="sigem-chart-card">
-                        <div class="sigem-chart-head">
-                            <h3>Estado del Inventario</h3>
-                            <button type="button" class="sigem-chart-close" x-on:click="showGrafica = false" title="Cerrar gráfica">✕</button>
-                        </div>
-                        <p class="sigem-chart-sub">Proporción de equipos por condición actual</p>
-
-                        @php
-                            $disp = $inventarioDisponibles ?? 0;
-                            $mant = $inventarioEnMantenimiento ?? 0;
-                            $asig = $inventarioAsignados ?? 0;
-                            $dan  = $inventarioDanados ?? 0;
-                            $totalChart = $disp + $mant + $asig + $dan;
-                            $totalChart = $totalChart > 0 ? $totalChart : 1;
-
-                            $pDisp = round(($disp / $totalChart) * 100, 1);
-                            $pMant = round(($mant / $totalChart) * 100, 1);
-                            $pAsig = round(($asig / $totalChart) * 100, 1);
-                            $pDan  = round(($dan  / $totalChart) * 100, 1);
-
-                            $cDisp = $pDisp;
-                            $cMant = $cDisp + $pMant;
-                            $cAsig = $cMant + $pAsig;
-                        @endphp
-
-                        <div class="sigem-donut-wrap">
-                            <div class="sigem-donut" style="background: conic-gradient(
-                                var(--sig-success) 0% {{ $cDisp }}%,
-                                var(--sig-warning) {{ $cDisp }}% {{ $cMant }}%,
-                                var(--sig-info) {{ $cMant }}% {{ $cAsig }}%,
-                                var(--sig-danger) {{ $cAsig }}% 100%
-                            );">
-                                <div class="sigem-donut-hole">
-                                    <span class="sigem-donut-total">{{ $totalChart > 1 ? ($disp + $mant + $asig + $dan) : $disp }}</span>
-                                    <span class="sigem-donut-label">Total</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="sigem-donut-legend">
-                            <div class="sigem-legend-item">
-                                <span class="sigem-legend-dot" style="background: var(--sig-success);"></span>
-                                <span class="sigem-legend-name">Disponible</span>
-                                <span class="sigem-legend-val">{{ $disp }} ({{ $pDisp }}%)</span>
-                            </div>
-                            <div class="sigem-legend-item">
-                                <span class="sigem-legend-dot" style="background: var(--sig-warning);"></span>
-                                <span class="sigem-legend-name">Mantenimiento</span>
-                                <span class="sigem-legend-val">{{ $mant }} ({{ $pMant }}%)</span>
-                            </div>
-                            <div class="sigem-legend-item">
-                                <span class="sigem-legend-dot" style="background: var(--sig-info);"></span>
-                                <span class="sigem-legend-name">Asignado</span>
-                                <span class="sigem-legend-val">{{ $asig }} ({{ $pAsig }}%)</span>
-                            </div>
-                            <div class="sigem-legend-item">
-                                <span class="sigem-legend-dot" style="background: var(--sig-danger);"></span>
-                                <span class="sigem-legend-name">Dañado / Baja</span>
-                                <span class="sigem-legend-val">{{ $dan }} ({{ $pDan }}%)</span>
-                            </div>
+                        <div class="sigem-dash-more">
+                            <a href="{{ url('/servicio-social/inventarios') }}">
+                                Ver todo el inventario →
+                            </a>
                         </div>
                     </div>
                 </div>
+
+                <!-- Panel lateral derecho: Gráfica del inventario -->
+                <aside class="sigem-inv-side" x-show="showGrafica">
+                    <div class="sigem-inv-side-title">Resumen del inventario</div>
+
+                    @php
+                        $dashTotal = $totalActivos ?? 0;
+                        $circunf = 263.89;
+                        $donutSegs = [
+                            ['label' => 'Disponible', 'cant' => $inventarioDisponibles ?? 0, 'color' => '#059669'],
+                            ['label' => 'En mantenimiento', 'cant' => $inventarioEnMantenimiento ?? 0, 'color' => '#d97706'],
+                            ['label' => 'Asignado', 'cant' => $inventarioAsignados ?? 0, 'color' => '#0891b2'],
+                            ['label' => 'Dañado', 'cant' => $inventarioDanados ?? 0, 'color' => '#dc2626'],
+                        ];
+                        $dashOffset = 0;
+                    @endphp
+
+                    <!-- 1. Dona SVG -->
+                    <div class="sigem-donut">
+                        <svg viewBox="0 0 120 120" width="120" height="120">
+                            <circle cx="60" cy="60" r="42" fill="none" stroke="#f1f5f9" stroke-width="16" />
+                            @if($dashTotal > 0)
+                                @foreach($donutSegs as $seg)
+                                    @if($seg['cant'] > 0)
+                                        @php
+                                            $dLen = round(($seg['cant'] / $dashTotal) * $circunf, 2);
+                                            $dGap = round($circunf - $dLen, 2);
+                                            $curOff = $dashOffset;
+                                            $dashOffset += $dLen;
+                                        @endphp
+                                        <circle
+                                            cx="60"
+                                            cy="60"
+                                            r="42"
+                                            fill="none"
+                                            stroke="{{ $seg['color'] }}"
+                                            stroke-width="16"
+                                            stroke-dasharray="{{ $dLen }} {{ $dGap }}"
+                                            stroke-dashoffset="{{ -$curOff }}"
+                                            transform="rotate(-90 60 60)"
+                                        />
+                                    @endif
+                                @endforeach
+                            @else
+                                <circle cx="60" cy="60" r="42" fill="none" stroke="#e5e7eb" stroke-width="16" />
+                            @endif
+                        </svg>
+                        <div class="sigem-donut-center">
+                            <b>{{ $dashTotal }}</b>
+                            <span>equipos</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. Leyenda de estados -->
+                    <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 3px;">
+                        @foreach($donutSegs as $seg)
+                            <div class="sigem-lg" style="cursor: default;">
+                                <i style="background: {{ $seg['color'] }};"></i>
+                                <span>{{ $seg['label'] }}</span>
+                                <b>{{ $seg['cant'] }}</b>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <!-- 3. Barras por categoría -->
+                    <div style="margin-top: 18px; border-top: 1px solid var(--sig-border); padding-top: 14px;">
+                        <div style="font-size: 13.5px; font-weight: 700; color: var(--sig-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px;">
+                            Por categoría
+                        </div>
+                        @forelse(($categoriasTop ?? []) as $catNom => $catCant)
+                            @php
+                                $pct = ($dashTotal ?? 0) > 0 ? round(($catCant / $dashTotal) * 100) : 0;
+                            @endphp
+                            <a href="{{ url('/servicio-social/inventarios?tableSearch=' . urlencode($catNom)) }}"
+                               class="sigem-cb"
+                               style="text-decoration: none; color: inherit;"
+                               title="Ver {{ $catNom }} en inventario">
+                                <span title="{{ $catNom }}">{{ $catNom }}</span>
+                                <div><span style="width: {{ $pct }}%;"></span></div>
+                                <span style="text-align: right; font-weight: 600;">{{ $catCant }}</span>
+                            </a>
+                        @empty
+                            <div style="font-size: 13px; color: var(--sig-muted);">Sin categorías registradas</div>
+                        @endforelse
+                    </div>
+                </aside>
             </div>
         </div>
 
