@@ -34,6 +34,10 @@ class UserPolicy
 
     public function delete(User $user, User $modelInstance): bool
     {
+        if ($user->id === $modelInstance->id) {
+            return false; // No puede eliminarse a sí mismo
+        }
+
         return $this->isAdmin($user);
     }
 
@@ -44,6 +48,10 @@ class UserPolicy
 
     public function forceDelete(User $user, User $modelInstance): bool
     {
+        if ($user->id === $modelInstance->id) {
+            return false; // No puede eliminarse a sí mismo
+        }
+
         return $this->isAdmin($user);
     }
 }

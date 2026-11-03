@@ -95,6 +95,13 @@
 </IfModule>
 
 <IfModule mod_headers.c>
+    # Cabeceras de Seguridad HTTP (V-03)
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
     # Cache inmutable de 1 año (31,536,000 segundos) para assets estáticos
     <FilesMatch "\.(ico|pdf|jpg|jpeg|png|gif|webp|js|css|svg|woff|woff2|ttf|otf)$">
         Header set Cache-Control "max-age=31536000, public, immutable"

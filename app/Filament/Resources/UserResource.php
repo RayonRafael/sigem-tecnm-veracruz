@@ -15,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 
 class UserResource extends Resource
@@ -77,6 +78,7 @@ class UserResource extends Resource
                                 ->label('Contraseña')
                                 ->placeholder('••••••••')
                                 ->password()
+                                ->rule(Password::min(8)->letters()->numbers())
                                 ->prefixIcon('heroicon-m-key')
                                 ->required(fn (string $operation): bool => $operation === 'create')
                                 ->dehydrated(fn (?string $state): bool => filled($state))
@@ -122,6 +124,8 @@ class UserResource extends Resource
                                 ->boolean(trueLabel: 'Sí', falseLabel: 'No')
                                 ->inline()
                                 ->default(true)
+                                ->disabled(fn (?User $record): bool => auth()->id() === $record?->id)
+                                ->helperText(fn (?User $record): ?string => auth()->id() === $record?->id ? 'No puedes desactivar tu propia cuenta.' : null)
                                 ->required()
                                 ->columnSpanFull(),
                         ])
@@ -204,7 +208,7 @@ class UserResource extends Resource
                             ->label('Eliminar')
                             ->color('danger')
                             ->icon('heroicon-m-trash')
-                            ->hidden(fn (?User $record): bool => ! $record || $record->email === 'admin@tecnm.edu.mx')
+                            ->hidden(fn (?User $record): bool => ! $record || $record->email === 'admin@tecnm.edu.mx' || auth()->id() === $record->id)
                             ->alpineClickHandler(fn (?User $record) => "\$wire.replaceMountedTableAction('delete', '{$record?->getKey()}')"),
                     ]),
                 Tables\Actions\EditAction::make()
@@ -225,13 +229,13 @@ class UserResource extends Resource
                     ->color('danger')
                     ->tooltip('Eliminar')
                     ->iconButton()
-                    ->hidden(fn (User $record): bool => $record->email === 'admin@tecnm.edu.mx'),
+                    ->hidden(fn (User $record): bool => $record->email === 'admin@tecnm.edu.mx' || auth()->id() === $record->id),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->action(function (Collection $records) {
-                            $records->filter(fn ($record) => $record->email !== 'admin@tecnm.edu.mx')->each->delete();
+                            $records->filter(fn ($record) => $record->email !== 'admin@tecnm.edu.mx' && $record->id !== auth()->id())->each->delete();
                         }),
                 ]),
             ]);
