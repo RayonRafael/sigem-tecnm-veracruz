@@ -15,9 +15,10 @@ WORKDIR /var/www/html
 
 COPY . .
 
+# APP_KEY se proporciona via variable de entorno en Render Dashboard
+# NUNCA hardcodear la APP_KEY en este archivo
 ENV APP_ENV=production \
     APP_DEBUG=false \
-    APP_KEY=base64:kX/Ss1wi677iwLQrFpWXOfSgaLk4VCI7sV4/PIbmFmc= \
     DB_CONNECTION=sqlite \
     DB_DATABASE=database/database.sqlite
 
