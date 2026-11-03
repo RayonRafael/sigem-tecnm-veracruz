@@ -79,8 +79,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'inventario.ver',
             'inventario.crear',
             'catalogos.ver',
-            'catalogos.crear',
-            'catalogos.editar',
+            // 'catalogos.crear' y 'catalogos.editar' omitidos intencionalmente:
+            // Las Policies vigentes (AreaPolicy, MaterialPolicy, etc.) restringen estas acciones exclusivamente al rol Administrador.
             'mantenimiento.ver',
             'mantenimiento.crear',
             'mantenimiento.editar',

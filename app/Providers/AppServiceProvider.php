@@ -35,6 +35,7 @@ use Filament\Tables\Table;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\ValidationException;
@@ -91,6 +92,10 @@ class AppServiceProvider extends ServiceProvider
             $user = User::where('email', $event->credentials['email'] ?? '')->first();
 
             if ($user && ! $user->canAccessPanel($panel)) {
+                // Mitigación V-09 (Timing attack): ejecutar hash con bcrypt (~250ms)
+                // para equiparar el tiempo de respuesta con una verificación de credenciales regular.
+                Hash::check($event->credentials['password'] ?? '', $user->password);
+
                 throw ValidationException::withMessages([
                     'data.email' => __('filament-panels::pages/auth/login.messages.failed'),
                 ]);
