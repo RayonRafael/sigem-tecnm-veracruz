@@ -40,5 +40,5 @@ RUN composer install --no-dev --optimize-autoloader \
 
 EXPOSE 10000
 
-# Ajustar puerto dinámico de Render ($PORT) y arrancar Apache en primer plano
-CMD sh -c "sed -i 's/80/'\"\${PORT:-10000}\"'/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf && exec apache2-foreground"
+# Ajustar puerto dinámico de Render ($PORT), limpiar cache de configuración de build para leer variables de entorno en runtime (APP_KEY, etc.) y arrancar Apache en primer plano
+CMD sh -c "sed -i 's/80/'\"\${PORT:-10000}\"'/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf && php artisan config:clear && exec apache2-foreground"
