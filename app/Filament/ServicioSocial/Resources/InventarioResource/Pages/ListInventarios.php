@@ -28,8 +28,32 @@ class ListInventarios extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label("\u{FF0B} Registrar equipo")
+                ->slideOver()
+                ->form(\App\Filament\Resources\InventarioResource::getMockupFormSchema())
+                ->modalSubmitActionLabel('Registrar')
+                ->modalCancelActionLabel('Cancelar')
+                ->extraAttributes([
+                    'class' => 'sigem-btn-primary',
+                    'title' => 'Registrar un nuevo equipo en el inventario',
+                ])
+                ->using(fn (array $data): Inventario => \App\Filament\Resources\InventarioResource::registrarMultiplesEquipos($data))
+                ->successNotificationTitle(fn (?Inventario $record, Actions\CreateAction $action): string => \App\Filament\Resources\InventarioResource::obtenerMensajeExito($record ?? $action->getRecord())),
         ];
+    }
+
+    protected function configureCreateAction(Actions\CreateAction | \Filament\Tables\Actions\CreateAction $action): void
+    {
+        parent::configureCreateAction($action);
+
+        $action->url(null);
+        $action->slideOver();
+        $action->form(\App\Filament\Resources\InventarioResource::getMockupFormSchema());
+        $action->modalSubmitActionLabel('Registrar');
+        $action->modalCancelActionLabel('Cancelar');
+        $action->using(fn (array $data): Inventario => \App\Filament\Resources\InventarioResource::registrarMultiplesEquipos($data));
+        $action->successNotificationTitle(fn (?Inventario $record, $act): string => \App\Filament\Resources\InventarioResource::obtenerMensajeExito($record ?? (method_exists($act, 'getRecord') ? $act->getRecord() : null)));
     }
 
     protected function mutateSlideOverData(array $data): array

@@ -18,7 +18,7 @@
         <div class="sigem-note-strip">
             <span style="font-size: 20px; line-height: 1;">💡</span>
             <div>
-                Esta información es de referencia para consultar los activos, áreas y materiales registrados en el instituto.
+                No puedes modificarla — el administrador la mantiene actualizada.
             </div>
         </div>
 

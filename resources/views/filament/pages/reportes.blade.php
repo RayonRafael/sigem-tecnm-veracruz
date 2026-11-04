@@ -35,11 +35,19 @@
                             <span class="sigem-sw-ui"></span>
                             <span class="sigem-sw-l">Visible para Servicio Social</span>
                         </label>
-                        <button type="button"
-                                wire:click="verReporte('{{ $rep['id'] }}')"
-                                class="sigem-rep-btn-primary">
-                            Ver reporte
-                        </button>
+                        <div style="display: inline-flex; align-items: center; gap: 6px;">
+                            <button type="button"
+                                    wire:click="exportarExcel('{{ $rep['id'] }}')"
+                                    class="sigem-rep-btn-sec"
+                                    title="Descargar este reporte en formato Excel (.xlsx)">
+                                ⬇ Exportar
+                            </button>
+                            <button type="button"
+                                    wire:click="verReporte('{{ $rep['id'] }}')"
+                                    class="sigem-rep-btn-primary">
+                                Ver reporte
+                            </button>
+                        </div>
                     </div>
                 </div>
             @endforeach
@@ -57,12 +65,12 @@
                     </div>
                     <div style="display: inline-flex; align-items: center; gap: 8px;">
                         <button type="button"
-                                wire:click="exportarReporte('{{ $this->reporteActivo }}')"
+                                wire:click="exportarExcel('{{ $this->reporteActivo }}')"
                                 wire:loading.attr="disabled"
                                 class="sigem-rep-btn-sec"
-                                title="Descargar como archivo CSV compatible con Excel">
-                            <span wire:loading.remove wire:target="exportarReporte">⬇ Exportar</span>
-                            <span wire:loading wire:target="exportarReporte" style="display: none;" class="sigem-btn-loading-content">
+                                title="Descargar como archivo Excel (.xlsx)">
+                            <span wire:loading.remove wire:target="exportarExcel">⬇ Exportar Excel</span>
+                            <span wire:loading wire:target="exportarExcel" style="display: none;" class="sigem-btn-loading-content">
                                 <svg class="sigem-btn-spinner" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"></circle><path d="M4 12a8 8 0 018-8" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path></svg>
                                 Exportando...
                             </span>
@@ -99,7 +107,7 @@
                     </div>
                 @else
                     <div class="sigem-rep-empty">
-                        Sin registros por ahora.
+                        Sin registros disponibles para los filtros actuales de este reporte.
                     </div>
                 @endif
             </div>

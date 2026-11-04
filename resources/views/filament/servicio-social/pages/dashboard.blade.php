@@ -10,70 +10,22 @@
         @endphp
 
         {{-- 1. HERO CON ACCIONES --}}
-        <div class="sigem-hero">
+        <div class="sigem-hero" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
             <div>
-                <h1 id="sigem-hero-hi">👋 <span x-text="getGreeting()">{{ $saludo }}</span>, {{ $nombreCorto }}</h1>
+                <h1 id="sigem-hero-hi">👋 <span x-text="getGreeting()">{{ $saludo }}</span>, Alumno</h1>
                 <p>Gestiona tus solicitudes de material, reportes de mantenimiento y consulta el inventario del instituto.</p>
+            </div>
+            <div class="sigem-hero-actions" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <a href="{{ url('/servicio-social/solicituds/create') }}" class="sigem-btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    ＋ Crear solicitud
+                </a>
+                <a href="{{ url('/servicio-social/mantenimientos/create') }}" class="sigem-rep-btn-sec" style="background: white; border: 1px solid var(--sig-border); color: var(--sig-text); padding: 8px 14px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                    🔧 Reportar mantenimiento
+                </a>
             </div>
         </div>
 
-        {{-- 2. FILA 1 — 4 TARJETAS DE ACCIÓN --}}
-        @if($isSkeletonPreview)
-            {{-- SKELETON PREVIEW: ACCIONES RÁPIDAS (4 CARDS) --}}
-            <div class="sigem-quick-grid sigem-skeleton-grid">
-                @for($i = 0; $i < 4; $i++)
-                    <div class="sigem-skeleton-card sigem-skeleton-quick">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                            <span class="sigem-skeleton" style="width: 36px; height: 36px; border-radius: 10px;"></span>
-                            <span class="sigem-skeleton" style="width: 14px; height: 14px; border-radius: 4px;"></span>
-                        </div>
-                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 65%; height: 16px; margin-bottom: 6px;"></span>
-                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 85%; height: 12px;"></span>
-                    </div>
-                @endfor
-            </div>
-        @else
-            <div class="sigem-quick-grid">
-                {{-- 1. Crear solicitud --}}
-                <a class="sigem-quick" href="{{ url('/servicio-social/solicituds?abrir=create') }}">
-                    <div class="arrow">→</div>
-                    <div class="sigem-quick-ico sigem-i-primary">📋</div>
-                    <div class="sigem-quick-title">Crear solicitud</div>
-                    <div class="sigem-quick-desc">Petición de material o consumibles</div>
-                </a>
-
-                {{-- 2. Reportar mantenimiento --}}
-                <a class="sigem-quick" href="{{ url('/servicio-social/mantenimientos?abrir=create') }}">
-                    <div class="arrow">→</div>
-                    <div class="sigem-quick-ico sigem-i-warning">🔧</div>
-                    <div class="sigem-quick-title">Reportar mantenimiento</div>
-                    <div class="sigem-quick-desc">Reporte de falla técnica o servicio</div>
-                </a>
-
-                {{-- 3. Registrar equipo --}}
-                <a class="sigem-quick" href="javascript:void(0)" wire:click="mountAction('registrarEquipo')">
-                    <div class="arrow">→</div>
-                    <div class="sigem-quick-ico sigem-i-success">＋</div>
-                    <div class="sigem-quick-title">Registrar equipo</div>
-                    <div class="sigem-quick-desc">Alta de equipo en inventario</div>
-                </a>
-
-                {{-- 4. Seguir mis trámites --}}
-                <a class="sigem-quick" href="{{ url('/servicio-social/solicituds') }}">
-                    <div class="arrow">→</div>
-                    <div class="sigem-quick-ico sigem-i-info">🕘</div>
-                    <div class="sigem-quick-title">
-                        Seguir mis trámites
-                        @if(($misSolicitudesPendientes ?? 0) > 0)
-                            <span class="sigem-qbadge">{{ $misSolicitudesPendientes }}</span>
-                        @endif
-                    </div>
-                    <div class="sigem-quick-desc">Estado de solicitudes y órdenes</div>
-                </a>
-            </div>
-        @endif
-
-        {{-- 3. FILA 2 — 4 TARJETAS KPI --}}
+        {{-- 2. KPIS (4 TARJETAS SUPERIORES — DIFERENTES AL ADMIN) --}}
         @if($isSkeletonPreview)
             {{-- SKELETON PREVIEW: KPIS (4 MÉTRICAS) --}}
             <div class="sigem-stats-grid sigem-skeleton-grid">
@@ -101,7 +53,7 @@
                     <div class="sigem-stat-ico sigem-i-primary">📋</div>
                     <div class="sigem-stat-val">{{ $misSolicitudes ?? 0 }}</div>
                     <div class="sigem-stat-label">Mis solicitudes</div>
-                    <div class="sigem-stat-hint sigem-h-ok">✓ {{ $solicitudesAutorizadas ?? 0 }} autorizadas · {{ $misSolicitudesPendientes ?? 0 }} pendientes</div>
+                    <div class="sigem-stat-hint sigem-h-ok">✓ {{ $solicitudesAutorizadas ?? 0 }} autorizadas</div>
                 </div>
 
                 {{-- 3. Mis mantenimientos --}}
@@ -117,8 +69,64 @@
                     <div class="sigem-stat-ico sigem-i-success">✓</div>
                     <div class="sigem-stat-val">{{ $inventarioDisponibles ?? 0 }}</div>
                     <div class="sigem-stat-label">Equipos disponibles</div>
-                    <div class="sigem-stat-hint sigem-h-info">de {{ $totalActivos ?? 0 }} artículos registrados</div>
+                    <div class="sigem-stat-hint sigem-h-info">Número total</div>
                 </div>
+            </div>
+        @endif
+
+        {{-- 3. QUICK CARDS (4 TARJETAS CON FLECHA "→" — DIFERENTES AL ADMIN) --}}
+        @if($isSkeletonPreview)
+            {{-- SKELETON PREVIEW: ACCIONES RÁPIDAS (4 CARDS) --}}
+            <div class="sigem-quick-grid sigem-skeleton-grid">
+                @for($i = 0; $i < 4; $i++)
+                    <div class="sigem-skeleton-card sigem-skeleton-quick">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                            <span class="sigem-skeleton" style="width: 36px; height: 36px; border-radius: 10px;"></span>
+                            <span class="sigem-skeleton" style="width: 14px; height: 14px; border-radius: 4px;"></span>
+                        </div>
+                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 65%; height: 16px; margin-bottom: 6px;"></span>
+                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 85%; height: 12px;"></span>
+                    </div>
+                @endfor
+            </div>
+        @else
+            <div class="sigem-quick-grid">
+                {{-- 1. Crear solicitud --}}
+                <a class="sigem-quick" href="{{ url('/servicio-social/solicituds/create') }}">
+                    <div class="arrow">→</div>
+                    <div class="sigem-quick-ico sigem-i-primary">📋</div>
+                    <div class="sigem-quick-title">Crear solicitud</div>
+                    <div class="sigem-quick-desc">Pide salida, entrada o traslado</div>
+                </a>
+
+                {{-- 2. Reportar mantenimiento --}}
+                <a class="sigem-quick" href="{{ url('/servicio-social/mantenimientos/create') }}">
+                    <div class="arrow">→</div>
+                    <div class="sigem-quick-ico sigem-i-warning">🔧</div>
+                    <div class="sigem-quick-title">Reportar mantenimiento</div>
+                    <div class="sigem-quick-desc">Avisa que un equipo necesita servicio</div>
+                </a>
+
+                {{-- 3. Registrar equipo --}}
+                <a class="sigem-quick" href="javascript:void(0)" wire:click="mountAction('registrarEquipo')">
+                    <div class="arrow">→</div>
+                    <div class="sigem-quick-ico sigem-i-success">＋</div>
+                    <div class="sigem-quick-title">Registrar equipo</div>
+                    <div class="sigem-quick-desc">Da de alta un equipo o estación</div>
+                </a>
+
+                {{-- 4. Seguir mis trámites --}}
+                <a class="sigem-quick" href="{{ url('/servicio-social/solicituds') }}">
+                    <div class="arrow">→</div>
+                    <div class="sigem-quick-ico sigem-i-info">🕘</div>
+                    <div class="sigem-quick-title">
+                        Seguir mis trámites
+                        @if(($misSolicitudesPendientes ?? 0) > 0)
+                            <span class="sigem-qbadge">{{ $misSolicitudesPendientes }}</span>
+                        @endif
+                    </div>
+                    <div class="sigem-quick-desc">Estado de lo enviado</div>
+                </a>
             </div>
         @endif
 

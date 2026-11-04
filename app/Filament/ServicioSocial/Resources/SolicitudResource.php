@@ -3,11 +3,13 @@
 namespace App\Filament\ServicioSocial\Resources;
 
 use App\Filament\ServicioSocial\Resources\SolicitudResource\Pages;
+use App\Models\Receptor;
 use App\Models\Solicitud;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -37,112 +39,19 @@ class SolicitudResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Wizard::make([
-                    Forms\Components\Wizard\Step::make('Datos de la solicitud')
-                        ->icon('heroicon-m-document-text')
-                        ->schema([
-                            Forms\Components\Grid::make(3)
-                                ->schema([
-                                    Forms\Components\DatePicker::make('fecha_solicitud')
-                                        ->default(now())
-                                        ->required()
-                                        ->prefixIcon('heroicon-m-calendar')
-                                        ->columnSpan(1),
-                                    Forms\Components\ToggleButtons::make('tipo_movimiento')
-                                        ->options([
-                                            'Asignacion Temporal' => 'Asignación Temporal',
-                                            'Asignacion Permanente' => 'Asignación Permanente',
-                                        ])
-                                        ->colors([
-                                            'Asignacion Temporal' => 'warning',
-                                            'Asignacion Permanente' => 'success',
-                                        ])
-                                        ->inline()
-                                        ->default('Asignacion Temporal')
-                                        ->required()
-                                        ->live()
-                                        ->columnSpan(2),
-                                ]),
-                            Forms\Components\ToggleButtons::make('estado')
-                                ->options([
-                                    'Pendiente' => 'Pendiente',
-                                ])
-                                ->colors([
-                                    'Pendiente' => 'warning',
-                                ])
-                                ->inline()
-                                ->default('Pendiente')
-                                ->required()
-                                ->columnSpanFull(),
-                            Forms\Components\Textarea::make('observaciones')
-                                ->label('Detalle / motivo de la solicitud')
-                                ->placeholder('Explica qué necesitas y para qué...')
-                                ->rows(3)
-                                ->required()
-                                ->columnSpanFull(),
-                            Forms\Components\Repeater::make('detalles')
-                                ->label('Materiales solicitados')
-                                ->relationship('detalles')
-                                ->schema([
-                                    Forms\Components\Select::make('id_producto')
-                                        ->label('Material')
-                                        ->relationship('material', 'nombre')
-                                        ->searchable()
-                                        ->preload()
-                                        ->required()
-                                        ->columnSpan(2),
-                                    Forms\Components\TextInput::make('cantidad')
-                                        ->label('Cantidad')
-                                        ->numeric()
-                                        ->default(1)
-                                        ->required()
-                                        ->columnSpan(1),
-                                ])
-                                ->columns(3)
-                                ->columnSpanFull()
-                                ->defaultItems(1)
-                                ->addActionLabel('Añadir material'),
-                        ]),
-
-                    Forms\Components\Wizard\Step::make('Participantes y detalles')
-                        ->icon('heroicon-m-users')
-                        ->schema([
-                            Forms\Components\Hidden::make('id_usuario')
-                                ->default(auth()->id()),
-                            Forms\Components\Select::make('id_receptor')
-                                ->label('Receptor (área/persona)')
-                                ->relationship('receptor', 'nombre')
-                                ->required()
-                                ->searchable()
-                                ->preload()
-                                ->prefixIcon('heroicon-m-user-group')
-                                ->live(),
-                            Forms\Components\Grid::make(2)
-                                ->schema([
-                                    Forms\Components\DatePicker::make('fecha_devolucion_estimada')
-                                        ->label('Devolución estimada')
-                                        ->prefixIcon('heroicon-m-calendar-days')
-                                        ->visible(fn (Forms\Get $get) => $get('tipo_movimiento') === 'Asignacion Temporal'),
-                                    Forms\Components\DatePicker::make('fecha_devolucion_real')
-                                        ->label('Devolución real')
-                                        ->prefixIcon('heroicon-m-calendar-days')
-                                        ->visible(fn (Forms\Get $get) => $get('tipo_movimiento') === 'Asignacion Temporal'),
-                                ]),
-                        ]),
-                ])->columnSpanFull(),
-            ]);
+        return \App\Filament\Resources\SolicitudResource::form($form);
     }
 
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id_solicitud')->wrap(false)->limit(30)->grow(false)
+                Tables\Columns\TextColumn::make('id_solicitud')
                     ->label('Folio')
-                    ->formatStateUsing(fn ($state) => 'FOLIO-'.str_pad($state, 5, '0', STR_PAD_LEFT))
+                    ->formatStateUsing(fn ($state) => 'FOLIO-' . str_pad($state, 5, '0', STR_PAD_LEFT))
                     ->fontFamily('mono')
+                    ->weight(FontWeight::Bold)
+                    ->extraAttributes(['class' => 'sigem-td-folio'])
                     ->searchable(query: function (Builder $query, string $search): Builder {
                         $num = preg_replace('/[^0-9]/', '', $search);
                         return $query->where(function (Builder $q) use ($search, $num) {
@@ -153,26 +62,43 @@ class SolicitudResource extends Resource
                         });
                     }, isIndividual: true)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('tipo_movimiento')->wrap(false)->limit(30)->grow(false)
-                    ->label('Tipo de movimiento')
+
+                Tables\Columns\TextColumn::make('tipo_movimiento')
+                    ->label('Tipo')
                     ->badge()
-                    ->color('gray')
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'Asignacion Permanente', 'Salida' => 'Salida',
+                        'Asignacion Temporal', 'Entrada' => 'Entrada',
+                        'Renta Externa', 'Traslado' => 'Traslado',
+                        default => $state ?? '—',
+                    })
+                    ->color('info')
                     ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->where('tipo_movimiento', $search);
+                        $mapped = match (trim($search)) {
+                            'Salida' => 'Asignacion Permanente',
+                            'Entrada' => 'Asignacion Temporal',
+                            'Traslado' => 'Renta Externa',
+                            default => $search,
+                        };
+                        return $query->where('tipo_movimiento', $mapped);
                     }, isIndividual: true),
-                Tables\Columns\TextColumn::make('usuario.name')->wrap(false)->limit(30)->grow(false)
-                    ->label('Solicitante')
-                    ->searchable(isIndividual: true),
-                Tables\Columns\TextColumn::make('receptor.nombre')->wrap(false)->limit(30)->grow(false)
-                    ->label('Receptor')
-                    ->searchable(isIndividual: true),
-                Tables\Columns\TextColumn::make('receptor.area.departamento.nombre')->wrap(false)->limit(30)->grow(false)
-                    ->label('Departamento')
+
+                Tables\Columns\TextColumn::make('estado')
+                    ->label('Estado')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => '● ' . ($state ?? 'Pendiente'))
+                    ->color(fn (?string $state): string => match ($state) {
+                        'Pendiente' => 'warning',
+                        'Autorizado' => 'success',
+                        'Rechazado' => 'danger',
+                        'Entregado', 'Completado' => 'info',
+                        default => 'gray',
+                    })
                     ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->whereHas('receptor.area.departamento', fn ($q) => $q->where('nombre', 'like', '%' . trim($search) . '%'));
-                    }, isIndividual: true)
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('fecha_solicitud')->wrap(false)->limit(30)->grow(false)
+                        return $query->where('estado', $search);
+                    }, isIndividual: true),
+
+                Tables\Columns\TextColumn::make('fecha_solicitud')
                     ->label('Fecha')
                     ->date('d/m/Y')
                     ->searchable(query: function (Builder $query, string $search): Builder {
@@ -182,23 +108,10 @@ class SolicitudResource extends Resource
                         return $query->where('fecha_solicitud', 'like', "%{$search}%");
                     }, isIndividual: true)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)
-                    ->badge()
-                    ->formatStateUsing(fn (string $state): string => '● ' . $state)
-                    ->color(fn (string $state): string => match ($state) {
-                        'Pendiente' => 'warning',
-                        'Autorizado' => 'success',
-                        'Rechazado' => 'danger',
-                        'Entregado' => 'info',
-                        default => 'gray',
-                    })
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->where('estado', $search);
-                    }, isIndividual: true),
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
-            ->searchPlaceholder('Buscar por folio, solicitante o detalle...')
+            ->searchPlaceholder('Buscar por folio o detalle...')
             ->defaultPaginationPageOption(10)
             ->filters([])
             ->modifyQueryUsing(function (Builder $query, $livewire): Builder {
@@ -212,6 +125,9 @@ class SolicitudResource extends Resource
                 }
                 return $query;
             })
+            ->emptyStateHeading('No hay registros')
+            ->emptyStateDescription('Cuando se creen registros, aparecerán aquí.')
+            ->emptyStateIcon('heroicon-o-document-text')
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
@@ -220,10 +136,14 @@ class SolicitudResource extends Resource
                     ->tooltip('Ver detalle')
                     ->extraAttributes(['title' => 'Ver detalle'])
                     ->slideOver()
-                    ->modalHeading(fn (?Solicitud $record) => 'Folio: ' . ($record?->id_solicitud ? 'FOLIO-' . str_pad($record->id_solicitud, 5, '0', STR_PAD_LEFT) : '—'))
+                    ->modalHeading(fn (?Solicitud $record) => $record?->id_solicitud ? 'FOLIO-' . str_pad($record->id_solicitud, 5, '0', STR_PAD_LEFT) : 'Detalle de solicitud')
                     ->modalDescription(fn (?Solicitud $record) => new \Illuminate\Support\HtmlString(
-                        e($record?->tipo_movimiento ?? 'Por capturar') . ' · ' .
-                        e($record?->estado ?? 'Por capturar')
+                        'Solicitud de <b>' . e(match ($record?->tipo_movimiento) {
+                            'Asignacion Permanente', 'Salida' => 'Salida',
+                            'Asignacion Temporal', 'Entrada' => 'Entrada',
+                            'Renta Externa', 'Traslado' => 'Traslado',
+                            default => $record?->tipo_movimiento ?? 'Salida',
+                        }) . '</b> · ' . e($record?->fecha_solicitud?->format('d/m/Y') ?? '—')
                     ))
                     ->modalCancelActionLabel('Cerrar'),
             ])
@@ -249,7 +169,7 @@ class SolicitudResource extends Resource
         ];
     }
 
-    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()->where('id_usuario', auth()->id());
     }

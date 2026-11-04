@@ -17,6 +17,7 @@ class Departamento extends Model
     protected $fillable = [
         'nombre',
         'edificio_id',
+        'encargado',
     ];
 
     // RELACIONES: Un departamento pertenece a un edificio
@@ -29,5 +30,10 @@ class Departamento extends Model
     public function areas()
     {
         return $this->hasMany(Area::class, 'id_departamento', 'id_departamento');
+    }
+
+    public function inventarios()
+    {
+        return $this->hasMany(Inventario::class, 'departamento_id', 'id_departamento');
     }
 }

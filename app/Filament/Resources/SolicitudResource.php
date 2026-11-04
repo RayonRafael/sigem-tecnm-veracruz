@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -45,163 +46,62 @@ class SolicitudResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Wizard::make([
-                    Forms\Components\Wizard\Step::make('Datos de la solicitud')
-                        ->icon('heroicon-m-document-text')
-                        ->schema([
-                            Forms\Components\Grid::make(3)
-                                ->schema([
-                                    Forms\Components\DatePicker::make('fecha_solicitud')->label('Fecha de solicitud')
-                                        ->default(now())
-                                        ->required()
-                                        ->prefixIcon('heroicon-m-calendar')
-                                        ->columnSpan(1),
-                                    Forms\Components\ToggleButtons::make('tipo_movimiento')
-                                        ->options([
-                                            'Asignacion Temporal' => 'Asignación Temporal',
-                                            'Asignacion Permanente' => 'Asignación Permanente',
-                                            'Renta Externa' => 'Renta Externa',
-                                        ])
-                                        ->colors([
-                                            'Asignacion Temporal' => 'warning',
-                                            'Asignacion Permanente' => 'success',
-                                            'Renta Externa' => 'info',
-                                        ])
-                                        ->inline()
-                                        ->default('Asignacion Temporal')
-                                        ->required()
-                                        ->live()
-                                        ->columnSpan(2),
-                                ]),
-                            Forms\Components\ToggleButtons::make('estado')->label('Estado')
-                                ->options([
-                                    'Pendiente' => 'Pendiente',
-                                    'Autorizado' => 'Autorizado',
-                                    'Rechazado' => 'Rechazado',
-                                    'Completado' => 'Completado',
-                                    'Cancelado' => 'Cancelado',
-                                ])
-                                ->colors([
-                                    'Pendiente' => 'warning',
-                                    'Autorizado' => 'primary',
-                                    'Rechazado' => 'danger',
-                                    'Completado' => 'success',
-                                    'Cancelado' => 'gray',
-                                ])
-                                ->inline()
-                                ->default('Pendiente')
-                                ->required()
-                                ->columnSpanFull(),
-                            Forms\Components\Textarea::make('observaciones')->label('Observaciones')
-                                ->label('Detalle / motivo de la solicitud')
-                                ->placeholder('Explica qué necesitas y para qué...')
-                                ->rows(3)
-                                ->required()
-                                ->columnSpanFull(),
-                            Forms\Components\Repeater::make('detalles')
-                                ->label('Materiales solicitados')
-                                ->relationship('detalles')
-                                ->schema([
-                                    Forms\Components\Select::make('id_producto')->placeholder('Selecciona...')
-                                        ->label('Material')
-                                        ->relationship('material', 'nombre')
-                                        ->searchable()
-                                        ->preload()
-                                        ->required()
-                                        ->columnSpan(2),
-                                    Forms\Components\TextInput::make('cantidad')
-                                        ->label('Cantidad')
-                                        ->numeric()
-                                        ->default(1)
-                                        ->required()
-                                        ->columnSpan(1),
-                                ])
-                                ->columns(3)
-                                ->columnSpanFull()
-                                ->defaultItems(1)
-                                ->addActionLabel('Añadir material'),
-                        ]),
+                Forms\Components\Section::make('📝 Datos de la solicitud')
+                    ->extraAttributes(['class' => 'form-card'])
+                    ->schema([
+                        Forms\Components\ViewField::make('tipo_solicitud')
+                            ->label('¿Qué tipo de solicitud?')
+                            ->view('filament.forms.components.tipo-solicitud-cards')
+                            ->default('Salida')
+                            ->required()
+                            ->columnSpanFull(),
 
-                    Forms\Components\Wizard\Step::make('Participantes y detalles')
-                        ->icon('heroicon-m-users')
-                        ->schema([
-                            Forms\Components\Grid::make(3)
-                                ->schema([
-                                    Forms\Components\Select::make('id_usuario')->placeholder('Selecciona...')
-                                        ->label('Solicitante (usuario)')
-                                        ->relationship('usuario', 'name')
-                                        ->required()
-                                        ->searchable()
-                                        ->preload()
-                                        ->prefixIcon('heroicon-m-user'),
-                                    Forms\Components\Select::make('id_receptor')->placeholder('Selecciona...')
-                                        ->label('Receptor (área/persona)')
-                                        ->relationship('receptor', 'nombre')
-                                        ->required()
-                                        ->searchable()
-                                        ->preload()
-                                        ->prefixIcon('heroicon-m-user-group')
-                                        ->live()
-                                        ->createOptionForm([
-                                            Forms\Components\TextInput::make('nombre')
-                                                ->label('Nombre')
-                                                ->required()
-                                                ->maxLength(100),
-                                            Forms\Components\TextInput::make('apellido_paterno')
-                                                ->label('Apellido paterno')
-                                                ->required()
-                                                ->maxLength(100),
-                                            Forms\Components\TextInput::make('apellido_materno')
-                                                ->label('Apellido materno')
-                                                ->required()
-                                                ->maxLength(100),
-                                            Forms\Components\TextInput::make('email')
-                                                ->label('Correo electrónico')
-                                                ->email()
-                                                ->maxLength(100),
-                                            Forms\Components\TextInput::make('telefono')
-                                                ->label('Teléfono')
-                                                ->tel()
-                                                ->maxLength(20),
-                                            Forms\Components\Select::make('id_area')->placeholder('Selecciona...')
-                                                ->label('Área')
-                                                ->options(\App\Models\Area::pluck('nombre', 'id_area'))
-                                                ->required()
-                                                ->searchable()
-                                                ->preload(),
-                                        ]),
-                                    Forms\Components\Placeholder::make('departamento')
-                                        ->label('Departamento')
-                                        ->content(function (callable $get) {
-                                            $receptorId = $get('id_receptor');
-                                            if ($receptorId) {
-                                                $receptor = Receptor::with('area.departamento')->find($receptorId);
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\DatePicker::make('fecha_solicitud')
+                                    ->label('Fecha')
+                                    ->default(now())
+                                    ->required()
+                                    ->helperText('Puedes programar la solicitud para otro día.')
+                                    ->prefixIcon('heroicon-m-calendar'),
 
-                                                return $receptor?->area?->departamento?->nombre ?? 'Sin departamento';
-                                            }
+                                Forms\Components\Select::make('id_producto')
+                                    ->label('Material')
+                                    ->placeholder('Selecciona...')
+                                    ->options(function () {
+                                        return \App\Models\Material::pluck('nombre', 'id_producto');
+                                    })
+                                    ->searchable()
+                                    ->preload()
+                                    ->required(),
+                            ]),
 
-                                            return 'Seleccione un receptor';
-                                        }),
-                                ]),
-                            Forms\Components\Grid::make(3)
-                                ->schema([
-                                    Forms\Components\Select::make('autorizado_por')->placeholder('Selecciona...')
-                                        ->label('Autorizado por')
-                                        ->relationship('autorizadoPor', 'name')
-                                        ->searchable()
-                                        ->preload()
-                                        ->prefixIcon('heroicon-m-shield-check'),
-                                    Forms\Components\DatePicker::make('fecha_devolucion_estimada')
-                                        ->label('Devolución estimada')
-                                        ->prefixIcon('heroicon-m-calendar-days')
-                                        ->visible(fn (Forms\Get $get) => $get('tipo_movimiento') === 'Asignacion Temporal'),
-                                    Forms\Components\DatePicker::make('fecha_devolucion_real')
-                                        ->label('Devolución real')
-                                        ->prefixIcon('heroicon-m-calendar-days')
-                                        ->visible(fn (Forms\Get $get) => $get('tipo_movimiento') === 'Asignacion Temporal'),
-                                ]),
-                        ]),
-                ])->columnSpanFull(),
+                        Forms\Components\Textarea::make('observaciones')
+                            ->label('Observaciones')
+                            ->placeholder('Describe brevemente para qué necesitas el material...')
+                            ->helperText('Esto ayuda al administrador a decidir más rápido.')
+                            ->rows(3)
+                            ->columnSpanFull(),
+
+                        Forms\Components\Placeholder::make('solicitante_info')
+                            ->label('')
+                            ->content(new \Illuminate\Support\HtmlString(
+                                '<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;font-size:13px;color:#0369a1;">'
+                                . '<span>ℹ️</span> <span>Tu registro se enviará al administrador para su revisión</span>'
+                                . '</div>'
+                            ))
+                            ->columnSpanFull(),
+
+                        Forms\Components\Hidden::make('id_usuario')
+                            ->default(fn () => auth()->id()),
+
+                        Forms\Components\Hidden::make('estado')
+                            ->default('Pendiente'),
+
+                        Forms\Components\Hidden::make('id_receptor')
+                            ->default(fn () => Receptor::value('id_receptor') ?? 1),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -209,9 +109,9 @@ class SolicitudResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id_solicitud')->wrap(false)->limit(30)->grow(false)
+                Tables\Columns\TextColumn::make('id_solicitud')
                     ->label('Folio')
-                    ->formatStateUsing(fn ($state) => 'FOLIO-'.str_pad($state, 5, '0', STR_PAD_LEFT))
+                    ->formatStateUsing(fn ($state) => 'FOLIO-' . str_pad($state, 5, '0', STR_PAD_LEFT))
                     ->fontFamily('mono')
                     ->weight(FontWeight::Bold)
                     ->extraAttributes(['class' => 'sigem-td-folio'])
@@ -225,26 +125,48 @@ class SolicitudResource extends Resource
                         });
                     }, isIndividual: true)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('tipo_movimiento')->wrap(false)->limit(30)->grow(false)
-                    ->label('Tipo de movimiento')
-                    ->badge()
-                    ->color('gray')
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->where('tipo_movimiento', $search);
-                    }, isIndividual: true),
-                Tables\Columns\TextColumn::make('usuario.name')->wrap(false)->limit(30)->grow(false)
+
+                Tables\Columns\TextColumn::make('usuario.name')
                     ->label('Solicitante')
-                    ->searchable(isIndividual: true),
-                Tables\Columns\TextColumn::make('receptor.nombre')->wrap(false)->limit(30)->grow(false)
-                    ->label('Receptor')
-                    ->searchable(isIndividual: true),
-                Tables\Columns\TextColumn::make('receptor.area.departamento.nombre')->wrap(false)->limit(30)->grow(false)
-                    ->label('Departamento')
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->whereHas('receptor.area.departamento', fn ($q) => $q->where('nombre', 'like', '%' . trim($search) . '%'));
-                    }, isIndividual: true)
+                    ->searchable(isIndividual: true)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('fecha_solicitud')->wrap(false)->limit(30)->grow(false)->label('Fecha de solicitud')
+
+                Tables\Columns\TextColumn::make('tipo_movimiento')
+                    ->label('Tipo')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'Asignacion Permanente', 'Salida' => 'Salida',
+                        'Asignacion Temporal', 'Entrada' => 'Entrada',
+                        'Renta Externa', 'Traslado' => 'Traslado',
+                        default => $state ?? '—',
+                    })
+                    ->color('info')
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        $mapped = match (trim($search)) {
+                            'Salida' => 'Asignacion Permanente',
+                            'Entrada' => 'Asignacion Temporal',
+                            'Traslado' => 'Renta Externa',
+                            default => $search,
+                        };
+                        return $query->where('tipo_movimiento', $mapped);
+                    }, isIndividual: true),
+
+                Tables\Columns\TextColumn::make('estado')
+                    ->label('Estado')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => '● ' . ($state ?? 'Pendiente'))
+                    ->color(fn (?string $state): string => match ($state) {
+                        'Pendiente' => 'warning',
+                        'Autorizado' => 'success',
+                        'Rechazado' => 'danger',
+                        'Entregado', 'Completado' => 'info',
+                        default => 'gray',
+                    })
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->where('estado', $search);
+                    }, isIndividual: true),
+
+                Tables\Columns\TextColumn::make('fecha_solicitud')
                     ->label('Fecha')
                     ->date('d/m/Y')
                     ->searchable(query: function (Builder $query, string $search): Builder {
@@ -254,29 +176,6 @@ class SolicitudResource extends Resource
                         return $query->where('fecha_solicitud', 'like', "%{$search}%");
                     }, isIndividual: true)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('estado')->wrap(false)->limit(30)->grow(false)->label('Estado')
-                    ->badge()
-                    ->formatStateUsing(fn (string $state): string => '● ' . $state)
-                    ->color(fn (string $state): string => match ($state) {
-                        'Pendiente' => 'warning',
-                        'Autorizado' => 'success',
-                        'Rechazado' => 'danger',
-                        'Entregado' => 'info',
-                        default => 'gray',
-                    })
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->where('estado', $search);
-                    }, isIndividual: true),
-                Tables\Columns\TextColumn::make('fecha_devolucion_estimada')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
-                    ->label('Devolución estimada')
-                    ->date('d/m/Y')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('autorizadoPor.name')->wrap(false)->limit(30)->grow(false)
-                    ->label('Autorizado por')
-                    ->searchable()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
             ->striped()
@@ -301,53 +200,19 @@ class SolicitudResource extends Resource
             ->recordUrl(null)
             ->recordAction(null)
             ->actions([
-                Tables\Actions\Action::make('autorizar')
-                    ->iconButton()
-                    ->color('success')
-                    ->tooltip('Autorizar')
-                    ->extraAttributes(['title' => 'Autorizar'])
-                    ->visible(fn (Solicitud $record): bool => $record->estado === 'Pendiente')
-                    ->action(function (Solicitud $record) {
-                        $record->update([
-                            'estado' => 'Autorizado',
-                            'fecha_autorizacion' => now(),
-                            'autorizado_por' => auth()->id(),
-                        ]);
-                        Notification::make()->title('Solicitud autorizada correctamente')->success()->send();
-                    })
-                    ->requiresConfirmation(),
-                Tables\Actions\Action::make('rechazar')
-                    ->iconButton()
-                    ->color('danger')
-                    ->tooltip('Rechazar')
-                    ->extraAttributes(['title' => 'Rechazar'])
-                    ->visible(fn (Solicitud $record): bool => $record->estado === 'Pendiente')
-                    ->form([
-                        Forms\Components\Textarea::make('motivo_rechazo')
-                            ->label('Motivo de rechazo (opcional)')
-                            ->rows(3),
-                    ])
-                    ->action(function (Solicitud $record, array $data) {
-                        $observacion = $record->observaciones;
-                        if ($data['motivo_rechazo']) {
-                            $observacion = $observacion ? $observacion."\n\nMotivo Rechazo: ".$data['motivo_rechazo'] : 'Motivo Rechazo: '.$data['motivo_rechazo'];
-                        }
-                        $record->update([
-                            'estado' => 'Rechazado',
-                            'observaciones' => $observacion,
-                        ]);
-                        Notification::make()->title('Solicitud rechazada')->success()->send();
-                    })
-                    ->requiresConfirmation(),
                 Tables\Actions\ViewAction::make()
                     ->iconButton()
                     ->tooltip('Ver detalle')
                     ->extraAttributes(['title' => 'Ver detalle'])
                     ->slideOver()
-                    ->modalHeading(fn (?Solicitud $record) => 'Folio: ' . ($record?->id_solicitud ? 'FOLIO-' . str_pad($record->id_solicitud, 5, '0', STR_PAD_LEFT) : '—'))
+                    ->modalHeading(fn (?Solicitud $record) => $record?->id_solicitud ? 'FOLIO-' . str_pad($record->id_solicitud, 5, '0', STR_PAD_LEFT) : 'Detalle de solicitud')
                     ->modalDescription(fn (?Solicitud $record) => new \Illuminate\Support\HtmlString(
-                        e($record?->tipo_movimiento ?? 'Por capturar') . ' · ' .
-                        e($record?->estado ?? 'Por capturar')
+                        'Solicitud de <b>' . e(match ($record?->tipo_movimiento) {
+                            'Asignacion Permanente', 'Salida' => 'Salida',
+                            'Asignacion Temporal', 'Entrada' => 'Entrada',
+                            'Renta Externa', 'Traslado' => 'Traslado',
+                            default => $record?->tipo_movimiento ?? 'Salida',
+                        }) . '</b> · ' . e($record?->fecha_solicitud?->format('d/m/Y') ?? '—')
                     ))
                     ->modalCancelActionLabel('Cerrar'),
             ])
@@ -364,92 +229,70 @@ class SolicitudResource extends Resource
             ->schema([
                 Tabs::make('Detalle')
                     ->tabs([
-                        Tabs\Tab::make('Información')
-                            ->icon('heroicon-m-tag')
+                        Tabs\Tab::make('informacion')
+                            ->label('🔖 Información')
                             ->schema([
-                                Section::make('Datos de la solicitud')
+                                Section::make('ℹ️ Información de la solicitud')
                                     ->schema([
                                         TextEntry::make('id_solicitud')
                                             ->label('Folio')
-                                            ->formatStateUsing(fn ($state) => $state ? 'FOLIO-' . str_pad($state, 5, '0', STR_PAD_LEFT) : 'Por capturar')
+                                            ->formatStateUsing(fn ($state) => $state ? 'FOLIO-' . str_pad($state, 5, '0', STR_PAD_LEFT) : '—')
                                             ->fontFamily('mono')
-                                            ->icon('heroicon-m-hashtag')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('fecha_solicitud')
-                                            ->label('Fecha')
-                                            ->date('d/m/Y')
-                                            ->icon('heroicon-m-calendar')
-                                            ->placeholder('Por capturar'),
+                                            ->weight(FontWeight::Bold),
                                         TextEntry::make('tipo_movimiento')
                                             ->label('Tipo')
                                             ->badge()
-                                            ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : 'Por capturar')
-                                            ->color('info')
-                                            ->placeholder('Por capturar'),
+                                            ->formatStateUsing(fn (?string $state): string => match ($state) {
+                                                'Asignacion Permanente', 'Salida' => 'Salida',
+                                                'Asignacion Temporal', 'Entrada' => 'Entrada',
+                                                'Renta Externa', 'Traslado' => 'Traslado',
+                                                default => $state ?? '—',
+                                            })
+                                            ->color('info'),
                                         TextEntry::make('estado')
                                             ->label('Estado')
                                             ->badge()
-                                            ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : 'Por capturar')
+                                            ->formatStateUsing(fn (?string $state): string => $state ? '● ' . $state : '—')
                                             ->color(fn (?string $state): string => match ($state) {
                                                 'Pendiente' => 'warning',
                                                 'Autorizado' => 'success',
-                                                'Completado' => 'success',
-                                                'Entregado' => 'info',
+                                                'Completado', 'Entregado' => 'info',
                                                 'Rechazado' => 'danger',
-                                                'Cancelado' => 'gray',
                                                 default => 'gray',
-                                            })
-                                            ->placeholder('Por capturar'),
+                                            }),
+                                        TextEntry::make('fecha_solicitud')
+                                            ->label('Fecha')
+                                            ->date('d/m/Y'),
                                     ])
                                     ->columns(2),
-                            ]),
 
-                        Tabs\Tab::make('Participantes')
-                            ->icon('heroicon-m-users')
-                            ->schema([
-                                Section::make('Participantes')
+                                Section::make('👥 Participantes')
                                     ->schema([
                                         TextEntry::make('usuario.name')
                                             ->label('Solicitante')
-                                            ->icon('heroicon-m-user')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('receptor.nombre')
-                                            ->label('Receptor')
-                                            ->icon('heroicon-m-user-group')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('receptor.area.departamento.nombre')
-                                            ->label('Departamento')
-                                            ->icon('heroicon-m-building-office')
-                                            ->placeholder('Por capturar'),
+                                            ->default('—'),
                                         TextEntry::make('autorizadoPor.name')
                                             ->label('Autorizado por')
-                                            ->icon('heroicon-m-shield-check')
-                                            ->placeholder('Por capturar'),
+                                            ->default('— Sin autorizar —'),
                                     ])
                                     ->columns(2),
+
+                                Section::make('')
+                                    ->schema([
+                                        TextEntry::make('observaciones')
+                                            ->label('Detalle (observaciones)')
+                                            ->default('Sin observaciones registradas.')
+                                            ->columnSpanFull(),
+                                    ]),
                             ]),
 
-                        Tabs\Tab::make('Devolución')
-                            ->icon('heroicon-m-arrow-uturn-left')
+                        Tabs\Tab::make('historial')
+                            ->label('🕘 Historial')
                             ->schema([
-                                Section::make('Devoluciones y observaciones')
-                                    ->schema([
-                                        TextEntry::make('fecha_devolucion_estimada')
-                                            ->label('Devolución estimada')
-                                            ->date('d/m/Y')
-                                            ->icon('heroicon-m-calendar-days')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('fecha_devolucion_real')
-                                            ->label('Devolución real')
-                                            ->date('d/m/Y')
-                                            ->icon('heroicon-m-calendar-days')
-                                            ->placeholder('Por capturar'),
-                                        TextEntry::make('observaciones')
-                                            ->label('Observaciones')
-                                            ->placeholder('Por capturar')
-                                            ->columnSpanFull(),
-                                    ])
-                                    ->columns(2),
+                                ViewEntry::make('historial')
+                                    ->label('')
+                                    ->view('filament.infolists.components.solicitud-historial')
+                                    ->columnSpanFull(),
                             ]),
                     ])
                     ->columnSpanFull(),
@@ -458,9 +301,7 @@ class SolicitudResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            SolicitudResource\RelationManagers\DetallesRelationManager::class,
-        ];
+        return [];
     }
 
     public static function getPages(): array

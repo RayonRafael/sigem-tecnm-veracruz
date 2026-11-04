@@ -24,7 +24,7 @@ class EditMantenimiento extends EditRecord
 
     protected function getRedirectUrl(): string
     {
-        return url('/admin');
+        return static::getResource()::getUrl('index');
     }
 
     protected function getSavedNotificationTitle(): ?string

@@ -44,12 +44,15 @@ class Dashboard extends BaseDashboard
             ->model(Inventario::class)
             ->slideOver()
             ->createAnother(false)
-            ->steps(InventarioResource::getFormSteps())
+            ->form(InventarioResource::getMockupFormSchema())
+            ->modalSubmitActionLabel('Registrar')
+            ->modalCancelActionLabel('Cancelar')
             ->extraAttributes([
                 'class' => 'sigem-btn-primary',
                 'title' => 'Registrar un nuevo equipo en el inventario',
             ])
-            ->successNotificationTitle('Registro creado exitosamente');
+            ->using(fn (array $data): Inventario => InventarioResource::registrarMultiplesEquipos($data))
+            ->successNotificationTitle(fn (?Inventario $record, CreateAction $action): string => InventarioResource::obtenerMensajeExito($record ?? $action->getRecord()));
     }
 
     public function verEquipoAction(): Action
