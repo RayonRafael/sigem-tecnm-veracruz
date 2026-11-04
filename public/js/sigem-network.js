@@ -251,7 +251,8 @@
         });
       });
 
-      fail(({ status }) => {
+      fail((response) => {
+        const status = response?.status;
         if (status === 0 || !navigator.onLine) {
           isOffline = true;
           showNetworkToast('offline');
