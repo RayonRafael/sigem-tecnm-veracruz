@@ -37,14 +37,41 @@ class InventarioResource extends Resource
 
     public static function form(Form $form): Form
     {
+        if ($form->getOperation() === 'create' || ($form->getLivewire() instanceof \Filament\Resources\Pages\CreateRecord)) {
+            return $form
+                ->schema(\App\Filament\Resources\InventarioResource::getMockupFormSchema());
+        }
+
         return $form
             ->schema([
-                Forms\Components\Wizard::make(static::getFormSteps())
+                Forms\Components\Wizard::make(static::getEditFormSteps())
                     ->columnSpanFull(),
             ]);
     }
 
     public static function getFormSteps(): array
+    {
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+        $isEdit = false;
+        foreach ($backtrace as $frame) {
+            $func = strtolower($frame['function'] ?? '');
+            if (str_contains($func, 'edit') || str_contains($func, 'update')) {
+                $isEdit = true;
+                break;
+            }
+        }
+
+        if (! $isEdit) {
+            return [
+                Forms\Components\Wizard\Step::make('Registro')
+                    ->schema(\App\Filament\Resources\InventarioResource::getMockupFormSchema()),
+            ];
+        }
+
+        return static::getEditFormSteps();
+    }
+
+    public static function getEditFormSteps(): array
     {
         return [
             Forms\Components\Wizard\Step::make('Identificación y ubicación')

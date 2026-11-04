@@ -39,16 +39,25 @@ class InventarioObserver
         $tipoId = $inventario->id_tipodematerial
             ?? $inventario->tipo_material_id
             ?? null;
-        $tipoNombre = $inventario->tipo_equipo
+        $tipoNombre = $inventario->subtipo
+            ?? ($inventario->especificaciones['componente'] ?? null)
+            ?? $inventario->tipo_equipo
             ?? ($inventario->especificaciones['tipo_equipo'] ?? null)
-            ?? $inventario->subtipo
             ?? null;
 
         $tipoMaterial = null;
         if ($tipoId) {
             $tipoMaterial = TipoMaterial::find($tipoId);
         } elseif ($tipoNombre) {
-            $tipoMaterial = TipoMaterial::where('nombre', $tipoNombre)->first()
+            $tipoBusqueda = match (strtolower(trim($tipoNombre))) {
+                'mouse', 'raton', 'ratón' => 'Muse',
+                'pc' => 'CPU',
+                default => $tipoNombre,
+            };
+
+            $tipoMaterial = TipoMaterial::where('nombre', $tipoBusqueda)->first()
+                ?? TipoMaterial::where('nombre', 'LIKE', "%{$tipoBusqueda}%")->first()
+                ?? TipoMaterial::where('nombre', $tipoNombre)->first()
                 ?? TipoMaterial::where('nombre', 'LIKE', "%{$tipoNombre}%")->first()
                 ?? TipoMaterial::firstOrCreate(['nombre' => $tipoNombre]);
         }

@@ -17,8 +17,13 @@ class CreateInventario extends CreateRecord
         return url('/admin');
     }
 
+    protected function handleRecordCreation(array $data): \Illuminate\Database\Eloquent\Model
+    {
+        return InventarioResource::registrarMultiplesEquipos($data);
+    }
+
     protected function getCreatedNotificationTitle(): ?string
     {
-        return 'Registro creado exitosamente';
+        return InventarioResource::obtenerMensajeExito($this->record);
     }
 }

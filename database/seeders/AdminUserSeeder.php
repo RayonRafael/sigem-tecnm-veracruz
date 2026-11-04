@@ -11,7 +11,7 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        $defaultPassword = app()->environment('testing') ? 'admin123' : Str::random(24);
+        $defaultPassword = app()->environment('local', 'testing') ? 'admin123' : Str::random(24);
 
         $admin = User::updateOrCreate(
             ['email' => 'admin@tecnm.edu.mx'],

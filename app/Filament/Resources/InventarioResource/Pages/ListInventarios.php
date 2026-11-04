@@ -49,12 +49,15 @@ class ListInventarios extends ListRecords implements HasInfolists
             Actions\CreateAction::make()
                 ->label("\u{FF0B} Registrar equipo")
                 ->slideOver()
-                ->steps(InventarioResource::getFormSteps())
+                ->form(InventarioResource::getMockupFormSchema())
+                ->modalSubmitActionLabel('Registrar')
+                ->modalCancelActionLabel('Cancelar')
                 ->extraAttributes([
                     'class' => 'sigem-btn-primary',
                     'title' => 'Registrar un nuevo equipo en el inventario',
                 ])
-                ->successNotificationTitle('Registro creado exitosamente'),
+                ->using(fn (array $data): Inventario => InventarioResource::registrarMultiplesEquipos($data))
+                ->successNotificationTitle(fn (?Inventario $record, Actions\CreateAction $action): string => InventarioResource::obtenerMensajeExito($record ?? $action->getRecord())),
         ];
     }
 
@@ -64,7 +67,11 @@ class ListInventarios extends ListRecords implements HasInfolists
 
         $action->url(null);
         $action->slideOver();
-        $action->steps(InventarioResource::getFormSteps());
+        $action->form(InventarioResource::getMockupFormSchema());
+        $action->modalSubmitActionLabel('Registrar');
+        $action->modalCancelActionLabel('Cancelar');
+        $action->using(fn (array $data): Inventario => InventarioResource::registrarMultiplesEquipos($data));
+        $action->successNotificationTitle(fn (?Inventario $record, $act): string => InventarioResource::obtenerMensajeExito($record ?? (method_exists($act, 'getRecord') ? $act->getRecord() : null)));
     }
 
     public function infolist(Infolist $infolist): Infolist
