@@ -6121,3 +6121,204 @@ button .sigem-btn-spinner ~ .sigem-btn-spinner,
     word-break: normal !important;
   }
 }
+/* ==========================================================================
+   MÓVIL PRIORIDAD 1: Touch Targets (>= 44px táctil en móvil)
+   ========================================================================== */
+@media (max-width: 767px) {
+  .fi-ta-actions-cell .fi-ta-actions,
+  .fi-ta-actions,
+  .fi-ta-actions-cell,
+  .sigem-row-actions {
+    display: flex !important;
+    gap: 8px !important;
+  }
+  .fi-ta-actions-cell .fi-ta-actions button,
+  .fi-ta-actions-cell .fi-ta-actions a[title],
+  .fi-ta-actions-cell .fi-ta-actions [role=button],
+  .fi-ta-actions-cell .fi-ta-actions .fi-icon-btn,
+  .fi-ta-actions-cell .fi-ta-actions .sigem-dash-btn,
+  .fi-ta-actions button,
+  .fi-ta-actions a[title],
+  .fi-ta-actions [role=button],
+  .fi-ta-actions .fi-icon-btn,
+  .fi-ta-actions .sigem-dash-btn,
+  .fi-ta-actions-cell button,
+  .fi-ta-actions-cell a[title],
+  .fi-ta-actions-cell [role=button],
+  .fi-ta-actions-cell .fi-icon-btn,
+  .fi-ta-actions-cell .sigem-dash-btn,
+  .sigem-row-actions button,
+  .sigem-row-actions a[title],
+  .sigem-row-actions [role=button],
+  .sigem-row-actions .fi-icon-btn,
+  .sigem-row-actions .sigem-dash-btn {
+    position: relative !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    padding: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+  }
+  .fi-ta-actions-cell .fi-ta-actions button::after,
+  .fi-ta-actions-cell .fi-ta-actions a[title]::after,
+  .fi-ta-actions-cell .fi-ta-actions [role=button]::after,
+  .fi-ta-actions-cell .fi-ta-actions .fi-icon-btn::after,
+  .fi-ta-actions-cell .fi-ta-actions .sigem-dash-btn::after,
+  .fi-ta-actions button::after,
+  .fi-ta-actions a[title]::after,
+  .fi-ta-actions [role=button]::after,
+  .fi-ta-actions .fi-icon-btn::after,
+  .fi-ta-actions .sigem-dash-btn::after,
+  .fi-ta-actions-cell button::after,
+  .fi-ta-actions-cell a[title]::after,
+  .fi-ta-actions-cell [role=button]::after,
+  .fi-ta-actions-cell .fi-icon-btn::after,
+  .fi-ta-actions-cell .sigem-dash-btn::after,
+  .sigem-row-actions button::after,
+  .sigem-row-actions a[title]::after,
+  .sigem-row-actions [role=button]::after,
+  .sigem-row-actions .fi-icon-btn::after,
+  .sigem-row-actions .sigem-dash-btn::after {
+    content: "" !important;
+    position: absolute !important;
+    inset: -4px !important;
+  }
+  .fi-ta-actions-cell .fi-ta-actions button svg,
+  .fi-ta-actions-cell .fi-ta-actions a[title] svg,
+  .fi-ta-actions-cell .fi-ta-actions [role=button] svg,
+  .fi-ta-actions-cell .fi-ta-actions .fi-icon-btn svg,
+  .fi-ta-actions-cell .fi-ta-actions .sigem-dash-btn svg,
+  .fi-ta-actions button svg,
+  .fi-ta-actions a[title] svg,
+  .fi-ta-actions [role=button] svg,
+  .fi-ta-actions .fi-icon-btn svg,
+  .fi-ta-actions .sigem-dash-btn svg,
+  .fi-ta-actions-cell button svg,
+  .fi-ta-actions-cell a[title] svg,
+  .fi-ta-actions-cell [role=button] svg,
+  .fi-ta-actions-cell .fi-icon-btn svg,
+  .fi-ta-actions-cell .sigem-dash-btn svg,
+  .sigem-row-actions button svg,
+  .sigem-row-actions a[title] svg,
+  .sigem-row-actions [role=button] svg,
+  .sigem-row-actions .fi-icon-btn svg,
+  .sigem-row-actions .sigem-dash-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  .fi-ta-actions-cell .fi-ta-actions button,
+  .fi-ta-actions-cell button,
+  .fi-ta-actions-cell .fi-icon-btn,
+  .sigem-dash-btn {
+    position: relative !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    border-radius: 8px !important;
+  }
+  .fi-ta-actions-cell .fi-ta-actions button::after,
+  .fi-ta-actions-cell button::after,
+  .fi-ta-actions-cell .fi-icon-btn::after,
+  .sigem-dash-btn::after {
+    content: "" !important;
+    position: absolute !important;
+    inset: -4px !important;
+  }
+  .fi-ta-actions-cell,
+  .fi-ta-table thead th:last-child,
+  .fi-ta-table thead th.fi-ta-actions-cell,
+  .fi-ta-table thead th.fi-ta-actions-header-cell,
+  .sigem-col-actions {
+    min-width: 140px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+  .sigem-hamburger {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    margin: 4px !important;
+  }
+  .fi-topbar .fi-user-menu,
+  .fi-topbar button[class*=avatar],
+  .fi-topbar .fi-dropdown-trigger,
+  .fi-topbar .fi-dropdown-trigger button {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .sigem-topbar-search {
+    min-height: 40px !important;
+  }
+  .fi-checkbox-input,
+  input[type=checkbox] {
+    min-width: 22px !important;
+    min-height: 22px !important;
+  }
+  .fi-ta-table tbody td:first-child,
+  .fi-ta-table thead th:first-child {
+    padding: 10px !important;
+  }
+  .sigem-toolbar-reset-btn,
+  .sigem-rep-btn-primary,
+  .sigem-rep-btn-sec,
+  .sigem-btn-primary,
+  .sigem-cat-btn {
+    min-height: 44px !important;
+    padding: 8px 16px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+/* ==========================================================================
+   MÓVIL PRIORIDAD 2: Toolbar apilada + quitar doble botón de acciones
+   ========================================================================== */
+@media (max-width: 767px) {
+  .fi-ta-header-ctn button.fi-ac-btn-group:not(.sm\:hidden),
+  .fi-ta-header-ctn button.sm\:inline-grid,
+  .fi-ta-header-ctn .fi-dropdown-trigger button.sm\:inline-grid,
+  .fi-ta-header-toolbar button.sm\:inline-grid,
+  .fi-ta-header-toolbar button.fi-ac-btn-group:not(.sm\:hidden) {
+    display: none !important;
+  }
+  .fi-ta-header-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  .fi-ta-header-toolbar > .ms-auto {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+  .sigem-table-toolbar-group {
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    gap: 8px !important;
+  }
+  .sigem-table-toolbar-group .sigem-toolbar-search {
+    width: 100% !important;
+    max-width: none !important;
+    flex: 1 1 100% !important;
+    margin-left: 0 !important;
+  }
+  .sigem-table-toolbar-group .sigem-toolbar-date {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+  .sigem-table-toolbar-group .sigem-toolbar-date-input {
+    width: 100% !important;
+    max-width: 140px !important;
+  }
+  .sigem-table-toolbar-group .sigem-toolbar-reset-btn {
+    flex: 0 0 auto !important;
+  }
+}

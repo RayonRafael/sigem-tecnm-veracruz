@@ -6246,3 +6246,187 @@ button,
     }
   }
 }
+
+/* ==========================================================================
+   MÓVIL PRIORIDAD 1: Touch Targets (>= 44px táctil en móvil)
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  // GRUPO A: Botones de acción en tablas (👁 ✏️ 🗑️) — 36px visibles + hit-slop 44px
+  .fi-ta-actions-cell .fi-ta-actions,
+  .fi-ta-actions,
+  .fi-ta-actions-cell,
+  .sigem-row-actions {
+    display: flex !important;
+    gap: 8px !important; // separación ampliada (era 4px)
+
+    button,
+    a[title],
+    [role="button"],
+    .fi-icon-btn,
+    .sigem-dash-btn {
+      position: relative !important;
+      width: 36px !important;
+      height: 36px !important;
+      min-width: 36px !important;
+      min-height: 36px !important;
+      padding: 6px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 8px !important;
+
+      // Hit-slop transparente para llegar a 44×44px táctiles
+      &::after {
+        content: "" !important;
+        position: absolute !important;
+        inset: -4px !important;
+      }
+
+      svg {
+        width: 16px !important;
+        height: 16px !important;
+      }
+    }
+  }
+
+  // Sobrescribir específicamente L4989 (.fi-ta-actions-cell .fi-ta-actions button)
+  .fi-ta-actions-cell .fi-ta-actions button,
+  .fi-ta-actions-cell button,
+  .fi-ta-actions-cell .fi-icon-btn,
+  .sigem-dash-btn {
+    position: relative !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    border-radius: 8px !important;
+
+    &::after {
+      content: "" !important;
+      position: absolute !important;
+      inset: -4px !important;
+    }
+  }
+
+  // Ancho de columna de acciones para albergar botones de 36px + gap 8px
+  .fi-ta-actions-cell,
+  .fi-ta-table thead th:last-child,
+  .fi-ta-table thead th.fi-ta-actions-cell,
+  .fi-ta-table thead th.fi-ta-actions-header-cell,
+  .sigem-col-actions {
+    min-width: 140px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  // GRUPO B: Topbar (hamburger, avatar, buscador)
+  // Hamburger 44×44px
+  .sigem-hamburger {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    margin: 4px !important;
+  }
+
+  // Avatar / menú de usuario 44×44px
+  .fi-topbar .fi-user-menu,
+  .fi-topbar button[class*="avatar"],
+  .fi-topbar .fi-dropdown-trigger,
+  .fi-topbar .fi-dropdown-trigger button {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  // Buscador topbar 40px de alto
+  .sigem-topbar-search {
+    min-height: 40px !important;
+  }
+
+  // GRUPO C: Checkboxes de tabla y botones secundarios
+  // Checkboxes — área visible de 22px
+  .fi-checkbox-input,
+  input[type="checkbox"] {
+    min-width: 22px !important;
+    min-height: 22px !important;
+  }
+
+  // Contenedor del checkbox con área táctil ampliada
+  .fi-ta-table tbody td:first-child,
+  .fi-ta-table thead th:first-child {
+    padding: 10px !important;
+  }
+
+  // Botones secundarios (Gráfica, Exportar, Quitar filtros, etc.)
+  .sigem-toolbar-reset-btn,
+  .sigem-rep-btn-primary,
+  .sigem-rep-btn-sec,
+  .sigem-btn-primary,
+  .sigem-cat-btn {
+    min-height: 44px !important;
+    padding: 8px 16px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}
+
+/* ==========================================================================
+   MÓVIL PRIORIDAD 2: Toolbar apilada + quitar doble botón de acciones
+   ========================================================================== */
+
+@media (max-width: 767px) {
+  // Problema 1: Quitar doble botón de acciones (ocultar botón desktop forzado por L5056)
+  .fi-ta-header-ctn button.fi-ac-btn-group:not(.sm\:hidden),
+  .fi-ta-header-ctn button.sm\:inline-grid,
+  .fi-ta-header-ctn .fi-dropdown-trigger button.sm\:inline-grid,
+  .fi-ta-header-toolbar button.sm\:inline-grid,
+  .fi-ta-header-toolbar button.fi-ac-btn-group:not(.sm\:hidden) {
+    display: none !important;
+  }
+
+  // Problema 2: Toolbar apilada en móvil (evitar compresión en 156px)
+  .fi-ta-header-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+
+    > .ms-auto {
+      margin-left: 0 !important;
+      width: 100% !important;
+    }
+  }
+
+  .sigem-table-toolbar-group {
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    gap: 8px !important;
+
+    .sigem-toolbar-search {
+      width: 100% !important;
+      max-width: none !important;
+      flex: 1 1 100% !important;
+      margin-left: 0 !important;
+    }
+
+    .sigem-toolbar-date {
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+
+      &-input {
+        width: 100% !important;
+        max-width: 140px !important;
+      }
+    }
+
+    .sigem-toolbar-reset-btn {
+      flex: 0 0 auto !important;
+    }
+  }
+}
+
+
