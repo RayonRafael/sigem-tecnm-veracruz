@@ -623,7 +623,7 @@ body:has(.sigem-professional) .sigem-topbar-brand {
   --sig-border: #e5e7eb;
   --sig-text: #111827;
   --sig-muted: #6b7280;
-  --sig-light: #9ca3af;
+  --sig-light: #64748b;
   --sig-primary: #1b65d4;
   --sig-primary-dark: #1557b0;
   --sig-primary-light: #e8f0fe;
@@ -1365,7 +1365,7 @@ aside.fi-sidebar,
   font-weight: 700 !important;
   text-transform: uppercase !important;
   letter-spacing: .06em !important;
-  color: #6b7280 !important;
+  color: #475569 !important;
 }
 
 
@@ -2280,14 +2280,6 @@ div:has(> .sigem-bitacora-filters) p {
 .sigem-topbar-search:hover {
   border-color: var(--sig-primary);
   color: var(--sig-muted)
-}
-
-@media (max-width: 767px) {
-  .sigem-topbar-search {
-    min-width: auto;
-    padding: 6px 10px;
-    font-size: 13.5px
-  }
 }
 
 /* ===== Fase 10: Pulido final, Focus visible y Estados interactivos ===== */
@@ -3832,14 +3824,6 @@ aside.fi-sidebar {
   .sigem-quick-grid,
   .sigem-stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
-  }
-}
-
-@media (max-width: 767px) {
-
-  .sigem-quick-grid,
-  .sigem-stats-grid {
-    grid-template-columns: 1fr !important;
   }
 }
 
@@ -5897,29 +5881,6 @@ button,
 
 .sigem-hamburger {
   display: none;
-
-  @media (max-width: 767px) {
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    width: 38px;
-    height: 38px;
-    border: none;
-    background: transparent;
-    font-size: 22px;
-    line-height: 1;
-    cursor: pointer;
-    color: var(--sig-text, #1e293b);
-    padding: 0;
-    margin-right: 6px;
-    border-radius: 6px;
-    flex-shrink: 0;
-    transition: background-color 0.15s ease;
-
-    &:hover {
-      background-color: rgba(0, 0, 0, 0.05);
-    }
-  }
 }
 
 .sigem-sidebar-overlay {
@@ -5937,121 +5898,8 @@ button,
   }
 }
 
-@media (max-width: 767px) {
-  // Sidebar fuera de pantalla en móvil (<768px)
-  .fi-sidebar,
-  aside.fi-sidebar {
-    position: fixed !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    left: -260px !important;
-    transform: none !important;
-    width: 260px !important;
-    min-width: 260px !important;
-    max-width: 260px !important;
-    height: 100vh !important;
-    z-index: 1000 !important;
-    transition: left 0.3s ease !important;
-    background: #ffffff !important;
-    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.15) !important;
-    overflow-y: auto !important;
-
-    &.is-open {
-      left: 0 !important;
-      transform: none !important;
-    }
-
-    // Visibilidad de etiquetas en el menú desplegado móvil
-    .fi-sidebar-item-label,
-    .fi-sidebar-nav-item-label {
-      display: inline-block !important;
-      font-size: 14px !important;
-    }
-
-    .fi-sidebar-item,
-    .fi-sidebar-item-button {
-      max-width: 100% !important;
-      width: 100% !important;
-      justify-content: flex-start !important;
-      padding-left: 12px !important;
-      padding-right: 12px !important;
-    }
-  }
-
-  // Contenido principal ocupa 100% del ancho sin margin-left ni estar tapado
-  .fi-main,
-  main.fi-main,
-  .fi-main-ctn {
-    margin-left: 0 !important;
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-
-  // Topbar móvil: distribución y espacio
-  .fi-topbar nav,
-  header.fi-topbar nav {
-    padding-left: 12px !important;
-    padding-right: 12px !important;
-    gap: 8px !important;
-  }
-
-  body:has(.sigem-role-banner) .sigem-topbar-brand {
-    display: flex !important;
-    align-items: center !important;
-  }
-
-  .sigem-topbar-brand {
-    display: flex !important;
-    align-items: center !important;
-    img {
-      height: 28px !important;
-    }
-  }
-
-  // En móvil (375px), ocultar breadcrumb extenso
-  .sigem-crumb {
-    display: none !important;
-  }
-
-  // Pill "Administrador" compacto en móvil
-  .sigem-role-banner {
-    display: inline-flex !important;
-    align-items: center !important;
-    padding: 2px 8px !important;
-    font-size: 11px !important;
-    max-width: 120px !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-    flex-shrink: 0 !important;
-  }
-
-  // Buscador con placeholder compacto en móvil
-  .sigem-topbar-search {
-    max-width: 200px !important;
-    min-width: 0 !important;
-    padding: 4px 8px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-
-    span:nth-child(2) {
-      display: inline !important;
-      font-size: 12px !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-      white-space: nowrap !important;
-    }
-  }
-}
-
 /* ==========================================================================
-   RESPONSIVO GRUPO 2: Tabs y Wizard scrollables en slide-overs móvil
+   RESPONSIVO GRUPO 2: Tabs y Wizard scrollables en slide-overs
    ========================================================================== */
 
 .fi-modal-slide-over-window,
@@ -6097,34 +5945,6 @@ button,
         overflow: visible !important;
         text-overflow: clip !important;
       }
-    }
-  }
-}
-
-@media (max-width: 767px) {
-  .fi-modal-slide-over-window,
-  .fi-modal-window,
-  .fi-modal-slide-over {
-    .fi-fo-wizard-header-step,
-    li.fi-fo-wizard-header-step {
-      padding: 6px 8px !important;
-
-      .fi-fo-wizard-header-step-button {
-        padding: 6px 4px !important;
-        gap: 6px !important;
-      }
-
-      .fi-fo-wizard-header-step-label {
-        font-size: 12px !important;
-        white-space: nowrap !important;
-      }
-    }
-
-    .fi-tabs-item,
-    .fi-in-tabs-tab {
-      padding: 8px 12px !important;
-      font-size: 13px !important;
-      white-space: nowrap !important;
     }
   }
 }
@@ -6225,14 +6045,221 @@ button,
 }
 
 /* ==========================================================================
-   RESPONSIVO FIX C: Tablas móvil — scroll horizontal
+   WCAG AA: Contraste accesible (headers tabla #475569 ratio 5.8:1, placeholders #64748b)
    ========================================================================== */
 
+.fi-ta-table thead th,
+.fi-ta-table thead th *,
+.fi-ta-table thead th button,
+.fi-ta-table thead th .fi-ta-header-cell-label,
+.fi-ta-table thead th::after {
+  color: #475569 !important;
+}
+
+::placeholder,
+input::placeholder,
+textarea::placeholder,
+.fi-input-wrp input::placeholder,
+.choices__placeholder,
+.choices__input::placeholder {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+
+/* ============================================================
+   MÓVIL (max-width: 767px) — Bloque consolidado
+   Última actualización: 2026-11-03
+   ============================================================ */
 @media (max-width: 767px) {
+
+  /* --- 1. Topbar --- */
+  .sigem-hamburger {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    margin: 4px !important;
+    border: none !important;
+    background: transparent !important;
+    font-size: 22px !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    color: var(--sig-text, #1e293b) !important;
+    padding: 0 !important;
+    border-radius: 6px !important;
+    flex-shrink: 0 !important;
+    transition: background-color 0.15s ease !important;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05) !important;
+    }
+  }
+
+  .fi-topbar nav,
+  header.fi-topbar nav {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    gap: 8px !important;
+  }
+
+  body:has(.sigem-role-banner) .fi-topbar:first-of-type .sigem-topbar-brand,
+  body:has(.sigem-role-banner) .sigem-topbar-brand,
+  body:has(.sigem-professional) .fi-topbar:first-of-type .sigem-topbar-brand,
+  body:has(.sigem-professional) .sigem-topbar-brand,
+  .sigem-topbar-brand {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+
+    img {
+      height: 28px !important;
+      width: auto !important;
+      max-width: 95px !important;
+      flex-shrink: 0 !important;
+      object-fit: contain !important;
+    }
+  }
+
+  .sigem-crumb {
+    display: none !important;
+  }
+
+  .sigem-role-banner {
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 2px 8px !important;
+    font-size: 12px !important;
+    max-width: 120px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  .sigem-topbar-search {
+    max-width: 200px !important;
+    min-width: 0 !important;
+    padding: 4px 8px !important;
+    min-height: 40px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+
+    span,
+    span:nth-child(2) {
+      display: inline !important;
+      font-size: 13px !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+    }
+  }
+
+  .fi-topbar .fi-user-menu,
+  .fi-topbar button[class*="avatar"],
+  .fi-topbar .fi-dropdown-trigger,
+  .fi-topbar .fi-dropdown-trigger button {
+    min-width: 44px !important;
+    min-height: 44px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* --- 2. Sidebar --- */
+  .fi-sidebar,
+  aside.fi-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: -260px !important;
+    transform: none !important;
+    width: 260px !important;
+    min-width: 260px !important;
+    max-width: 260px !important;
+    height: 100vh !important;
+    z-index: 1000 !important;
+    transition: left 0.3s ease !important;
+    background: #ffffff !important;
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.15) !important;
+    overflow-y: auto !important;
+
+    &.is-open {
+      left: 0 !important;
+      transform: none !important;
+    }
+
+    .fi-sidebar-item-label,
+    .fi-sidebar-nav-item-label {
+      display: inline-block !important;
+      font-size: 14px !important;
+    }
+
+    .fi-sidebar-item,
+    .fi-sidebar-item-button {
+      max-width: 100% !important;
+      width: 100% !important;
+      justify-content: flex-start !important;
+      padding-left: 12px !important;
+      padding-right: 12px !important;
+    }
+  }
+
+  /* --- 3. Contenido principal --- */
+  body:has(.sigem-professional) .fi-main-ctn,
+  body:has(.sigem-role-banner) .fi-main-ctn,
+  body .fi-main-ctn,
+  .fi-main,
+  main.fi-main,
+  .fi-main-ctn {
+    margin-left: 0 !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* --- 4. Dashboard --- */
+  .sigem-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .sigem-quick-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* --- 5. Tablas --- */
   .fi-ta-ctn,
   .fi-ta-content {
     overflow-x: auto !important;
     -webkit-overflow-scrolling: touch !important;
+    min-height: auto !important;
+    height: auto !important;
+    background:
+      linear-gradient(to right, var(--sig-surface, #fff) 30%, transparent),
+      linear-gradient(to left, var(--sig-surface, #fff) 30%, transparent),
+      linear-gradient(to right, rgba(0, 0, 0, 0.1), transparent 20px),
+      linear-gradient(to left, rgba(0, 0, 0, 0.1), transparent 20px) !important;
+    background-position: left center, right center, left center, right center !important;
+    background-repeat: no-repeat !important;
+    background-size: 40px 100%, 40px 100%, 15px 100%, 15px 100% !important;
+    background-attachment: local, local, scroll, scroll !important;
+  }
+
+  .fi-ta-content {
+    flex: 0 0 auto !important;
+  }
+
+  .fi-ta-pagination {
+    margin-top: 0 !important;
   }
 
   .fi-ta-table {
@@ -6245,4 +6272,242 @@ button,
       word-break: normal !important;
     }
   }
+
+  .fi-ta-table thead th,
+  .fi-ta-table thead th *,
+  .fi-ta-table thead th button,
+  .fi-ta-table thead th .fi-ta-header-cell-label,
+  .fi-ta-table thead th::after {
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    color: #475569 !important;
+  }
+
+  .fi-table-individual-search-select,
+  :is(.fi-table-individual-search-cell, [class*="fi-table-individual-search-cell"]) select,
+  :is(.fi-table-individual-search-cell, [class*="fi-table-individual-search-cell"]) input {
+    font-size: 13px !important;
+  }
+
+  .fi-checkbox-input,
+  input[type="checkbox"] {
+    min-width: 22px !important;
+    min-height: 22px !important;
+  }
+
+  .fi-ta-table tbody td:first-child,
+  .fi-ta-table thead th:first-child {
+    padding: 10px !important;
+  }
+
+  .fi-ta-actions-cell .fi-ta-actions,
+  .fi-ta-actions,
+  .fi-ta-actions-cell,
+  .sigem-row-actions {
+    display: flex !important;
+    gap: 8px !important;
+
+    button,
+    a[title],
+    [role="button"],
+    .fi-icon-btn,
+    .sigem-dash-btn {
+      position: relative !important;
+      width: 36px !important;
+      height: 36px !important;
+      min-width: 36px !important;
+      min-height: 36px !important;
+      padding: 6px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      border-radius: 8px !important;
+
+      &::after {
+        content: "" !important;
+        position: absolute !important;
+        inset: -4px !important;
+      }
+
+      svg {
+        width: 16px !important;
+        height: 16px !important;
+      }
+    }
+  }
+
+  .fi-ta-actions-cell .fi-ta-actions button,
+  .fi-ta-actions-cell button,
+  .fi-ta-actions-cell .fi-icon-btn,
+  .sigem-dash-btn {
+    position: relative !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    border-radius: 8px !important;
+
+    &::after {
+      content: "" !important;
+      position: absolute !important;
+      inset: -4px !important;
+    }
+  }
+
+  .fi-ta-actions-cell,
+  .fi-ta-table thead th:last-child,
+  .fi-ta-table thead th.fi-ta-actions-cell,
+  .fi-ta-table thead th.fi-ta-actions-header-cell,
+  .sigem-col-actions {
+    min-width: 140px !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  /* --- 6. Toolbar --- */
+  .fi-ta-header-ctn .fi-dropdown-trigger button.fi-ac-btn-group:not(.sm\:hidden),
+  .fi-ta-header-ctn .fi-dropdown-trigger button.sm\:inline-grid,
+  .fi-ta-header-ctn button.fi-ac-btn-group:not(.sm\:hidden),
+  .fi-ta-header-ctn button.sm\:inline-grid,
+  .fi-ta-header-toolbar .fi-dropdown-trigger button.fi-ac-btn-group:not(.sm\:hidden),
+  .fi-ta-header-toolbar .fi-dropdown-trigger button.sm\:inline-grid,
+  .fi-ta-header-toolbar button.fi-ac-btn-group:not(.sm\:hidden),
+  .fi-ta-header-toolbar button.sm\:inline-grid {
+    display: none !important;
+  }
+
+  .fi-ta-header-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+
+    > .ms-auto {
+      margin-left: 0 !important;
+      width: 100% !important;
+    }
+  }
+
+  .sigem-table-toolbar-group {
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    gap: 8px !important;
+
+    .sigem-toolbar-search {
+      width: 100% !important;
+      max-width: none !important;
+      flex: 1 1 100% !important;
+      margin-left: 0 !important;
+    }
+
+    .sigem-toolbar-date {
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+
+      &-input {
+        width: 100% !important;
+        max-width: 140px !important;
+      }
+    }
+
+    .sigem-toolbar-reset-btn {
+      flex: 0 0 auto !important;
+    }
+  }
+
+  .sigem-toolbar-date-label {
+    font-size: 12.5px !important;
+    color: #475569 !important;
+  }
+
+  .sigem-toolbar-reset-btn,
+  .sigem-rep-btn-primary,
+  .sigem-rep-btn-sec,
+  .sigem-btn-primary,
+  .sigem-cat-btn {
+    min-height: 44px !important;
+    padding: 8px 16px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* --- 7. Slide-overs --- */
+  .fi-modal-slide-over-window {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-left: none !important;
+
+    .fi-modal-footer-actions,
+    .fi-form-actions {
+      flex-direction: column-reverse !important;
+      gap: 10px !important;
+
+      .fi-btn {
+        width: 100% !important;
+        justify-content: center !important;
+        min-height: 44px !important;
+      }
+    }
+
+    .fi-in-tabs,
+    .fi-tabs,
+    .fi-fo-wizard-header {
+      background:
+        linear-gradient(to right, var(--sig-surface, #fff) 85%, transparent),
+        linear-gradient(to left, rgba(0, 0, 0, 0.08), transparent 15px) !important;
+      background-position: right center, right center !important;
+      background-repeat: no-repeat !important;
+      background-size: 30px 100%, 15px 100% !important;
+      background-attachment: local, scroll !important;
+    }
+  }
+
+  .fi-modal-slide-over-window,
+  .fi-modal-window,
+  .fi-modal-slide-over {
+    .fi-fo-wizard-header-step,
+    li.fi-fo-wizard-header-step {
+      padding: 6px 8px !important;
+
+      .fi-fo-wizard-header-step-button {
+        padding: 6px 4px !important;
+        gap: 6px !important;
+      }
+
+      .fi-fo-wizard-header-step-label {
+        font-size: 13px !important;
+        white-space: nowrap !important;
+      }
+    }
+
+    .fi-tabs-item,
+    .fi-in-tabs-tab {
+      padding: 8px 12px !important;
+      font-size: 13px !important;
+      white-space: nowrap !important;
+    }
+  }
+
+  /* --- 8. Tipografía --- */
+  .fi-fo-wizard-header-step-label,
+  .fi-fo-wizard-header .fi-fo-wizard-header-step-label {
+    font-size: 13px !important;
+  }
+
+  /* --- 9. Consistencia --- */
+  .sigem-stat,
+  .sigem-quick,
+  .sigem-rep-card,
+  .sigem-cat-card,
+  .fi-ta-ctn,
+  .sigem-skeleton-card {
+    border-radius: 10px !important;
+  }
 }
+
+
+
+
+
+
+
