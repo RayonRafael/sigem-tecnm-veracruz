@@ -14,10 +14,15 @@ class TipoMaterial extends Model
 
     protected $primaryKey = 'id_tipodematerial';
 
-    protected $fillable = ['nombre'];
+    protected $fillable = ['nombre', 'familia'];
 
     public function materiales()
     {
         return $this->hasMany(Material::class, 'id_tipodematerial', 'id_tipodematerial');
+    }
+
+    public function scopePorFamilia($query, string $familia)
+    {
+        return $query->where('familia', $familia);
     }
 }
