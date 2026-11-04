@@ -21,69 +21,7 @@
             </div>
         </div>
 
-        <!-- 2. ACCIONES RÁPIDAS (4 CARDS) -->
-        @if($isSkeletonPreview)
-            {{-- SKELETON PREVIEW: ACCIONES RÁPIDAS (4 CARDS) --}}
-            <div class="sigem-quick-grid sigem-skeleton-grid">
-                @for($i = 0; $i < 4; $i++)
-                    <div class="sigem-skeleton-card sigem-skeleton-quick">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                            <span class="sigem-skeleton" style="width: 36px; height: 36px; border-radius: 10px;"></span>
-                            <span class="sigem-skeleton" style="width: 14px; height: 14px; border-radius: 4px;"></span>
-                        </div>
-                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 65%; height: 16px; margin-bottom: 6px;"></span>
-                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 85%; height: 12px;"></span>
-                    </div>
-                @endfor
-            </div>
-        @else
-            <div class="sigem-quick-grid">
-                <!-- 1. Autorizar mantenimiento -->
-                <a class="sigem-quick" href="{{ url('/admin/mantenimientos') }}">
-                    <div class="arrow">→</div>
-                    <div class="sigem-quick-ico sigem-i-warning">🔧</div>
-                    <div class="sigem-quick-title">
-                        Autorizar mantenimiento
-                        @if(($mantenimientosPendientes ?? 0) > 0)
-                            <span class="sigem-qbadge">{{ $mantenimientosPendientes }}</span>
-                        @endif
-                    </div>
-                    <div class="sigem-quick-desc">Hay reportes esperando tu revisión</div>
-                </a>
-
-                <!-- 2. Revisar solicitudes -->
-                <a class="sigem-quick" href="{{ url('/admin/solicituds') }}">
-                    <div class="arrow">→</div>
-                    <div class="sigem-quick-ico sigem-i-primary">📋</div>
-                    <div class="sigem-quick-title">
-                        Revisar solicitudes
-                        @if(($solicitudesPendientes ?? 0) > 0)
-                            <span class="sigem-qbadge">{{ $solicitudesPendientes }}</span>
-                        @endif
-                    </div>
-                    <div class="sigem-quick-desc">Solicitudes de material por autorizar</div>
-                </a>
-
-                <!-- 3. Registrar activo -->
-                <a class="sigem-quick" href="javascript:void(0)" wire:click="mountAction('registrarEquipo')">
-                    <div class="arrow">→</div>
-                    <div class="sigem-quick-ico sigem-i-success">＋</div>
-                    <div class="sigem-quick-title">Registrar activo</div>
-                    <div class="sigem-quick-desc">Alta de nuevo equipo en inventario</div>
-                </a>
-
-                <!-- 4. Ver bitácora -->
-                {{-- Fase 10: Enlazado a la pestaña Bitácora de Configuración y Catálogos (/admin/configuracion) --}}
-                <a class="sigem-quick" href="{{ url('/admin/configuracion') }}">
-                    <div class="arrow">→</div>
-                    <div class="sigem-quick-ico sigem-i-info">🕘</div>
-                    <div class="sigem-quick-title">Ver bitácora</div>
-                    <div class="sigem-quick-desc">Registro de actividad y movimientos</div>
-                </a>
-            </div>
-        @endif
-
-        <!-- 3. KPIS (4 MÉTRICAS) -->
+        <!-- 2. KPIS (4 TARJETAS SUPERIORES) -->
         @if($isSkeletonPreview)
             {{-- SKELETON PREVIEW: KPIS (4 MÉTRICAS) --}}
             <div class="sigem-stats-grid sigem-skeleton-grid">
@@ -110,7 +48,7 @@
                 <div class="sigem-stat">
                     <div class="sigem-stat-ico sigem-i-success">✓</div>
                     <div class="sigem-stat-val">{{ $inventarioDisponibles ?? 0 }}</div>
-                    <div class="sigem-stat-label">Disponibles para uso</div>
+                    <div class="sigem-stat-label">Disponibles</div>
                     <div class="sigem-stat-hint sigem-h-info">{{ $porcentajeDisponibles }}% del parque</div>
                 </div>
 
@@ -119,7 +57,7 @@
                     <div class="sigem-stat-ico sigem-i-warning">🔧</div>
                     <div class="sigem-stat-val">{{ $inventarioEnMantenimiento ?? 0 }}</div>
                     <div class="sigem-stat-label">En mantenimiento</div>
-                    <div class="sigem-stat-hint sigem-h-warn">{{ $mantenimientosPendientes ?? 0 }} pendientes de revisión</div>
+                    <div class="sigem-stat-hint sigem-h-warn">{{ $mantenimientosPendientes ?? 0 }} pendientes</div>
                 </div>
 
                 <!-- 4. Requieren atención -->
@@ -127,8 +65,69 @@
                     <div class="sigem-stat-ico sigem-i-danger">⚠️</div>
                     <div class="sigem-stat-val">{{ $requierenAtencion }}</div>
                     <div class="sigem-stat-label">Requieren atención</div>
-                    <div class="sigem-stat-hint sigem-h-warn">{{ $materialesStockBajoCount ?? 0 }} stock bajo · {{ $inventarioDanados ?? 0 }} dañados</div>
+                    <div class="sigem-stat-hint sigem-h-warn">cambios de área y solicitudes de baja</div>
                 </div>
+            </div>
+        @endif
+
+        <!-- 3. ACCIONES RÁPIDAS (4 CARDS CON FLECHA "→") -->
+        @if($isSkeletonPreview)
+            {{-- SKELETON PREVIEW: ACCIONES RÁPIDAS (4 CARDS) --}}
+            <div class="sigem-quick-grid sigem-skeleton-grid">
+                @for($i = 0; $i < 4; $i++)
+                    <div class="sigem-skeleton-card sigem-skeleton-quick">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                            <span class="sigem-skeleton" style="width: 36px; height: 36px; border-radius: 10px;"></span>
+                            <span class="sigem-skeleton" style="width: 14px; height: 14px; border-radius: 4px;"></span>
+                        </div>
+                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 65%; height: 16px; margin-bottom: 6px;"></span>
+                        <span class="sigem-skeleton sigem-skeleton-cell" style="width: 85%; height: 12px;"></span>
+                    </div>
+                @endfor
+            </div>
+        @else
+            <div class="sigem-quick-grid">
+                <!-- 1. Autorizar mantenimiento -->
+                <a class="sigem-quick" href="{{ url('/admin/mantenimientos') }}">
+                    <div class="arrow">→</div>
+                    <div class="sigem-quick-ico sigem-i-warning">🔧</div>
+                    <div class="sigem-quick-title">
+                        Autorizar mantenimiento
+                        @if(($mantenimientosPendientes ?? 0) > 0)
+                            <span class="sigem-qbadge">{{ $mantenimientosPendientes }}</span>
+                        @endif
+                    </div>
+                    <div class="sigem-quick-desc">Revisar reportes pendientes</div>
+                </a>
+
+                <!-- 2. Revisar solicitudes -->
+                <a class="sigem-quick" href="{{ url('/admin/solicituds') }}">
+                    <div class="arrow">→</div>
+                    <div class="sigem-quick-ico sigem-i-primary">📋</div>
+                    <div class="sigem-quick-title">
+                        Revisar solicitudes
+                        @if(($solicitudesPendientes ?? 0) > 0)
+                            <span class="sigem-qbadge">{{ $solicitudesPendientes }}</span>
+                        @endif
+                    </div>
+                    <div class="sigem-quick-desc">Aprobar o rechazar</div>
+                </a>
+
+                <!-- 3. Registrar activo -->
+                <a class="sigem-quick" href="javascript:void(0)" wire:click="mountAction('registrarEquipo')">
+                    <div class="arrow">→</div>
+                    <div class="sigem-quick-ico sigem-i-success">＋</div>
+                    <div class="sigem-quick-title">Registrar activo</div>
+                    <div class="sigem-quick-desc">Da de alta un equipo</div>
+                </a>
+
+                <!-- 4. Ver bitácora -->
+                <a class="sigem-quick" href="{{ url('/admin/configuracion') }}">
+                    <div class="arrow">→</div>
+                    <div class="sigem-quick-ico sigem-i-info">🕘</div>
+                    <div class="sigem-quick-title">Ver bitácora</div>
+                    <div class="sigem-quick-desc">Historial de acciones</div>
+                </a>
             </div>
         @endif
 

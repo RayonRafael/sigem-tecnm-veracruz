@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\SolicitudResource\Pages;
 
 use App\Filament\Concerns\ConDashboardBreadcrumb;
-use App\Filament\Concerns\ConSlideOver;
 use App\Filament\Resources\SolicitudResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
@@ -11,13 +10,21 @@ use Filament\Resources\Pages\ListRecords;
 class ListSolicituds extends ListRecords
 {
     use ConDashboardBreadcrumb;
-    use ConSlideOver;
 
     protected static string $resource = SolicitudResource::class;
 
+    public function mount(): void
+    {
+        parent::mount();
+
+        if (request()->query('abrir') === 'create') {
+            $this->redirect(static::getResource()::getUrl('create'));
+        }
+    }
+
     public function getTitle(): string
     {
-        return '📋 Lista de solicitudes de materiales';
+        return '📋 Solicitud de Material/Equipo';
     }
 
     public function getSubheading(): ?string
@@ -28,7 +35,9 @@ class ListSolicituds extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label('＋ Nueva solicitud')
+                ->url(fn (): string => static::getResource()::getUrl('create')),
         ];
     }
 }
