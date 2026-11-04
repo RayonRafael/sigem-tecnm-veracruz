@@ -30,6 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->passwordReset()
             ->brandName('SIGEM - TecNM Veracruz')
             ->brandLogo(new HtmlString('<div class="sigem-brand"><img src="' . asset('images/sigem-icon.svg') . '" alt="SIGEM" class="sigem-brand-logo"></div>'))
             ->brandLogoHeight('auto')
@@ -52,11 +53,13 @@ class AdminPanelProvider extends PanelProvider
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <link rel="stylesheet" href="{{ asset(\'css/sigem-theme.css\') }}">
+<script src="{{ asset(\'js/sigem-network.js\') }}" defer></script>
 ')
             )
             ->renderHook(
                 PanelsRenderHook::TOPBAR_START,
                 fn (): string => Blade::render('
+<button type="button" class="sigem-hamburger" onclick="toggleSidebar()" aria-label="Abrir menú lateral">☰</button>
 <div class="sigem-topbar-brand flex items-center gap-x-3">
     <img src="{{ asset(\'images/sigem-logo.svg\') }}" alt="SIGEM" class="h-8">
     <span class="font-bold text-lg hidden sm:block">SIGEM - TecNM Veracruz</span>
@@ -68,8 +71,8 @@ class AdminPanelProvider extends PanelProvider
                 fn (): string => Blade::render('
 <div class="flex justify-center items-center gap-4 mb-6">
     <img src="{{ asset(\'images/sigem-logo.svg\') }}" alt="SIGEM" style="height: 40px; object-fit: contain;">
-    <img src="{{ asset(\'images/tecnm-logo.png\') }}" alt="TecNM" style="height: 40px; object-fit: contain;">
-    <img src="{{ asset(\'images/itv-logo.png\') }}" alt="ITV" style="height: 40px; object-fit: contain;">
+    <img src="{{ asset(\'images/tecnm-logo.png\') }}" alt="TecNM" loading="lazy" style="height: 40px; object-fit: contain;">
+    <img src="{{ asset(\'images/itv-logo.png\') }}" alt="ITV" loading="lazy" style="height: 40px; object-fit: contain;">
 </div>
 ')
             )
@@ -140,7 +143,28 @@ class AdminPanelProvider extends PanelProvider
 @if (auth()->check())
     @livewire(\App\Livewire\CommandPalette::class)
 @endif
+<div class="sigem-sidebar-overlay" onclick="toggleSidebar()"></div>
 <script>
+    window.toggleSidebar = function () {
+        var sidebar = document.querySelector(\'.fi-sidebar\');
+        var overlay = document.querySelector(\'.sigem-sidebar-overlay\');
+        if (sidebar) sidebar.classList.toggle(\'is-open\');
+        if (overlay) overlay.classList.toggle(\'is-active\');
+    };
+    document.addEventListener(\'livewire:navigated\', function () {
+        var sidebar = document.querySelector(\'.fi-sidebar\');
+        var overlay = document.querySelector(\'.sigem-sidebar-overlay\');
+        if (sidebar) sidebar.classList.remove(\'is-open\');
+        if (overlay) overlay.classList.remove(\'is-active\');
+    });
+    document.addEventListener(\'keydown\', function (e) {
+        if (e.key === \'Escape\') {
+            var sidebar = document.querySelector(\'.fi-sidebar\');
+            var overlay = document.querySelector(\'.sigem-sidebar-overlay\');
+            if (sidebar) sidebar.classList.remove(\'is-open\');
+            if (overlay) overlay.classList.remove(\'is-active\');
+        }
+    });
     (function () {
         var isTooltipsUpdating = false;
         function initSidebarTooltips() {

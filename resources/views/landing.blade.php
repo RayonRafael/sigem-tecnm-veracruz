@@ -576,9 +576,9 @@
     <footer class="footer">
         <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 20px;">
             <span style="color: rgba(255,255,255,0.7); font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Instituciones:</span>
-            <img src="{{ asset('images/sigem-logo.svg') }}" alt="SIGEM" style="height: 38px; opacity: 0.95; object-fit: contain;">
-            <img src="{{ asset('images/tecnm-logo.png') }}" alt="TecNM" style="height: 38px; opacity: 0.95; object-fit: contain;">
-            <img src="{{ asset('images/itv-logo.png') }}" alt="ITV" style="height: 38px; opacity: 0.95; object-fit: contain;">
+            <img src="{{ asset('images/sigem-logo.svg') }}" alt="SIGEM" loading="lazy" style="height: 38px; opacity: 0.95; object-fit: contain;">
+            <img src="{{ asset('images/tecnm-logo.png') }}" alt="TecNM" loading="lazy" style="height: 38px; opacity: 0.95; object-fit: contain;">
+            <img src="{{ asset('images/itv-logo.png') }}" alt="ITV" loading="lazy" style="height: 38px; opacity: 0.95; object-fit: contain;">
         </div>
         <p>&copy; {{ date('Y') }} SIGEM — Tecnológico Nacional de México Campus Veracruz. Todos los derechos reservados.</p>
     </footer>

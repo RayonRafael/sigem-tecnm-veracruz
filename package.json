@@ -3,14 +3,20 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
-        "dev": "vite"
+        "build:css": "sass public/css/sigem-theme.scss public/css/sigem-theme.css --no-source-map --style=expanded",
+        "watch:css": "sass --watch public/css/sigem-theme.scss:public/css/sigem-theme.css --no-source-map",
+        "build": "npm run build:css && vite build",
+        "dev": "vite",
+        "backstop:reference": "backstop reference",
+        "backstop:test": "backstop test"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",
         "axios": "^1.11.0",
+        "backstopjs": "^6.3.25",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^2.0.0",
+        "sass": "^1.107.1",
         "tailwindcss": "^4.0.0",
         "vite": "^7.0.7"
     }
