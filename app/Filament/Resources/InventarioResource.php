@@ -142,13 +142,14 @@ class InventarioResource extends Resource
                 ->content(function (Forms\Get $get) {
                     $tipo = $get('tipo_equipo') ?? 'pc';
                     $texto = match ($tipo) {
-                        'pc' => '💡 Se registrarán <strong>monitor, teclado, mouse y CPU</strong> como un solo equipo. Si le falta alguno, marca <strong>«No tiene»</strong>.',
-                        'aio' => '💡 Se registrará el <strong>All in One</strong> con su teclado y mouse como un solo equipo. Si le falta alguno, marca <strong>«No tiene»</strong>.',
+                        'pc' => 'Se registrarán <strong>monitor, teclado, mouse y CPU</strong> como un solo equipo. Si le falta alguno, marca <strong>«No tiene»</strong>.',
+                        'aio' => 'Se registrará el <strong>All in One</strong> con su teclado y mouse como un solo equipo. Si le falta alguno, marca <strong>«No tiene»</strong>.',
                         default => '',
                     };
                     return new HtmlString('
-                        <div style="background-color: #eff6ff; border: 1.5px solid #bfdbfe; color: #1e40af; padding: 0.875rem 1.25rem; border-radius: 0.5rem; font-size: 0.9375rem; display: flex; align-items: center; gap: 0.5rem;">
-                            ' . $texto . '
+                        <div style="background-color: #eff6ff; border: 1.5px solid #bfdbfe; color: #1e40af; padding: 0.875rem 1.25rem; border-radius: 0.5rem; font-size: 0.9375rem; display: flex; align-items: center; gap: 0.625rem;">
+                            <span style="flex-shrink: 0; font-size: 1.125rem; line-height: 1;">💡</span>
+                            <span style="white-space: normal; line-height: 1.5; word-break: normal;">' . $texto . '</span>
                         </div>
                     ');
                 })
@@ -164,7 +165,7 @@ class InventarioResource extends Resource
                             Forms\Components\Select::make('departamento_id')
                                 ->label('Departamento')
                                 ->placeholder('Selecciona departamento...')
-                                ->options(fn () => Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento'))
+                                ->options(fn (): array => Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento')->toArray())
                                 ->searchable()
                                 ->preload()
                                 ->live()
@@ -178,14 +179,15 @@ class InventarioResource extends Resource
                             Forms\Components\Select::make('area_id')
                                 ->label('Área')
                                 ->placeholder(fn (Forms\Get $get) => $get('departamento_id') ? 'Selecciona área...' : 'Elige departamento primero')
-                                ->options(function (Forms\Get $get) {
+                                ->options(function (Forms\Get $get): array {
                                     $deptoId = $get('departamento_id');
                                     if (! $deptoId) {
                                         return [];
                                     }
                                     return Area::where('id_departamento', $deptoId)
                                         ->orderBy('nombre')
-                                        ->pluck('nombre', 'id_area');
+                                        ->pluck('nombre', 'id_area')
+                                        ->toArray();
                                 })
                                 ->searchable()
                                 ->live()
@@ -800,7 +802,9 @@ class InventarioResource extends Resource
                         $clean = trim(substr($clean, 8));
                     }
                     MarcaMaterial::firstOrCreate(['nombre' => $clean]);
-                    $set($fieldName, $clean);
+                    if ($clean !== $state) {
+                        $set($fieldName, $clean);
+                    }
                 }
             })
             ->createOptionForm([
@@ -886,7 +890,9 @@ class InventarioResource extends Resource
                         $clean = trim(substr($clean, 8));
                     }
                     $clean = static::agregarEspecificacionGlobal($clean);
-                    $set($fieldName, $clean);
+                    if ($clean !== $state) {
+                        $set($fieldName, $clean);
+                    }
                 }
             })
             ->createOptionForm([
@@ -1342,7 +1348,7 @@ class InventarioResource extends Resource
                                     Forms\Components\Select::make('marca')
                                         ->label('Marca')
                                         ->placeholder('Selecciona la marca...')
-                                        ->options(fn () => MarcaMaterial::orderBy('nombre')->pluck('nombre', 'nombre'))
+                                        ->options(fn (): array => MarcaMaterial::orderBy('nombre')->pluck('nombre', 'nombre')->toArray())
                                         ->searchable()
                                         ->preload()
                                         ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->especificaciones['marca'] ?? $record?->especificaciones['cpu_marca'] ?? $record?->material?->marca?->nombre ?? '')),
@@ -1427,7 +1433,7 @@ class InventarioResource extends Resource
                                     Forms\Components\Select::make('area_id')
                                         ->label('Área')
                                         ->placeholder('Selecciona el área...')
-                                        ->options(fn () => Area::orderBy('nombre')->pluck('nombre', 'id_area'))
+                                        ->options(fn (): array => Area::orderBy('nombre')->pluck('nombre', 'id_area')->toArray())
                                         ->searchable()
                                         ->preload()
                                         ->required(),

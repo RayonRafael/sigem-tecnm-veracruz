@@ -58,14 +58,15 @@ class MantenimientoResource extends Resource
                         Forms\Components\Select::make('id_inventario')
                             ->label('¿Qué equipo necesita servicio?')
                             ->placeholder('Selecciona...')
-                            ->options(function () {
+                            ->options(function (): array {
                                 return Inventario::with('material')
                                     ->get()
                                     ->mapWithKeys(function ($inv) {
                                         $code = $inv->codigo ?: $inv->num_serie ?: $inv->numero_serie ?: 'S/N';
                                         $name = $inv->material?->nombre ?: $inv->subtipo ?: 'Equipo';
                                         return [$inv->id_inventario => "{$code} — {$name}"];
-                                    });
+                                    })
+                                    ->toArray();
                             })
                             ->searchable()
                             ->preload()

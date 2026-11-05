@@ -74,8 +74,8 @@ class SolicitudResource extends Resource
                                 Forms\Components\Select::make('id_producto')
                                     ->label('Material')
                                     ->placeholder('Selecciona...')
-                                    ->options(function () {
-                                        return \App\Models\Material::pluck('nombre', 'id_producto');
+                                    ->options(function (): array {
+                                        return \App\Models\Material::pluck('nombre', 'id_producto')->toArray();
                                     })
                                     ->searchable()
                                     ->preload()

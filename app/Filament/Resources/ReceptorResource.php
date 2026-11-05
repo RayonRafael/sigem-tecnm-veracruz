@@ -118,7 +118,7 @@ class ReceptorResource extends Resource
                         Forms\Components\Select::make('departamento_id_virtual')
                             ->label('Departamento')
                             ->placeholder('Selecciona el departamento...')
-                            ->options(fn () => \App\Models\Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento'))
+                            ->options(fn (): array => \App\Models\Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento')->toArray())
                             ->searchable()
                             ->preload()
                             ->live()
