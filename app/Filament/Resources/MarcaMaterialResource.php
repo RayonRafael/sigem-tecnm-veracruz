@@ -45,7 +45,7 @@ class MarcaMaterialResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos de la marca')
+                Forms\Components\Section::make('🏷 Datos de la marca')
                     ->icon('heroicon-m-tag')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -102,7 +102,7 @@ class MarcaMaterialResource extends Resource
                         Tab::make('Información')
                             ->icon('heroicon-m-tag')
                             ->schema([
-                                Section::make('Datos de la marca')
+                                Section::make('🏷 Datos de la marca')
                                     ->schema([
                                         TextEntry::make('nombre')->label('Nombre de la marca')->icon('heroicon-m-tag'),
                                         TextEntry::make('materiales_count')

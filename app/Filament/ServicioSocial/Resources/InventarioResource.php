@@ -67,6 +67,11 @@ class InventarioResource extends Resource
         return AdminInventarioResource::getEditFormTabs();
     }
 
+    public static function obtenerTipoEquipoNormalizado(?\App\Models\Inventario $record = null, ?Forms\Get $get = null): string
+    {
+        return AdminInventarioResource::obtenerTipoEquipoNormalizado($record, $get);
+    }
+
     public static function table(Table $table): Table
     {
         return $table

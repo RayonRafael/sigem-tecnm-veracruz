@@ -63,7 +63,7 @@ class ReceptorResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos del receptor')
+                Forms\Components\Section::make('👤 Datos del receptor')
                     ->icon('heroicon-m-user-circle')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -292,7 +292,7 @@ class ReceptorResource extends Resource
                         Tab::make('Información')
                             ->icon('heroicon-m-tag')
                             ->schema([
-                                Section::make('Datos personales')
+                                Section::make('👤 Datos del receptor')
                                     ->schema([
                                         TextEntry::make('nombre')
                                             ->label('Nombre')

@@ -52,7 +52,7 @@ class AreaResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos del área')
+                Forms\Components\Section::make('📍 Datos del área')
                     ->icon('heroicon-m-map-pin')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -127,7 +127,7 @@ class AreaResource extends Resource
                         Tab::make('Información')
                             ->icon('heroicon-m-tag')
                             ->schema([
-                                Section::make('Datos del área')
+                                Section::make('📍 Datos del área')
                                     ->schema([
                                         TextEntry::make('nombre')->label('Nombre del área')->icon('heroicon-m-map-pin'),
                                         TextEntry::make('departamento.nombre')->label('Departamento')->icon('heroicon-m-building-office-2'),

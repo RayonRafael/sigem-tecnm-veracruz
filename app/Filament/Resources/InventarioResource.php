@@ -1328,6 +1328,147 @@ class InventarioResource extends Resource
         return 'Equipo registrado exitosamente';
     }
 
+    public static function obtenerTipoEquipoNormalizado(?Inventario $record = null, ?Forms\Get $get = null): string
+    {
+        if (! $record && $get) {
+            $record = $get('record');
+        }
+
+        if (! $record) {
+            $subtipo = strtolower(trim((string) ($get ? $get('subtipo') : '')));
+            $nombre = strtolower(trim((string) ($get ? $get('nombre_equipo') : '')));
+            $tipoMat = strtolower(trim((string) ($get ? $get('categoria_display') : '')));
+            $combined = " {$subtipo} {$nombre} {$tipoMat} ";
+            if (str_contains($combined, 'impresora') || str_contains($combined, 'multifuncional')) return 'imp';
+            if (str_contains($combined, 'switch') || str_contains($combined, 'conmutador')) return 'swi';
+            if (str_contains($combined, 'monitor') || str_contains($combined, 'pantalla')) return 'mon';
+            if (str_contains($combined, 'all in one') || str_contains($combined, 'aio')) return 'aio';
+            if (str_contains($combined, 'laptop') || str_contains($combined, 'notebook')) return 'lap';
+            if (str_contains($combined, 'cpu') || str_contains($combined, 'computadora') || str_contains($combined, 'gabinete')) return 'cpu';
+            return 'otro';
+        }
+
+        $subtipo = strtolower(trim((string) ($record->subtipo ?? '')));
+        $matNombre = strtolower(trim((string) ($record->material?->nombre ?? '')));
+        $matTipo = strtolower(trim((string) ($record->material?->tipo?->nombre ?? '')));
+        $componente = strtolower(trim((string) ($record->especificaciones['componente'] ?? '')));
+        $tipoEquipo = strtolower(trim((string) ($record->tipo_equipo ?? ($record->especificaciones['tipo_equipo'] ?? ''))));
+
+        $combined = " {$subtipo} {$matNombre} {$matTipo} ";
+
+        // 1. All in One
+        if (
+            str_contains($combined, 'all in one') ||
+            str_contains($combined, 'all-in-one') ||
+            str_contains($combined, 'aio') ||
+            $tipoEquipo === 'aio'
+        ) {
+            return 'aio';
+        }
+
+        // 2. Laptop / Portátil
+        if (
+            str_contains($combined, 'laptop') ||
+            str_contains($combined, 'notebook') ||
+            str_contains($combined, 'portátil') ||
+            str_contains($combined, 'portatil') ||
+            $tipoEquipo === 'lap'
+        ) {
+            return 'lap';
+        }
+
+        // 3. Impresora
+        if (
+            str_contains($combined, 'impresora') ||
+            str_contains($combined, 'multifuncional') ||
+            $tipoEquipo === 'imp' ||
+            filled($record->tipo_impresora) ||
+            isset($record->especificaciones['tipo_impresora'])
+        ) {
+            return 'imp';
+        }
+
+        // 4. Switch de red
+        if (
+            str_contains($combined, 'switch') ||
+            str_contains($combined, 'conmutador') ||
+            $tipoEquipo === 'swi' ||
+            isset($record->especificaciones['num_puertos'])
+        ) {
+            return 'swi';
+        }
+
+        // 5. Monitor / Pantalla
+        if (
+            str_contains($combined, 'monitor') ||
+            str_contains($combined, 'pantalla') ||
+            $componente === 'mon' ||
+            $tipoEquipo === 'mon'
+        ) {
+            return 'mon';
+        }
+
+        // 6. Teclado
+        if (
+            str_contains($combined, 'teclado') ||
+            str_contains($combined, 'keyboard') ||
+            $componente === 'tec' ||
+            $tipoEquipo === 'tec'
+        ) {
+            return 'periferico';
+        }
+
+        // 7. Mouse
+        if (
+            str_contains($combined, 'mouse') ||
+            str_contains($combined, 'ratón') ||
+            str_contains($combined, 'raton') ||
+            $componente === 'mou' ||
+            $tipoEquipo === 'mou'
+        ) {
+            return 'periferico';
+        }
+
+        // 8. Proyector
+        if (
+            str_contains($combined, 'proyector') ||
+            str_contains($combined, 'cañón') ||
+            str_contains($combined, 'canon') ||
+            $tipoEquipo === 'proy'
+        ) {
+            return 'periferico';
+        }
+
+        // 9. No-Break / Regulador / UPS
+        if (
+            str_contains($combined, 'no-break') ||
+            str_contains($combined, 'nobreak') ||
+            str_contains($combined, 'no break') ||
+            str_contains($combined, 'regulador') ||
+            str_contains($combined, 'ups') ||
+            $tipoEquipo === 'nob'
+        ) {
+            return 'periferico';
+        }
+
+        // 10. CPU / PC / Gabinete / Computadora
+        if (
+            str_contains($combined, 'cpu') ||
+            str_contains($combined, 'gabinete') ||
+            str_contains($combined, 'computadora') ||
+            str_contains($combined, 'escritorio') ||
+            str_contains($combined, 'optiplex') ||
+            str_contains($combined, 'prodesk') ||
+            $componente === 'cpu' ||
+            $tipoEquipo === 'cpu' ||
+            $tipoEquipo === 'pc'
+        ) {
+            return 'cpu';
+        }
+
+        return 'otro';
+    }
+
     public static function getEditFormTabs(): array
     {
         return [
@@ -1373,7 +1514,22 @@ class InventarioResource extends Resource
                                         ->label('Categoría / Tipo de equipo')
                                         ->disabled()
                                         ->dehydrated(false)
+                                        ->columnSpan(fn (?Inventario $record = null, ?Forms\Get $get = null): int => in_array(static::obtenerTipoEquipoNormalizado($record, $get), ['imp', 'swi'], true) ? 1 : 2)
                                         ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->material?->tipo?->nombre ?? $record?->subtipo ?? 'General')),
+
+                                    Forms\Components\TextInput::make('tipo_impresora')
+                                        ->label('Tipo de impresora')
+                                        ->disabled()
+                                        ->dehydrated(false)
+                                        ->visible(fn (?Inventario $record = null, ?Forms\Get $get = null): bool => static::obtenerTipoEquipoNormalizado($record, $get) === 'imp')
+                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->tipo_impresora ?? ($record?->especificaciones['tipo_impresora'] ?? '—'))),
+
+                                    Forms\Components\TextInput::make('num_puertos')
+                                        ->label('Número de puertos')
+                                        ->disabled()
+                                        ->dehydrated(false)
+                                        ->visible(fn (?Inventario $record = null, ?Forms\Get $get = null): bool => static::obtenerTipoEquipoNormalizado($record, $get) === 'swi')
+                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->especificaciones['num_puertos'] ?? '—')),
 
                                     Forms\Components\TextInput::make('especificacion_texto')
                                         ->label('Especificaciones')
@@ -1393,8 +1549,8 @@ class InventarioResource extends Resource
 
                     Forms\Components\Section::make('Datos técnicos')
                         ->description('Hardware y configuración técnica (solo lectura)')
-                        ->icon('heroicon-m-cpu-chip')
                         ->collapsible()
+                        ->visible(fn (?Inventario $record = null, ?Forms\Get $get = null): bool => in_array(static::obtenerTipoEquipoNormalizado($record, $get), ['cpu', 'lap', 'aio'], true))
                         ->schema([
                             Forms\Components\Grid::make(2)
                                 ->schema([
@@ -1424,9 +1580,8 @@ class InventarioResource extends Resource
                                 ]),
                         ]),
 
-                    Forms\Components\Section::make('Ubicación y Red')
-                        ->description('Ubicación física y parámetros de red asignados')
-                        ->icon('heroicon-m-map-pin')
+                    Forms\Components\Section::make('Ubicación y asignación')
+                        ->description('Ubicación física asignada del equipo')
                         ->schema([
                             Forms\Components\Grid::make(2)
                                 ->schema([
@@ -1443,7 +1598,15 @@ class InventarioResource extends Resource
                                         ->placeholder('Ej. E101')
                                         ->maxLength(5)
                                         ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->salon?->nombre ?? ($record?->especificaciones['aula'] ?? null) ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record?->ubicacion_fisica ?? '', $m) ? $m[1] : null) ?? '')),
+                                ]),
+                        ]),
 
+                    Forms\Components\Section::make('Red y conectividad')
+                        ->description('Parámetros de conexión a la red institucional')
+                        ->visible(fn (?Inventario $record = null, ?Forms\Get $get = null): bool => in_array(static::obtenerTipoEquipoNormalizado($record, $get), ['cpu', 'lap', 'aio', 'imp', 'swi'], true) || filled($record?->ip_address) || filled($record?->mac_address))
+                        ->schema([
+                            Forms\Components\Grid::make(2)
+                                ->schema([
                                     Forms\Components\TextInput::make('ip_address')
                                         ->label('Dirección IP')
                                         ->placeholder('Ej. 192.168.1.100')
@@ -1462,110 +1625,116 @@ class InventarioResource extends Resource
             Forms\Components\Tabs\Tab::make('Factura y proveedor')
                 ->icon('heroicon-m-document-text')
                 ->schema([
-                    Forms\Components\Grid::make(2)
+                    Forms\Components\Section::make('Datos de facturación y proveedor')
                         ->schema([
-                            Forms\Components\ToggleButtons::make('tipo_propiedad')
-                                ->options([
-                                    'Propio' => 'Propio',
-                                    'Rentado' => 'Rentado',
-                                ])
-                                ->colors([
-                                    'Propio' => 'primary',
-                                    'Rentado' => 'gray',
-                                ])
-                                ->inline()
-                                ->default('Propio')
-                                ->live(),
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\ToggleButtons::make('tipo_propiedad')
+                                        ->options([
+                                            'Propio' => 'Propio',
+                                            'Rentado' => 'Rentado',
+                                        ])
+                                        ->colors([
+                                            'Propio' => 'primary',
+                                            'Rentado' => 'gray',
+                                        ])
+                                        ->inline()
+                                        ->default('Propio')
+                                        ->live(),
 
-                            Forms\Components\Select::make('id_proveedor')
-                                ->label('Proveedor')
-                                ->placeholder('Selecciona...')
-                                ->relationship('proveedor', 'nombre_empresa')
-                                ->searchable()
-                                ->preload()
-                                ->prefixIcon('heroicon-m-truck')
+                                    Forms\Components\Select::make('id_proveedor')
+                                        ->label('Proveedor')
+                                        ->placeholder('Selecciona...')
+                                        ->relationship('proveedor', 'nombre_empresa')
+                                        ->searchable()
+                                        ->preload()
+                                        ->prefixIcon('heroicon-m-truck')
+                                        ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
+
+                                    Forms\Components\TextInput::make('num_factura')
+                                        ->label('Número de factura')
+                                        ->placeholder('Ej. FAC-2026-001')
+                                        ->prefixIcon('heroicon-m-hashtag')
+                                        ->maxLength(100),
+
+                                    Forms\Components\DatePicker::make('fecha_factura')
+                                        ->label('Fecha de factura')
+                                        ->prefixIcon('heroicon-m-calendar'),
+                                ]),
+
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\DatePicker::make('fecha_inicio_renta')
+                                        ->label('Inicio de renta')
+                                        ->prefixIcon('heroicon-m-calendar-days'),
+
+                                    Forms\Components\DatePicker::make('fecha_fin_renta')
+                                        ->label('Fin de renta')
+                                        ->prefixIcon('heroicon-m-calendar-days'),
+
+                                    Forms\Components\Textarea::make('observaciones_renta')
+                                        ->label('Observaciones de renta')
+                                        ->placeholder('Ej. Contrato de arrendamiento...')
+                                        ->columnSpanFull(),
+                                ])
                                 ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
-
-                            Forms\Components\TextInput::make('num_factura')
-                                ->label('Número de factura')
-                                ->placeholder('Ej. FAC-2026-001')
-                                ->prefixIcon('heroicon-m-hashtag')
-                                ->maxLength(100),
-
-                            Forms\Components\DatePicker::make('fecha_factura')
-                                ->label('Fecha de factura')
-                                ->prefixIcon('heroicon-m-calendar'),
                         ]),
-
-                    Forms\Components\Grid::make(2)
-                        ->schema([
-                            Forms\Components\DatePicker::make('fecha_inicio_renta')
-                                ->label('Inicio de renta')
-                                ->prefixIcon('heroicon-m-calendar-days'),
-
-                            Forms\Components\DatePicker::make('fecha_fin_renta')
-                                ->label('Fin de renta')
-                                ->prefixIcon('heroicon-m-calendar-days'),
-
-                            Forms\Components\Textarea::make('observaciones_renta')
-                                ->label('Observaciones de renta')
-                                ->placeholder('Ej. Contrato de arrendamiento...')
-                                ->columnSpanFull(),
-                        ])
-                        ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
                 ]),
 
             Forms\Components\Tabs\Tab::make('Garantía y observaciones')
-                ->icon('heroicon-m-clipboard-document-check')
+                ->icon('heroicon-m-shield-check')
                 ->schema([
-                    Forms\Components\Grid::make(2)
+                    Forms\Components\Section::make('Estado y garantía del equipo')
                         ->schema([
-                            Forms\Components\DatePicker::make('fecha_registro')
-                                ->label('Fecha de registro')
-                                ->default(now())
-                                ->prefixIcon('heroicon-m-clock'),
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\DatePicker::make('fecha_registro')
+                                        ->label('Fecha de registro')
+                                        ->default(now())
+                                        ->prefixIcon('heroicon-m-clock'),
 
-                            Forms\Components\DatePicker::make('garantia_fecha_fin')
-                                ->label('Fin de garantía')
-                                ->prefixIcon('heroicon-m-shield-check'),
+                                    Forms\Components\DatePicker::make('garantia_fecha_fin')
+                                        ->label('Fin de garantía')
+                                        ->prefixIcon('heroicon-m-shield-check'),
 
-                            Forms\Components\Select::make('garantia_estado')
-                                ->label('Estado de garantía')
-                                ->placeholder('Selecciona...')
-                                ->options([
-                                    'vigente' => 'Vigente',
-                                    'vencida' => 'Vencida',
-                                    'sin_garantia' => 'Sin Garantía',
-                                ])
-                                ->default('sin_garantia'),
+                                    Forms\Components\Select::make('garantia_estado')
+                                        ->label('Estado de garantía')
+                                        ->placeholder('Selecciona...')
+                                        ->options([
+                                            'vigente' => 'Vigente',
+                                            'vencida' => 'Vencida',
+                                            'sin_garantia' => 'Sin Garantía',
+                                        ])
+                                        ->default('sin_garantia'),
 
-                            Forms\Components\ToggleButtons::make('estado')
-                                ->label('Estado del activo')
-                                ->options([
-                                    'Disponible' => 'Disponible',
-                                    'Asignado' => 'Asignado',
-                                    'Reasignado' => 'Reasignado',
-                                    'En Mantenimiento' => 'En Mantenimiento',
-                                    'Dañado' => 'Dañado',
-                                    'Baja' => 'Baja',
-                                ])
-                                ->colors([
-                                    'Disponible' => 'success',
-                                    'Asignado' => 'info',
-                                    'Reasignado' => 'reassign',
-                                    'En Mantenimiento' => 'warning',
-                                    'Dañado' => 'danger',
-                                    'Baja' => 'gray',
-                                ])
-                                ->inline(),
+                                    Forms\Components\ToggleButtons::make('estado')
+                                        ->label('Estado del activo')
+                                        ->options([
+                                            'Disponible' => 'Disponible',
+                                            'Asignado' => 'Asignado',
+                                            'Reasignado' => 'Reasignado',
+                                            'En Mantenimiento' => 'En Mantenimiento',
+                                            'Dañado' => 'Dañado',
+                                            'Baja' => 'Baja',
+                                        ])
+                                        ->colors([
+                                            'Disponible' => 'success',
+                                            'Asignado' => 'info',
+                                            'Reasignado' => 'reassign',
+                                            'En Mantenimiento' => 'warning',
+                                            'Dañado' => 'danger',
+                                            'Baja' => 'gray',
+                                        ])
+                                        ->inline(),
+                                ]),
+
+                            Forms\Components\Textarea::make('observaciones_adicionales')
+                                ->label('Observaciones adicionales')
+                                ->placeholder('Notas u observaciones sobre el estado...')
+                                ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->observaciones_generales))
+                                ->dehydrated(false)
+                                ->rows(2),
                         ]),
-
-                    Forms\Components\Textarea::make('observaciones_adicionales')
-                        ->label('Observaciones adicionales')
-                        ->placeholder('Notas u observaciones sobre el estado...')
-                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->observaciones_generales))
-                        ->dehydrated(false)
-                        ->rows(2),
                 ]),
         ];
     }
@@ -1587,10 +1756,12 @@ class InventarioResource extends Resource
             ?? '';
         $data['categoria_display'] = $record->material?->tipo?->nombre ?? $record->subtipo ?? 'General';
         $data['especificacion_texto'] = $record->especificacion_texto ?? ($record->especificaciones['especificaciones'] ?? '');
-        $data['procesador'] = $record->procesador ?? ($record->especificaciones['procesador'] ?? '');
-        $data['ram'] = $record->ram ?? ($record->especificaciones['ram'] ?? '');
-        $data['disco'] = $record->disco ?? ($record->especificaciones['disco'] ?? '');
-        $data['sistema_operativo'] = $record->sistema_operativo ?? ($record->especificaciones['sistema_operativo'] ?? '');
+        $data['procesador'] = $record->procesador ?? ($record->especificaciones['procesador'] ?? '—');
+        $data['ram'] = $record->ram ?? ($record->especificaciones['ram'] ?? '—');
+        $data['disco'] = $record->disco ?? ($record->especificaciones['disco'] ?? '—');
+        $data['sistema_operativo'] = $record->sistema_operativo ?? ($record->especificaciones['sistema_operativo'] ?? '—');
+        $data['tipo_impresora'] = $record->tipo_impresora ?? ($record->especificaciones['tipo_impresora'] ?? '—');
+        $data['num_puertos'] = $record->especificaciones['num_puertos'] ?? '—';
         $data['ip_address'] = $record->ip_address ?? ($record->especificaciones['ip_address'] ?? '');
         $data['mac_address'] = $record->mac_address ?? ($record->especificaciones['mac_address'] ?? '');
 
@@ -1673,6 +1844,9 @@ class InventarioResource extends Resource
         return [
             Tables\Columns\TextColumn::make('departamento.nombre')
                 ->label('Departamento')
+                ->extraHeaderAttributes(['style' => 'min-width: 180px;'])
+                ->extraCellAttributes(['style' => 'min-width: 180px;'])
+                ->tooltip(fn (Inventario $record): ?string => $record->departamento?->nombre ?? $record->area?->departamento?->nombre)
                 ->getStateUsing(function (Inventario $record): ?string {
                     return $record->departamento?->nombre
                         ?? $record->area?->departamento?->nombre
@@ -1696,6 +1870,8 @@ class InventarioResource extends Resource
             Tables\Columns\TextColumn::make('equipo')
                 ->label('Equipo')
                 ->html()
+                ->extraHeaderAttributes(['style' => 'min-width: 250px;'])
+                ->extraCellAttributes(['style' => 'min-width: 250px; max-width: 320px;'])
                 ->getStateUsing(function (Inventario $record): string {
                     $nombre = $record->material?->nombre ?? $record->subtipo ?? 'Equipo';
                     $cod = ! empty($record->codigo) ? $record->codigo : null;
@@ -1704,8 +1880,10 @@ class InventarioResource extends Resource
                     } else {
                         $sub = 'ID: #' . ($record->id_inventario ?? $record->id);
                     }
-                    return '<div class="td-main" style="font-weight:600;line-height:1.25;color:#111827;">' . e($nombre) . '</div>'
-                        . '<div class="td-sub" style="font-size:11.5px;color:#6b7280;margin-top:1px;">' . e($sub) . '</div>';
+                    $titleMain = e($nombre);
+                    $titleSub = e($cod ?? ('#' . ($record->id_inventario ?? $record->id)));
+                    return '<div class="td-main" title="' . $titleMain . '" style="font-weight:600;line-height:1.25;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' . $titleMain . '</div>'
+                        . '<div class="td-sub" title="' . $titleSub . '" style="font-size:11.5px;color:#6b7280;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' . e($sub) . '</div>';
                 })
                 ->searchable(query: function (Builder $query, string $search): Builder {
                     return $query->where(function (Builder $q) use ($search) {
@@ -1726,6 +1904,8 @@ class InventarioResource extends Resource
                 ->label('Categoría')
                 ->badge()
                 ->color('gray')
+                ->extraHeaderAttributes(['style' => 'min-width: 120px;'])
+                ->extraCellAttributes(['style' => 'min-width: 120px;'])
                 ->getStateUsing(fn (Inventario $record): string => $record->material?->tipo?->nombre ?? $record->subtipo ?? 'General')
                 ->searchable(query: function (Builder $query, string $search): Builder {
                     return $query->where(function (Builder $q) use ($search) {
@@ -1743,6 +1923,8 @@ class InventarioResource extends Resource
             Tables\Columns\TextColumn::make('estado')
                 ->label('Estado')
                 ->html()
+                ->extraHeaderAttributes(['style' => 'min-width: 130px;'])
+                ->extraCellAttributes(['style' => 'min-width: 130px;'])
                 ->getStateUsing(function (Inventario $record): string {
                     $estado = $record->estado ?? 'Disponible';
                     $colors = match ($estado) {
@@ -1795,6 +1977,18 @@ class InventarioResource extends Resource
 
             Tables\Columns\TextColumn::make('area.nombre')
                 ->label('Área')
+                ->extraHeaderAttributes(['style' => 'min-width: 180px;'])
+                ->extraCellAttributes(['style' => 'min-width: 180px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;'])
+                ->tooltip(function (Inventario $record): ?string {
+                    if ($record->area?->nombre) {
+                        return $record->area->nombre;
+                    }
+                    if (! empty($record->ubicacion_fisica)) {
+                        $parts = explode(' > ', $record->ubicacion_fisica);
+                        return $parts[1] ?? $parts[0] ?? null;
+                    }
+                    return null;
+                })
                 ->getStateUsing(function (Inventario $record): ?string {
                     if ($record->area?->nombre) {
                         return $record->area->nombre;
@@ -1820,6 +2014,8 @@ class InventarioResource extends Resource
 
             Tables\Columns\TextColumn::make('aula')
                 ->label('Aula')
+                ->extraHeaderAttributes(['style' => 'min-width: 80px;'])
+                ->extraCellAttributes(['style' => 'min-width: 80px;'])
                 ->getStateUsing(function (Inventario $record): string {
                     return $record->salon?->nombre
                         ?? ($record->especificaciones['aula'] ?? null)
@@ -1842,12 +2038,17 @@ class InventarioResource extends Resource
 
             Tables\Columns\TextColumn::make('num_serie')
                 ->label('No. de serie')
+                ->extraHeaderAttributes(['style' => 'min-width: 140px;'])
+                ->extraCellAttributes(['style' => 'min-width: 140px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;'])
+                ->tooltip(fn (?string $state): ?string => $state)
                 ->searchable(isIndividual: true)
                 ->sortable()
                 ->placeholder('—'),
 
             Tables\Columns\TextColumn::make('ip_address')
                 ->label('IP')
+                ->extraHeaderAttributes(['style' => 'min-width: 120px;'])
+                ->extraCellAttributes(['style' => 'min-width: 120px;'])
                 ->getStateUsing(fn (Inventario $record): string => $record->ip_address ?? ($record->especificaciones['ip_address'] ?? null) ?? '—')
                 ->searchable(query: function (Builder $query, string $search): Builder {
                     return $query->where(function (Builder $q) use ($search) {
@@ -1860,6 +2061,8 @@ class InventarioResource extends Resource
 
             Tables\Columns\TextColumn::make('mac_address')
                 ->label('MAC')
+                ->extraHeaderAttributes(['style' => 'min-width: 140px;'])
+                ->extraCellAttributes(['style' => 'min-width: 140px;'])
                 ->getStateUsing(fn (Inventario $record): string => $record->mac_address ?? ($record->especificaciones['mac_address'] ?? null) ?? '—')
                 ->searchable(query: function (Builder $query, string $search): Builder {
                     return $query->where(function (Builder $q) use ($search) {

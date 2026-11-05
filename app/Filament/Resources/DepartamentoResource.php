@@ -44,7 +44,7 @@ class DepartamentoResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos del departamento')
+                Forms\Components\Section::make('📁 Datos del departamento')
                     ->icon('heroicon-m-building-office-2')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -96,7 +96,7 @@ class DepartamentoResource extends Resource
                         Tab::make('Información')
                             ->icon('heroicon-m-tag')
                             ->schema([
-                                Section::make('Datos del departamento')
+                                Section::make('📁 Datos del departamento')
                                     ->schema([
                                         TextEntry::make('nombre')->label('Nombre del departamento')->icon('heroicon-m-building-office-2'),
                                         TextEntry::make('encargado')

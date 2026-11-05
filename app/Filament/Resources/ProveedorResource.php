@@ -45,7 +45,7 @@ class ProveedorResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos de la empresa')
+                Forms\Components\Section::make('🏢 Datos del proveedor')
                     ->icon('heroicon-m-building-office-2')
                     ->schema([
                         Forms\Components\TextInput::make('nombre_empresa')
@@ -203,7 +203,7 @@ class ProveedorResource extends Resource
                         Tab::make('Información')
                             ->icon('heroicon-m-tag')
                             ->schema([
-                                Section::make('Datos de la empresa')
+                                Section::make('🏢 Datos del proveedor')
                                     ->schema([
                                         TextEntry::make('nombre_empresa')
                                             ->label('Empresa')
