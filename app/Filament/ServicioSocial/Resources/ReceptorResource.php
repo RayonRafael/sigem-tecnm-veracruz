@@ -4,13 +4,13 @@ namespace App\Filament\ServicioSocial\Resources;
 
 use App\Filament\ServicioSocial\Resources\ReceptorResource\Pages;
 use App\Models\Receptor;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class ReceptorResource extends Resource
@@ -31,6 +31,11 @@ class ReceptorResource extends Resource
 
     protected static ?string $pluralModelLabel = 'receptores';
 
+    public static function getEloquentQuery(): Builder
+    {
+        return \App\Filament\Resources\ReceptorResource::getEloquentQuery();
+    }
+
     public static function canDelete(Model $record): bool
     {
         return false;
@@ -43,59 +48,7 @@ class ReceptorResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Datos del receptor')
-                    ->icon('heroicon-m-user-circle')
-                    ->schema([
-                        Forms\Components\TextInput::make('nombre')
-                            ->label('Nombre')
-                            ->placeholder('Ej. Roberto')
-                            ->required()
-                            ->prefixIcon('heroicon-m-user')
-                            ->maxLength(100),
-                        Forms\Components\TextInput::make('apellido_paterno')
-                            ->label('Apellido paterno')
-                            ->placeholder('Ej. Hernández')
-                            ->required()
-                            ->prefixIcon('heroicon-m-user')
-                            ->maxLength(100),
-                        Forms\Components\TextInput::make('apellido_materno')
-                            ->label('Apellido materno')
-                            ->placeholder('Ej. García')
-                            ->required()
-                            ->prefixIcon('heroicon-m-user')
-                            ->maxLength(100),
-                        Forms\Components\TextInput::make('cargo')
-                            ->label('Cargo / Puesto')
-                            ->placeholder('Ej. Ing. de Sistemas')
-                            ->maxLength(100)
-                            ->prefixIcon('heroicon-m-briefcase'),
-                        Forms\Components\TextInput::make('email')
-                            ->label('Correo electrónico')
-                            ->placeholder('Ej. receptor@veracruz.tecnm.mx')
-                            ->email()
-                            ->prefixIcon('heroicon-m-envelope')
-                            ->maxLength(100)
-                            ->default(null),
-                        Forms\Components\TextInput::make('telefono')
-                            ->label('Teléfono')
-                            ->placeholder('Ej. 229 123 4567')
-                            ->tel()
-                            ->prefixIcon('heroicon-m-device-phone-mobile')
-                            ->maxLength(20)
-                            ->default(null),
-                        Forms\Components\Select::make('id_area')
-                            ->label('Área')
-                            ->placeholder('Selecciona...')
-                            ->relationship('area', 'nombre')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->prefixIcon('heroicon-m-building-office')
-                            ->columnSpanFull(),
-                    ])->columns(2),
-            ]);
+        return \App\Filament\Resources\ReceptorResource::form($form);
     }
 
     public static function table(Table $table): Table
@@ -106,8 +59,33 @@ class ReceptorResource extends Resource
                     ->label('Nombre')
                     ->description(fn (Receptor $record): ?string => $record->cargo)
                     ->searchable(isIndividual: true),
+                Tables\Columns\TextColumn::make('tipo')
+                    ->label('Tipo')
+                    ->badge()
+                    ->color(fn (?string $state): string => match ($state) {
+                        'Docente' => 'info',
+                        'Administrativo' => 'primary',
+                        'Auxiliar' => 'warning',
+                        'Alumno' => 'success',
+                        'Externo' => 'gray',
+                        default => 'gray',
+                    })
+                    ->placeholder('—')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('num_control')
+                    ->label('No. Control')
+                    ->fontFamily('mono')
+                    ->placeholder('—')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('cargo')->wrap(false)->limit(30)->grow(false)
                     ->label('Cargo / Puesto')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('area.departamento.nombre')->wrap(false)->limit(30)->grow(false)
+                    ->label('Departamento')
+                    ->placeholder('—')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('apellido_paterno')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)

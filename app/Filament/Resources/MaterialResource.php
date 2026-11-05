@@ -38,6 +38,13 @@ class MaterialResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withStockDerivado()
+            ->with(['marca', 'tipo', 'unidad']);
+    }
+
     public static function getGloballySearchableAttributes(): array
     {
         return ['nombre', 'descripcion', 'modelo'];
@@ -48,7 +55,7 @@ class MaterialResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Wizard::make([
-                    Forms\Components\Wizard\Step::make('Datos y clasificación')
+                    Forms\Components\Wizard\Step::make('🔧 Datos del material')
                         ->icon('heroicon-m-cube')
                         ->schema([
                             Forms\Components\Grid::make(2)
@@ -227,7 +234,7 @@ class MaterialResource extends Resource
                         Tab::make('Información')
                             ->icon('heroicon-m-tag')
                             ->schema([
-                                Section::make('Datos del material')
+                                Section::make('🔧 Datos del material')
                                     ->schema([
                                         TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-tag'),
                                         TextEntry::make('modelo')->label('Modelo')->icon('heroicon-m-qr-code'),

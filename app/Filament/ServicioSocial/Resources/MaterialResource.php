@@ -4,7 +4,6 @@ namespace App\Filament\ServicioSocial\Resources;
 
 use App\Filament\ServicioSocial\Resources\MaterialResource\Pages;
 use App\Models\Material;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -33,6 +32,11 @@ class MaterialResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    public static function getEloquentQuery(): Builder
+    {
+        return \App\Filament\Resources\MaterialResource::getEloquentQuery();
+    }
+
     public static function hasRecordTitle(): bool
     {
         return false;
@@ -40,77 +44,7 @@ class MaterialResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Wizard::make([
-                    Forms\Components\Wizard\Step::make('Datos y clasificación')
-                        ->icon('heroicon-m-cube')
-                        ->schema([
-                            Forms\Components\Grid::make(2)
-                                ->schema([
-                                    Forms\Components\TextInput::make('nombre')
-                                        ->placeholder('Ej. Computadora de Escritorio OptiPlex')
-                                        ->required()
-                                        ->prefixIcon('heroicon-m-tag')
-                                        ->maxLength(150)
-                                        ->columnSpanFull(),
-                                    Forms\Components\TextInput::make('modelo')
-                                        ->placeholder('Ej. OptiPlex 7090')
-                                        ->prefixIcon('heroicon-m-qr-code')
-                                        ->maxLength(100),
-                                    Forms\Components\Textarea::make('descripcion')
-                                        ->label('Descripción')
-                                        ->placeholder('Ej. Especificaciones y características generales del material...')
-                                        ->rows(3)
-                                        ->columnSpanFull(),
-                                ]),
-                            Forms\Components\Grid::make(2)
-                                ->schema([
-                                    Forms\Components\Select::make('id_marca')
-                                        ->label('Marca')
-                                        ->placeholder('Selecciona...')
-                                        ->relationship('marca', 'nombre')
-                                        ->required()
-                                        ->searchable()
-                                        ->preload()
-                                        ->prefixIcon('heroicon-m-star'),
-                                    Forms\Components\Select::make('id_tipodematerial')
-                                        ->label('Tipo de material')
-                                        ->placeholder('Selecciona...')
-                                        ->relationship('tipo', 'nombre')
-                                        ->required()
-                                        ->searchable()
-                                        ->preload()
-                                        ->prefixIcon('heroicon-m-square-3-stack-3d'),
-                                    Forms\Components\Select::make('id_unidad')
-                                        ->label('Unidad de medida')
-                                        ->placeholder('Selecciona...')
-                                        ->relationship('unidad', 'nombre')
-                                        ->required()
-                                        ->searchable()
-                                        ->preload()
-                                        ->prefixIcon('heroicon-m-scale')
-                                        ->columnSpanFull(),
-                                ]),
-                        ]),
-
-                    Forms\Components\Wizard\Step::make('Control de stock')
-                        ->icon('heroicon-m-chart-bar')
-                        ->schema([
-                            Forms\Components\TextInput::make('stock_actual')
-                                ->label('Stock actual')
-                                ->numeric()
-                                ->prefixIcon('heroicon-m-archive-box')
-                                ->disabled()
-                                ->dehydrated(false)
-                                ->helperText('Calculado automáticamente'),
-                            Forms\Components\Hidden::make('stock_minimo')
-                                ->default(0),
-                            Forms\Components\Hidden::make('requiere_control_individual')
-                                ->default(true),
-                        ]),
-                ])->columnSpanFull(),
-            ]);
+        return \App\Filament\Resources\MaterialResource::form($form);
     }
 
     public static function table(Table $table): Table

@@ -38,14 +38,28 @@ class TipoMaterialResource extends Resource
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['nombre'];
+        return ['nombre', 'familia'];
+    }
+
+    public static function getFamiliasOptions(): array
+    {
+        return [
+            'Equipos completos' => 'Equipos completos',
+            'Componentes internos' => 'Componentes internos',
+            'Periféricos y pantallas' => 'Periféricos y pantallas',
+            'Redes y telecomunicaciones' => 'Redes y telecomunicaciones',
+            'Cableado y conectividad' => 'Cableado y conectividad',
+            'Accesorios y almacenamiento' => 'Accesorios y almacenamiento',
+            'Consumibles y limpieza' => 'Consumibles y limpieza',
+            'Herramientas y mobiliario' => 'Herramientas y mobiliario',
+        ];
     }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos del tipo de material')
+                Forms\Components\Section::make('📦 Datos del tipo de material')
                     ->icon('heroicon-m-rectangle-stack')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -54,6 +68,13 @@ class TipoMaterialResource extends Resource
                             ->required()
                             ->prefixIcon('heroicon-m-rectangle-stack')
                             ->maxLength(100),
+                        Forms\Components\Select::make('familia')
+                            ->label('Familia')
+                            ->placeholder('Selecciona la familia...')
+                            ->options(self::getFamiliasOptions())
+                            ->nullable()
+                            ->searchable()
+                            ->prefixIcon('heroicon-m-tag'),
                     ]),
             ]);
     }
@@ -64,6 +85,13 @@ class TipoMaterialResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
+                    ->searchable(isIndividual: true)
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('familia')
+                    ->label('Familia')
+                    ->badge()
+                    ->color('info')
+                    ->placeholder('—')
                     ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)->label('Fecha de creación')
@@ -102,9 +130,15 @@ class TipoMaterialResource extends Resource
                         Tab::make('Información')
                             ->icon('heroicon-m-tag')
                             ->schema([
-                                Section::make('Datos del tipo de material')
+                                Section::make('📦 Datos del tipo de material')
                                     ->schema([
                                         TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-rectangle-stack'),
+                                        TextEntry::make('familia')
+                                            ->label('Familia')
+                                            ->badge()
+                                            ->color('info')
+                                            ->placeholder('—')
+                                            ->icon('heroicon-m-tag'),
                                         TextEntry::make('materiales_count')
                                             ->label('Materiales registrados')
                                             ->state(fn (TipoMaterial $record): string => $record->materiales()->count() . ' registrados')

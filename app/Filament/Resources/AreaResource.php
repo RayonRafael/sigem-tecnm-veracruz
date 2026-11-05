@@ -15,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class AreaResource extends Resource
 {
@@ -36,6 +37,12 @@ class AreaResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['departamento']);
+    }
+
     public static function getGloballySearchableAttributes(): array
     {
         return ['nombre'];
@@ -45,7 +52,7 @@ class AreaResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos del área')
+                Forms\Components\Section::make('📍 Datos del área')
                     ->icon('heroicon-m-map-pin')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -120,7 +127,7 @@ class AreaResource extends Resource
                         Tab::make('Información')
                             ->icon('heroicon-m-tag')
                             ->schema([
-                                Section::make('Datos del área')
+                                Section::make('📍 Datos del área')
                                     ->schema([
                                         TextEntry::make('nombre')->label('Nombre del área')->icon('heroicon-m-map-pin'),
                                         TextEntry::make('departamento.nombre')->label('Departamento')->icon('heroicon-m-building-office-2'),

@@ -37,6 +37,12 @@ class MantenimientoResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['inventario.material']);
+    }
+
     public static function getGloballySearchableAttributes(): array
     {
         return ['descripcion_falla', 'nombre_tecnico', 'observaciones'];
@@ -52,14 +58,15 @@ class MantenimientoResource extends Resource
                         Forms\Components\Select::make('id_inventario')
                             ->label('¿Qué equipo necesita servicio?')
                             ->placeholder('Selecciona...')
-                            ->options(function () {
+                            ->options(function (): array {
                                 return Inventario::with('material')
                                     ->get()
                                     ->mapWithKeys(function ($inv) {
-                                        $code = $inv->num_serie ?: $inv->numero_serie ?: 'S/N';
-                                        $name = $inv->material?->nombre ?: 'Equipo';
+                                        $code = $inv->codigo ?: $inv->num_serie ?: $inv->numero_serie ?: 'S/N';
+                                        $name = $inv->material?->nombre ?: $inv->subtipo ?: 'Equipo';
                                         return [$inv->id_inventario => "{$code} — {$name}"];
-                                    });
+                                    })
+                                    ->toArray();
                             })
                             ->searchable()
                             ->preload()
@@ -135,11 +142,18 @@ class MantenimientoResource extends Resource
 
                 Tables\Columns\TextColumn::make('inventario.num_serie')
                     ->label('Equipo')
+                    ->getStateUsing(fn (Mantenimiento $record): string => $record->inventario?->codigo ?? $record->inventario?->num_serie ?? '—')
                     ->fontFamily('mono')
                     ->weight(FontWeight::Bold)
                     ->extraAttributes(['class' => 'sigem-td-folio'])
-                    ->searchable(isIndividual: true)
-                    ->description(fn (Mantenimiento $record): ?string => $record->inventario?->material?->nombre),
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->whereHas('inventario', function (Builder $q) use ($search) {
+                            $q->where('codigo', 'like', "%{$search}%")
+                              ->orWhere('num_serie', 'like', "%{$search}%")
+                              ->orWhereHas('material', fn ($m) => $m->where('nombre', 'like', "%{$search}%"));
+                        });
+                    }, isIndividual: true)
+                    ->description(fn (Mantenimiento $record): ?string => $record->inventario?->material?->nombre ?? $record->inventario?->subtipo),
 
                 Tables\Columns\TextColumn::make('nombre_tecnico')
                     ->label('Técnico')
@@ -208,7 +222,7 @@ class MantenimientoResource extends Resource
                 }
                 $area = $livewire->tableColumnSearches['area'] ?? null;
                 if (filled($area)) {
-                    $query->whereHas('inventario', fn ($q) => $q->where('id_area', $area));
+                    $query->whereHas('inventario', fn ($q) => $q->where('area_id', $area));
                 }
                 return $query;
             })
@@ -225,7 +239,7 @@ class MantenimientoResource extends Resource
                     ->slideOver()
                     ->modalHeading(fn (?Mantenimiento $record) => 'Mantenimiento #' . ($record?->id_mantenimiento ? str_pad($record->id_mantenimiento, 4, '0', STR_PAD_LEFT) : '—'))
                     ->modalDescription(fn (?Mantenimiento $record) => new \Illuminate\Support\HtmlString(
-                        'Equipo: <b>' . e($record?->inventario?->num_serie ?? '—') . '</b> · ' . e($record?->fecha_solicitud?->format('d/m/Y') ?? '—')
+                        'Equipo: <b>' . e($record?->inventario?->codigo ?? $record?->inventario?->num_serie ?? '—') . '</b> · ' . e($record?->fecha_solicitud?->format('d/m/Y') ?? '—')
                     ))
                     ->modalCancelActionLabel('Cerrar')
                     ->extraModalFooterActions([
@@ -235,11 +249,25 @@ class MantenimientoResource extends Resource
                             ->visible(fn (?Mantenimiento $record): bool => in_array($record?->estado, ['Pendiente Revision Admin', 'En revisión', 'Solicitado']))
                             ->requiresConfirmation()
                             ->modalHeading('Autorizar mantenimiento')
-                            ->modalDescription('El reporte pasará a En proceso para que el técnico inicie labores.')
+                            ->modalDescription('El reporte pasará a En proceso y el equipo pasará a estado En mantenimiento.')
                             ->modalSubmitActionLabel('Sí, autorizar')
                             ->action(function (Mantenimiento $record) {
                                 $record->update(['estado' => 'En proceso', 'fecha_inicio' => now()]);
+                                $record->inventario?->update(['estado' => 'En Mantenimiento']);
                                 Notification::make()->title('Mantenimiento autorizado correctamente')->success()->send();
+                            }),
+                        Tables\Actions\Action::make('rechazar_slideover')
+                            ->label('✕ Rechazar')
+                            ->color('danger')
+                            ->visible(fn (?Mantenimiento $record): bool => in_array($record?->estado, ['Pendiente Revision Admin', 'En revisión', 'Solicitado']))
+                            ->requiresConfirmation()
+                            ->modalHeading('Rechazar mantenimiento')
+                            ->modalDescription('El reporte quedará marcado como rechazado y el estado del equipo no cambiará.')
+                            ->modalSubmitActionLabel('Sí, rechazar')
+                            ->action(function (Mantenimiento $record) {
+                                $record->update(['estado' => 'Cancelado']);
+                                // Al rechazar, el estado del Inventario NO cambia
+                                Notification::make()->title('Mantenimiento rechazado')->danger()->send();
                             }),
                         Tables\Actions\Action::make('completar_slideover')
                             ->label('Completar')
@@ -247,10 +275,11 @@ class MantenimientoResource extends Resource
                             ->visible(fn (?Mantenimiento $record): bool => $record?->estado === 'En proceso')
                             ->requiresConfirmation()
                             ->modalHeading('Completar mantenimiento')
-                            ->modalDescription('Se marcará el servicio como finalizado y el equipo quedará disponible.')
+                            ->modalDescription('Se marcará el servicio como finalizado y el equipo volverá a Disponible.')
                             ->modalSubmitActionLabel('Completar')
                             ->action(function (Mantenimiento $record) {
                                 $record->update(['estado' => 'Completado', 'fecha_fin' => now()]);
+                                $record->inventario?->update(['estado' => 'Disponible']);
                                 Notification::make()->title('Mantenimiento completado')->success()->send();
                             }),
                     ]),
@@ -264,11 +293,29 @@ class MantenimientoResource extends Resource
                     ->visible(fn (Mantenimiento $record): bool => in_array($record->estado, ['Pendiente Revision Admin', 'En revisión', 'Solicitado']))
                     ->requiresConfirmation()
                     ->modalHeading(fn (Mantenimiento $record) => 'Autorizar mantenimiento #' . str_pad($record->id_mantenimiento, 4, '0', STR_PAD_LEFT))
-                    ->modalDescription('El reporte pasará a En proceso para que el técnico inicie labores.')
+                    ->modalDescription('El reporte pasará a En proceso y el equipo pasará a estado En mantenimiento.')
                     ->modalSubmitActionLabel('Sí, autorizar')
                     ->action(function (Mantenimiento $record) {
                         $record->update(['estado' => 'En proceso', 'fecha_inicio' => now()]);
+                        $record->inventario?->update(['estado' => 'En Mantenimiento']);
                         Notification::make()->title('Mantenimiento autorizado correctamente')->success()->send();
+                    }),
+
+                Tables\Actions\Action::make('completar')
+                    ->iconButton()
+                    ->color('info')
+                    ->icon('heroicon-m-check-badge')
+                    ->tooltip('Completar')
+                    ->extraAttributes(['title' => 'Completar'])
+                    ->visible(fn (Mantenimiento $record): bool => $record->estado === 'En proceso')
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (Mantenimiento $record) => 'Completar mantenimiento #' . str_pad($record->id_mantenimiento, 4, '0', STR_PAD_LEFT))
+                    ->modalDescription('Se marcará el servicio como finalizado y el equipo volverá a Disponible.')
+                    ->modalSubmitActionLabel('Completar')
+                    ->action(function (Mantenimiento $record) {
+                        $record->update(['estado' => 'Completado', 'fecha_fin' => now()]);
+                        $record->inventario?->update(['estado' => 'Disponible']);
+                        Notification::make()->title('Mantenimiento completado')->success()->send();
                     }),
             ])
             ->bulkActions([
@@ -283,6 +330,7 @@ class MantenimientoResource extends Resource
         return $infolist
             ->schema([
                 Tabs::make('Detalle')
+                    ->extraAttributes(['style' => 'display: flex; flex-direction: column;'])
                     ->tabs([
                         Tabs\Tab::make('informacion')
                             ->label('🔖 Información')
@@ -291,11 +339,13 @@ class MantenimientoResource extends Resource
                                     ->schema([
                                         TextEntry::make('inventario.num_serie')
                                             ->label('Equipo')
+                                            ->getStateUsing(fn (Mantenimiento $record): string => $record->inventario?->codigo ?? $record->inventario?->num_serie ?? '—')
                                             ->fontFamily('mono')
                                             ->weight(FontWeight::Bold)
                                             ->default('—'),
                                         TextEntry::make('inventario.material.nombre')
                                             ->label('Material')
+                                            ->getStateUsing(fn (Mantenimiento $record): string => $record->inventario?->material?->nombre ?? $record->inventario?->subtipo ?? '—')
                                             ->default('—'),
                                         TextEntry::make('nombre_tecnico')
                                             ->label('Técnico asignado')

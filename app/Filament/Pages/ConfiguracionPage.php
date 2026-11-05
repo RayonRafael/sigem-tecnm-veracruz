@@ -120,6 +120,11 @@ class ConfiguracionPage extends Page
 
     public function mount(): void
     {
+        $tab = request()->query('tab');
+        if (in_array($tab, ['catalogos', 'bitacora', 'preferencias'], true)) {
+            $this->tabActiva = $tab;
+        }
+
         $this->registrosPorHoja = (int) session(
             'sigem_registros_por_hoja',
             Cache::get('sigem_registros_por_hoja_' . auth()->id(), 10)
@@ -308,16 +313,20 @@ class ConfiguracionPage extends Page
         // TODO [Fase 10 - Documentado]: Vista previa embebida en pestaña Catálogos; cada catálogo redirige a su ListRecords nativo completo al hacer clic.
         switch ($cat['id']) {
             case 'departamentos':
-                $headers = ['ID', 'Nombre del departamento', 'Acciones'];
+                $headers = ['ID', 'Nombre del departamento', 'Encargado', 'Acciones'];
                 $deptosQ = Departamento::orderBy('nombre');
                 if ($term !== '') {
-                    $deptosQ->where('nombre', 'like', "%{$term}%");
+                    $deptosQ->where(function ($q) use ($term) {
+                        $q->where('nombre', 'like', "%{$term}%")
+                          ->orWhere('encargado', 'like', "%{$term}%");
+                    });
                 }
                 $deptos = $deptosQ->limit(25)->get();
                 foreach ($deptos as $d) {
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $d->id_departamento . '</span>',
                         '<strong>' . e($d->nombre) . '</strong>',
+                        e($d->encargado ?: '—'),
                         $this->renderActionButtons('editarDepartamento', 'verDepartamento', 'eliminarDepartamento', $d->getKey()),
                     ];
                 }
@@ -348,7 +357,7 @@ class ConfiguracionPage extends Page
 
             case 'materiales':
                 $headers = ['Modelo / ID', 'Material / Equipo', 'Marca', 'Tipo', 'Stock', 'Acciones'];
-                $materialesQ = Material::with(['marca', 'tipo'])->orderBy('nombre');
+                $materialesQ = Material::withStockDerivado()->with(['marca', 'tipo'])->orderBy('nombre');
                 if ($term !== '') {
                     $materialesQ->where(function ($q) use ($term) {
                         $q->where('nombre', 'like', "%{$term}%")
@@ -394,16 +403,23 @@ class ConfiguracionPage extends Page
                 break;
 
             case 'tipos':
-                $headers = ['ID', 'Tipo de material', 'Acciones'];
+                $headers = ['ID', 'Tipo de material', 'Familia', 'Acciones'];
                 $tiposQ = TipoMaterial::orderBy('nombre');
                 if ($term !== '') {
-                    $tiposQ->where('nombre', 'like', "%{$term}%");
+                    $tiposQ->where(function ($q) use ($term) {
+                        $q->where('nombre', 'like', "%{$term}%")
+                          ->orWhere('familia', 'like', "%{$term}%");
+                    });
                 }
                 $tipos = $tiposQ->limit(25)->get();
                 foreach ($tipos as $t) {
+                    $familiaCell = $t->familia
+                        ? '<span class="sigem-pill info">' . e($t->familia) . '</span>'
+                        : '—';
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $t->id_tipodematerial . '</span>',
                         '<strong>' . e($t->nombre) . '</strong>',
+                        $familiaCell,
                         $this->renderActionButtons('editarTipo', 'verTipo', 'eliminarTipo', $t->getKey()),
                     ];
                 }
@@ -426,12 +442,13 @@ class ConfiguracionPage extends Page
                 break;
 
             case 'proveedores':
-                $headers = ['ID', 'Proveedor', 'RFC', 'Contacto', 'Acciones'];
+                $headers = ['ID', 'Proveedor', 'RFC', 'Contacto', 'Dirección', 'Acciones'];
                 $proveedoresQ = Proveedor::orderBy('nombre_empresa');
                 if ($term !== '') {
                     $proveedoresQ->where(function ($q) use ($term) {
                         $q->where('nombre_empresa', 'like', "%{$term}%")
                           ->orWhere('rfc', 'like', "%{$term}%")
+                          ->orWhere('direccion', 'like', "%{$term}%")
                           ->orWhere('contacto_nombre', 'like', "%{$term}%")
                           ->orWhere('contacto_email', 'like', "%{$term}%");
                     });
@@ -444,18 +461,21 @@ class ConfiguracionPage extends Page
                         '<strong>' . e($p->nombre_empresa) . '</strong>',
                         e($p->rfc ?? 'N/A'),
                         e($contacto ?: 'Sin datos'),
+                        e($p->direccion ?: '—'),
                         $this->renderActionButtons('editarProveedor', 'verProveedor', 'eliminarProveedor', $p->getKey()),
                     ];
                 }
                 break;
 
             case 'receptores':
-                $headers = ['ID', 'Receptor', 'Área', 'Contacto', 'Acciones'];
+                $headers = ['ID', 'Receptor', 'Tipo', 'No. Control', 'Departamento', 'Área', 'Contacto', 'Acciones'];
                 $receptoresQ = Receptor::with('area.departamento')->orderBy('nombre');
                 if ($term !== '') {
                     $receptoresQ->where(function ($q) use ($term) {
                         $q->where('nombre', 'like', "%{$term}%")
                           ->orWhere('apellido_paterno', 'like', "%{$term}%")
+                          ->orWhere('tipo', 'like', "%{$term}%")
+                          ->orWhere('num_control', 'like', "%{$term}%")
                           ->orWhere('cargo', 'like', "%{$term}%")
                           ->orWhere('email', 'like', "%{$term}%")
                           ->orWhereHas('area', fn ($aq) => $aq->where('nombre', 'like', "%{$term}%"));
@@ -468,9 +488,15 @@ class ConfiguracionPage extends Page
                 foreach ($receptores as $r) {
                     $nombreCompleto = trim("{$r->nombre} {$r->apellido_paterno} {$r->apellido_materno}");
                     $contacto = trim(($r->telefono ?? '') . ' ' . ($r->email ?? ''));
+                    $tipoPill = $r->tipo
+                        ? '<span class="sigem-pill info">' . e($r->tipo) . '</span>'
+                        : '—';
                     $rows[] = [
                         '<span class="sigem-td-folio">#' . $r->id_receptor . '</span>',
                         '<strong>' . e($nombreCompleto ?: $r->nombre) . '</strong>',
+                        $tipoPill,
+                        e($r->num_control ?: '—'),
+                        e($r->area?->departamento?->nombre ?? '—'),
                         e($r->area?->nombre ?? 'N/A'),
                         e($contacto ?: 'Sin datos'),
                         $this->renderActionButtons('editarReceptor', 'verReceptor', 'eliminarReceptor', $r->getKey()),

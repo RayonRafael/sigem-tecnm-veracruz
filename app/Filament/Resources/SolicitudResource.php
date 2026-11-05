@@ -37,6 +37,12 @@ class SolicitudResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['usuario', 'receptor.area.departamento', 'autorizadoPor']);
+    }
+
     public static function getGloballySearchableAttributes(): array
     {
         return ['observaciones'];
@@ -68,8 +74,8 @@ class SolicitudResource extends Resource
                                 Forms\Components\Select::make('id_producto')
                                     ->label('Material')
                                     ->placeholder('Selecciona...')
-                                    ->options(function () {
-                                        return \App\Models\Material::pluck('nombre', 'id_producto');
+                                    ->options(function (): array {
+                                        return \App\Models\Material::pluck('nombre', 'id_producto')->toArray();
                                     })
                                     ->searchable()
                                     ->preload()
@@ -214,7 +220,61 @@ class SolicitudResource extends Resource
                             default => $record?->tipo_movimiento ?? 'Salida',
                         }) . '</b> · ' . e($record?->fecha_solicitud?->format('d/m/Y') ?? '—')
                     ))
-                    ->modalCancelActionLabel('Cerrar'),
+                    ->modalCancelActionLabel('Cerrar')
+                    ->extraModalFooterActions([
+                        Tables\Actions\Action::make('autorizar_slideover')
+                            ->label('✓ Autorizar')
+                            ->color('success')
+                            ->visible(fn (?Solicitud $record): bool => $record?->estado === 'Pendiente')
+                            ->alpineClickHandler(fn (?Solicitud $record) => "\$wire.replaceMountedTableAction('autorizar', '{$record?->getKey()}')"),
+                        Tables\Actions\Action::make('rechazar_slideover')
+                            ->label('✕ Rechazar')
+                            ->color('danger')
+                            ->visible(fn (?Solicitud $record): bool => $record?->estado === 'Pendiente')
+                            ->alpineClickHandler(fn (?Solicitud $record) => "\$wire.replaceMountedTableAction('rechazar', '{$record?->getKey()}')"),
+                    ]),
+
+                Tables\Actions\Action::make('autorizar')
+                    ->label('✓ Autorizar')
+                    ->iconButton()
+                    ->color('success')
+                    ->icon('heroicon-m-check')
+                    ->tooltip('Autorizar')
+                    ->extraAttributes(['title' => 'Autorizar'])
+                    ->visible(fn (Solicitud $record): bool => $record->estado === 'Pendiente')
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (Solicitud $record) => 'Autorizar FOLIO-' . str_pad($record->id_solicitud, 5, '0', STR_PAD_LEFT))
+                    ->modalDescription('¿Deseas autorizar esta solicitud de material?')
+                    ->modalSubmitActionLabel('Sí, autorizar')
+                    ->action(function (Solicitud $record) {
+                        $record->update([
+                            'estado' => 'Autorizado',
+                            'autorizado_por' => auth()->id(),
+                            'fecha_autorizacion' => now(),
+                        ]);
+                        Notification::make()->title('Solicitud autorizada correctamente')->success()->send();
+                    }),
+
+                Tables\Actions\Action::make('rechazar')
+                    ->label('✕ Rechazar')
+                    ->iconButton()
+                    ->color('danger')
+                    ->icon('heroicon-m-x-mark')
+                    ->tooltip('Rechazar')
+                    ->extraAttributes(['title' => 'Rechazar'])
+                    ->visible(fn (Solicitud $record): bool => $record->estado === 'Pendiente')
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (Solicitud $record) => 'Rechazar FOLIO-' . str_pad($record->id_solicitud, 5, '0', STR_PAD_LEFT))
+                    ->modalDescription('¿Estás seguro de rechazar esta solicitud?')
+                    ->modalSubmitActionLabel('Sí, rechazar')
+                    ->action(function (Solicitud $record) {
+                        $record->update([
+                            'estado' => 'Rechazado',
+                            'autorizado_por' => auth()->id(),
+                            'fecha_autorizacion' => now(),
+                        ]);
+                        Notification::make()->title('Solicitud rechazada')->danger()->send();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -228,6 +288,7 @@ class SolicitudResource extends Resource
         return $infolist
             ->schema([
                 Tabs::make('Detalle')
+                    ->extraAttributes(['style' => 'display: flex; flex-direction: column;'])
                     ->tabs([
                         Tabs\Tab::make('informacion')
                             ->label('🔖 Información')
@@ -263,6 +324,24 @@ class SolicitudResource extends Resource
                                         TextEntry::make('fecha_solicitud')
                                             ->label('Fecha')
                                             ->date('d/m/Y'),
+                                        TextEntry::make('material_solicitado')
+                                            ->label('Material solicitado')
+                                            ->icon('heroicon-m-cube')
+                                            ->getStateUsing(function (?Solicitud $record): string {
+                                                if (! $record) {
+                                                    return '—';
+                                                }
+                                                $nombres = $record->detalles()
+                                                    ->with('material')
+                                                    ->get()
+                                                    ->map(fn ($detalle) => $detalle->material?->nombre)
+                                                    ->filter()
+                                                    ->unique()
+                                                    ->values();
+
+                                                return $nombres->isNotEmpty() ? $nombres->implode(', ') : '—';
+                                            })
+                                            ->columnSpanFull(),
                                     ])
                                     ->columns(2),
 

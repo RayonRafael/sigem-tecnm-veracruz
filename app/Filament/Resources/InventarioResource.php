@@ -6,10 +6,10 @@ use App\Enums\RoleEnum;
 use App\Filament\Resources\InventarioResource\Pages;
 use App\Models\Area;
 use App\Models\Departamento;
-use App\Models\Edificio;
 use App\Models\Inventario;
 use App\Models\MarcaMaterial;
 use App\Models\Salon;
+use App\Models\TipoMaterial;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
@@ -41,6 +41,12 @@ class InventarioResource extends Resource
     protected static ?string $navigationGroup = 'Gestión de inventario';
 
     protected static ?int $navigationSort = 1;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['material.tipo', 'material.marca', 'departamento', 'area.departamento', 'salon']);
+    }
 
     public static function getGloballySearchableAttributes(): array
     {
@@ -136,13 +142,14 @@ class InventarioResource extends Resource
                 ->content(function (Forms\Get $get) {
                     $tipo = $get('tipo_equipo') ?? 'pc';
                     $texto = match ($tipo) {
-                        'pc' => '💡 Se registrarán <strong>monitor, teclado, mouse y CPU</strong> como un solo equipo. Si le falta alguno, marca <strong>«No tiene»</strong>.',
-                        'aio' => '💡 Se registrará el <strong>All in One</strong> con su teclado y mouse como un solo equipo. Si le falta alguno, marca <strong>«No tiene»</strong>.',
+                        'pc' => 'Se registrarán <strong>monitor, teclado, mouse y CPU</strong> como un solo equipo. Si le falta alguno, marca <strong>«No tiene»</strong>.',
+                        'aio' => 'Se registrará el <strong>All in One</strong> con su teclado y mouse como un solo equipo. Si le falta alguno, marca <strong>«No tiene»</strong>.',
                         default => '',
                     };
                     return new HtmlString('
-                        <div style="background-color: #eff6ff; border: 1.5px solid #bfdbfe; color: #1e40af; padding: 0.875rem 1.25rem; border-radius: 0.5rem; font-size: 0.9375rem; display: flex; align-items: center; gap: 0.5rem;">
-                            ' . $texto . '
+                        <div style="background-color: #eff6ff; border: 1.5px solid #bfdbfe; color: #1e40af; padding: 0.875rem 1.25rem; border-radius: 0.5rem; font-size: 0.9375rem; display: flex; align-items: center; gap: 0.625rem;">
+                            <span style="flex-shrink: 0; font-size: 1.125rem; line-height: 1;">💡</span>
+                            <span style="white-space: normal; line-height: 1.5; word-break: normal;">' . $texto . '</span>
                         </div>
                     ');
                 })
@@ -158,7 +165,7 @@ class InventarioResource extends Resource
                             Forms\Components\Select::make('departamento_id')
                                 ->label('Departamento')
                                 ->placeholder('Selecciona departamento...')
-                                ->options(fn () => Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento'))
+                                ->options(fn (): array => Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento')->toArray())
                                 ->searchable()
                                 ->preload()
                                 ->live()
@@ -172,14 +179,15 @@ class InventarioResource extends Resource
                             Forms\Components\Select::make('area_id')
                                 ->label('Área')
                                 ->placeholder(fn (Forms\Get $get) => $get('departamento_id') ? 'Selecciona área...' : 'Elige departamento primero')
-                                ->options(function (Forms\Get $get) {
+                                ->options(function (Forms\Get $get): array {
                                     $deptoId = $get('departamento_id');
                                     if (! $deptoId) {
                                         return [];
                                     }
                                     return Area::where('id_departamento', $deptoId)
                                         ->orderBy('nombre')
-                                        ->pluck('nombre', 'id_area');
+                                        ->pluck('nombre', 'id_area')
+                                        ->toArray();
                                 })
                                 ->searchable()
                                 ->live()
@@ -794,7 +802,9 @@ class InventarioResource extends Resource
                         $clean = trim(substr($clean, 8));
                     }
                     MarcaMaterial::firstOrCreate(['nombre' => $clean]);
-                    $set($fieldName, $clean);
+                    if ($clean !== $state) {
+                        $set($fieldName, $clean);
+                    }
                 }
             })
             ->createOptionForm([
@@ -880,7 +890,9 @@ class InventarioResource extends Resource
                         $clean = trim(substr($clean, 8));
                     }
                     $clean = static::agregarEspecificacionGlobal($clean);
-                    $set($fieldName, $clean);
+                    if ($clean !== $state) {
+                        $set($fieldName, $clean);
+                    }
                 }
             })
             ->createOptionForm([
@@ -1316,26 +1328,145 @@ class InventarioResource extends Resource
         return 'Equipo registrado exitosamente';
     }
 
-    public static function getFormSteps(): array
+    public static function obtenerTipoEquipoNormalizado(?Inventario $record = null, ?Forms\Get $get = null): string
     {
-        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
-        $isEdit = false;
-        foreach ($backtrace as $frame) {
-            $func = strtolower($frame['function'] ?? '');
-            if (str_contains($func, 'edit') || str_contains($func, 'update')) {
-                $isEdit = true;
-                break;
-            }
+        if (! $record && $get) {
+            $record = $get('record');
         }
 
-        if (! $isEdit) {
-            return [
-                Forms\Components\Wizard\Step::make('Registro')
-                    ->schema(static::getMockupFormSchema()),
-            ];
+        if (! $record) {
+            $subtipo = strtolower(trim((string) ($get ? $get('subtipo') : '')));
+            $nombre = strtolower(trim((string) ($get ? $get('nombre_equipo') : '')));
+            $tipoMat = strtolower(trim((string) ($get ? $get('categoria_display') : '')));
+            $combined = " {$subtipo} {$nombre} {$tipoMat} ";
+            if (str_contains($combined, 'impresora') || str_contains($combined, 'multifuncional')) return 'imp';
+            if (str_contains($combined, 'switch') || str_contains($combined, 'conmutador')) return 'swi';
+            if (str_contains($combined, 'monitor') || str_contains($combined, 'pantalla')) return 'mon';
+            if (str_contains($combined, 'all in one') || str_contains($combined, 'aio')) return 'aio';
+            if (str_contains($combined, 'laptop') || str_contains($combined, 'notebook')) return 'lap';
+            if (str_contains($combined, 'cpu') || str_contains($combined, 'computadora') || str_contains($combined, 'gabinete')) return 'cpu';
+            return 'otro';
         }
 
-        return static::getEditFormSteps();
+        $subtipo = strtolower(trim((string) ($record->subtipo ?? '')));
+        $matNombre = strtolower(trim((string) ($record->material?->nombre ?? '')));
+        $matTipo = strtolower(trim((string) ($record->material?->tipo?->nombre ?? '')));
+        $componente = strtolower(trim((string) ($record->especificaciones['componente'] ?? '')));
+        $tipoEquipo = strtolower(trim((string) ($record->tipo_equipo ?? ($record->especificaciones['tipo_equipo'] ?? ''))));
+
+        $combined = " {$subtipo} {$matNombre} {$matTipo} ";
+
+        // 1. All in One
+        if (
+            str_contains($combined, 'all in one') ||
+            str_contains($combined, 'all-in-one') ||
+            str_contains($combined, 'aio') ||
+            $tipoEquipo === 'aio'
+        ) {
+            return 'aio';
+        }
+
+        // 2. Laptop / Portátil
+        if (
+            str_contains($combined, 'laptop') ||
+            str_contains($combined, 'notebook') ||
+            str_contains($combined, 'portátil') ||
+            str_contains($combined, 'portatil') ||
+            $tipoEquipo === 'lap'
+        ) {
+            return 'lap';
+        }
+
+        // 3. Impresora
+        if (
+            str_contains($combined, 'impresora') ||
+            str_contains($combined, 'multifuncional') ||
+            $tipoEquipo === 'imp' ||
+            filled($record->tipo_impresora) ||
+            isset($record->especificaciones['tipo_impresora'])
+        ) {
+            return 'imp';
+        }
+
+        // 4. Switch de red
+        if (
+            str_contains($combined, 'switch') ||
+            str_contains($combined, 'conmutador') ||
+            $tipoEquipo === 'swi' ||
+            isset($record->especificaciones['num_puertos'])
+        ) {
+            return 'swi';
+        }
+
+        // 5. Monitor / Pantalla
+        if (
+            str_contains($combined, 'monitor') ||
+            str_contains($combined, 'pantalla') ||
+            $componente === 'mon' ||
+            $tipoEquipo === 'mon'
+        ) {
+            return 'mon';
+        }
+
+        // 6. Teclado
+        if (
+            str_contains($combined, 'teclado') ||
+            str_contains($combined, 'keyboard') ||
+            $componente === 'tec' ||
+            $tipoEquipo === 'tec'
+        ) {
+            return 'periferico';
+        }
+
+        // 7. Mouse
+        if (
+            str_contains($combined, 'mouse') ||
+            str_contains($combined, 'ratón') ||
+            str_contains($combined, 'raton') ||
+            $componente === 'mou' ||
+            $tipoEquipo === 'mou'
+        ) {
+            return 'periferico';
+        }
+
+        // 8. Proyector
+        if (
+            str_contains($combined, 'proyector') ||
+            str_contains($combined, 'cañón') ||
+            str_contains($combined, 'canon') ||
+            $tipoEquipo === 'proy'
+        ) {
+            return 'periferico';
+        }
+
+        // 9. No-Break / Regulador / UPS
+        if (
+            str_contains($combined, 'no-break') ||
+            str_contains($combined, 'nobreak') ||
+            str_contains($combined, 'no break') ||
+            str_contains($combined, 'regulador') ||
+            str_contains($combined, 'ups') ||
+            $tipoEquipo === 'nob'
+        ) {
+            return 'periferico';
+        }
+
+        // 10. CPU / PC / Gabinete / Computadora
+        if (
+            str_contains($combined, 'cpu') ||
+            str_contains($combined, 'gabinete') ||
+            str_contains($combined, 'computadora') ||
+            str_contains($combined, 'escritorio') ||
+            str_contains($combined, 'optiplex') ||
+            str_contains($combined, 'prodesk') ||
+            $componente === 'cpu' ||
+            $tipoEquipo === 'cpu' ||
+            $tipoEquipo === 'pc'
+        ) {
+            return 'cpu';
+        }
+
+        return 'otro';
     }
 
     public static function getEditFormTabs(): array
@@ -1358,7 +1489,7 @@ class InventarioResource extends Resource
                                     Forms\Components\Select::make('marca')
                                         ->label('Marca')
                                         ->placeholder('Selecciona la marca...')
-                                        ->options(fn () => MarcaMaterial::orderBy('nombre')->pluck('nombre', 'nombre'))
+                                        ->options(fn (): array => MarcaMaterial::orderBy('nombre')->pluck('nombre', 'nombre')->toArray())
                                         ->searchable()
                                         ->preload()
                                         ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->especificaciones['marca'] ?? $record?->especificaciones['cpu_marca'] ?? $record?->material?->marca?->nombre ?? '')),
@@ -1383,7 +1514,22 @@ class InventarioResource extends Resource
                                         ->label('Categoría / Tipo de equipo')
                                         ->disabled()
                                         ->dehydrated(false)
+                                        ->columnSpan(fn (?Inventario $record = null, ?Forms\Get $get = null): int => in_array(static::obtenerTipoEquipoNormalizado($record, $get), ['imp', 'swi'], true) ? 1 : 2)
                                         ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->material?->tipo?->nombre ?? $record?->subtipo ?? 'General')),
+
+                                    Forms\Components\TextInput::make('tipo_impresora')
+                                        ->label('Tipo de impresora')
+                                        ->disabled()
+                                        ->dehydrated(false)
+                                        ->visible(fn (?Inventario $record = null, ?Forms\Get $get = null): bool => static::obtenerTipoEquipoNormalizado($record, $get) === 'imp')
+                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->tipo_impresora ?? ($record?->especificaciones['tipo_impresora'] ?? '—'))),
+
+                                    Forms\Components\TextInput::make('num_puertos')
+                                        ->label('Número de puertos')
+                                        ->disabled()
+                                        ->dehydrated(false)
+                                        ->visible(fn (?Inventario $record = null, ?Forms\Get $get = null): bool => static::obtenerTipoEquipoNormalizado($record, $get) === 'swi')
+                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->especificaciones['num_puertos'] ?? '—')),
 
                                     Forms\Components\TextInput::make('especificacion_texto')
                                         ->label('Especificaciones')
@@ -1403,8 +1549,8 @@ class InventarioResource extends Resource
 
                     Forms\Components\Section::make('Datos técnicos')
                         ->description('Hardware y configuración técnica (solo lectura)')
-                        ->icon('heroicon-m-cpu-chip')
                         ->collapsible()
+                        ->visible(fn (?Inventario $record = null, ?Forms\Get $get = null): bool => in_array(static::obtenerTipoEquipoNormalizado($record, $get), ['cpu', 'lap', 'aio'], true))
                         ->schema([
                             Forms\Components\Grid::make(2)
                                 ->schema([
@@ -1434,16 +1580,15 @@ class InventarioResource extends Resource
                                 ]),
                         ]),
 
-                    Forms\Components\Section::make('Ubicación y Red')
-                        ->description('Ubicación física y parámetros de red asignados')
-                        ->icon('heroicon-m-map-pin')
+                    Forms\Components\Section::make('Ubicación y asignación')
+                        ->description('Ubicación física asignada del equipo')
                         ->schema([
                             Forms\Components\Grid::make(2)
                                 ->schema([
                                     Forms\Components\Select::make('area_id')
                                         ->label('Área')
                                         ->placeholder('Selecciona el área...')
-                                        ->options(fn () => Area::orderBy('nombre')->pluck('nombre', 'id_area'))
+                                        ->options(fn (): array => Area::orderBy('nombre')->pluck('nombre', 'id_area')->toArray())
                                         ->searchable()
                                         ->preload()
                                         ->required(),
@@ -1453,7 +1598,15 @@ class InventarioResource extends Resource
                                         ->placeholder('Ej. E101')
                                         ->maxLength(5)
                                         ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->salon?->nombre ?? ($record?->especificaciones['aula'] ?? null) ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record?->ubicacion_fisica ?? '', $m) ? $m[1] : null) ?? '')),
+                                ]),
+                        ]),
 
+                    Forms\Components\Section::make('Red y conectividad')
+                        ->description('Parámetros de conexión a la red institucional')
+                        ->visible(fn (?Inventario $record = null, ?Forms\Get $get = null): bool => in_array(static::obtenerTipoEquipoNormalizado($record, $get), ['cpu', 'lap', 'aio', 'imp', 'swi'], true) || filled($record?->ip_address) || filled($record?->mac_address))
+                        ->schema([
+                            Forms\Components\Grid::make(2)
+                                ->schema([
                                     Forms\Components\TextInput::make('ip_address')
                                         ->label('Dirección IP')
                                         ->placeholder('Ej. 192.168.1.100')
@@ -1472,353 +1625,490 @@ class InventarioResource extends Resource
             Forms\Components\Tabs\Tab::make('Factura y proveedor')
                 ->icon('heroicon-m-document-text')
                 ->schema([
-                    Forms\Components\Grid::make(2)
+                    Forms\Components\Section::make('Datos de facturación y proveedor')
                         ->schema([
-                            Forms\Components\ToggleButtons::make('tipo_propiedad')
-                                ->options([
-                                    'Propio' => 'Propio',
-                                    'Rentado' => 'Rentado',
-                                ])
-                                ->colors([
-                                    'Propio' => 'primary',
-                                    'Rentado' => 'gray',
-                                ])
-                                ->inline()
-                                ->default('Propio')
-                                ->live(),
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\ToggleButtons::make('tipo_propiedad')
+                                        ->options([
+                                            'Propio' => 'Propio',
+                                            'Rentado' => 'Rentado',
+                                        ])
+                                        ->colors([
+                                            'Propio' => 'primary',
+                                            'Rentado' => 'gray',
+                                        ])
+                                        ->inline()
+                                        ->default('Propio')
+                                        ->live(),
 
-                            Forms\Components\Select::make('id_proveedor')
-                                ->label('Proveedor')
-                                ->placeholder('Selecciona...')
-                                ->relationship('proveedor', 'nombre_empresa')
-                                ->searchable()
-                                ->preload()
-                                ->prefixIcon('heroicon-m-truck')
+                                    Forms\Components\Select::make('id_proveedor')
+                                        ->label('Proveedor')
+                                        ->placeholder('Selecciona...')
+                                        ->relationship('proveedor', 'nombre_empresa')
+                                        ->searchable()
+                                        ->preload()
+                                        ->prefixIcon('heroicon-m-truck')
+                                        ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
+
+                                    Forms\Components\TextInput::make('num_factura')
+                                        ->label('Número de factura')
+                                        ->placeholder('Ej. FAC-2026-001')
+                                        ->prefixIcon('heroicon-m-hashtag')
+                                        ->maxLength(100),
+
+                                    Forms\Components\DatePicker::make('fecha_factura')
+                                        ->label('Fecha de factura')
+                                        ->prefixIcon('heroicon-m-calendar'),
+                                ]),
+
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\DatePicker::make('fecha_inicio_renta')
+                                        ->label('Inicio de renta')
+                                        ->prefixIcon('heroicon-m-calendar-days'),
+
+                                    Forms\Components\DatePicker::make('fecha_fin_renta')
+                                        ->label('Fin de renta')
+                                        ->prefixIcon('heroicon-m-calendar-days'),
+
+                                    Forms\Components\Textarea::make('observaciones_renta')
+                                        ->label('Observaciones de renta')
+                                        ->placeholder('Ej. Contrato de arrendamiento...')
+                                        ->columnSpanFull(),
+                                ])
                                 ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
-
-                            Forms\Components\TextInput::make('num_factura')
-                                ->label('Número de factura')
-                                ->placeholder('Ej. FAC-2026-001')
-                                ->prefixIcon('heroicon-m-hashtag')
-                                ->maxLength(100),
-
-                            Forms\Components\DatePicker::make('fecha_factura')
-                                ->label('Fecha de factura')
-                                ->prefixIcon('heroicon-m-calendar'),
                         ]),
-
-                    Forms\Components\Grid::make(2)
-                        ->schema([
-                            Forms\Components\DatePicker::make('fecha_inicio_renta')
-                                ->label('Inicio de renta')
-                                ->prefixIcon('heroicon-m-calendar-days'),
-
-                            Forms\Components\DatePicker::make('fecha_fin_renta')
-                                ->label('Fin de renta')
-                                ->prefixIcon('heroicon-m-calendar-days'),
-
-                            Forms\Components\Textarea::make('observaciones_renta')
-                                ->label('Observaciones de renta')
-                                ->placeholder('Ej. Contrato de arrendamiento...')
-                                ->columnSpanFull(),
-                        ])
-                        ->visible(fn (Forms\Get $get) => $get('tipo_propiedad') === 'Rentado'),
                 ]),
 
             Forms\Components\Tabs\Tab::make('Garantía y observaciones')
-                ->icon('heroicon-m-clipboard-document-check')
+                ->icon('heroicon-m-shield-check')
                 ->schema([
-                    Forms\Components\Grid::make(2)
+                    Forms\Components\Section::make('Estado y garantía del equipo')
                         ->schema([
-                            Forms\Components\DatePicker::make('fecha_registro')
-                                ->label('Fecha de registro')
-                                ->default(now())
-                                ->prefixIcon('heroicon-m-clock'),
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    Forms\Components\DatePicker::make('fecha_registro')
+                                        ->label('Fecha de registro')
+                                        ->default(now())
+                                        ->prefixIcon('heroicon-m-clock'),
 
-                            Forms\Components\DatePicker::make('garantia_fecha_fin')
-                                ->label('Fin de garantía')
-                                ->prefixIcon('heroicon-m-shield-check'),
+                                    Forms\Components\DatePicker::make('garantia_fecha_fin')
+                                        ->label('Fin de garantía')
+                                        ->prefixIcon('heroicon-m-shield-check'),
 
-                            Forms\Components\Select::make('garantia_estado')
-                                ->label('Estado de garantía')
-                                ->placeholder('Selecciona...')
-                                ->options([
-                                    'vigente' => 'Vigente',
-                                    'vencida' => 'Vencida',
-                                    'sin_garantia' => 'Sin Garantía',
-                                ])
-                                ->default('sin_garantia'),
+                                    Forms\Components\Select::make('garantia_estado')
+                                        ->label('Estado de garantía')
+                                        ->placeholder('Selecciona...')
+                                        ->options([
+                                            'vigente' => 'Vigente',
+                                            'vencida' => 'Vencida',
+                                            'sin_garantia' => 'Sin Garantía',
+                                        ])
+                                        ->default('sin_garantia'),
 
-                            Forms\Components\ToggleButtons::make('estado')
-                                ->label('Estado del activo')
-                                ->options([
-                                    'Disponible' => 'Disponible',
-                                    'Asignado' => 'Asignado',
-                                    'Reasignado' => 'Reasignado',
-                                    'En Mantenimiento' => 'En Mantenimiento',
-                                    'Dañado' => 'Dañado',
-                                    'Baja' => 'Baja',
-                                ])
-                                ->colors([
-                                    'Disponible' => 'success',
-                                    'Asignado' => 'info',
-                                    'Reasignado' => 'reassign',
-                                    'En Mantenimiento' => 'warning',
-                                    'Dañado' => 'danger',
-                                    'Baja' => 'gray',
-                                ])
-                                ->inline(),
+                                    Forms\Components\ToggleButtons::make('estado')
+                                        ->label('Estado del activo')
+                                        ->options([
+                                            'Disponible' => 'Disponible',
+                                            'Asignado' => 'Asignado',
+                                            'Reasignado' => 'Reasignado',
+                                            'En Mantenimiento' => 'En Mantenimiento',
+                                            'Dañado' => 'Dañado',
+                                            'Baja' => 'Baja',
+                                        ])
+                                        ->colors([
+                                            'Disponible' => 'success',
+                                            'Asignado' => 'info',
+                                            'Reasignado' => 'reassign',
+                                            'En Mantenimiento' => 'warning',
+                                            'Dañado' => 'danger',
+                                            'Baja' => 'gray',
+                                        ])
+                                        ->inline(),
+                                ]),
+
+                            Forms\Components\Textarea::make('observaciones_adicionales')
+                                ->label('Observaciones adicionales')
+                                ->placeholder('Notas u observaciones sobre el estado...')
+                                ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->observaciones_generales))
+                                ->dehydrated(false)
+                                ->rows(2),
                         ]),
-
-                    Forms\Components\Textarea::make('observaciones_adicionales')
-                        ->label('Observaciones adicionales')
-                        ->placeholder('Notas u observaciones sobre el estado...')
-                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->observaciones_generales))
-                        ->dehydrated(false)
-                        ->rows(2),
                 ]),
         ];
     }
 
-    public static function getEditFormSteps(): array
+    public static function hidratarDatosEdicion(array $data, ?Inventario $record = null): array
     {
-        return array_map(function (Forms\Components\Tabs\Tab $tab) {
-            return Forms\Components\Wizard\Step::make($tab->getLabel())
-                ->icon($tab->getIcon())
-                ->schema($tab->getChildComponents());
-        }, static::getEditFormTabs());
+        if (! $record) {
+            return $data;
+        }
+
+        $data['nombre_equipo'] = $record->material?->nombre ?? $record->subtipo ?? '';
+        $data['marca'] = $record->especificaciones['marca']
+            ?? $record->especificaciones['cpu_marca']
+            ?? $record->material?->marca?->nombre
+            ?? '';
+        $data['aula'] = $record->salon?->nombre
+            ?? ($record->especificaciones['aula'] ?? null)
+            ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record->ubicacion_fisica ?? '', $m) ? $m[1] : null)
+            ?? '';
+        $data['categoria_display'] = $record->material?->tipo?->nombre ?? $record->subtipo ?? 'General';
+        $data['especificacion_texto'] = $record->especificacion_texto ?? ($record->especificaciones['especificaciones'] ?? '');
+        $data['procesador'] = $record->procesador ?? ($record->especificaciones['procesador'] ?? '—');
+        $data['ram'] = $record->ram ?? ($record->especificaciones['ram'] ?? '—');
+        $data['disco'] = $record->disco ?? ($record->especificaciones['disco'] ?? '—');
+        $data['sistema_operativo'] = $record->sistema_operativo ?? ($record->especificaciones['sistema_operativo'] ?? '—');
+        $data['tipo_impresora'] = $record->tipo_impresora ?? ($record->especificaciones['tipo_impresora'] ?? '—');
+        $data['num_puertos'] = $record->especificaciones['num_puertos'] ?? '—';
+        $data['ip_address'] = $record->ip_address ?? ($record->especificaciones['ip_address'] ?? '');
+        $data['mac_address'] = $record->mac_address ?? ($record->especificaciones['mac_address'] ?? '');
+
+        return $data;
+    }
+
+    public static function guardarCambiosEquipo(Inventario $record, array $data): Inventario
+    {
+        // 1. Nombre (Material/Equipo)
+        if (isset($data['nombre_equipo']) && filled($data['nombre_equipo'])) {
+            $nuevoNombre = trim($data['nombre_equipo']);
+            $record->subtipo = $nuevoNombre;
+            if ($record->material) {
+                $record->material->update(['nombre' => $nuevoNombre]);
+            }
+        }
+
+        // 2. Marca
+        if (isset($data['marca']) && filled($data['marca'])) {
+            $nuevaMarca = trim($data['marca']);
+            $specs = $record->especificaciones ?? [];
+            $specs['marca'] = $nuevaMarca;
+            $record->especificaciones = $specs;
+
+            $marcaModel = MarcaMaterial::firstOrCreate(['nombre' => $nuevaMarca]);
+            if ($record->material) {
+                $record->material->update(['id_marca' => $marcaModel->id_marca]);
+            }
+        }
+
+        // 3. Aula
+        if (isset($data['aula'])) {
+            $nuevaAula = trim($data['aula']);
+            $specs = $record->especificaciones ?? [];
+            $specs['aula'] = $nuevaAula;
+            $record->especificaciones = $specs;
+
+            if ($record->area_id && filled($nuevaAula)) {
+                $salon = Salon::where('area_id', $record->area_id)
+                    ->where('nombre', $nuevaAula)
+                    ->first();
+                if ($salon) {
+                    $record->salon_id = $salon->id;
+                }
+            }
+        }
+
+        // 4. IP & MAC
+        if (isset($data['ip_address'])) {
+            $record->ip_address = $data['ip_address'];
+            $specs = $record->especificaciones ?? [];
+            $specs['ip_address'] = $data['ip_address'];
+            $record->especificaciones = $specs;
+        }
+        if (isset($data['mac_address'])) {
+            $record->mac_address = $data['mac_address'];
+            $specs = $record->especificaciones ?? [];
+            $specs['mac_address'] = $data['mac_address'];
+            $record->especificaciones = $specs;
+        }
+
+        // 5. Área
+        if (isset($data['area_id']) && filled($data['area_id'])) {
+            $record->area_id = $data['area_id'];
+            $area = Area::find($data['area_id']);
+            if ($area && $area->id_departamento) {
+                $record->departamento_id = $area->id_departamento;
+            }
+        }
+
+        // 6. Fill other allowable fields
+        $record->fill($data);
+        $record->save();
+
+        return $record;
+    }
+
+    public static function getTableColumns(): array
+    {
+        return [
+            Tables\Columns\TextColumn::make('departamento.nombre')
+                ->label('Departamento')
+                ->extraHeaderAttributes(['style' => 'min-width: 180px;'])
+                ->extraCellAttributes(['style' => 'min-width: 180px;'])
+                ->tooltip(fn (Inventario $record): ?string => $record->departamento?->nombre ?? $record->area?->departamento?->nombre)
+                ->getStateUsing(function (Inventario $record): ?string {
+                    return $record->departamento?->nombre
+                        ?? $record->area?->departamento?->nombre
+                        ?? ($record->ubicacion_fisica ? explode(' > ', $record->ubicacion_fisica)[0] ?? null : null)
+                        ?? '—';
+                })
+                ->searchable(query: function (Builder $query, string $search): Builder {
+                    return $query->where(function (Builder $q) use ($search) {
+                        $q->whereHas('departamento', fn ($sub) => $sub->where('nombre', 'like', "%{$search}%"))
+                          ->orWhereHas('area.departamento', fn ($sub) => $sub->where('nombre', 'like', "%{$search}%"))
+                          ->orWhere('ubicacion_fisica', 'like', "%{$search}%");
+                    });
+                }, isIndividual: true)
+                ->sortable(query: function (Builder $query, string $direction): Builder {
+                    return $query->leftJoin('departamento', 'inventario.departamento_id', '=', 'departamento.id_departamento')
+                        ->orderBy('departamento.nombre', $direction)
+                        ->select('inventario.*');
+                })
+                ->placeholder('—'),
+
+            Tables\Columns\TextColumn::make('equipo')
+                ->label('Equipo')
+                ->html()
+                ->extraHeaderAttributes(['style' => 'min-width: 250px;'])
+                ->extraCellAttributes(['style' => 'min-width: 250px; max-width: 320px;'])
+                ->getStateUsing(function (Inventario $record): string {
+                    $nombre = $record->material?->nombre ?? $record->subtipo ?? 'Equipo';
+                    $cod = ! empty($record->codigo) ? $record->codigo : null;
+                    if ($cod) {
+                        $sub = str_starts_with($cod, 'ID: ') ? $cod : 'ID: ' . $cod;
+                    } else {
+                        $sub = 'ID: #' . ($record->id_inventario ?? $record->id);
+                    }
+                    $titleMain = e($nombre);
+                    $titleSub = e($cod ?? ('#' . ($record->id_inventario ?? $record->id)));
+                    return '<div class="td-main" title="' . $titleMain . '" style="font-weight:600;line-height:1.25;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' . $titleMain . '</div>'
+                        . '<div class="td-sub" title="' . $titleSub . '" style="font-size:11.5px;color:#6b7280;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' . e($sub) . '</div>';
+                })
+                ->searchable(query: function (Builder $query, string $search): Builder {
+                    return $query->where(function (Builder $q) use ($search) {
+                        $q->whereHas('material', fn ($sub) => $sub->where('nombre', 'like', "%{$search}%"))
+                          ->orWhere('subtipo', 'like', "%{$search}%")
+                          ->orWhere('codigo', 'like', "%{$search}%")
+                          ->orWhere('num_serie', 'like', "%{$search}%")
+                          ->orWhere('modelo', 'like', "%{$search}%");
+                    });
+                }, isIndividual: true)
+                ->sortable(query: function (Builder $query, string $direction): Builder {
+                    return $query->leftJoin('material', 'inventario.id_producto', '=', 'material.id_producto')
+                        ->orderBy('material.nombre', $direction)
+                        ->select('inventario.*');
+                }),
+
+            Tables\Columns\TextColumn::make('categoria')
+                ->label('Categoría')
+                ->badge()
+                ->color('gray')
+                ->extraHeaderAttributes(['style' => 'min-width: 120px;'])
+                ->extraCellAttributes(['style' => 'min-width: 120px;'])
+                ->getStateUsing(fn (Inventario $record): string => $record->material?->tipo?->nombre ?? $record->subtipo ?? 'General')
+                ->searchable(query: function (Builder $query, string $search): Builder {
+                    return $query->where(function (Builder $q) use ($search) {
+                        $q->whereHas('material.tipo', fn ($sub) => $sub->where('nombre', 'like', trim($search) . '%'))
+                          ->orWhere('subtipo', 'like', "%{$search}%");
+                    });
+                }, isIndividual: true)
+                ->sortable(query: function (Builder $query, string $direction): Builder {
+                    return $query->leftJoin('material', 'inventario.id_producto', '=', 'material.id_producto')
+                        ->leftJoin('tipo_material', 'material.id_tipodematerial', '=', 'tipo_material.id_tipodematerial')
+                        ->orderBy('tipo_material.nombre', $direction)
+                        ->select('inventario.*');
+                }),
+
+            Tables\Columns\TextColumn::make('estado')
+                ->label('Estado')
+                ->html()
+                ->extraHeaderAttributes(['style' => 'min-width: 130px;'])
+                ->extraCellAttributes(['style' => 'min-width: 130px;'])
+                ->getStateUsing(function (Inventario $record): string {
+                    $estado = $record->estado ?? 'Disponible';
+                    $colors = match ($estado) {
+                        'Disponible' => [
+                            'bg' => '#d1fae5',
+                            'text' => '#065f46',
+                            'border' => '#a7f3d0',
+                            'dot' => '#059669',
+                            'class' => 'ok',
+                        ],
+                        'En mantenimiento', 'En Mantenimiento', 'Cambio de área' => [
+                            'bg' => '#fef3c7',
+                            'text' => '#92400e',
+                            'border' => '#fde68a',
+                            'dot' => '#d97706',
+                            'class' => 'warn',
+                        ],
+                        'Asignado', 'Reasignado' => [
+                            'bg' => '#e0f2fe',
+                            'text' => '#075985',
+                            'border' => '#bae6fd',
+                            'dot' => '#0284c7',
+                            'class' => 'info',
+                        ],
+                        'Dañado', 'Baja', 'Solicitud de baja' => [
+                            'bg' => '#fee2e2',
+                            'text' => '#991b1b',
+                            'border' => '#fecaca',
+                            'dot' => '#dc2626',
+                            'class' => 'danger',
+                        ],
+                        default => [
+                            'bg' => '#f3f4f6',
+                            'text' => '#374151',
+                            'border' => '#e5e7eb',
+                            'dot' => '#9ca3af',
+                            'class' => 'neutral',
+                        ],
+                    };
+
+                    return '<span class="pill ' . $colors['class'] . '" style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap;background-color:' . $colors['bg'] . ';color:' . $colors['text'] . ';border:1px solid ' . $colors['border'] . ';">'
+                        . '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background-color:' . $colors['dot'] . ';flex-shrink:0;"></span>'
+                        . e($estado)
+                        . '</span>';
+                })
+                ->searchable(query: function (Builder $query, string $search): Builder {
+                    return $query->where('estado', $search);
+                }, isIndividual: true)
+                ->sortable(),
+
+            Tables\Columns\TextColumn::make('area.nombre')
+                ->label('Área')
+                ->extraHeaderAttributes(['style' => 'min-width: 180px;'])
+                ->extraCellAttributes(['style' => 'min-width: 180px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;'])
+                ->tooltip(function (Inventario $record): ?string {
+                    if ($record->area?->nombre) {
+                        return $record->area->nombre;
+                    }
+                    if (! empty($record->ubicacion_fisica)) {
+                        $parts = explode(' > ', $record->ubicacion_fisica);
+                        return $parts[1] ?? $parts[0] ?? null;
+                    }
+                    return null;
+                })
+                ->getStateUsing(function (Inventario $record): ?string {
+                    if ($record->area?->nombre) {
+                        return $record->area->nombre;
+                    }
+                    if (! empty($record->ubicacion_fisica)) {
+                        $parts = explode(' > ', $record->ubicacion_fisica);
+                        return $parts[1] ?? $parts[0] ?? null;
+                    }
+                    return '—';
+                })
+                ->searchable(query: function (Builder $query, string $search): Builder {
+                    return $query->where(function (Builder $q) use ($search) {
+                        $q->whereHas('area', fn ($sub) => $sub->where('nombre', 'like', "%{$search}%"))
+                          ->orWhere('ubicacion_fisica', 'like', "%{$search}%");
+                    });
+                }, isIndividual: true)
+                ->sortable(query: function (Builder $query, string $direction): Builder {
+                    return $query->leftJoin('area', 'inventario.area_id', '=', 'area.id_area')
+                        ->orderBy('area.nombre', $direction)
+                        ->select('inventario.*');
+                })
+                ->placeholder('—'),
+
+            Tables\Columns\TextColumn::make('aula')
+                ->label('Aula')
+                ->extraHeaderAttributes(['style' => 'min-width: 80px;'])
+                ->extraCellAttributes(['style' => 'min-width: 80px;'])
+                ->getStateUsing(function (Inventario $record): string {
+                    return $record->salon?->nombre
+                        ?? ($record->especificaciones['aula'] ?? null)
+                        ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record->ubicacion_fisica ?? '', $m) ? $m[1] : null)
+                        ?? '—';
+                })
+                ->searchable(query: function (Builder $query, string $search): Builder {
+                    return $query->where(function (Builder $q) use ($search) {
+                        $q->whereHas('salon', fn ($sub) => $sub->where('nombre', 'like', "%{$search}%"))
+                          ->orWhere('especificaciones->aula', 'like', "%{$search}%")
+                          ->orWhere('ubicacion_fisica', 'like', "%{$search}%");
+                    });
+                }, isIndividual: true)
+                ->sortable(query: function (Builder $query, string $direction): Builder {
+                    return $query->leftJoin('salones', 'inventario.salon_id', '=', 'salones.id')
+                        ->orderBy('salones.nombre', $direction)
+                        ->select('inventario.*');
+                })
+                ->placeholder('—'),
+
+            Tables\Columns\TextColumn::make('num_serie')
+                ->label('No. de serie')
+                ->extraHeaderAttributes(['style' => 'min-width: 140px;'])
+                ->extraCellAttributes(['style' => 'min-width: 140px; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;'])
+                ->tooltip(fn (?string $state): ?string => $state)
+                ->searchable(isIndividual: true)
+                ->sortable()
+                ->placeholder('—'),
+
+            Tables\Columns\TextColumn::make('ip_address')
+                ->label('IP')
+                ->extraHeaderAttributes(['style' => 'min-width: 120px;'])
+                ->extraCellAttributes(['style' => 'min-width: 120px;'])
+                ->getStateUsing(fn (Inventario $record): string => $record->ip_address ?? ($record->especificaciones['ip_address'] ?? null) ?? '—')
+                ->searchable(query: function (Builder $query, string $search): Builder {
+                    return $query->where(function (Builder $q) use ($search) {
+                        $q->where('ip_address', 'like', "%{$search}%")
+                          ->orWhere('especificaciones->ip_address', 'like', "%{$search}%");
+                    });
+                }, isIndividual: true)
+                ->sortable()
+                ->placeholder('—'),
+
+            Tables\Columns\TextColumn::make('mac_address')
+                ->label('MAC')
+                ->extraHeaderAttributes(['style' => 'min-width: 140px;'])
+                ->extraCellAttributes(['style' => 'min-width: 140px;'])
+                ->getStateUsing(fn (Inventario $record): string => $record->mac_address ?? ($record->especificaciones['mac_address'] ?? null) ?? '—')
+                ->searchable(query: function (Builder $query, string $search): Builder {
+                    return $query->where(function (Builder $q) use ($search) {
+                        $q->where('mac_address', 'like', "%{$search}%")
+                          ->orWhere('especificaciones->mac_address', 'like', "%{$search}%");
+                    });
+                }, isIndividual: true)
+                ->sortable()
+                ->placeholder('—'),
+        ];
+    }
+
+    public static function aplicarFiltrosTabla(Builder $query, $livewire): Builder
+    {
+        $desde = $livewire->tableColumnSearches['fecha_desde'] ?? null;
+        $hasta = $livewire->tableColumnSearches['fecha_hasta'] ?? null;
+        if (filled($desde)) {
+            $query->where(function (Builder $q) use ($desde) {
+                $q->whereDate('fecha_registro', '>=', $desde)
+                  ->orWhere(fn ($sub) => $sub->whereNull('fecha_registro')->whereDate('created_at', '>=', $desde));
+            });
+        }
+        if (filled($hasta)) {
+            $query->where(function (Builder $q) use ($hasta) {
+                $q->whereDate('fecha_registro', '<=', $hasta)
+                  ->orWhere(fn ($sub) => $sub->whereNull('fecha_registro')->whereDate('created_at', '<=', $hasta));
+            });
+        }
+        $estadoResumen = $livewire->tableFilters['estado']['value'] ?? null;
+        if (filled($estadoResumen)) {
+            $query->where('estado', $estadoResumen);
+        }
+        return $query;
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('departamento.nombre')
-                    ->label('Departamento')
-                    ->getStateUsing(function (Inventario $record): ?string {
-                        return $record->departamento?->nombre 
-                            ?? $record->area?->departamento?->nombre 
-                            ?? ($record->ubicacion_fisica ? explode(' > ', $record->ubicacion_fisica)[0] ?? null : null)
-                            ?? '—';
-                    })
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->where(function (Builder $q) use ($search) {
-                            $q->whereHas('departamento', fn ($sub) => $sub->where('nombre', 'like', "%{$search}%"))
-                              ->orWhereHas('area.departamento', fn ($sub) => $sub->where('nombre', 'like', "%{$search}%"))
-                              ->orWhere('ubicacion_fisica', 'like', "%{$search}%");
-                        });
-                    }, isIndividual: true)
-                    ->sortable(query: function (Builder $query, string $direction): Builder {
-                        return $query->leftJoin('departamento', 'inventarios.departamento_id', '=', 'departamento.id_departamento')
-                            ->orderBy('departamento.nombre', $direction)
-                            ->select('inventarios.*');
-                    })
-                    ->placeholder('—'),
-
-                Tables\Columns\TextColumn::make('equipo')
-                    ->label('Equipo')
-                    ->html()
-                    ->getStateUsing(function (Inventario $record): string {
-                        $nombre = $record->material?->nombre ?? $record->subtipo ?? 'Equipo';
-                        $cod = !empty($record->codigo) ? $record->codigo : null;
-                        if ($cod) {
-                            $sub = str_starts_with($cod, 'ID: ') ? $cod : 'ID: ' . $cod;
-                        } else {
-                            $sub = 'ID: #' . ($record->id_inventario ?? $record->id);
-                        }
-                        return '<div class="td-main" style="font-weight:600;line-height:1.25;color:#111827;">' . e($nombre) . '</div>'
-                            . '<div class="td-sub" style="font-size:11.5px;color:#6b7280;margin-top:1px;">' . e($sub) . '</div>';
-                    })
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->where(function (Builder $q) use ($search) {
-                            $q->whereHas('material', fn ($sub) => $sub->where('nombre', 'like', "%{$search}%"))
-                              ->orWhere('subtipo', 'like', "%{$search}%")
-                              ->orWhere('codigo', 'like', "%{$search}%")
-                              ->orWhere('num_serie', 'like', "%{$search}%")
-                              ->orWhere('modelo', 'like', "%{$search}%");
-                        });
-                    }, isIndividual: true)
-                    ->sortable(query: function (Builder $query, string $direction): Builder {
-                        return $query->leftJoin('materiales', 'inventarios.id_producto', '=', 'materiales.id_producto')
-                            ->orderBy('materiales.nombre', $direction)
-                            ->select('inventarios.*');
-                    }),
-
-                Tables\Columns\TextColumn::make('categoria')
-                    ->label('Categoría')
-                    ->badge()
-                    ->color('gray')
-                    ->getStateUsing(fn (Inventario $record): string => $record->material?->tipo?->nombre ?? $record->subtipo ?? 'General')
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->where(function (Builder $q) use ($search) {
-                            $q->whereHas('material.tipo', fn ($sub) => $sub->where('nombre', 'like', trim($search) . '%'))
-                              ->orWhere('subtipo', 'like', "%{$search}%");
-                        });
-                    }, isIndividual: true)
-                    ->sortable(query: function (Builder $query, string $direction): Builder {
-                        return $query->leftJoin('materiales', 'inventarios.id_producto', '=', 'materiales.id_producto')
-                            ->leftJoin('tipos_material', 'materiales.id_tipo', '=', 'tipos_material.id_tipo')
-                            ->orderBy('tipos_material.nombre', $direction)
-                            ->select('inventarios.*');
-                    }),
-
-                Tables\Columns\TextColumn::make('estado')
-                    ->label('Estado')
-                    ->html()
-                    ->getStateUsing(function (Inventario $record): string {
-                        $estado = $record->estado ?? 'Disponible';
-                        $colors = match ($estado) {
-                            'Disponible' => [
-                                'bg' => '#d1fae5',
-                                'text' => '#065f46',
-                                'border' => '#a7f3d0',
-                                'dot' => '#059669',
-                                'class' => 'ok',
-                            ],
-                            'En mantenimiento', 'En Mantenimiento', 'Cambio de área' => [
-                                'bg' => '#fef3c7',
-                                'text' => '#92400e',
-                                'border' => '#fde68a',
-                                'dot' => '#d97706',
-                                'class' => 'warn',
-                            ],
-                            'Asignado', 'Reasignado' => [
-                                'bg' => '#e0f2fe',
-                                'text' => '#075985',
-                                'border' => '#bae6fd',
-                                'dot' => '#0284c7',
-                                'class' => 'info',
-                            ],
-                            'Dañado', 'Baja', 'Solicitud de baja' => [
-                                'bg' => '#fee2e2',
-                                'text' => '#991b1b',
-                                'border' => '#fecaca',
-                                'dot' => '#dc2626',
-                                'class' => 'danger',
-                            ],
-                            default => [
-                                'bg' => '#f3f4f6',
-                                'text' => '#374151',
-                                'border' => '#e5e7eb',
-                                'dot' => '#9ca3af',
-                                'class' => 'neutral',
-                            ],
-                        };
-
-                        return '<span class="pill ' . $colors['class'] . '" style="display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap;background-color:' . $colors['bg'] . ';color:' . $colors['text'] . ';border:1px solid ' . $colors['border'] . ';">'
-                            . '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background-color:' . $colors['dot'] . ';flex-shrink:0;"></span>'
-                            . e($estado)
-                            . '</span>';
-                    })
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->where('estado', $search);
-                    }, isIndividual: true)
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('area.nombre')
-                    ->label('Área')
-                    ->getStateUsing(function (Inventario $record): ?string {
-                        if ($record->area?->nombre) {
-                            return $record->area->nombre;
-                        }
-                        if (! empty($record->ubicacion_fisica)) {
-                            $parts = explode(' > ', $record->ubicacion_fisica);
-                            return $parts[1] ?? $parts[0] ?? null;
-                        }
-                        return '—';
-                    })
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->where(function (Builder $q) use ($search) {
-                            $q->whereHas('area', fn ($sub) => $sub->where('nombre', 'like', "%{$search}%"))
-                              ->orWhere('ubicacion_fisica', 'like', "%{$search}%");
-                        });
-                    }, isIndividual: true)
-                    ->sortable(query: function (Builder $query, string $direction): Builder {
-                        return $query->leftJoin('areas', 'inventarios.area_id', '=', 'areas.id_area')
-                            ->orderBy('areas.nombre', $direction)
-                            ->select('inventarios.*');
-                    })
-                    ->placeholder('—'),
-
-                Tables\Columns\TextColumn::make('aula')
-                    ->label('Aula')
-                    ->getStateUsing(function (Inventario $record): string {
-                        return $record->salon?->nombre 
-                            ?? ($record->especificaciones['aula'] ?? null)
-                            ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record->ubicacion_fisica ?? '', $m) ? $m[1] : null)
-                            ?? '—';
-                    })
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->where(function (Builder $q) use ($search) {
-                            $q->whereHas('salon', fn ($sub) => $sub->where('nombre', 'like', "%{$search}%"))
-                              ->orWhere('especificaciones->aula', 'like', "%{$search}%")
-                              ->orWhere('ubicacion_fisica', 'like', "%{$search}%");
-                        });
-                    }, isIndividual: true)
-                    ->sortable(query: function (Builder $query, string $direction): Builder {
-                        return $query->leftJoin('salones', 'inventarios.salon_id', '=', 'salones.id')
-                            ->orderBy('salones.nombre', $direction)
-                            ->select('inventarios.*');
-                    })
-                    ->placeholder('—'),
-
-                Tables\Columns\TextColumn::make('num_serie')
-                    ->label('No. de serie')
-                    ->searchable(isIndividual: true)
-                    ->sortable()
-                    ->placeholder('—'),
-
-                Tables\Columns\TextColumn::make('ip_address')
-                    ->label('IP')
-                    ->getStateUsing(fn (Inventario $record): string => $record->ip_address ?? ($record->especificaciones['ip_address'] ?? null) ?? '—')
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->where(function (Builder $q) use ($search) {
-                            $q->where('ip_address', 'like', "%{$search}%")
-                              ->orWhere('especificaciones->ip_address', 'like', "%{$search}%");
-                        });
-                    }, isIndividual: true)
-                    ->sortable()
-                    ->placeholder('—'),
-
-                Tables\Columns\TextColumn::make('mac_address')
-                    ->label('MAC')
-                    ->getStateUsing(fn (Inventario $record): string => $record->mac_address ?? ($record->especificaciones['mac_address'] ?? null) ?? '—')
-                    ->searchable(query: function (Builder $query, string $search): Builder {
-                        return $query->where(function (Builder $q) use ($search) {
-                            $q->where('mac_address', 'like', "%{$search}%")
-                              ->orWhere('especificaciones->mac_address', 'like', "%{$search}%");
-                        });
-                    }, isIndividual: true)
-                    ->sortable()
-                    ->placeholder('—'),
-            ])
+            ->columns(static::getTableColumns())
             ->defaultSort('created_at', 'desc')
             ->striped()
             ->searchPlaceholder('Buscar por equipo, código, IP, MAC, marca...')
             ->defaultPaginationPageOption(fn () => \App\Support\SigemPagination::getPageOption())
             ->paginationPageOptions(fn () => \App\Support\SigemPagination::getPageOptions())
             ->filters([])
-            ->modifyQueryUsing(function (Builder $query, $livewire): Builder {
-                $desde = $livewire->tableColumnSearches['fecha_desde'] ?? null;
-                $hasta = $livewire->tableColumnSearches['fecha_hasta'] ?? null;
-                if (filled($desde)) {
-                    $query->where(function (Builder $q) use ($desde) {
-                        $q->whereDate('fecha_registro', '>=', $desde)
-                          ->orWhere(fn ($sub) => $sub->whereNull('fecha_registro')->whereDate('created_at', '>=', $desde));
-                    });
-                }
-                if (filled($hasta)) {
-                    $query->where(function (Builder $q) use ($hasta) {
-                        $q->whereDate('fecha_registro', '<=', $hasta)
-                          ->orWhere(fn ($sub) => $sub->whereNull('fecha_registro')->whereDate('created_at', '<=', $hasta));
-                    });
-                }
-                $estadoResumen = $livewire->tableFilters['estado']['value'] ?? null;
-                if (filled($estadoResumen)) {
-                    $query->where('estado', $estadoResumen);
-                }
-                return $query;
-            })
+            ->modifyQueryUsing(fn (Builder $query, $livewire): Builder => static::aplicarFiltrosTabla($query, $livewire))
             ->emptyStateHeading('No hay registros')
             ->emptyStateDescription('Cuando se creen registros, aparecerán aquí.')
             ->emptyStateIcon('heroicon-o-document-text')
@@ -1828,7 +2118,7 @@ class InventarioResource extends Resource
                 Tables\Actions\Action::make('export')
                     ->label('↓ Exportar')
                     ->color('gray')
-                    ->action(fn () => null),
+                    ->action(fn ($livewire) => self::exportarInventarioExcel($livewire)),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
@@ -1872,95 +2162,8 @@ class InventarioResource extends Resource
                     ->slideOver()
                     ->modalSubmitActionLabel('Guardar cambios')
                     ->modalCancelActionLabel('Cancelar')
-                    ->mutateRecordDataUsing(function (array $data, Inventario $record): array {
-                        $data['nombre_equipo'] = $record->material?->nombre ?? $record->subtipo ?? '';
-                        $data['marca'] = $record->especificaciones['marca'] 
-                            ?? $record->especificaciones['cpu_marca'] 
-                            ?? $record->material?->marca?->nombre 
-                            ?? '';
-                        $data['aula'] = $record->salon?->nombre 
-                            ?? ($record->especificaciones['aula'] ?? null) 
-                            ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record->ubicacion_fisica ?? '', $m) ? $m[1] : null) 
-                            ?? '';
-                        $data['categoria_display'] = $record->material?->tipo?->nombre ?? $record->subtipo ?? 'General';
-                        $data['especificacion_texto'] = $record->especificacion_texto ?? ($record->especificaciones['especificaciones'] ?? '');
-                        $data['procesador'] = $record->procesador ?? ($record->especificaciones['procesador'] ?? '');
-                        $data['ram'] = $record->ram ?? ($record->especificaciones['ram'] ?? '');
-                        $data['disco'] = $record->disco ?? ($record->especificaciones['disco'] ?? '');
-                        $data['sistema_operativo'] = $record->sistema_operativo ?? ($record->especificaciones['sistema_operativo'] ?? '');
-                        $data['ip_address'] = $record->ip_address ?? ($record->especificaciones['ip_address'] ?? '');
-                        $data['mac_address'] = $record->mac_address ?? ($record->especificaciones['mac_address'] ?? '');
-                        return $data;
-                    })
-                    ->using(function (Inventario $record, array $data): Inventario {
-                        // 1. Nombre (Material/Equipo)
-                        if (isset($data['nombre_equipo']) && filled($data['nombre_equipo'])) {
-                            $nuevoNombre = trim($data['nombre_equipo']);
-                            $record->subtipo = $nuevoNombre;
-                            if ($record->material) {
-                                $record->material->update(['nombre' => $nuevoNombre]);
-                            }
-                        }
-
-                        // 2. Marca
-                        if (isset($data['marca']) && filled($data['marca'])) {
-                            $nuevaMarca = trim($data['marca']);
-                            $specs = $record->especificaciones ?? [];
-                            $specs['marca'] = $nuevaMarca;
-                            $record->especificaciones = $specs;
-
-                            $marcaModel = MarcaMaterial::firstOrCreate(['nombre' => $nuevaMarca]);
-                            if ($record->material) {
-                                $record->material->update(['id_marca' => $marcaModel->id_marca]);
-                            }
-                        }
-
-                        // 3. Aula
-                        if (isset($data['aula'])) {
-                            $nuevaAula = trim($data['aula']);
-                            $specs = $record->especificaciones ?? [];
-                            $specs['aula'] = $nuevaAula;
-                            $record->especificaciones = $specs;
-
-                            if ($record->area_id && filled($nuevaAula)) {
-                                $salon = Salon::where('area_id', $record->area_id)
-                                    ->where('nombre', $nuevaAula)
-                                    ->first();
-                                if ($salon) {
-                                    $record->salon_id = $salon->id;
-                                }
-                            }
-                        }
-
-                        // 4. IP & MAC
-                        if (isset($data['ip_address'])) {
-                            $record->ip_address = $data['ip_address'];
-                            $specs = $record->especificaciones ?? [];
-                            $specs['ip_address'] = $data['ip_address'];
-                            $record->especificaciones = $specs;
-                        }
-                        if (isset($data['mac_address'])) {
-                            $record->mac_address = $data['mac_address'];
-                            $specs = $record->especificaciones ?? [];
-                            $specs['mac_address'] = $data['mac_address'];
-                            $record->especificaciones = $specs;
-                        }
-
-                        // 5. Área
-                        if (isset($data['area_id']) && filled($data['area_id'])) {
-                            $record->area_id = $data['area_id'];
-                            $area = Area::find($data['area_id']);
-                            if ($area && $area->id_departamento) {
-                                $record->departamento_id = $area->id_departamento;
-                            }
-                        }
-
-                        // 6. Fill other allowable fields
-                        $record->fill($data);
-                        $record->save();
-
-                        return $record;
-                    })
+                    ->mutateRecordDataUsing(fn (array $data, Inventario $record): array => static::hidratarDatosEdicion($data, $record))
+                    ->using(fn (Inventario $record, array $data): Inventario => static::guardarCambiosEquipo($record, $data))
                     ->successNotificationTitle('Registro actualizado correctamente'),
             ])
             ->bulkActions([
@@ -1991,6 +2194,7 @@ class InventarioResource extends Resource
         return $infolist
             ->schema([
                 Infolists\Components\Tabs::make('Detalle')
+                    ->extraAttributes(['style' => 'display: flex; flex-direction: column;'])
                     ->tabs([
                         Infolists\Components\Tabs\Tab::make('Información')
                             ->icon('heroicon-m-tag')
@@ -1998,22 +2202,45 @@ class InventarioResource extends Resource
                                 Infolists\Components\Section::make('Identificación del Equipo')
                                     ->collapsible()
                                     ->schema([
-                                        Infolists\Components\TextEntry::make('tipo_equipo')
-                                            ->label('Tipo de equipo')
-                                            ->badge()
-                                            ->color('primary')
+                                        Infolists\Components\TextEntry::make('codigo')
+                                            ->label('Código')
+                                            ->fontFamily('mono')
+                                            ->weight(\Filament\Support\Enums\FontWeight::Bold)
+                                            ->getStateUsing(fn (Inventario $record): string => $record->codigo ?: ($record->num_serie ?: ('#' . $record->id_inventario)))
                                             ->placeholder('Por capturar'),
-                                        Infolists\Components\TextEntry::make('subtipo')
-                                            ->label('Subtipo')
+                                        Infolists\Components\TextEntry::make('material.nombre')
+                                            ->label('Nombre del equipo')
+                                            ->icon('heroicon-m-cube')
+                                            ->getStateUsing(fn (Inventario $record): string => $record->material?->nombre ?? $record->subtipo ?? 'Por capturar')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('marca_display')
+                                            ->label('Marca')
+                                            ->getStateUsing(fn (Inventario $record): string => $record->material?->marca?->nombre ?? ($record->especificaciones['marca'] ?? null) ?? ($record->especificaciones['cpu_marca'] ?? null) ?? 'Por capturar')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('modelo_display')
+                                            ->label('Modelo')
+                                            ->getStateUsing(fn (Inventario $record): string => $record->modelo ?? $record->material?->modelo ?? ($record->especificaciones['modelo'] ?? null) ?? 'Por capturar')
                                             ->placeholder('Por capturar'),
                                         Infolists\Components\TextEntry::make('num_serie')
-                                            ->label('Número de serie')
+                                            ->label('No. de serie')
                                             ->fontFamily('mono')
                                             ->icon('heroicon-m-qr-code')
                                             ->placeholder('Por capturar'),
-                                        Infolists\Components\TextEntry::make('material.nombre')
-                                            ->label('Material / Equipo')
-                                            ->icon('heroicon-m-cube')
+                                        Infolists\Components\TextEntry::make('especificacion_texto_display')
+                                            ->label('Especificaciones')
+                                            ->getStateUsing(fn (Inventario $record): string => $record->especificacion_texto ?? ($record->especificaciones['especificaciones'] ?? null) ?? 'Por capturar')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('subtipo')
+                                            ->label('Tipo de equipo')
+                                            ->badge()
+                                            ->color('primary')
+                                            ->getStateUsing(fn (Inventario $record): string => $record->subtipo ?? $record->tipo_equipo ?? 'Por capturar')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('categoria_display')
+                                            ->label('Categoría')
+                                            ->badge()
+                                            ->color('gray')
+                                            ->getStateUsing(fn (Inventario $record): string => $record->material?->tipo?->nombre ?? $record->subtipo ?? 'Por capturar')
                                             ->placeholder('Por capturar'),
                                         Infolists\Components\TextEntry::make('estado')
                                             ->label('Estado')
@@ -2023,10 +2250,14 @@ class InventarioResource extends Resource
                                                 'Disponible' => 'success',
                                                 'Asignado' => 'info',
                                                 'Reasignado' => 'reassign',
-                                                'En Mantenimiento' => 'warning',
-                                                'Dañado' => 'danger',
+                                                'En Mantenimiento', 'En mantenimiento' => 'warning',
+                                                'Dañado', 'Baja' => 'danger',
                                                 default => 'gray',
                                             }),
+                                        Infolists\Components\TextEntry::make('sistema_operativo_display')
+                                            ->label('Sistema operativo')
+                                            ->getStateUsing(fn (Inventario $record): string => $record->sistema_operativo ?? ($record->especificaciones['sistema_operativo'] ?? null) ?? 'No aplica / Sin SO')
+                                            ->placeholder('Por capturar'),
                                         Infolists\Components\TextEntry::make('tipo_propiedad')
                                             ->label('Propiedad')
                                             ->badge()
@@ -2045,6 +2276,49 @@ class InventarioResource extends Resource
                                 Infolists\Components\Section::make('Ubicación y Asignación')
                                     ->collapsible()
                                     ->schema([
+                                        Infolists\Components\TextEntry::make('departamento_display')
+                                            ->label('Departamento')
+                                            ->icon('heroicon-m-building-office-2')
+                                            ->getStateUsing(function (Inventario $record): string {
+                                                $depto = $record->departamento ?? $record->area?->departamento;
+                                                if ($depto) {
+                                                    return $depto->encargado
+                                                        ? "{$depto->nombre} (Encargado: {$depto->encargado})"
+                                                        : $depto->nombre;
+                                                }
+                                                if ($record->ubicacion_fisica) {
+                                                    return explode(' > ', $record->ubicacion_fisica)[0] ?? 'Por capturar';
+                                                }
+                                                return 'Por capturar';
+                                            }),
+                                        Infolists\Components\TextEntry::make('area_display')
+                                            ->label('Área')
+                                            ->icon('heroicon-m-building-office')
+                                            ->getStateUsing(function (Inventario $record): string {
+                                                if ($record->area?->nombre) {
+                                                    return $record->area->nombre;
+                                                }
+                                                if ($record->ubicacion_fisica) {
+                                                    $parts = explode(' > ', $record->ubicacion_fisica);
+                                                    return $parts[1] ?? $parts[0] ?? 'Por capturar';
+                                                }
+                                                return 'Por capturar';
+                                            }),
+                                        Infolists\Components\TextEntry::make('aula_display')
+                                            ->label('Aula')
+                                            ->icon('heroicon-m-academic-cap')
+                                            ->getStateUsing(function (Inventario $record): string {
+                                                return $record->salon?->nombre
+                                                    ?? ($record->especificaciones['aula'] ?? null)
+                                                    ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record->ubicacion_fisica ?? '', $m) ? $m[1] : null)
+                                                    ?? '—';
+                                            }),
+                                        Infolists\Components\TextEntry::make('estacion')
+                                            ->label('Estación')
+                                            ->fontFamily('mono')
+                                            ->badge()
+                                            ->color('info')
+                                            ->placeholder('Individual (sin estación)'),
                                         Infolists\Components\TextEntry::make('ubicacion_fisica')
                                             ->label('Ubicación física descriptiva')
                                             ->icon('heroicon-m-map-pin')
@@ -2069,38 +2343,61 @@ class InventarioResource extends Resource
                                             ->label('Dirección IP')
                                             ->fontFamily('mono')
                                             ->icon('heroicon-m-globe-alt')
+                                            ->getStateUsing(fn (Inventario $record): ?string => $record->ip_address ?? ($record->especificaciones['ip_address'] ?? null))
                                             ->placeholder('Por capturar'),
                                         Infolists\Components\TextEntry::make('mac_address')
                                             ->label('Dirección MAC')
                                             ->fontFamily('mono')
                                             ->icon('heroicon-m-signal')
+                                            ->getStateUsing(fn (Inventario $record): ?string => $record->mac_address ?? ($record->especificaciones['mac_address'] ?? null))
                                             ->placeholder('Por capturar'),
                                         Infolists\Components\TextEntry::make('procesador')
                                             ->label('Procesador')
+                                            ->getStateUsing(fn (Inventario $record): ?string => $record->procesador ?? ($record->especificaciones['procesador'] ?? null))
                                             ->placeholder('Por capturar'),
                                         Infolists\Components\TextEntry::make('ram')
                                             ->label('Memoria RAM')
+                                            ->getStateUsing(fn (Inventario $record): ?string => $record->ram ?? ($record->especificaciones['ram'] ?? null))
                                             ->placeholder('Por capturar'),
                                         Infolists\Components\TextEntry::make('disco')
                                             ->label('Disco duro')
+                                            ->getStateUsing(fn (Inventario $record): ?string => $record->disco ?? ($record->especificaciones['disco'] ?? null))
                                             ->placeholder('Por capturar')
                                             ->columnSpanFull(),
                                     ])->columns(2),
 
                                 Infolists\Components\Section::make('Componentes de la Estación')
                                     ->collapsible()
+                                    ->visible(fn (?Inventario $record): bool => filled($record?->estacion))
                                     ->schema([
-                                        Infolists\Components\TextEntry::make('especificaciones.cpu_marca')->label('Marca CPU')->placeholder('Por capturar'),
-                                        Infolists\Components\TextEntry::make('especificaciones.cpu_sn')->label('S/N CPU')->placeholder('Por capturar'),
-                                        Infolists\Components\TextEntry::make('especificaciones.monitor_marca')->label('Marca Monitor')->placeholder('Por capturar'),
-                                        Infolists\Components\TextEntry::make('especificaciones.monitor_sn')->label('S/N Monitor')->placeholder('Por capturar'),
-                                        Infolists\Components\TextEntry::make('especificaciones.teclado_marca')->label('Marca Teclado')->placeholder('Por capturar'),
-                                        Infolists\Components\TextEntry::make('especificaciones.teclado_sn')->label('S/N Teclado')->placeholder('Por capturar'),
-                                        Infolists\Components\TextEntry::make('especificaciones.mouse_marca')->label('Marca Mouse')->placeholder('Por capturar'),
-                                        Infolists\Components\TextEntry::make('especificaciones.mouse_sn')->label('S/N Mouse')->placeholder('Por capturar'),
-                                    ])
-                                    ->columns(2)
-                                    ->visible(fn (?Inventario $record) => in_array($record?->tipo_equipo, ['Desktop', 'All in One', 'Computadora'])),
+                                        Infolists\Components\RepeatableEntry::make('componentes_estacion')
+                                            ->label('')
+                                            ->getStateUsing(fn (?Inventario $record) => filled($record?->estacion)
+                                                ? Inventario::with(['material.marca'])->where('estacion', $record->estacion)->orderBy('id_inventario')->get()
+                                                : [])
+                                            ->schema([
+                                                Infolists\Components\TextEntry::make('nombre_componente')
+                                                    ->label('Componente')
+                                                    ->weight(\Filament\Support\Enums\FontWeight::Bold)
+                                                    ->getStateUsing(fn (Inventario $comp): string => $comp->material?->nombre ?? $comp->subtipo ?? 'Componente'),
+                                                Infolists\Components\TextEntry::make('codigo')
+                                                    ->label('Código')
+                                                    ->fontFamily('mono')
+                                                    ->getStateUsing(fn (Inventario $comp): string => $comp->codigo ?: ('#' . $comp->id_inventario)),
+                                                Infolists\Components\TextEntry::make('num_serie')
+                                                    ->label('No. de serie (S/N)')
+                                                    ->fontFamily('mono')
+                                                    ->getStateUsing(fn (Inventario $comp): string => $comp->num_serie ?: '—'),
+                                                Infolists\Components\TextEntry::make('marca_comp')
+                                                    ->label('Marca')
+                                                    ->getStateUsing(fn (Inventario $comp): string => $comp->material?->marca?->nombre ?? ($comp->especificaciones['marca'] ?? '—')),
+                                                Infolists\Components\TextEntry::make('modelo_comp')
+                                                    ->label('Modelo')
+                                                    ->getStateUsing(fn (Inventario $comp): string => $comp->modelo ?? $comp->material?->modelo ?? ($comp->especificaciones['modelo'] ?? '—')),
+                                            ])
+                                            ->columns(2)
+                                            ->columnSpanFull(),
+                                    ]),
 
                                 Infolists\Components\Section::make('Observaciones')
                                     ->collapsible()
@@ -2154,6 +2451,16 @@ class InventarioResource extends Resource
                                             ->label('Fecha de factura')
                                             ->date('d/m/Y')
                                             ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('tipo_impresora')
+                                            ->label('Tipo de impresora')
+                                            ->badge()
+                                            ->color('info')
+                                            ->getStateUsing(fn (Inventario $record): ?string => $record->tipo_impresora ?? ($record->especificaciones['tipo_impresora'] ?? null))
+                                            ->placeholder('No especificado')
+                                            ->visible(fn (?Inventario $record): bool => filled($record?->tipo_impresora)
+                                                || filled($record?->especificaciones['tipo_impresora'] ?? null)
+                                                || ($record?->especificaciones['tipo_equipo'] ?? '') === 'imp'
+                                                || str_contains(strtolower(($record?->subtipo ?? '') . ' ' . ($record?->tipo_equipo ?? '') . ' ' . ($record?->material?->nombre ?? '')), 'impresora')),
                                     ])
                                     ->columns(2),
 
@@ -2206,36 +2513,187 @@ class InventarioResource extends Resource
         ];
     }
 
-    public static function actualizarUbicacionFisica(Forms\Set $set, Forms\Get $get): void
+    public static function obtenerOpcionesFiltrosDashboard(): array
     {
-        $partes = [];
-        if ($edificioId = $get('edificio_id')) {
-            $edificio = Edificio::find($edificioId);
-            if ($edificio) {
-                $partes[] = $edificio->letra ? "Edif. {$edificio->letra} ({$edificio->nombre})" : $edificio->nombre;
-            }
+        $categoriasFiltro = ['' => 'Todas'];
+        try {
+            $categoriasFiltro += TipoMaterial::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+        } catch (\Throwable $e) {}
+
+        $areasFiltro = ['' => 'Todas'];
+        try {
+            $areasFiltro += Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+        } catch (\Throwable $e) {}
+
+        return [$categoriasFiltro, $areasFiltro];
+    }
+
+    public static function obtenerInventariosDashboard(array $searches): Collection
+    {
+        $invQuery = Inventario::with(['material.marca', 'material.tipo', 'proveedor', 'usuario', 'area', 'departamento', 'salon']);
+
+        if (filled($searches['num_serie'] ?? null)) {
+            $termSerie = '%' . trim($searches['num_serie']) . '%';
+            $invQuery->where(function ($q) use ($termSerie) {
+                $q->where('num_serie', 'like', $termSerie)
+                  ->orWhere('codigo', 'like', $termSerie);
+            });
         }
-        if ($deptoId = $get('departamento_id')) {
-            $depto = Departamento::find($deptoId);
-            if ($depto) {
-                $partes[] = $depto->nombre;
-            }
+        if (filled($searches['material_nombre'] ?? null)) {
+            $termMat = '%' . trim($searches['material_nombre']) . '%';
+            $invQuery->where(function ($q) use ($termMat) {
+                $q->whereHas('material', fn ($m) => $m->where('nombre', 'like', $termMat))
+                  ->orWhere('subtipo', 'like', $termMat);
+            });
         }
-        if ($areaId = $get('area_id')) {
-            $area = Area::find($areaId);
-            if ($area) {
-                $partes[] = $area->nombre;
-            }
+        if (filled($searches['material_tipo_nombre'] ?? null)) {
+            $invQuery->whereHas('material.tipo', fn ($q) => $q->where('nombre', trim($searches['material_tipo_nombre'])));
         }
-        if ($salonId = $get('salon_id')) {
-            $salon = Salon::find($salonId);
-            if ($salon) {
-                $partes[] = $salon->nombre;
-            }
+        if (filled($searches['estado'] ?? null)) {
+            $invQuery->where('estado', $searches['estado']);
+        }
+        if (filled($searches['ubicacion_fisica'] ?? null)) {
+            $termArea = '%' . trim($searches['ubicacion_fisica']) . '%';
+            $invQuery->where(function ($q) use ($termArea) {
+                $q->where('ubicacion_fisica', 'like', $termArea)
+                  ->orWhereHas('area', fn ($a) => $a->where('nombre', 'like', $termArea));
+            });
         }
 
-        if (! empty($partes)) {
-            $set('ubicacion_fisica', implode(' > ', $partes));
+        if (filled($searches['busqueda'] ?? null)) {
+            $term = '%' . trim($searches['busqueda']) . '%';
+            $invQuery->where(function ($q) use ($term) {
+                $q->where('num_serie', 'like', $term)
+                    ->orWhere('codigo', 'like', $term)
+                    ->orWhere('subtipo', 'like', $term)
+                    ->orWhere('modelo', 'like', $term)
+                    ->orWhere('ubicacion_fisica', 'like', $term)
+                    ->orWhere('mac_address', 'like', $term)
+                    ->orWhere('ip_address', 'like', $term)
+                    ->orWhereHas('area', fn ($a) => $a->where('nombre', 'like', $term))
+                    ->orWhereHas('material', fn ($m) => $m->where('nombre', 'like', $term)
+                        ->orWhereHas('marca', fn ($b) => $b->where('nombre', 'like', $term)));
+            });
         }
+        if (filled($searches['fecha_desde'] ?? null)) {
+            $invQuery->whereDate('fecha_registro', '>=', $searches['fecha_desde']);
+        }
+        if (filled($searches['fecha_hasta'] ?? null)) {
+            $invQuery->whereDate('fecha_registro', '<=', $searches['fecha_hasta']);
+        }
+
+        return $invQuery->latest('created_at')->take(50)->get();
+    }
+
+    public static function obtenerCategoriasTop(): array
+    {
+        $todasCategorias = Inventario::query()
+            ->join('material', 'inventario.id_producto', '=', 'material.id_producto')
+            ->leftJoin('tipo_material', 'material.id_tipodematerial', '=', 'tipo_material.id_tipodematerial')
+            ->selectRaw("COALESCE(tipo_material.nombre, 'General') as cat, count(*) as total")
+            ->groupBy('cat')
+            ->orderByDesc('total')
+            ->pluck('total', 'cat')
+            ->toArray();
+
+        $top = [];
+        $otras = 0;
+        $idx = 0;
+        foreach ($todasCategorias as $catNom => $catCant) {
+            if ($idx < 8) {
+                $top[$catNom] = $catCant;
+            } else {
+                $otras += $catCant;
+            }
+            $idx++;
+        }
+        if ($otras > 0) {
+            $top['Otras categorías'] = $otras;
+        }
+
+        return $top;
+    }
+
+    public static function exportarInventarioExcel($livewire = null): ?\Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        $query = ($livewire && method_exists($livewire, 'getFilteredTableQuery'))
+            ? $livewire->getFilteredTableQuery()
+            : Inventario::query();
+
+        $registros = $query
+            ->with(['material.tipo', 'departamento', 'area.departamento', 'salon'])
+            ->latest('created_at')
+            ->get();
+
+        $headers = [
+            'Departamento',
+            'Código',
+            'Equipo',
+            'Categoría',
+            'Estado',
+            'Área',
+            'Aula',
+            'No. de serie',
+            'IP',
+            'MAC',
+        ];
+
+        $rows = [];
+        foreach ($registros as $record) {
+            $depto = $record->departamento?->nombre
+                ?? $record->area?->departamento?->nombre
+                ?? ($record->ubicacion_fisica ? (explode(' > ', $record->ubicacion_fisica)[0] ?? null) : null)
+                ?? '—';
+
+            $codigo = ! empty($record->codigo)
+                ? $record->codigo
+                : ($record->num_serie ?: ('#' . ($record->id_inventario ?? $record->id)));
+
+            $equipo = $record->material?->nombre ?? $record->subtipo ?? 'Equipo';
+            $categoria = $record->material?->tipo?->nombre ?? $record->subtipo ?? 'General';
+            $estado = $record->estado ?? 'Disponible';
+
+            $area = $record->area?->nombre;
+            if (! $area && ! empty($record->ubicacion_fisica)) {
+                $parts = explode(' > ', $record->ubicacion_fisica);
+                $area = $parts[1] ?? $parts[0] ?? null;
+            }
+            $area = $area ?: '—';
+
+            $aula = $record->salon?->nombre
+                ?? ($record->especificaciones['aula'] ?? null)
+                ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record->ubicacion_fisica ?? '', $m) ? $m[1] : null)
+                ?? '—';
+
+            $numSerie = $record->num_serie ?: '—';
+            $ip = $record->ip_address ?? ($record->especificaciones['ip_address'] ?? null) ?? '—';
+            $mac = $record->mac_address ?? ($record->especificaciones['mac_address'] ?? null) ?? '—';
+
+            $rows[] = [
+                $depto,
+                $codigo,
+                $equipo,
+                $categoria,
+                $estado,
+                $area,
+                $aula,
+                $numSerie,
+                $ip,
+                $mac,
+            ];
+        }
+
+        if (empty($rows)) {
+            $rows[] = ['Sin registros', '—', '—', '—', '—', '—', '—', '—', '—', '—'];
+        }
+
+        $fileName = 'inventario-sigem-' . now()->format('Y-m-d-His') . '.xlsx';
+
+        return \App\Support\SigemExcelExporter::export(
+            'Inventario de Equipos y Materiales',
+            $headers,
+            $rows,
+            $fileName
+        );
     }
 }

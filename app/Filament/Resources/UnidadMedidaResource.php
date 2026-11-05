@@ -45,7 +45,7 @@ class UnidadMedidaResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos de la unidad de medida')
+                Forms\Components\Section::make('📏 Datos de la unidad de medida')
                     ->icon('heroicon-m-bars-3-bottom-left')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -102,7 +102,7 @@ class UnidadMedidaResource extends Resource
                         Tab::make('Información')
                             ->icon('heroicon-m-tag')
                             ->schema([
-                                Section::make('Datos de la unidad de medida')
+                                Section::make('📏 Datos de la unidad de medida')
                                     ->schema([
                                         TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-bars-3-bottom-left'),
                                         TextEntry::make('materiales_count')

@@ -4,7 +4,6 @@ namespace App\Filament\ServicioSocial\Resources;
 
 use App\Filament\ServicioSocial\Resources\MarcaMaterialResource\Pages;
 use App\Models\MarcaMaterial;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -53,18 +52,7 @@ class MarcaMaterialResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Datos de la marca')
-                    ->icon('heroicon-m-tag')
-                    ->schema([
-                        Forms\Components\TextInput::make('nombre')
-                            ->label('Nombre de la marca')
-                            ->required()
-                            ->prefixIcon('heroicon-m-tag')
-                            ->maxLength(100),
-                    ]),
-            ]);
+        return \App\Filament\Resources\MarcaMaterialResource::form($form);
     }
 
     public static function table(Table $table): Table

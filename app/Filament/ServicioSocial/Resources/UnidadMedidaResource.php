@@ -4,7 +4,6 @@ namespace App\Filament\ServicioSocial\Resources;
 
 use App\Filament\ServicioSocial\Resources\UnidadMedidaResource\Pages;
 use App\Models\UnidadMedida;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -53,18 +52,7 @@ class UnidadMedidaResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Datos de la unidad de medida')
-                    ->icon('heroicon-m-bars-3-bottom-left')
-                    ->schema([
-                        Forms\Components\TextInput::make('nombre')
-                            ->label('Nombre de la unidad')
-                            ->required()
-                            ->prefixIcon('heroicon-m-bars-3-bottom-left')
-                            ->maxLength(50),
-                    ]),
-            ]);
+        return \App\Filament\Resources\UnidadMedidaResource::form($form);
     }
 
     public static function table(Table $table): Table

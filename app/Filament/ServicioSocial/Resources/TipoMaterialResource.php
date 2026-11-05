@@ -4,7 +4,6 @@ namespace App\Filament\ServicioSocial\Resources;
 
 use App\Filament\ServicioSocial\Resources\TipoMaterialResource\Pages;
 use App\Models\TipoMaterial;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -53,18 +52,7 @@ class TipoMaterialResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Datos del tipo de material')
-                    ->icon('heroicon-m-rectangle-stack')
-                    ->schema([
-                        Forms\Components\TextInput::make('nombre')
-                            ->label('Nombre del tipo')
-                            ->required()
-                            ->prefixIcon('heroicon-m-rectangle-stack')
-                            ->maxLength(100),
-                    ]),
-            ]);
+        return \App\Filament\Resources\TipoMaterialResource::form($form);
     }
 
     public static function table(Table $table): Table
@@ -73,6 +61,13 @@ class TipoMaterialResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
                     ->label('Nombre')
+                    ->searchable(isIndividual: true)
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('familia')
+                    ->label('Familia')
+                    ->badge()
+                    ->color('info')
+                    ->placeholder('—')
                     ->searchable(isIndividual: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)

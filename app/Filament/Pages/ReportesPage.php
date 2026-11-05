@@ -214,13 +214,21 @@ class ReportesPage extends Page
     protected function generarReporteInventarioCategoria(string $fecha, string $formato): array
     {
         $tipos = TipoMaterial::orderBy('nombre')->get();
+        $inventariosPorTipo = Inventario::join('material', 'inventario.id_producto', '=', 'material.id_producto')
+            ->select([
+                'inventario.id_inventario',
+                'inventario.tipo_propiedad',
+                'inventario.estado',
+                'inventario.estado_registro',
+                'material.id_tipodematerial',
+            ])
+            ->get()
+            ->groupBy('id_tipodematerial');
         $rows = [];
 
         if ($formato === 'csv') {
             foreach ($tipos as $tipo) {
-                $inventarios = Inventario::whereHas('material', function ($q) use ($tipo) {
-                    $q->where('id_tipodematerial', $tipo->id_tipodematerial);
-                })->get();
+                $inventarios = $inventariosPorTipo->get($tipo->id_tipodematerial, collect());
 
                 $total = $inventarios->count();
                 if ($total === 0) {
@@ -254,9 +262,7 @@ class ReportesPage extends Page
 
         // Formato Mockup (Pantalla / Excel): Categoría, Total, Disponible, En mantto, Asignado, Cambio área, Solicitud baja
         foreach ($tipos as $tipo) {
-            $inventarios = Inventario::whereHas('material', function ($q) use ($tipo) {
-                $q->where('id_tipodematerial', $tipo->id_tipodematerial);
-            })->get();
+            $inventarios = $inventariosPorTipo->get($tipo->id_tipodematerial, collect());
 
             $total = $inventarios->count();
             if ($total === 0) {
@@ -307,7 +313,7 @@ class ReportesPage extends Page
     protected function generarReporteEquiposArea(string $fecha, string $formato): array
     {
         $areas = Area::with('departamento')->orderBy('nombre')->get();
-        $inventarios = Inventario::select(['id_inventario', 'ubicacion_fisica', 'especificaciones', 'tipo_propiedad', 'estado', 'estado_registro'])->get();
+        $inventarios = Inventario::select(['id_inventario', 'area_id', 'ubicacion_fisica', 'especificaciones', 'tipo_propiedad', 'estado', 'estado_registro'])->get();
         $rows = [];
 
         if ($formato === 'csv') {
@@ -316,6 +322,9 @@ class ReportesPage extends Page
                 $areaIdStr = (string) $area->id_area;
 
                 $areaInventarios = $inventarios->filter(function ($inv) use ($areaNombre, $areaIdStr) {
+                    if ((string) ($inv->area_id ?? '') === $areaIdStr) {
+                        return true;
+                    }
                     if ($inv->ubicacion_fisica && stripos($inv->ubicacion_fisica, $areaNombre) !== false) {
                         return true;
                     }
@@ -359,6 +368,9 @@ class ReportesPage extends Page
             $areaIdStr = (string) $area->id_area;
 
             $areaInventarios = $inventarios->filter(function ($inv) use ($areaNombre, $areaIdStr) {
+                if ((string) ($inv->area_id ?? '') === $areaIdStr) {
+                    return true;
+                }
                 if ($inv->ubicacion_fisica && stripos($inv->ubicacion_fisica, $areaNombre) !== false) {
                     return true;
                 }
@@ -415,7 +427,7 @@ class ReportesPage extends Page
 
     protected function generarReporteEquiposMantenimiento(string $fecha, string $formato): array
     {
-        $mantenimientos = Mantenimiento::with(['inventario.material.tipo'])->latest('fecha_solicitud')->get();
+        $mantenimientos = Mantenimiento::with(['inventario.material.tipo', 'inventario.area', 'inventario.salon'])->latest('fecha_solicitud')->get();
         $rows = [];
 
         if ($formato === 'csv') {
@@ -449,11 +461,11 @@ class ReportesPage extends Page
         foreach ($mantenimientos as $m) {
             $inv = $m->inventario;
             $espec = is_array($inv?->especificaciones) ? $inv->especificaciones : json_decode($inv?->especificaciones ?? '[]', true);
-            $aula = $espec['aula'] ?? '—';
-            $codigo = $inv?->num_serie ?: ('#' . $m->id_inventario);
-            $equipo = $inv?->material?->nombre ?? 'N/A';
-            $categoria = $inv?->material?->tipo?->nombre ?? 'General';
-            $area = $inv?->ubicacion_fisica ?: 'Centro de Cómputo';
+            $aula = $inv?->salon?->nombre ?? ($espec['aula'] ?? '—');
+            $codigo = $inv?->codigo ?: ($inv?->num_serie ?: ('#' . $m->id_inventario));
+            $equipo = $inv?->material?->nombre ?? $inv?->subtipo ?? 'N/A';
+            $categoria = $inv?->material?->tipo?->nombre ?? $inv?->subtipo ?? 'General';
+            $area = $inv?->area?->nombre ?? ($inv?->ubicacion_fisica ?: 'Centro de Cómputo');
 
             if ($formato === 'xlsx') {
                 $rows[] = [
@@ -486,7 +498,7 @@ class ReportesPage extends Page
 
     protected function generarReporteEquiposBajaDanados(string $fecha, string $formato): array
     {
-        $inventarios = Inventario::with('material.tipo')
+        $inventarios = Inventario::with(['material.tipo', 'area'])
             ->where(function ($q) {
                 $q->whereIn('estado', ['Dañado', 'Baja'])
                     ->orWhere('estado_registro', 'Rechazado');
@@ -523,10 +535,10 @@ class ReportesPage extends Page
         // Formato Mockup (Pantalla / Excel): Código, Equipo, Categoría, Área, Último movimiento
         foreach ($inventarios as $i) {
             $fFecha = $i->fecha_baja ? $i->fecha_baja->format('d/m/Y') : ($i->updated_at ? $i->updated_at->format('d/m/Y') : 'N/A');
-            $codigo = $i->num_serie ?: ('#' . $i->id_inventario);
-            $equipo = $i->material?->nombre ?? 'N/A';
-            $categoria = $i->material?->tipo?->nombre ?? 'General';
-            $area = $i->ubicacion_fisica ?: 'Centro de Cómputo';
+            $codigo = $i->codigo ?: ($i->num_serie ?: ('#' . $i->id_inventario));
+            $equipo = $i->material?->nombre ?? $i->subtipo ?? 'N/A';
+            $categoria = $i->material?->tipo?->nombre ?? $i->subtipo ?? 'General';
+            $area = $i->area?->nombre ?? ($i->ubicacion_fisica ?: 'Centro de Cómputo');
 
             if ($formato === 'xlsx') {
                 $rows[] = [

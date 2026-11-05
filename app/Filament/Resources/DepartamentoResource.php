@@ -37,14 +37,14 @@ class DepartamentoResource extends Resource
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['nombre'];
+        return ['nombre', 'encargado'];
     }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Datos del departamento')
+                Forms\Components\Section::make('📁 Datos del departamento')
                     ->icon('heroicon-m-building-office-2')
                     ->schema([
                         Forms\Components\TextInput::make('nombre')
@@ -52,6 +52,13 @@ class DepartamentoResource extends Resource
                             ->placeholder('Ej. Departamento de Ciencias Básicas')
                             ->required()
                             ->prefixIcon('heroicon-m-tag')
+                            ->maxLength(100),
+                        Forms\Components\TextInput::make('encargado')
+                            ->label('Encargado')
+                            ->placeholder('Ej. Dr. Juan Pérez')
+                            ->helperText('Jefe o responsable del departamento')
+                            ->nullable()
+                            ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
                     ]),
             ]);
@@ -62,6 +69,7 @@ class DepartamentoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)->label('Nombre')->searchable(isIndividual: true)->sortable(),
+                Tables\Columns\TextColumn::make('encargado')->wrap(false)->limit(30)->grow(false)->label('Encargado')->placeholder('—')->searchable(isIndividual: true)->sortable(),
             ])
             ->defaultSort('nombre', 'asc')
             ->searchPlaceholder('Buscar por nombre del departamento...')
@@ -88,9 +96,13 @@ class DepartamentoResource extends Resource
                         Tab::make('Información')
                             ->icon('heroicon-m-tag')
                             ->schema([
-                                Section::make('Datos del departamento')
+                                Section::make('📁 Datos del departamento')
                                     ->schema([
                                         TextEntry::make('nombre')->label('Nombre del departamento')->icon('heroicon-m-building-office-2'),
+                                        TextEntry::make('encargado')
+                                            ->label('Encargado')
+                                            ->placeholder('—')
+                                            ->icon('heroicon-m-user'),
                                         TextEntry::make('areas_count')
                                             ->label('Áreas adscritas')
                                             ->state(fn (Departamento $record): string => $record->areas()->count() . ' registradas')

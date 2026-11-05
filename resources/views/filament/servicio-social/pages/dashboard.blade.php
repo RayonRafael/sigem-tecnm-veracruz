@@ -314,11 +314,16 @@
                                         @endphp
                                         @forelse($inventariosTabla as $inv)
                                             @php
-                                                $codigo = $inv->num_serie ?: ('#' . $inv->id_inventario);
-                                                $nombreEquipo = $inv->material?->nombre ?? 'Equipo general';
-                                                $serieSub = $inv->num_serie ? 'S/N: ' . $inv->num_serie : 'Sin número de serie';
-                                                $categoria = $inv->material?->tipo?->nombre ?? 'General';
-                                                $areaUbicacion = $inv->ubicacion_fisica ?: 'Sin área asignada';
+                                                $codigo = ! empty($inv->codigo) ? $inv->codigo : ($inv->num_serie ?: ('#' . $inv->id_inventario));
+                                                $nombreEquipo = $inv->material?->nombre ?? $inv->subtipo ?? 'Equipo general';
+                                                $serieSub = 'ID: ' . $codigo;
+                                                $categoria = $inv->material?->tipo?->nombre ?? $inv->subtipo ?? 'General';
+                                                $areaUbicacion = $inv->area?->nombre;
+                                                if (! $areaUbicacion && ! empty($inv->ubicacion_fisica)) {
+                                                    $parts = explode(' > ', $inv->ubicacion_fisica);
+                                                    $areaUbicacion = $parts[1] ?? $parts[0] ?? null;
+                                                }
+                                                $areaUbicacion = $areaUbicacion ?: 'Sin área asignada';
                                                 $estado = $inv->estado ?? 'Sin estado';
 
                                                 $pillCls = match ($estado) {
@@ -345,7 +350,9 @@
                                                     <span class="sigem-pill neutral" style="font-weight: 500;">{{ $categoria }}</span>
                                                 </td>
                                                 <td>
-                                                    <span class="sigem-pill {{ $pillCls }}">{{ $estado }}</span>
+                                                    <span class="sigem-pill {{ $pillCls }}">
+                                                        <span class="sigem-dot"></span>{{ $estado }}
+                                                    </span>
                                                 </td>
                                                 <td>
                                                     <span style="font-size: 14.5px; color: var(--sig-muted);">{{ $areaUbicacion }}</span>
@@ -361,14 +368,8 @@
                                                         <button type="button"
                                                                 wire:click="editarEquipo({{ $inv->id_inventario }})"
                                                                 class="fi-icon-btn sigem-dash-btn"
-                                                                title="Editar"
-                                                                aria-label="Editar">
-                                                        </button>
-                                                        <button type="button"
-                                                                wire:click="eliminarEquipo({{ $inv->id_inventario }})"
-                                                                class="fi-icon-btn sigem-dash-btn"
-                                                                title="Eliminar"
-                                                                aria-label="Eliminar">
+                                                                title="Modificar"
+                                                                aria-label="Modificar">
                                                         </button>
                                                     </div>
                                                 </td>

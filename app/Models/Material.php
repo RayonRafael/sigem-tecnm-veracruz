@@ -41,6 +41,11 @@ class Material extends Model
         'requiere_control_individual', 'stock_minimo',
     ];
 
+    protected $casts = [
+        'requiere_control_individual' => 'boolean',
+        'stock_minimo' => 'integer',
+    ];
+
     // RELACIONES: Pertenece a una unidad, marca y tipo
     public function unidad()
     {
@@ -107,6 +112,10 @@ class Material extends Model
     {
         return Attribute::make(
             get: function ($value, array $attributes) {
+                if (array_key_exists('stock_derivado', $attributes)) {
+                    return max(0, (int) $attributes['stock_derivado']);
+                }
+
                 $id = $attributes[$this->primaryKey] ?? null;
                 if (! $id) {
                     return 0;
@@ -123,6 +132,11 @@ class Material extends Model
     }
 
     // Scopes
+    public function scopeWithStockDerivado($query)
+    {
+        return $query->selectRaw('material.*, '.self::stockDerivadoSql().' AS stock_derivado');
+    }
+
     public function scopeStockBajo($query)
     {
         // Se usa el SQL derivado: la columna stock_actual ya no es fuente de verdad.
