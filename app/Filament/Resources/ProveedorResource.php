@@ -38,7 +38,7 @@ class ProveedorResource extends Resource
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['nombre_empresa', 'rfc', 'contacto_nombre'];
+        return ['nombre_empresa', 'rfc', 'direccion', 'contacto_nombre'];
     }
 
     public static function form(Form $form): Form
@@ -55,11 +55,18 @@ class ProveedorResource extends Resource
                             ->prefixIcon('heroicon-m-building-storefront')
                             ->maxLength(150),
                         Forms\Components\TextInput::make('rfc')
-                            ->label('Rfc')
+                            ->label('RFC')
                             ->placeholder('Ej. STE200101AAA')
                             ->prefixIcon('heroicon-m-identification')
                             ->maxLength(13)
                             ->default(null),
+                        Forms\Components\TextInput::make('direccion')
+                            ->label('Dirección')
+                            ->placeholder('Calle, número, colonia, CP')
+                            ->prefixIcon('heroicon-m-map-pin')
+                            ->maxLength(255)
+                            ->default(null)
+                            ->columnSpanFull(),
                         Forms\Components\ToggleButtons::make('activo')
                             ->label('Proveedor activo')
                             ->boolean(trueLabel: 'Sí', falseLabel: 'No')
@@ -104,18 +111,26 @@ class ProveedorResource extends Resource
                     ->label('Empresa')
                     ->searchable(isIndividual: true)
                     ->sortable(),
-                Tables\Columns\TextColumn::make('rfc')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
-                    ->label('Rfc')
+                Tables\Columns\TextColumn::make('rfc')->wrap(false)->limit(30)->grow(false)->toggleable()
+                    ->label('RFC')
                     ->fontFamily('mono')
+                    ->placeholder('—')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('contacto_nombre')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
+                Tables\Columns\TextColumn::make('contacto_nombre')->wrap(false)->limit(30)->grow(false)->toggleable()
                     ->label('Contacto')
+                    ->placeholder('—')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('contacto_telefono')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
+                Tables\Columns\TextColumn::make('contacto_telefono')->wrap(false)->limit(30)->grow(false)->toggleable()
                     ->label('Teléfono')
+                    ->placeholder('—')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('contacto_email')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
-                    ->label('Email')
+                Tables\Columns\TextColumn::make('contacto_email')->wrap(false)->limit(30)->grow(false)->toggleable()
+                    ->label('Correo')
+                    ->placeholder('—')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('direccion')->wrap(false)->limit(35)->grow(false)->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Dirección')
+                    ->placeholder('—')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('activo')->wrap(false)->limit(30)->grow(false)
                     ->label('Estado')
@@ -199,6 +214,11 @@ class ProveedorResource extends Resource
                                             ->fontFamily('mono')
                                             ->icon('heroicon-m-identification')
                                             ->placeholder('Por capturar'),
+                                        TextEntry::make('direccion')
+                                            ->label('Dirección')
+                                            ->icon('heroicon-m-map-pin')
+                                            ->placeholder('—')
+                                            ->columnSpanFull(),
                                         TextEntry::make('activo')
                                             ->label('Estado')
                                             ->badge()

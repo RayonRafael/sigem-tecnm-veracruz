@@ -3,9 +3,7 @@
 namespace App\Filament\ServicioSocial\Resources;
 
 use App\Filament\ServicioSocial\Resources\SolicitudResource\Pages;
-use App\Models\Receptor;
 use App\Models\Solicitud;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -171,6 +169,8 @@ class SolicitudResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('id_usuario', auth()->id());
+        return parent::getEloquentQuery()
+            ->with(['usuario', 'receptor.area.departamento', 'autorizadoPor'])
+            ->where('id_usuario', auth()->id());
     }
 }

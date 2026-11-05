@@ -38,6 +38,13 @@ class MaterialResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withStockDerivado()
+            ->with(['marca', 'tipo', 'unidad']);
+    }
+
     public static function getGloballySearchableAttributes(): array
     {
         return ['nombre', 'descripcion', 'modelo'];

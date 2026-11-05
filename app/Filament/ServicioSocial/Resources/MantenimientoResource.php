@@ -4,7 +4,6 @@ namespace App\Filament\ServicioSocial\Resources;
 
 use App\Filament\ServicioSocial\Resources\MantenimientoResource\Pages;
 use App\Models\Mantenimiento;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
@@ -64,11 +63,18 @@ class MantenimientoResource extends Resource
 
                 Tables\Columns\TextColumn::make('inventario.num_serie')
                     ->label('Equipo')
+                    ->getStateUsing(fn (Mantenimiento $record): string => $record->inventario?->codigo ?? $record->inventario?->num_serie ?? '—')
                     ->fontFamily('mono')
                     ->weight(FontWeight::Bold)
                     ->extraAttributes(['class' => 'sigem-td-folio'])
-                    ->searchable(isIndividual: true)
-                    ->description(fn (Mantenimiento $record): ?string => $record->inventario?->material?->nombre),
+                    ->searchable(query: function (Builder $query, string $search): Builder {
+                        return $query->whereHas('inventario', function (Builder $q) use ($search) {
+                            $q->where('codigo', 'like', "%{$search}%")
+                              ->orWhere('num_serie', 'like', "%{$search}%")
+                              ->orWhereHas('material', fn ($m) => $m->where('nombre', 'like', "%{$search}%"));
+                        });
+                    }, isIndividual: true)
+                    ->description(fn (Mantenimiento $record): ?string => $record->inventario?->material?->nombre ?? $record->inventario?->subtipo),
 
                 Tables\Columns\TextColumn::make('tipo_mantenimiento')
                     ->label('Tipo')
@@ -131,7 +137,7 @@ class MantenimientoResource extends Resource
                 }
                 $area = $livewire->tableColumnSearches['area'] ?? null;
                 if (filled($area)) {
-                    $query->whereHas('inventario', fn ($q) => $q->where('id_area', $area));
+                    $query->whereHas('inventario', fn ($q) => $q->where('area_id', $area));
                 }
                 return $query;
             })
@@ -148,7 +154,7 @@ class MantenimientoResource extends Resource
                     ->slideOver()
                     ->modalHeading(fn (?Mantenimiento $record) => 'Mantenimiento #' . ($record?->id_mantenimiento ? str_pad($record->id_mantenimiento, 4, '0', STR_PAD_LEFT) : '—'))
                     ->modalDescription(fn (?Mantenimiento $record) => new \Illuminate\Support\HtmlString(
-                        'Equipo: <b>' . e($record?->inventario?->num_serie ?? '—') . '</b> · ' . e($record?->fecha_solicitud?->format('d/m/Y') ?? '—')
+                        'Equipo: <b>' . e($record?->inventario?->codigo ?? $record?->inventario?->num_serie ?? '—') . '</b> · ' . e($record?->fecha_solicitud?->format('d/m/Y') ?? '—')
                     ))
                     ->modalCancelActionLabel('Cerrar'),
             ])
@@ -176,6 +182,8 @@ class MantenimientoResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('id_usuario_solicita', auth()->id());
+        return parent::getEloquentQuery()
+            ->with(['inventario.material'])
+            ->where('id_usuario_solicita', auth()->id());
     }
 }

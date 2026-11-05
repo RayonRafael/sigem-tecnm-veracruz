@@ -19,8 +19,9 @@ class MantenimientoObserver
         if ($mantenimiento->isDirty('estado')) {
             $estadoNuevo = $mantenimiento->estado;
 
-            // Si el estado cambió y ahora es "Completado"
-            if ($estadoNuevo === 'Completado') {
+            if ($estadoNuevo === 'En proceso') {
+                $mantenimiento->inventario?->update(['estado' => 'En Mantenimiento']);
+            } elseif ($estadoNuevo === 'Completado') {
                 $inventario = $mantenimiento->inventario;
                 if ($inventario) {
                     // inventario.id_usuario es quien REGISTRO la pieza (NOT NULL), no un prestatario,

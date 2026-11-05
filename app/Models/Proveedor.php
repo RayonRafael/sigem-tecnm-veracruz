@@ -15,7 +15,7 @@ class Proveedor extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['nombre_empresa', 'rfc', 'activo', 'contacto_nombre', 'contacto_telefono', 'contacto_email'])
+            ->logOnly(['nombre_empresa', 'rfc', 'direccion', 'activo', 'contacto_nombre', 'contacto_telefono', 'contacto_email'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->setDescriptionForEvent(function (string $eventName) {
@@ -33,7 +33,7 @@ class Proveedor extends Model
 
     protected $primaryKey = 'id_proveedor';
 
-    protected $fillable = ['nombre_empresa', 'rfc', 'contacto_nombre', 'contacto_telefono', 'contacto_email', 'activo'];
+    protected $fillable = ['nombre_empresa', 'rfc', 'direccion', 'contacto_nombre', 'contacto_telefono', 'contacto_email', 'activo'];
 
     public function inventarios()
     {

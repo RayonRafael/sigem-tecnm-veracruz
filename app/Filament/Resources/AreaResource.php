@@ -15,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class AreaResource extends Resource
 {
@@ -35,6 +36,12 @@ class AreaResource extends Resource
     protected static ?string $navigationGroup = 'Catálogos';
 
     protected static ?int $navigationSort = 2;
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['departamento']);
+    }
 
     public static function getGloballySearchableAttributes(): array
     {

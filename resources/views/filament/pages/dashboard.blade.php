@@ -122,7 +122,7 @@
                 </a>
 
                 <!-- 4. Ver bitácora -->
-                <a class="sigem-quick" href="{{ url('/admin/configuracion') }}">
+                <a class="sigem-quick" href="{{ url('/admin/configuracion?tab=bitacora') }}">
                     <div class="arrow">→</div>
                     <div class="sigem-quick-ico sigem-i-info">🕘</div>
                     <div class="sigem-quick-title">Ver bitácora</div>
@@ -316,11 +316,16 @@
                                         @endphp
                                         @forelse($inventariosTabla as $inv)
                                             @php
-                                                $codigo = $inv->num_serie ?: ('#' . $inv->id_inventario);
-                                                $nombreEquipo = $inv->material?->nombre ?? 'Equipo general';
-                                                $serieSub = $inv->num_serie ? 'S/N: ' . $inv->num_serie : 'Sin número de serie';
-                                                $categoria = $inv->material?->tipo?->nombre ?? 'General';
-                                                $areaUbicacion = $inv->ubicacion_fisica ?: 'Sin área asignada';
+                                                $codigo = ! empty($inv->codigo) ? $inv->codigo : ($inv->num_serie ?: ('#' . $inv->id_inventario));
+                                                $nombreEquipo = $inv->material?->nombre ?? $inv->subtipo ?? 'Equipo general';
+                                                $serieSub = 'ID: ' . $codigo;
+                                                $categoria = $inv->material?->tipo?->nombre ?? $inv->subtipo ?? 'General';
+                                                $areaUbicacion = $inv->area?->nombre;
+                                                if (! $areaUbicacion && ! empty($inv->ubicacion_fisica)) {
+                                                    $parts = explode(' > ', $inv->ubicacion_fisica);
+                                                    $areaUbicacion = $parts[1] ?? $parts[0] ?? null;
+                                                }
+                                                $areaUbicacion = $areaUbicacion ?: 'Sin área asignada';
                                                 $estado = $inv->estado ?? 'Sin estado';
 
                                                 $pillCls = match ($estado) {
@@ -364,8 +369,8 @@
                                                         <button type="button"
                                                                 wire:click="editarEquipo({{ $inv->id_inventario }})"
                                                                 class="fi-icon-btn sigem-dash-btn"
-                                                                title="Editar"
-                                                                aria-label="Editar">
+                                                                title="Modificar"
+                                                                aria-label="Modificar">
                                                         </button>
                                                         <button type="button"
                                                                 wire:click="eliminarEquipo({{ $inv->id_inventario }})"

@@ -12,6 +12,7 @@ use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Tabs;
 use Filament\Infolists\Infolist;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Support\Carbon;
@@ -59,9 +60,9 @@ class Dashboard extends BaseDashboard
     {
         return ViewAction::make('verEquipo')
             ->label('Ver equipo')
-            ->modalHeading(fn (?Inventario $record) => $record?->material?->nombre ?? 'Detalle de equipo')
+            ->modalHeading(fn (?Inventario $record) => $record?->material?->nombre ?? $record?->subtipo ?? 'Detalle de equipo')
             ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
-                'ID: ' . e($record?->num_serie ?? '—') . ' · ' . e($record?->material?->tipo?->nombre ?? 'Sin categoría')
+                'ID: ' . e($record?->codigo ?? $record?->num_serie ?? '—') . ' · ' . e($record?->material?->tipo?->nombre ?? $record?->subtipo ?? 'Sin categoría')
             ))
             ->model(Inventario::class)
             ->record(function (array $arguments) {
@@ -75,6 +76,9 @@ class Dashboard extends BaseDashboard
                     'material.tipo',
                     'proveedor',
                     'usuario',
+                    'departamento',
+                    'area.departamento',
+                    'salon',
                 ])->find($id);
             })
             ->slideOver()
@@ -111,16 +115,25 @@ class Dashboard extends BaseDashboard
     {
         return EditAction::make('editarEquipo')
             ->label('Editar equipo')
-            ->modalHeading(fn (?Inventario $record) => 'Editar: ' . ($record?->material?->nombre ?? 'equipo'))
+            ->modalHeading(fn (?Inventario $record) => 'Editar: ' . ($record?->material?->nombre ?? $record?->subtipo ?? 'equipo'))
             ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
-                'ID: ' . e($record?->num_serie ?? '—')
+                'ID: ' . e($record?->codigo ?? ('#' . $record?->id_inventario)) . ' · ' . e($record?->material?->tipo?->nombre ?? $record?->subtipo ?? 'General')
             ))
             ->model(Inventario::class)
             ->record(function (array $arguments) {
-                return Inventario::find($arguments['id'] ?? $arguments['record']);
+                return Inventario::with(['material.marca', 'material.tipo', 'area', 'salon'])
+                    ->find($arguments['id'] ?? $arguments['record']);
             })
-            ->steps(InventarioResource::getFormSteps())
+            ->form([
+                Tabs::make('Tabs')
+                    ->tabs(InventarioResource::getEditFormTabs())
+                    ->columnSpanFull(),
+            ])
             ->slideOver()
+            ->modalSubmitActionLabel('Guardar cambios')
+            ->modalCancelActionLabel('Cancelar')
+            ->mutateRecordDataUsing(fn (array $data, ?Inventario $record = null): array => InventarioResource::hidratarDatosEdicion($data, $record))
+            ->using(fn (Inventario $record, array $data): Inventario => InventarioResource::guardarCambiosEquipo($record, $data))
             ->successNotificationTitle('Registro actualizado correctamente');
     }
 
@@ -133,9 +146,9 @@ class Dashboard extends BaseDashboard
     {
         return DeleteAction::make('eliminarEquipo')
             ->label('Eliminar equipo')
-            ->modalHeading(fn (?Inventario $record) => '¿Eliminar ' . ($record?->material?->nombre ?? 'equipo') . '?')
+            ->modalHeading(fn (?Inventario $record) => '¿Eliminar ' . ($record?->material?->nombre ?? $record?->subtipo ?? 'equipo') . '?')
             ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
-                'ID: ' . e($record?->num_serie ?? '—') . ' · Esta acción no se puede deshacer'
+                'ID: ' . e($record?->codigo ?? $record?->num_serie ?? '—') . ' · Esta acción no se puede deshacer'
             ))
             ->model(Inventario::class)
             ->record(function (array $arguments) {
@@ -197,54 +210,9 @@ class Dashboard extends BaseDashboard
         // 4. Materiales con Stock Bajo (Usa el scope derivado)
         $materialesStockBajoCount = Material::stockBajo()->count();
 
-        // Opciones de filtros para la tabla de inventario general
-        $categoriasFiltro = ['' => 'Todas'];
-        try {
-            $categoriasFiltro += \App\Models\TipoMaterial::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
-        } catch (\Throwable $e) {}
-
-        $areasFiltro = ['' => 'Todas'];
-        try {
-            $areasFiltro += \App\Models\Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
-        } catch (\Throwable $e) {}
-
-        // 5. Inventarios (con filtros aplicados dinámicamente)
-        $invQuery = Inventario::with(['material.marca', 'material.tipo', 'proveedor', 'usuario']);
-
-        if (filled($this->tableColumnSearches['num_serie'] ?? null)) {
-            $invQuery->where('num_serie', 'like', '%' . trim($this->tableColumnSearches['num_serie']) . '%');
-        }
-        if (filled($this->tableColumnSearches['material_nombre'] ?? null)) {
-            $invQuery->whereHas('material', fn ($q) => $q->where('nombre', 'like', '%' . trim($this->tableColumnSearches['material_nombre']) . '%'));
-        }
-        if (filled($this->tableColumnSearches['material_tipo_nombre'] ?? null)) {
-            $invQuery->whereHas('material.tipo', fn ($q) => $q->where('nombre', trim($this->tableColumnSearches['material_tipo_nombre'])));
-        }
-        if (filled($this->tableColumnSearches['estado'] ?? null)) {
-            $invQuery->where('estado', $this->tableColumnSearches['estado']);
-        }
-        if (filled($this->tableColumnSearches['ubicacion_fisica'] ?? null)) {
-            $invQuery->where('ubicacion_fisica', 'like', '%' . trim($this->tableColumnSearches['ubicacion_fisica']) . '%');
-        }
-
-        if (filled($this->tableColumnSearches['busqueda'] ?? null)) {
-            $term = '%' . trim($this->tableColumnSearches['busqueda']) . '%';
-            $invQuery->where(function ($q) use ($term) {
-                $q->where('num_serie', 'like', $term)
-                    ->orWhere('ubicacion_fisica', 'like', $term)
-                    ->orWhere('mac_address', 'like', $term)
-                    ->orWhere('ip_address', 'like', $term)
-                    ->orWhereHas('material', fn ($m) => $m->where('nombre', 'like', $term)
-                        ->orWhereHas('marca', fn ($b) => $b->where('nombre', 'like', $term)));
-            });
-        }
-        if (filled($this->tableColumnSearches['fecha_desde'] ?? null)) {
-            $invQuery->whereDate('fecha_registro', '>=', $this->tableColumnSearches['fecha_desde']);
-        }
-        if (filled($this->tableColumnSearches['fecha_hasta'] ?? null)) {
-            $invQuery->whereDate('fecha_registro', '<=', $this->tableColumnSearches['fecha_hasta']);
-        }
-        $inventariosCompletos = $invQuery->latest('created_at')->take(50)->get();
+        // 5. Opciones de filtros y registros filtrados
+        [$categoriasFiltro, $areasFiltro] = InventarioResource::obtenerOpcionesFiltrosDashboard();
+        $inventariosCompletos = InventarioResource::obtenerInventariosDashboard($this->tableColumnSearches);
 
         return [
             'totalActivos' => $totalActivos,
@@ -261,33 +229,7 @@ class Dashboard extends BaseDashboard
             'categoriasFiltro' => $categoriasFiltro,
             'areasFiltro' => $areasFiltro,
             'inventariosCompletos' => $inventariosCompletos,
-            'categoriasTop' => (function () {
-                $todasCategorias = Inventario::query()
-                    ->join('material', 'inventario.id_producto', '=', 'material.id_producto')
-                    ->leftJoin('tipo_material', 'material.id_tipodematerial', '=', 'tipo_material.id_tipodematerial')
-                    ->selectRaw("COALESCE(tipo_material.nombre, 'General') as cat, count(*) as total")
-                    ->groupBy('cat')
-                    ->orderByDesc('total')
-                    ->pluck('total', 'cat')
-                    ->toArray();
-
-                $top = [];
-                $otras = 0;
-                $idx = 0;
-                foreach ($todasCategorias as $catNom => $catCant) {
-                    if ($idx < 8) {
-                        $top[$catNom] = $catCant;
-                    } else {
-                        $otras += $catCant;
-                    }
-                    $idx++;
-                }
-                if ($otras > 0) {
-                    $top['Otras categorías'] = $otras;
-                }
-
-                return $top;
-            })(),
+            'categoriasTop' => InventarioResource::obtenerCategoriasTop(),
         ];
     }
 }

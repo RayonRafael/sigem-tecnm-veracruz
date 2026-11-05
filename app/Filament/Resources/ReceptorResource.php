@@ -15,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ReceptorResource extends Resource
 {
@@ -36,9 +37,26 @@ class ReceptorResource extends Resource
 
     protected static ?int $navigationSort = 7;
 
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['area.departamento']);
+    }
+
     public static function getGloballySearchableAttributes(): array
     {
-        return ['nombre', 'apellido_paterno', 'apellido_materno', 'cargo', 'email'];
+        return ['nombre', 'apellido_paterno', 'apellido_materno', 'tipo', 'num_control', 'cargo', 'email'];
+    }
+
+    public static function getTiposOptions(): array
+    {
+        return [
+            'Docente' => 'Docente',
+            'Administrativo' => 'Administrativo',
+            'Auxiliar' => 'Auxiliar',
+            'Alumno' => 'Alumno',
+            'Externo' => 'Externo',
+        ];
     }
 
     public static function form(Form $form): Form
@@ -66,12 +84,24 @@ class ReceptorResource extends Resource
                             ->required()
                             ->prefixIcon('heroicon-m-user')
                             ->maxLength(100),
+                        Forms\Components\Select::make('tipo')
+                            ->label('Tipo')
+                            ->placeholder('Selecciona el tipo...')
+                            ->options(self::getTiposOptions())
+                            ->nullable()
+                            ->prefixIcon('heroicon-m-identification'),
+                        Forms\Components\TextInput::make('num_control')
+                            ->label('No. Control / Empleado')
+                            ->placeholder('Ej. 20240001')
+                            ->maxLength(30)
+                            ->nullable()
+                            ->prefixIcon('heroicon-m-hashtag'),
                         Forms\Components\TextInput::make('cargo')
                             ->label('Cargo / Puesto')
                             ->placeholder('Ej. Ing. de Sistemas')
                             ->maxLength(100)
                             ->prefixIcon('heroicon-m-briefcase'),
-                        Forms\Components\TextInput::make('email')->label('Correo electrónico')
+                        Forms\Components\TextInput::make('email')
                             ->label('Correo electrónico')
                             ->placeholder('Ej. receptor@veracruz.tecnm.mx')
                             ->email()
@@ -85,14 +115,44 @@ class ReceptorResource extends Resource
                             ->prefixIcon('heroicon-m-device-phone-mobile')
                             ->maxLength(20)
                             ->default(null),
-                        Forms\Components\Select::make('id_area')->placeholder('Selecciona...')
+                        Forms\Components\Select::make('departamento_id_virtual')
+                            ->label('Departamento')
+                            ->placeholder('Selecciona el departamento...')
+                            ->options(fn () => \App\Models\Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento'))
+                            ->searchable()
+                            ->preload()
+                            ->live()
+                            ->dehydrated(false)
+                            ->prefixIcon('heroicon-m-building-office-2')
+                            ->afterStateHydrated(function (Forms\Components\Select $component, ?Receptor $record): void {
+                                if ($record && $record->id_area) {
+                                    $deptId = $record->area?->id_departamento
+                                        ?? \App\Models\Area::where('id_area', $record->id_area)->value('id_departamento');
+                                    if ($deptId) {
+                                        $component->state($deptId);
+                                    }
+                                }
+                            })
+                            ->afterStateUpdated(fn (Forms\Set $set) => $set('id_area', null)),
+                        Forms\Components\Select::make('id_area')
                             ->label('Área')
-                            ->relationship('area', 'nombre')
+                            ->placeholder(fn (Forms\Get $get): string => $get('departamento_id_virtual')
+                                ? 'Selecciona el área...'
+                                : 'Selecciona...')
+                            ->options(function (Forms\Get $get): array {
+                                $deptoId = $get('departamento_id_virtual');
+                                if ($deptoId) {
+                                    return \App\Models\Area::where('id_departamento', $deptoId)
+                                        ->orderBy('nombre')
+                                        ->pluck('nombre', 'id_area')
+                                        ->toArray();
+                                }
+                                return \App\Models\Area::orderBy('nombre')->pluck('nombre', 'id_area')->toArray();
+                            })
                             ->required()
                             ->searchable()
                             ->preload()
                             ->prefixIcon('heroicon-m-building-office')
-                            ->columnSpanFull()
                             ->createOptionForm([
                                 Forms\Components\TextInput::make('nombre')
                                     ->label('Nombre del área')
@@ -105,7 +165,11 @@ class ReceptorResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->required(),
-                            ]),
+                            ])
+                            ->createOptionUsing(function (array $data): int {
+                                $area = \App\Models\Area::create($data);
+                                return $area->id_area;
+                            }),
                     ])->columns(2),
             ]);
     }
@@ -118,8 +182,33 @@ class ReceptorResource extends Resource
                     ->label('Nombre')
                     ->description(fn (Receptor $record): ?string => $record->cargo)
                     ->searchable(isIndividual: true),
+                Tables\Columns\TextColumn::make('tipo')
+                    ->label('Tipo')
+                    ->badge()
+                    ->color(fn (?string $state): string => match ($state) {
+                        'Docente' => 'info',
+                        'Administrativo' => 'primary',
+                        'Auxiliar' => 'warning',
+                        'Alumno' => 'success',
+                        'Externo' => 'gray',
+                        default => 'gray',
+                    })
+                    ->placeholder('—')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('num_control')
+                    ->label('No. Control')
+                    ->fontFamily('mono')
+                    ->placeholder('—')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('cargo')->wrap(false)->limit(30)->grow(false)
                     ->label('Cargo / Puesto')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('area.departamento.nombre')->wrap(false)->limit(30)->grow(false)
+                    ->label('Departamento')
+                    ->placeholder('—')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('apellido_paterno')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
@@ -217,6 +306,17 @@ class ReceptorResource extends Resource
                                             ->label('Apellido materno')
                                             ->icon('heroicon-m-user')
                                             ->placeholder('Por capturar'),
+                                        TextEntry::make('tipo')
+                                            ->label('Tipo')
+                                            ->badge()
+                                            ->color('info')
+                                            ->icon('heroicon-m-identification')
+                                            ->placeholder('—'),
+                                        TextEntry::make('num_control')
+                                            ->label('No. Control')
+                                            ->fontFamily('mono')
+                                            ->icon('heroicon-m-hashtag')
+                                            ->placeholder('—'),
                                         TextEntry::make('cargo')
                                             ->label('Cargo')
                                             ->icon('heroicon-m-briefcase')
@@ -228,8 +328,7 @@ class ReceptorResource extends Resource
                                         TextEntry::make('email')
                                             ->label('Correo')
                                             ->icon('heroicon-m-envelope')
-                                            ->placeholder('Por capturar')
-                                            ->columnSpanFull(),
+                                            ->placeholder('Por capturar'),
                                     ])
                                     ->columns(2),
 
@@ -238,13 +337,11 @@ class ReceptorResource extends Resource
                                         TextEntry::make('area.departamento.nombre')
                                             ->label('Departamento')
                                             ->icon('heroicon-m-building-office')
-                                            ->placeholder('Por capturar')
-                                            ->columnSpanFull(),
+                                            ->placeholder('—'),
                                         TextEntry::make('area.nombre')
                                             ->label('Área')
                                             ->icon('heroicon-m-map-pin')
-                                            ->placeholder('Por capturar')
-                                            ->columnSpanFull(),
+                                            ->placeholder('—'),
                                     ])
                                     ->columns(2),
                             ]),

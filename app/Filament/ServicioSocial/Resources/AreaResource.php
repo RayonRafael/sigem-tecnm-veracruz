@@ -4,13 +4,13 @@ namespace App\Filament\ServicioSocial\Resources;
 
 use App\Filament\ServicioSocial\Resources\AreaResource\Pages;
 use App\Models\Area;
-use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class AreaResource extends Resource
@@ -30,6 +30,11 @@ class AreaResource extends Resource
     protected static ?string $modelLabel = 'área';
 
     protected static ?string $pluralModelLabel = 'áreas';
+
+    public static function getEloquentQuery(): Builder
+    {
+        return \App\Filament\Resources\AreaResource::getEloquentQuery();
+    }
 
     public static function canCreate(): bool
     {
@@ -53,26 +58,7 @@ class AreaResource extends Resource
 
     public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('Datos del área')
-                    ->icon('heroicon-m-map-pin')
-                    ->schema([
-                        Forms\Components\TextInput::make('nombre')
-                            ->label('Nombre del área')
-                            ->required()
-                            ->prefixIcon('heroicon-m-tag')
-                            ->maxLength(100),
-                        Forms\Components\Select::make('id_departamento')
-                            ->label('Departamento')
-                            ->relationship('departamento', 'nombre')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->prefixIcon('heroicon-m-building-office-2')
-                            ->columnSpanFull(),
-                    ])->columns(2),
-            ]);
+        return \App\Filament\Resources\AreaResource::form($form);
     }
 
     public static function table(Table $table): Table
