@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class MarcaMaterialResource extends Resource
 {
+    use \App\Filament\Concerns\ConCatalogoSoloLectura;
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = MarcaMaterial::class;
@@ -29,26 +31,6 @@ class MarcaMaterialResource extends Resource
     protected static ?string $modelLabel = 'marca';
 
     protected static ?string $pluralModelLabel = 'marcas';
-
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        return false;
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        return false;
-    }
-
-    public static function hasRecordTitle(): bool
-    {
-        return false;
-    }
 
     public static function form(Form $form): Form
     {

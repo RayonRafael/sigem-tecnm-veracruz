@@ -520,7 +520,7 @@ class ConfiguracionPage extends Page
                 if ($this->filtroEstadoUsuario !== '') {
                     $usuariosQ->where('activo', (bool) $this->filtroEstadoUsuario);
                 }
-                $usuarios = $usuariosQ->limit(25)->get();
+                $usuarios = $usuariosQ->with('roles')->limit(25)->get();
                 foreach ($usuarios as $u) {
                     $nombreCompleto = trim("{$u->name} {$u->apellido_paterno} {$u->apellido_materno}");
                     $rol = $u->roles->first()?->name ?? $u->tipo_usuario ?? 'Sin rol';

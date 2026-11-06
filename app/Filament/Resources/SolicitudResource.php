@@ -214,10 +214,10 @@ class SolicitudResource extends Resource
                     ->modalHeading(fn (?Solicitud $record) => $record?->id_solicitud ? 'FOLIO-' . str_pad($record->id_solicitud, 5, '0', STR_PAD_LEFT) : 'Detalle de solicitud')
                     ->modalDescription(fn (?Solicitud $record) => new \Illuminate\Support\HtmlString(
                         'Solicitud de <b>' . e(match ($record?->tipo_movimiento) {
-                            'Asignacion Permanente', 'Salida' => 'Salida',
-                            'Asignacion Temporal', 'Entrada' => 'Entrada',
-                            'Renta Externa', 'Traslado' => 'Traslado',
-                            default => $record?->tipo_movimiento ?? 'Salida',
+                            'Asignacion Permanente' => 'Asignación Permanente',
+                            'Asignacion Temporal' => 'Asignación Temporal',
+                            'Renta Externa' => 'Renta Externa',
+                            default => $record?->tipo_movimiento ?? 'Solicitud',
                         }) . '</b> · ' . e($record?->fecha_solicitud?->format('d/m/Y') ?? '—')
                     ))
                     ->modalCancelActionLabel('Cerrar')

@@ -87,14 +87,4 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(Solicitud::class, 'autorizado_por', 'id');
     }
-
-    public function mantenimientosSolicitados()
-    {
-        return $this->hasMany(Mantenimiento::class, 'id_usuario_solicita', 'id');
-    }
-
-    public function historialEstados()
-    {
-        return $this->hasMany(HistorialEstado::class, 'id_usuario', 'id');
-    }
 }

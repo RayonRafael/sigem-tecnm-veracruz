@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoInventario;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -49,7 +51,11 @@ class Inventario extends Model
         'ram', 'disco', 'procesador', 'mac_address', 'ip_address',
         'tipo_equipo', 'edificio_id', 'departamento_id', 'area_id', 'salon_id',
         'codigo', 'estacion', 'tipo_impresora', 'sistema_operativo', 'modelo', 'especificacion_texto',
+        'motivo_baja', 'observaciones_baja', 'id_usuario_baja', 'estado_previo_baja',
+        'estado_previo_cambio', 'ubicacion_solicitada',
     ];
+
+    public bool $skipHistorialObserver = false;
 
     // Convertir fechas automáticamente a objetos Carbon
     protected $casts = [
@@ -57,13 +63,14 @@ class Inventario extends Model
         'fecha_asignacion' => 'date',
         'fecha_cambio_area' => 'date',
         'fecha_factura' => 'date',
-        'fecha_baja' => 'date',
+        'fecha_baja' => 'datetime',
         'fecha_inicio_renta' => 'date',
         'fecha_fin_renta' => 'date',
         'garantia_fecha_fin' => 'date',
         'aprobado' => 'boolean',
         'fecha_aprobacion' => 'datetime',
         'especificaciones' => 'array',
+        'ubicacion_solicitada' => 'array',
     ];
 
     public function material()
@@ -91,6 +98,11 @@ class Inventario extends Model
         return $this->belongsTo(User::class, 'id_usuario', 'id');
     }
 
+    public function usuarioBaja()
+    {
+        return $this->belongsTo(User::class, 'id_usuario_baja', 'id');
+    }
+
     public function proveedor()
     {
         return $this->belongsTo(Proveedor::class, 'id_proveedor', 'id_proveedor');
@@ -101,11 +113,6 @@ class Inventario extends Model
         return $this->belongsTo(User::class, 'aprobado_por', 'id');
     }
 
-    public function detallesSolicitud()
-    {
-        return $this->hasMany(DetalleSolicitud::class, 'id_inventario', 'id_inventario');
-    }
-
     public function mantenimientos()
     {
         return $this->hasMany(Mantenimiento::class, 'id_inventario', 'id_inventario');
@@ -114,32 +121,6 @@ class Inventario extends Model
     public function historial()
     {
         return $this->hasMany(HistorialEstado::class, 'id_inventario', 'id_inventario');
-    }
-
-    // Scopes de estado
-    public function scopeDisponibles($query)
-    {
-        return $query->where('estado', 'Disponible');
-    }
-
-    public function scopeAsignados($query)
-    {
-        return $query->where('estado', 'Asignado');
-    }
-
-    public function scopeReasignados($query)
-    {
-        return $query->where('estado', 'Reasignado');
-    }
-
-    public function scopeEnMantenimiento($query)
-    {
-        return $query->where('estado', 'En Mantenimiento');
-    }
-
-    public function scopeDanados($query)
-    {
-        return $query->whereIn('estado', ['Dañado', 'Baja']);
     }
 
     /**
@@ -164,24 +145,17 @@ class Inventario extends Model
 
         $prefix = "{$marca}-{$modelo}";
 
-        // Buscar el último registro que coincida con el prefijo
-        $ultimoCodigo = static::where('codigo', 'LIKE', "{$prefix}-%")
-            ->orderByRaw('LENGTH(codigo) DESC, codigo DESC')
-            ->value('codigo');
+        // Obtener el consecutivo máximo para este prefijo en una sola consulta
+        $codigosExistentes = static::where('codigo', 'LIKE', "{$prefix}-%")
+            ->pluck('codigo')
+            ->map(function ($cod) {
+                return preg_match('/-(\d+)$/', $cod, $matches) ? (int) $matches[1] : 0;
+            });
 
-        $consecutivo = 1;
-        if ($ultimoCodigo && preg_match('/-(\d+)$/', $ultimoCodigo, $matches)) {
-            $consecutivo = ((int) $matches[1]) + 1;
-        }
+        $maxConsecutivo = $codigosExistentes->max() ?? 0;
+        $consecutivo = $maxConsecutivo + 1;
 
-        $codigoGenerado = sprintf('%s-%03d', $prefix, $consecutivo);
-
-        while (static::where('codigo', $codigoGenerado)->exists()) {
-            $consecutivo++;
-            $codigoGenerado = sprintf('%s-%03d', $prefix, $consecutivo);
-        }
-
-        return $codigoGenerado;
+        return sprintf('%s-%03d', $prefix, $consecutivo);
     }
 
     // Accessors / Mutators para campos dinámicos en especificaciones (JSON) y columnas físicas
@@ -292,5 +266,287 @@ class Inventario extends Model
             unset($specs['salon_id']);
         }
         $this->especificaciones = $specs;
+    }
+
+    public function darBajaDirecta(string $motivo, string $observaciones, ?int $usuarioId = null): void
+    {
+        DB::transaction(function () use ($motivo, $observaciones, $usuarioId) {
+    $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
+            $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
+
+            $this->update([
+                'estado' => EstadoInventario::DadoDeBaja->value,
+                'fecha_baja' => now(),
+                'motivo_baja' => $motivo,
+                'observaciones_baja' => $observaciones,
+                'id_usuario_baja' => $userId,
+            ]);
+
+            HistorialEstado::create([
+                'id_inventario' => $this->id_inventario,
+                'id_usuario' => $userId,
+                'estado_anterior' => $estadoAnterior,
+                'estado_nuevo' => EstadoInventario::DadoDeBaja->value,
+                'motivo_cambio' => "Baja directa: {$motivo}",
+                'ubicacion_fisica' => $this->ubicacion_fisica,
+                'fecha_cambio' => now(),
+            ]);
+        });
+    }
+
+    public function solicitarBaja(string $motivo, string $observaciones, ?int $usuarioId = null): void
+    {
+        DB::transaction(function () use ($motivo, $observaciones, $usuarioId) {
+    $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
+            $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
+
+            $this->update([
+                'estado' => EstadoInventario::SolicitudDeBaja->value,
+                'estado_previo_baja' => $estadoAnterior,
+                'motivo_baja' => $motivo,
+                'observaciones_baja' => $observaciones,
+                'id_usuario_baja' => $userId,
+            ]);
+
+            HistorialEstado::create([
+                'id_inventario' => $this->id_inventario,
+                'id_usuario' => $userId,
+                'estado_anterior' => $estadoAnterior,
+                'estado_nuevo' => EstadoInventario::SolicitudDeBaja->value,
+                'motivo_cambio' => "Solicitud de baja: {$motivo}",
+                'ubicacion_fisica' => $this->ubicacion_fisica,
+                'fecha_cambio' => now(),
+            ]);
+        });
+    }
+
+    public function aprobarBaja(?int $usuarioId = null): void
+    {
+        DB::transaction(function () use ($usuarioId) {
+    $userId = $usuarioId ?? auth()->id() ?? 1;
+            $motivo = $this->motivo_baja ?? 'Sin motivo especificado';
+
+            $this->update([
+                'estado' => EstadoInventario::DadoDeBaja->value,
+                'fecha_baja' => now(),
+                'id_usuario_baja' => $userId,
+            ]);
+
+            HistorialEstado::create([
+                'id_inventario' => $this->id_inventario,
+                'id_usuario' => $userId,
+                'estado_anterior' => EstadoInventario::SolicitudDeBaja->value,
+                'estado_nuevo' => EstadoInventario::DadoDeBaja->value,
+                'motivo_cambio' => "Baja aprobada: {$motivo}",
+                'ubicacion_fisica' => $this->ubicacion_fisica,
+                'fecha_cambio' => now(),
+            ]);
+        });
+    }
+
+    public function rechazarBaja(?string $observaciones = null, ?int $usuarioId = null): void
+    {
+        DB::transaction(function () use ($observaciones, $usuarioId) {
+    $userId = $usuarioId ?? auth()->id() ?? 1;
+            $estadoRestaurar = $this->estado_previo_baja ?? EstadoInventario::Disponible->value;
+            $obsTexto = !empty($observaciones) ? $observaciones : ($this->observaciones_baja ?? 'Sin observaciones');
+
+            $this->update([
+                'estado' => $estadoRestaurar,
+                'estado_previo_baja' => null,
+                'motivo_baja' => null,
+                'observaciones_baja' => null,
+                'id_usuario_baja' => null,
+                'fecha_baja' => null,
+            ]);
+
+            HistorialEstado::create([
+                'id_inventario' => $this->id_inventario,
+                'id_usuario' => $userId,
+                'estado_anterior' => EstadoInventario::SolicitudDeBaja->value,
+                'estado_nuevo' => $estadoRestaurar,
+                'motivo_cambio' => "Baja rechazada: {$obsTexto}",
+                'ubicacion_fisica' => $this->ubicacion_fisica,
+                'fecha_cambio' => now(),
+            ]);
+        });
+    }
+
+    public function reactivar(?int $usuarioId = null): void
+    {
+        DB::transaction(function () use ($usuarioId) {
+    $userId = $usuarioId ?? auth()->id() ?? 1;
+
+            $this->update([
+                'estado' => EstadoInventario::Disponible->value,
+                'fecha_baja' => null,
+                'motivo_baja' => null,
+                'observaciones_baja' => null,
+                'id_usuario_baja' => null,
+                'estado_previo_baja' => null,
+            ]);
+
+            HistorialEstado::create([
+                'id_inventario' => $this->id_inventario,
+                'id_usuario' => $userId,
+                'estado_anterior' => EstadoInventario::DadoDeBaja->value,
+                'estado_nuevo' => EstadoInventario::Disponible->value,
+                'motivo_cambio' => 'Reactivación del equipo',
+                'ubicacion_fisica' => $this->ubicacion_fisica,
+                'fecha_cambio' => now(),
+            ]);
+        });
+    }
+
+    public function cambiarAreaDirecto($departamentoId, $areaId, $salonId = null, $estacion = null, ?string $motivo = null, ?int $usuarioId = null): void
+    {
+        DB::transaction(function () use ($departamentoId, $areaId, $salonId, $estacion, $motivo, $usuarioId) {
+            $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
+            $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
+
+            if (!empty($salonId) && !is_numeric($salonId) && is_string($salonId)) {
+                $salonObj = Salon::firstOrCreate(['nombre' => $salonId, 'area_id' => $areaId]);
+                $salonId = $salonObj->id;
+            }
+
+            $ubicacionAnterior = $this->ubicacion_fisica
+                ?: (\App\Support\UbicacionHelper::construir($this->departamento_id, $this->area_id, $this->salon_id, $this->estacion) ?: 'Sin ubicación previa');
+
+            $ubicacionNueva = \App\Support\UbicacionHelper::construir($departamentoId, $areaId, $salonId, $estacion);
+
+            $this->skipHistorialObserver = true;
+
+            $this->departamento_id = $departamentoId;
+            $this->area_id = $areaId;
+            $this->salon_id = $salonId;
+            $this->estacion = $estacion;
+            $this->fecha_cambio_area = now();
+            if (!empty($ubicacionNueva)) {
+                $this->ubicacion_fisica = substr($ubicacionNueva, 0, 150);
+            }
+            $this->save();
+
+            $textoAnterior = $ubicacionAnterior ?: 'Sin ubicación previa';
+            $textoNuevo = $this->ubicacion_fisica ?: ($ubicacionNueva ?: 'Sin ubicación asignada');
+            $motivoTexto = "Cambio de área: {$textoAnterior} → {$textoNuevo}";
+
+            HistorialEstado::create([
+                'id_inventario' => $this->id_inventario,
+                'id_usuario' => $userId,
+                'estado_anterior' => $estadoAnterior,
+                'estado_nuevo' => $this->estado ?? EstadoInventario::Disponible->value,
+                'motivo_cambio' => $motivoTexto,
+                'ubicacion_fisica' => $this->ubicacion_fisica,
+                'fecha_cambio' => now(),
+            ]);
+        });
+    }
+
+    public function solicitarCambioArea($departamentoId, $areaId, $salonId = null, $estacion = null, ?string $motivo = null, ?int $usuarioId = null): void
+    {
+        DB::transaction(function () use ($departamentoId, $areaId, $salonId, $estacion, $motivo, $usuarioId) {
+            $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
+            $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
+
+            if (!empty($salonId) && !is_numeric($salonId) && is_string($salonId)) {
+                $salonObj = Salon::firstOrCreate(['nombre' => $salonId, 'area_id' => $areaId]);
+                $salonId = $salonObj->id;
+            }
+
+            $solicitudData = [
+                'departamento_id' => $departamentoId,
+                'area_id' => $areaId,
+                'salon_id' => $salonId,
+                'estacion' => $estacion,
+                'motivo' => $motivo,
+            ];
+
+            $this->update([
+                'estado' => EstadoInventario::CambioDeArea->value,
+                'estado_previo_cambio' => $estadoAnterior,
+                'ubicacion_solicitada' => $solicitudData,
+            ]);
+
+            $motivoHistorial = filled($motivo) ? "Solicitud de cambio de área: {$motivo}" : "Solicitud de cambio de área";
+
+            HistorialEstado::create([
+                'id_inventario' => $this->id_inventario,
+                'id_usuario' => $userId,
+                'estado_anterior' => $estadoAnterior,
+                'estado_nuevo' => EstadoInventario::CambioDeArea->value,
+                'motivo_cambio' => $motivoHistorial,
+                'ubicacion_fisica' => $this->ubicacion_fisica,
+                'fecha_cambio' => now(),
+            ]);
+        });
+    }
+
+    public function aprobarCambioArea(?int $usuarioId = null): void
+    {
+        DB::transaction(function () use ($usuarioId) {
+            $userId = $usuarioId ?? auth()->id() ?? 1;
+            $solicitud = $this->ubicacion_solicitada ?? [];
+            $estadoPrevio = $this->estado_previo_cambio ?? EstadoInventario::Disponible->value;
+
+            $depto = $solicitud['departamento_id'] ?? $this->departamento_id;
+            $area = $solicitud['area_id'] ?? $this->area_id;
+            $salon = $solicitud['salon_id'] ?? null;
+            $estacion = $solicitud['estacion'] ?? null;
+
+            $this->skipHistorialObserver = true;
+
+            $this->departamento_id = $depto;
+            $this->area_id = $area;
+            $this->salon_id = $salon;
+            $this->estacion = $estacion;
+            $this->estado = $estadoPrevio;
+            $this->fecha_cambio_area = now();
+            $this->ubicacion_solicitada = null;
+            $this->estado_previo_cambio = null;
+
+            $ubicacionNueva = \App\Support\UbicacionHelper::construir($depto, $area, $salon, $estacion);
+            if (!empty($ubicacionNueva)) {
+                $this->ubicacion_fisica = substr($ubicacionNueva, 0, 150);
+            }
+            $this->save();
+
+            $ubicacionTexto = $this->ubicacion_fisica ?: ($ubicacionNueva ?: 'Sin ubicación asignada');
+
+            HistorialEstado::create([
+                'id_inventario' => $this->id_inventario,
+                'id_usuario' => $userId,
+                'estado_anterior' => EstadoInventario::CambioDeArea->value,
+                'estado_nuevo' => $estadoPrevio,
+                'motivo_cambio' => "Cambio de área aprobado: {$ubicacionTexto}",
+                'ubicacion_fisica' => $this->ubicacion_fisica,
+                'fecha_cambio' => now(),
+            ]);
+        });
+    }
+
+    public function rechazarCambioArea(?string $motivoRechazo = null, ?int $usuarioId = null): void
+    {
+        DB::transaction(function () use ($motivoRechazo, $usuarioId) {
+    $userId = $usuarioId ?? auth()->id() ?? 1;
+            $estadoPrevio = $this->estado_previo_cambio ?? EstadoInventario::Disponible->value;
+
+            $this->update([
+                'estado' => $estadoPrevio,
+                'ubicacion_solicitada' => null,
+                'estado_previo_cambio' => null,
+            ]);
+
+            $motivoTexto = filled($motivoRechazo) ? "Cambio de área rechazado: {$motivoRechazo}" : "Cambio de área rechazado";
+
+            HistorialEstado::create([
+                'id_inventario' => $this->id_inventario,
+                'id_usuario' => $userId,
+                'estado_anterior' => EstadoInventario::CambioDeArea->value,
+                'estado_nuevo' => $estadoPrevio,
+                'motivo_cambio' => $motivoTexto,
+                'ubicacion_fisica' => $this->ubicacion_fisica,
+                'fecha_cambio' => now(),
+            ]);
+        });
     }
 }

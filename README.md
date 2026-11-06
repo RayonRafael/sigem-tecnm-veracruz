@@ -1,143 +1,155 @@
 # SIGEM — Sistema de Gestión de Equipos y Materiales
 
-Sistema integral para el control de inventario, gestión de préstamos, rentas y seguimiento de mantenimiento para el equipamiento del TecNM Campus Veracruz. El sistema centraliza la operación de activos y proporciona interfaces distintas para administradores y prestadores de servicio social.
+Sistema integral para el control de inventario, gestión de préstamos, rentas y seguimiento de mantenimiento para el equipamiento del **TecNM Campus Veracruz**. El sistema centraliza la operación de activos y proporciona interfaces distintas para administradores y prestadores de servicio social.
+
+- **Producción:** [https://sigem-tecnm-veracruz-1.onrender.com](https://sigem-tecnm-veracruz-1.onrender.com)
+- **Rama principal de desarrollo actual:** `diseno-v2`
+
+---
 
 ## Stack Tecnológico
 
-- **Framework:** Laravel 12
-- **Admin Panel:** Filament 3.3
-- **Roles & Permisos:** Spatie Laravel Permission
-- **Auditoría:** Spatie ActivityLog
-- **Estilos:** Tailwind CSS 4
-- **Base de Datos:** MySQL 8
+- **Framework:** Laravel 12 (PHP 8.2+)
+- **Panel Administrativo:** Filament v3.3
+- **Roles y Permisos:** Spatie Laravel Permission
+- **Auditoría y Bitácora:** Spatie ActivityLog
+- **Frontend y Diseño:** Blade + SCSS modular + Tailwind CSS
+- **Bases de Datos:** MySQL 8 (Producción) / SQLite (Desarrollo y Testing automatizado)
+- **Contenedor y Despliegue:** Docker en Render (Apache + PHP 8.4)
+
+---
 
 ## Requisitos Previos
 
-- PHP 8.2+
-- Composer
-- Node.js & npm
-- MySQL 8
+- PHP 8.2 o superior (con extensiones `pdo_mysql`, `pdo_sqlite`, `zip`, `intl`, `gd`)
+- Composer 2+
+- Node.js 18+ y npm
+- MySQL 8 o SQLite
 
-## Instalación
+---
 
-1. Clona el repositorio:
+## Instalación y Configuración Local
+
+1. **Clonar el repositorio:**
    ```bash
-   git clone [repo]
+   git clone <url-del-repositorio>
+   cd sigem-tecnm-veracruz
    ```
-2. Instala las dependencias de PHP:
+
+2. **Instalar dependencias de PHP:**
    ```bash
    composer install
    ```
-3. Copia el archivo de entorno y configura tu base de datos:
+
+3. **Configurar el entorno:**
    ```bash
    cp .env.example .env
-   ```
-4. Genera la clave de la aplicación:
-   ```bash
    php artisan key:generate
    ```
-5. Ejecuta las migraciones:
-   ```bash
-   php artisan migrate
+
+4. **Configurar la base de datos en `.env`:**
+   Para SQLite:
+   ```env
+   DB_CONNECTION=sqlite
    ```
-6. Siembra la base de datos (Roles, Permisos y Usuarios):
-   ```bash
-   php artisan db:seed
+   O para MySQL:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=sigem_db
+   DB_USERNAME=tu_usuario
+   DB_PASSWORD=tu_password
    ```
-7. Instala y compila los assets del frontend:
+
+5. **Ejecutar migraciones y sembrar base de datos:**
+   ```bash
+   php artisan migrate --seed
+   ```
+
+6. **Instalar dependencias y compilar assets:**
    ```bash
    npm install
-   npm run build
+   npm run build:css
    ```
-8. Inicia el servidor de desarrollo:
+
+7. **Iniciar servidor local:**
    ```bash
    php artisan serve
    ```
 
-## Usuarios de Prueba
+---
 
-El sistema cuenta con dos paneles separados utilizando el sistema de autenticación nativo de Filament. Inicia sesión en las siguientes URLs:
+## Suite de Pruebas Automatizadas
 
-- **Administrador:** 
-  - URL de acceso: `http://localhost:8000/admin/login`
-  - Correo: `admin@tecnm.edu.mx` 
-  - Contraseña: `admin123` 
-- **Servicio Social:** 
-  - URL de acceso: `http://localhost:8000/servicio-social/login`
-  - Correo: `servicio@tecnm.edu.mx` 
-  - Contraseña: `servicio123` 
+El proyecto cuenta con una cobertura integral de pruebas de integración y features:
+- **130 tests automatizados (441 assertions)** pasando en verde.
+- Cobertura de flujos críticos:
+  - Autenticación y aislamiento de paneles (Admin vs Servicio Social).
+  - Flujo de bajas y reactivación de inventario con historial atómico.
+  - Flujo de cambios de área (solicitud por servicio social, aprobación/rechazo por administrador).
+  - Registro masivo (`MultiRegistro`) con generación única de códigos e integridad transaccional.
+  - Autorización y ciclo de vida de Solicitudes y Mantenimientos.
+  - Reportes tabulares y exportación a Excel (.xlsx) y CSV.
+  - Paleta de comandos con tolerancia a acentos y navegación rápida.
+  - Catálogos en modo solo lectura para roles restringidos.
+
+Para ejecutar toda la suite de pruebas:
+```bash
+php artisan test
+```
+
+---
+
+## Usuarios de Prueba (Seeders)
+
+El sistema cuenta con dos paneles aislados con autenticación nativa de Filament:
+
+| Rol | URL de Acceso | Correo | Contraseña |
+|---|---|---|---|
+| **Administrador** | `/admin/login` | `admin@tecnm.edu.mx` | `admin123` |
+| **Servicio Social** | `/servicio-social/login` | `servicio@tecnm.edu.mx` | `servicio123` |
+
+---
 
 ## Estructura del Proyecto
 
 | Directorio | Descripción |
 |---|---|
-| `app/Models/` | Modelos Eloquent. Los modelos de **catálogos utilizan Soft Deletes** para evitar pérdida de registros. |
-| `app/Enums/` | Contiene `RoleEnum` que centraliza los nombres de roles y permisos (evita *magic strings*). |
-| `app/Policies/` | Políticas estrictas de acceso que limitan acciones según permisos de Spatie. |
-| `app/Filament/Resources/` | Resources del panel Admin (Acceso total). |
-| `app/Filament/ServicioSocial/Resources/` | Resources del panel Servicio Social. |
-| `app/Observers/` | Observers puros para lógica de negocio (control de inventario, sincronización de estados). |
-| `resources/views/` | Vistas Blade para landing page y hooks visuales de autenticación. |
-| `database/seeders/` | Seeders responsables de cargar roles, permisos iniciales y usuarios de prueba. |
+| `app/Models/` | Modelos Eloquent con transacciones atómicas de base de datos (`DB::transaction`). |
+| `app/Enums/` | `RoleEnum`, `EstadoInventario`, `EstadoSolicitud` para evitar valores mágicos. |
+| `app/Policies/` | Políticas de acceso basadas en permisos granulares de Spatie. |
+| `app/Filament/Resources/` | Resources y Schemas modulares del Panel Admin (acceso total). |
+| `app/Filament/ServicioSocial/` | Resources y páginas del Panel Servicio Social (supervisión y lectura). |
+| `app/Filament/Concerns/` | Traits compartidos (`ConSlideOver`, `ConModalesBajaCambio`, `ConCatalogoSoloLectura`). |
+| `app/Observers/` | Observers de inventario y mantenimientos con control atómico de stock y estados. |
+| `app/Support/` | Helpers desacoplados (`UbicacionHelper`, `EstadoBadgeHelper`, `SigemExcelExporter`). |
+| `resources/views/` | Vistas Blade para Landing Page (optimizada WebP y Google Fonts asíncrono) y errores. |
+| `public/css/` | SCSS modular (`sigem-theme.scss`) compilado a `sigem-theme.css`. |
+| `database/migrations/` | Migraciones con índices de optimización (`tipo_propiedad`, `id_usuario_baja`, compuestos). |
 
-## Módulos del Sistema
+---
 
-### Panel Admin (Acceso Total)
-1. Inventario
-2. Solicitudes (Préstamos/Rentas)
-3. Mantenimiento
-4. Departamentos
-5. Áreas
-6. Materiales
-7. Marcas de Material
-8. Tipos de Material
-9. Unidades de Medida
-10. Proveedores
-11. Receptores
-12. Usuarios
+## Roles y Autorización (Spatie)
 
-*(La bitácora de sistema ahora se maneja invisiblemente en todo el proyecto a través de Spatie ActivityLog).*
+- Verificaciones basadas en permisos específicos (`hasPermissionTo()`) en combinación con `RoleEnum`.
+- **Administrador:** Cuenta con permisos totales y el permiso global de panel `access_admin_panel`. Autoriza solicitudes, aprueba bajas, traslados y administra usuarios.
+- **Servicio Social:** Cuenta con `access_servicio_social_panel`. Permisos enfocados en registro rápido, visualización controlada y solicitud de bajas/traslados sujetas a aprobación.
+- Toda la actividad administrativa y operativa se registra de forma transparente mediante **Spatie ActivityLog**.
 
-### Panel Servicio Social (Operaciones con Supervisión)
-1. Inventario
-2. Solicitudes
-3. Mantenimiento
-4. Materiales
-5. Receptores
-6. Marcas de Material
-7. Tipos de Material
-8. Unidades de Medida
-9. Áreas
+---
 
-## Roles y Permisos (Spatie)
+## Despliegue en Producción (Render)
 
-La autorización del sistema utiliza las mejores prácticas de **Spatie Permission**:
-- Las verificaciones en el código se realizan contra permisos específicos (usando `hasPermissionTo()`) en conjunto con un `RoleEnum`.
-- **Administrador:** Cuenta con permisos totales y el permiso global de panel `access_admin_panel`. Autoriza solicitudes y edita históricos libremente.
-- **Servicio Social:** Cuenta con un subconjunto de permisos y el permiso global `access_servicio_social_panel`. Sus permisos se enfocan en registro rápido y visualización. Su actividad es auditada por `Spatie ActivityLog`.
-
-## Cambios importantes para el equipo
-
-### Nuevas URLs de acceso
-- Administración: /admin/login
-- Servicio Social: /servicio-social/login
-- La URL unificada /login ya no existe
-
-### Convención para nuevos módulos
-Si creas un módulo nuevo:
-1. Crea el permiso en database/seeders/RolesAndPermissionsSeeder.php
-2. Agrega el permiso al enum app/Enums/RoleEnum.php
-3. Usa hasPermissionTo() en Policies, NO hasRole()
-4. Asigna el permiso al rol correspondiente
-
-### Lógica de inventario
-El control de stock (increment/decrement) vive centralizado en los Observers:
-- app/Observers/InventarioObserver.php
-- app/Observers/SolicitudObserver.php
-
-NO hagas restas o sumas manuales de stock en controladores o Resources. Los Observers se encargan automáticamente.
-
-### Deploy en Railway
-- Pre-deploy: migrate + filament cache + icons cache
-- APP_DEBUG: false en producción
-- Seeder: php artisan db:seed --class=RolesAndPermissionsSeeder
+El despliegue está configurado mediante `Dockerfile` sobre Apache + PHP 8.4:
+- Extensiones instaladas: `pdo_sqlite`, `pdo_mysql`, `zip`, `intl`.
+- Cachés generadas en tiempo de arranque (runtime CMD):
+  - `php artisan config:cache`
+  - `php artisan route:cache`
+  - `php artisan view:cache`
+  - `php artisan icons:cache`
+- Variables de entorno configuradas en Render Dashboard:
+  - `APP_ENV=production`
+  - `APP_KEY=base64:...`
+  - `DB_CONNECTION=mysql` (o sqlite)
+  - `PORT=10000` (Apache se ajusta automáticamente al puerto asignado)

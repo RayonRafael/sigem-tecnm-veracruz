@@ -14,7 +14,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Activitylog\Models\Activity;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportesPage extends Page
 {
@@ -701,26 +700,6 @@ class ReportesPage extends Page
             'headers' => ['Fecha', 'Usuario', 'Acción', 'Detalle'],
             'rows' => $rows,
         ];
-    }
-
-    protected function renderBadge(string $estado): string
-    {
-        $tipo = match ($estado) {
-            'Disponible', 'Autorizado', 'Terminado', 'Completado', 'Aprobado' => 'ok',
-            'En proceso', 'Solicitado', 'Pendiente', 'Asignado' => 'warn',
-            'En revisión', 'Pendiente Revision Admin', 'Entregado' => 'info',
-            'Dañado', 'Baja', 'Rechazado', 'Cancelado' => 'danger',
-            default => 'neutral',
-        };
-
-        $label = match ($estado) {
-            'Pendiente Revision Admin' => 'En revisión',
-            'Completado' => 'Terminado',
-            'Cancelado' => 'Rechazado',
-            default => $estado,
-        };
-
-        return '<span class="sigem-pill ' . $tipo . '">' . e($label) . '</span>';
     }
 
     protected function renderBadgeConteo(int $conteo, string $tipo): string

@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class MaterialResource extends Resource
 {
+    use \App\Filament\Concerns\ConCatalogoSoloLectura;
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Material::class;
@@ -35,11 +37,6 @@ class MaterialResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return \App\Filament\Resources\MaterialResource::getEloquentQuery();
-    }
-
-    public static function hasRecordTitle(): bool
-    {
-        return false;
     }
 
     public static function form(Form $form): Form

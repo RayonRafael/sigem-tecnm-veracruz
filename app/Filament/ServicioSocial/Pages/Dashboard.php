@@ -187,7 +187,10 @@ class Dashboard extends BaseDashboard
                 COUNT(CASE WHEN estado = 'Disponible' AND estado_registro = 'Aprobado' THEN 1 END) as disponibles,
                 COUNT(CASE WHEN estado = 'Asignado' AND estado_registro = 'Aprobado' THEN 1 END) as asignados,
                 COUNT(CASE WHEN estado = 'En Mantenimiento' AND estado_registro = 'Aprobado' THEN 1 END) as en_mantenimiento,
-                COUNT(CASE WHEN estado = 'Dañado' AND estado_registro = 'Aprobado' THEN 1 END) as danados
+                COUNT(CASE WHEN estado = 'Dañado' AND estado_registro = 'Aprobado' THEN 1 END) as danados,
+                COUNT(CASE WHEN estado = 'Solicitud de baja' AND estado_registro = 'Aprobado' THEN 1 END) as solicitudes_baja,
+                COUNT(CASE WHEN estado = 'Cambio de área' AND estado_registro = 'Aprobado' THEN 1 END) as solicitudes_cambio_area,
+                COUNT(CASE WHEN estado = 'Dado de baja' AND estado_registro = 'Aprobado' THEN 1 END) as dados_de_baja
             ")
             ->first();
 
@@ -211,6 +214,9 @@ class Dashboard extends BaseDashboard
             'inventarioAsignados' => $inventarioAsignados,
             'inventarioEnMantenimiento' => $inventarioEnMantenimiento,
             'inventarioDanados' => $inventarioDanados,
+            'inventarioSolicitudesBaja' => (int) ($inventarioStats->solicitudes_baja ?? 0),
+            'inventarioSolicitudesCambioArea' => (int) ($inventarioStats->solicitudes_cambio_area ?? 0),
+            'inventarioDadosDeBaja' => (int) ($inventarioStats->dados_de_baja ?? 0),
 
             'mantenimientoEnRevision' => $mantenimientoEnRevision,
             'solicitudesAutorizadas' => $solicitudesAutorizadas,

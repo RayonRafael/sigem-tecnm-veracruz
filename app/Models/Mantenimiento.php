@@ -48,25 +48,4 @@ class Mantenimiento extends Model
     {
         return $this->belongsTo(Inventario::class, 'id_inventario', 'id_inventario');
     }
-
-    public function usuarioSolicita()
-    {
-        return $this->belongsTo(User::class, 'id_usuario_solicita', 'id');
-    }
-
-    // Scopes de estado
-    public function scopeEnRevision($query)
-    {
-        return $query->whereIn('estado', ['Pendiente Revision Admin', 'Solicitado']);
-    }
-
-    public function scopeEnProceso($query)
-    {
-        return $query->where('estado', 'En proceso');
-    }
-
-    public function scopeCompletados($query)
-    {
-        return $query->where('estado', 'Completado');
-    }
 }
