@@ -284,73 +284,75 @@ class InventarioResource extends Resource
 
     public static function guardarCambiosEquipo(Inventario $record, array $data): Inventario
     {
-        // 1. Nombre (Material/Equipo)
-        if (isset($data['nombre_equipo']) && filled($data['nombre_equipo'])) {
-            $nuevoNombre = trim($data['nombre_equipo']);
-            $record->subtipo = $nuevoNombre;
-            if ($record->material) {
-                $record->material->update(['nombre' => $nuevoNombre]);
-            }
-        }
-
-        // 2. Marca
-        if (isset($data['marca']) && filled($data['marca'])) {
-            $nuevaMarca = trim($data['marca']);
-            $specs = $record->especificaciones ?? [];
-            $specs['marca'] = $nuevaMarca;
-            $record->especificaciones = $specs;
-
-            $marcaModel = MarcaMaterial::firstOrCreate(['nombre' => $nuevaMarca]);
-            if ($record->material) {
-                $record->material->update(['id_marca' => $marcaModel->id_marca]);
-            }
-        }
-
-        // 3. Aula
-        if (isset($data['aula'])) {
-            $nuevaAula = trim($data['aula']);
-            $specs = $record->especificaciones ?? [];
-            $specs['aula'] = $nuevaAula;
-            $record->especificaciones = $specs;
-
-            if ($record->area_id && filled($nuevaAula)) {
-                $salon = Salon::where('area_id', $record->area_id)
-                    ->where('nombre', $nuevaAula)
-                    ->first();
-                if ($salon) {
-                    $record->salon_id = $salon->id;
+        return DB::transaction(function () use ($record, $data) {
+            // 1. Nombre (Material/Equipo)
+            if (isset($data['nombre_equipo']) && filled($data['nombre_equipo'])) {
+                $nuevoNombre = trim($data['nombre_equipo']);
+                $record->subtipo = $nuevoNombre;
+                if ($record->material) {
+                    $record->material->update(['nombre' => $nuevoNombre]);
                 }
             }
-        }
 
-        // 4. IP & MAC
-        if (isset($data['ip_address'])) {
-            $record->ip_address = $data['ip_address'];
-            $specs = $record->especificaciones ?? [];
-            $specs['ip_address'] = $data['ip_address'];
-            $record->especificaciones = $specs;
-        }
-        if (isset($data['mac_address'])) {
-            $record->mac_address = $data['mac_address'];
-            $specs = $record->especificaciones ?? [];
-            $specs['mac_address'] = $data['mac_address'];
-            $record->especificaciones = $specs;
-        }
+            // 2. Marca
+            if (isset($data['marca']) && filled($data['marca'])) {
+                $nuevaMarca = trim($data['marca']);
+                $specs = $record->especificaciones ?? [];
+                $specs['marca'] = $nuevaMarca;
+                $record->especificaciones = $specs;
 
-        // 5. Área
-        if (isset($data['area_id']) && filled($data['area_id'])) {
-            $record->area_id = $data['area_id'];
-            $area = Area::find($data['area_id']);
-            if ($area && $area->id_departamento) {
-                $record->departamento_id = $area->id_departamento;
+                $marcaModel = MarcaMaterial::firstOrCreate(['nombre' => $nuevaMarca]);
+                if ($record->material) {
+                    $record->material->update(['id_marca' => $marcaModel->id_marca]);
+                }
             }
-        }
 
-        // 6. Fill other allowable fields
-        $record->fill($data);
-        $record->save();
+            // 3. Aula
+            if (isset($data['aula'])) {
+                $nuevaAula = trim($data['aula']);
+                $specs = $record->especificaciones ?? [];
+                $specs['aula'] = $nuevaAula;
+                $record->especificaciones = $specs;
 
-        return $record;
+                if ($record->area_id && filled($nuevaAula)) {
+                    $salon = Salon::where('area_id', $record->area_id)
+                        ->where('nombre', $nuevaAula)
+                        ->first();
+                    if ($salon) {
+                        $record->salon_id = $salon->id;
+                    }
+                }
+            }
+
+            // 4. IP & MAC
+            if (isset($data['ip_address'])) {
+                $record->ip_address = $data['ip_address'];
+                $specs = $record->especificaciones ?? [];
+                $specs['ip_address'] = $data['ip_address'];
+                $record->especificaciones = $specs;
+            }
+            if (isset($data['mac_address'])) {
+                $record->mac_address = $data['mac_address'];
+                $specs = $record->especificaciones ?? [];
+                $specs['mac_address'] = $data['mac_address'];
+                $record->especificaciones = $specs;
+            }
+
+            // 5. Área
+            if (isset($data['area_id']) && filled($data['area_id'])) {
+                $record->area_id = $data['area_id'];
+                $area = Area::find($data['area_id']);
+                if ($area && $area->id_departamento) {
+                    $record->departamento_id = $area->id_departamento;
+                }
+            }
+
+            // 6. Fill other allowable fields
+            $record->fill($data);
+            $record->save();
+
+            return $record;
+        });
     }
 
     public static function getTableColumns(): array
