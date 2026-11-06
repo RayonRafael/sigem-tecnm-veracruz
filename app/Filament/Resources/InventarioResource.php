@@ -27,6 +27,7 @@ use Illuminate\Support\HtmlString;
 
 class InventarioResource extends Resource
 {
+    use \App\Filament\Concerns\ConModalesBajaCambio;
     protected static ?string $model = Inventario::class;
 
     protected static ?string $recordTitleAttribute = 'num_serie';
@@ -1782,52 +1783,7 @@ class InventarioResource extends Resource
                             ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Cambio de Ã¡rea', 'Solicitud de baja'], true))
                             ->modalHeading(fn () => static::esAdmin() ? 'Cambiar Ã¡rea de equipo' : 'Solicitar cambio de Ã¡rea')
                             ->modalDescription(fn () => static::esAdmin() ? 'Se actualizarÃ¡ la ubicaciÃ³n fÃ­sica del equipo de forma inmediata.' : 'La solicitud quedarÃ¡ registrada en espera de revisiÃ³n y aprobaciÃ³n por el Administrador.')
-                            ->form([
-                                Forms\Components\Grid::make(2)
-                                    ->visible(fn () => static::esAdmin())
-                                    ->schema([
-                                        Forms\Components\TextInput::make('departamento_actual')
-                                            ->label('Departamento actual')
-                                            ->default(fn (?Inventario $record) => $record?->departamento?->nombre ?? 'Sin departamento')
-                                            ->disabled()
-                                            ->dehydrated(false),
-                                        Forms\Components\TextInput::make('area_actual')
-                                            ->label('Ãrea actual')
-                                            ->default(fn (?Inventario $record) => $record?->area?->nombre ?? 'Sin Ã¡rea')
-                                            ->disabled()
-                                            ->dehydrated(false),
-                                    ]),
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\Select::make('departamento_id')
-                                            ->label('Nuevo Departamento')
-                                            ->options(fn () => \App\Models\Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento'))
-                                            ->required()
-                                            ->live()
-                                            ->afterStateUpdated(fn (Forms\Set $set) => $set('area_id', null)),
-                                        Forms\Components\Select::make('area_id')
-                                            ->label('Nueva Ãrea')
-                                            ->options(fn (Forms\Get $get) => $get('departamento_id')
-                                                ? \App\Models\Area::where('id_departamento', $get('departamento_id'))->orderBy('nombre')->pluck('nombre', 'id_area')
-                                                : [])
-                                            ->required(),
-                                    ]),
-                                Forms\Components\Grid::make(2)
-                                    ->schema([
-                                        Forms\Components\TextInput::make('aula')
-                                            ->label('Nueva Aula')
-                                            ->placeholder('ej. E201')
-                                            ->maxLength(50),
-                                        Forms\Components\TextInput::make('estacion')
-                                            ->label('Nueva EstaciÃ³n')
-                                            ->placeholder('ej. AC001')
-                                            ->maxLength(50),
-                                    ]),
-                                Forms\Components\Textarea::make('motivo')
-                                    ->label('Motivo del cambio')
-                                    ->placeholder('ExplicaciÃ³n detallada del motivo del cambio...')
-                                    ->required(),
-                            ])
+                            ->form(static::getModalCambioAreaFormSchema(static::esAdmin()))
                             ->modalSubmitActionLabel(fn () => static::esAdmin() ? 'Confirmar cambio' : 'Solicitar cambio')
                             ->modalCancelActionLabel('Cancelar')
                             ->action(function (Inventario $record, array $data) {
@@ -1891,22 +1847,7 @@ class InventarioResource extends Resource
                             ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Solicitud de baja', 'Cambio de Ã¡rea'], true))
                             ->modalHeading(fn () => static::esAdmin() ? 'Confirmar baja de equipo' : 'Solicitar baja de equipo')
                             ->modalDescription(fn () => static::esAdmin() ? 'El equipo pasarÃ¡ a estado Dado de baja de manera inmediata.' : 'La solicitud quedarÃ¡ registrada en espera de revisiÃ³n y aprobaciÃ³n por el Administrador.')
-                            ->form([
-                                Forms\Components\Select::make('motivo_baja')
-                                    ->label('Motivo de baja')
-                                    ->options([
-                                        'DaÃ±o irreparable' => 'DaÃ±o irreparable',
-                                        'Obsolescencia' => 'Obsolescencia',
-                                        'PÃ©rdida' => 'PÃ©rdida',
-                                        'Robo' => 'Robo',
-                                        'Otro' => 'Otro',
-                                    ])
-                                    ->required(),
-                                Forms\Components\Textarea::make('observaciones_baja')
-                                    ->label('Observaciones detalladas')
-                                    ->placeholder('ExplicaciÃ³n detallada del motivo de la baja...')
-                                    ->required(),
-                            ])
+                            ->form(static::getModalBajaFormSchema())
                             ->modalSubmitActionLabel(fn () => static::esAdmin() ? 'Confirmar baja' : 'Solicitar baja')
                             ->modalCancelActionLabel('Cancelar')
                             ->action(function (Inventario $record, array $data) {
