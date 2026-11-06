@@ -1,6 +1,44 @@
-/* =========================================
-   SIGEM - FILAMENT GLOBAL THEME OVERRIDES
-   ========================================= */
+/* ==========================================================================
+   SIGEM - TECNM VERACRUZ THEME SCSS
+   ==========================================================================
+   1. VARIABLES & DESIGN TOKENS (:root)
+   2. BASE & RESET (html, body, tipografía)
+   3. LAYOUT & SHELL (topbar, sidebar, lienzo global)
+   4. COMPONENTS (cards, tablas, inputs, botones, badges, modales, slide-over)
+   5. PAGES (dashboard, reportes, login, configuración)
+   6. RESPONSIVE & OVERRIDES (tablet, móvil, fixes consolidados)
+   ========================================================================== */
+
+/* ===== 1. VARIABLES & DESIGN TOKENS ===== */
+:root {
+  --sig-bg: #f4f6f9;
+  --sig-surface: #ffffff;
+  --sig-border: #e5e7eb;
+  --sig-text: #111827;
+  --sig-muted: #6b7280;
+  --sig-light: #64748b;
+  --sig-primary: #1b65d4;
+  --sig-primary-dark: #1557b0;
+  --sig-primary-light: #e8f0fe;
+  --sig-radius: 14px;
+  --sig-radius-sm: 9px;
+  --mod-inv: #7c3aed;
+  --mod-inv-l: #efe7fd;
+  --mod-sol: #0d9488;
+  --mod-sol-l: #dcf5f2;
+  --mod-mant: #ea580c;
+  --mod-mant-l: #fdeadd;
+  --mod-rep: #ca8a04;
+  --mod-rep-l: #fdf3d7;
+  --mod-cfg: #475569;
+  --mod-cfg-l: #e8ecf1;
+  --mod-cat: #c026d3;
+  --mod-cat-l: #fae8ff;
+  --sig-info: #0284c7;
+  --sig-info-light: #e0f2fe;
+}
+
+
 
 /* ===== 0. TOPBAR EN EL DASHBOARD Y PANEL ===== */
 body:has(.sigem-professional) .fi-topbar {
@@ -710,33 +748,7 @@ body:has(.sigem-professional) .sigem-topbar-brand {
 /* FASE 1: LIENZO GLOBAL "INVGATE STYLE"                */
 /* ==================================================== */
 
-:root {
-  --sig-bg: #f4f6f9;
-  --sig-surface: #ffffff;
-  --sig-border: #e5e7eb;
-  --sig-text: #111827;
-  --sig-muted: #6b7280;
-  --sig-light: #64748b;
-  --sig-primary: #1b65d4;
-  --sig-primary-dark: #1557b0;
-  --sig-primary-light: #e8f0fe;
-  --sig-radius: 14px;
-  --sig-radius-sm: 9px;
-  --mod-inv: #7c3aed;
-  --mod-inv-l: #efe7fd;
-  --mod-sol: #0d9488;
-  --mod-sol-l: #dcf5f2;
-  --mod-mant: #ea580c;
-  --mod-mant-l: #fdeadd;
-  --mod-rep: #ca8a04;
-  --mod-rep-l: #fdf3d7;
-  --mod-cfg: #475569;
-  --mod-cfg-l: #e8ecf1;
-  --mod-cat: #c026d3;
-  --mod-cat-l: #fae8ff;
-  --sig-info: #0284c7;
-  --sig-info-light: #e0f2fe;
-}
+
 
 body,
 .fi-body {
@@ -3916,10 +3928,24 @@ aside.fi-sidebar {
   height: auto !important;
   min-height: 0 !important;
   max-height: max-content !important;
-  padding: 6px 4px !important;
+  width: 100% !important;
+  max-width: 64px !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+  padding: 6px 2px !important;
   gap: 3px !important;
   margin-top: auto !important;
   justify-content: center !important;
+
+  form {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: auto !important;
+    flex: 0 0 auto !important;
+  }
 }
 
 .sigem-avatar {
@@ -3945,25 +3971,15 @@ aside.fi-sidebar {
   flex: 0 0 auto !important;
 }
 
-.sigem-user-card {
-  form {
-    margin: 0 !important;
-    padding: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: auto !important;
-    flex: 0 0 auto !important;
-  }
-}
+
 
 /* FIX 3: Dashboard SS y Admin — 4 acciones + 4 KPIs en 2 filas de 4 */
 .sigem-quick-grid,
 .sigem-stats-grid {
   display: grid !important;
   grid-template-columns: repeat(4, 1fr) !important;
-  gap: 14px !important;
-  margin-bottom: 22px !important;
+  gap: 10px !important;
+  margin-bottom: 10px !important;
 }
 
 @media (max-width: 1024px) {
@@ -4012,15 +4028,7 @@ aside.fi-sidebar {
   overflow-x: hidden !important;
 }
 
-/* 3. Asegurar que la tarjeta de usuario encaje perfectamente en los 64px */
-.sigem-user-card {
-  width: 100% !important;
-  max-width: 64px !important;
-  box-sizing: border-box !important;
-  overflow-x: hidden !important;
-  padding-left: 2px !important;
-  padding-right: 2px !important;
-}
+
 
 /* ===== FIX: Barras de desplazamiento redundantes ===== */
 
@@ -4097,29 +4105,22 @@ main.fi-main {
   background-color: #f4f6f8 !important;
 }
 
-/* 2. Sidebar y topbar blancos */
+/* 2. Sidebar blanco */
 .fi-sidebar {
   background-color: #ffffff !important;
 }
 
-.fi-topbar {
-  background-color: #ffffff !important;
-  border-bottom: 1px solid #e5e7eb !important;
-}
-
-/* 3. Topbar delgado (~50px) */
+/* 3. Topbar delgado (~50px) sin gap */
 .fi-topbar,
 header.fi-topbar {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-left: none !important;
   min-height: 50px !important;
   height: 50px !important;
   padding: 0 16px !important;
   display: flex !important;
   align-items: center !important;
-}
-
-/* 4. Sin gap entre sidebar y topbar */
-.fi-topbar {
-  border-left: none !important;
 }
 
 /* 5. Tarjetas blancas sobre el gris */
@@ -4470,12 +4471,7 @@ header.fi-topbar nav>div.ms-auto,
   }
 }
 
-/* FIX 3: Quick cards y KPIs aún más compactos */
-.sigem-quick-grid,
-.sigem-stats-grid {
-  gap: 10px !important;
-  margin-bottom: 10px !important;
-}
+
 
 .sigem-quick {
   padding: 10px 12px !important;

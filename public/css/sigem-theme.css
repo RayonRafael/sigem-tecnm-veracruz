@@ -1,9 +1,45 @@
 @charset "UTF-8";
-/* =========================================
-   SIGEM - FILAMENT GLOBAL THEME OVERRIDES
-   ========================================= */
-/* ===== 0. TOPBAR EN EL DASHBOARD Y PANEL ===== */
+/* ==========================================================================
+   SIGEM - TECNM VERACRUZ THEME SCSS
+   ==========================================================================
+   1. VARIABLES & DESIGN TOKENS (:root)
+   2. BASE & RESET (html, body, tipografía)
+   3. LAYOUT & SHELL (topbar, sidebar, lienzo global)
+   4. COMPONENTS (cards, tablas, inputs, botones, badges, modales, slide-over)
+   5. PAGES (dashboard, reportes, login, configuración)
+   6. RESPONSIVE & OVERRIDES (tablet, móvil, fixes consolidados)
+   ========================================================================== */
+/* ===== 1. VARIABLES & DESIGN TOKENS ===== */
 @import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap");
+:root {
+  --sig-bg: #f4f6f9;
+  --sig-surface: #ffffff;
+  --sig-border: #e5e7eb;
+  --sig-text: #111827;
+  --sig-muted: #6b7280;
+  --sig-light: #64748b;
+  --sig-primary: #1b65d4;
+  --sig-primary-dark: #1557b0;
+  --sig-primary-light: #e8f0fe;
+  --sig-radius: 14px;
+  --sig-radius-sm: 9px;
+  --mod-inv: #7c3aed;
+  --mod-inv-l: #efe7fd;
+  --mod-sol: #0d9488;
+  --mod-sol-l: #dcf5f2;
+  --mod-mant: #ea580c;
+  --mod-mant-l: #fdeadd;
+  --mod-rep: #ca8a04;
+  --mod-rep-l: #fdf3d7;
+  --mod-cfg: #475569;
+  --mod-cfg-l: #e8ecf1;
+  --mod-cat: #c026d3;
+  --mod-cat-l: #fae8ff;
+  --sig-info: #0284c7;
+  --sig-info-light: #e0f2fe;
+}
+
+/* ===== 0. TOPBAR EN EL DASHBOARD Y PANEL ===== */
 body:has(.sigem-professional) .fi-topbar {
   display: flex !important;
   position: sticky !important;
@@ -683,34 +719,6 @@ body:has(.sigem-professional) .sigem-topbar-brand {
 /* ==================================================== */
 /* FASE 1: LIENZO GLOBAL "INVGATE STYLE"                */
 /* ==================================================== */
-:root {
-  --sig-bg: #f4f6f9;
-  --sig-surface: #ffffff;
-  --sig-border: #e5e7eb;
-  --sig-text: #111827;
-  --sig-muted: #6b7280;
-  --sig-light: #64748b;
-  --sig-primary: #1b65d4;
-  --sig-primary-dark: #1557b0;
-  --sig-primary-light: #e8f0fe;
-  --sig-radius: 14px;
-  --sig-radius-sm: 9px;
-  --mod-inv: #7c3aed;
-  --mod-inv-l: #efe7fd;
-  --mod-sol: #0d9488;
-  --mod-sol-l: #dcf5f2;
-  --mod-mant: #ea580c;
-  --mod-mant-l: #fdeadd;
-  --mod-rep: #ca8a04;
-  --mod-rep-l: #fdf3d7;
-  --mod-cfg: #475569;
-  --mod-cfg-l: #e8ecf1;
-  --mod-cat: #c026d3;
-  --mod-cat-l: #fae8ff;
-  --sig-info: #0284c7;
-  --sig-info-light: #e0f2fe;
-}
-
 body,
 .fi-body {
   color: var(--sig-text);
@@ -3564,10 +3572,23 @@ aside.fi-sidebar {
   height: auto !important;
   min-height: 0 !important;
   max-height: max-content !important;
-  padding: 6px 4px !important;
+  width: 100% !important;
+  max-width: 64px !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+  padding: 6px 2px !important;
   gap: 3px !important;
   margin-top: auto !important;
   justify-content: center !important;
+}
+.sigem-user-card form {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: auto !important;
+  flex: 0 0 auto !important;
 }
 
 .sigem-avatar {
@@ -3593,23 +3614,13 @@ aside.fi-sidebar {
   flex: 0 0 auto !important;
 }
 
-.sigem-user-card form {
-  margin: 0 !important;
-  padding: 0 !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  height: auto !important;
-  flex: 0 0 auto !important;
-}
-
 /* FIX 3: Dashboard SS y Admin — 4 acciones + 4 KPIs en 2 filas de 4 */
 .sigem-quick-grid,
 .sigem-stats-grid {
   display: grid !important;
   grid-template-columns: repeat(4, 1fr) !important;
-  gap: 14px !important;
-  margin-bottom: 22px !important;
+  gap: 10px !important;
+  margin-bottom: 10px !important;
 }
 
 @media (max-width: 1024px) {
@@ -3653,16 +3664,6 @@ aside.fi-sidebar {
 /* 2. Eliminar barra de desplazamiento horizontal en el sidebar y su footer */
 .fi-sidebar {
   overflow-x: hidden !important;
-}
-
-/* 3. Asegurar que la tarjeta de usuario encaje perfectamente en los 64px */
-.sigem-user-card {
-  width: 100% !important;
-  max-width: 64px !important;
-  box-sizing: border-box !important;
-  overflow-x: hidden !important;
-  padding-left: 2px !important;
-  padding-right: 2px !important;
 }
 
 /* ===== FIX: Barras de desplazamiento redundantes ===== */
@@ -3731,29 +3732,22 @@ main.fi-main {
   background-color: #f4f6f8 !important;
 }
 
-/* 2. Sidebar y topbar blancos */
+/* 2. Sidebar blanco */
 .fi-sidebar {
   background-color: #ffffff !important;
 }
 
-.fi-topbar {
-  background-color: #ffffff !important;
-  border-bottom: 1px solid #e5e7eb !important;
-}
-
-/* 3. Topbar delgado (~50px) */
+/* 3. Topbar delgado (~50px) sin gap */
 .fi-topbar,
 header.fi-topbar {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-left: none !important;
   min-height: 50px !important;
   height: 50px !important;
   padding: 0 16px !important;
   display: flex !important;
   align-items: center !important;
-}
-
-/* 4. Sin gap entre sidebar y topbar */
-.fi-topbar {
-  border-left: none !important;
 }
 
 /* 5. Tarjetas blancas sobre el gris */
@@ -4084,13 +4078,6 @@ header.fi-topbar nav > div.ms-auto,
 .sigem-hero p {
   font-size: 12.5px !important;
   line-height: 1.25 !important;
-}
-
-/* FIX 3: Quick cards y KPIs aún más compactos */
-.sigem-quick-grid,
-.sigem-stats-grid {
-  gap: 10px !important;
-  margin-bottom: 10px !important;
 }
 
 .sigem-quick {
@@ -4844,9 +4831,8 @@ body:has(.sigem-professional) .fi-main {
 }
 .sigem-dash-table .fi-ta-table thead th:first-child,
 .sigem-dash-table .fi-ta-table tbody td:first-child {
-  width: 250px !important;
-  min-width: 250px !important;
-  max-width: none !important;
+  width: 130px !important;
+  max-width: 130px !important;
 }
 .sigem-dash-table .fi-ta-table thead th:last-child,
 .sigem-dash-table .fi-ta-table tbody td:last-child {
@@ -5105,8 +5091,6 @@ body:has(.sigem-professional) .fi-main {
   border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
 }
 :is(.fi-table-individual-search-cell, [class*=fi-table-individual-search-cell]) input {
-  width: 100% !important;
-  box-sizing: border-box !important;
   font-size: 12.5px !important;
   height: 32px !important;
   min-height: 32px !important;
@@ -5163,36 +5147,19 @@ body:has(.sigem-professional) .fi-main {
 }
 
 /* ============================================
-   FIX 2: Tarjetas de tabla blancas sobre fondo gris
+   FIX 2: Fondo gris uniforme (sin huecos blancos)
    ============================================ */
-.fi-ta-ctn {
-  background: #ffffff !important;
-  background-color: #ffffff !important;
-  border: 1px solid var(--sig-border, #e5e7eb) !important;
-  border-radius: 12px !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
-}
-
+.fi-ta-ctn,
 .fi-ta-header-ctn,
 .fi-ta-header,
 .fi-ta-header-toolbar,
-.fi-ta-content {
-  background: #ffffff !important;
-}
-
+.fi-ta-content,
 .fi-ta-table thead,
-.fi-ta-table thead tr {
-  background: #f8fafc !important;
-}
-
-.fi-ta-table thead th {
-  background: #f8fafc !important;
-}
-
+.fi-ta-table thead tr,
+.fi-ta-table thead th,
 .fi-table-individual-search-cell,
 [class*=fi-table-individual-search-cell] {
-  background: #f8fafc !important;
-  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: var(--sig-bg, #f4f6f8) !important;
 }
 
 .fi-ta-header-ctn {
@@ -6458,302 +6425,6 @@ textarea::placeholder,
     border-radius: 10px !important;
   }
 }
-
-/* ==========================================================================
-   FIX VISUAL: Armonía de diseño — Editar + Catálogos igual que Ver detalle
-   ========================================================================== */
-
-/* Fondo blanco del slide-over y modales */
-.fi-modal-slide-over-window,
-.fi-modal-window {
-  background-color: #ffffff !important;
-  border-left: 1px solid #e5e7eb !important;
-  box-shadow: -8px 0 24px rgba(15, 23, 42, 0.08) !important;
-}
-
-.fi-modal-slide-over-window .fi-modal-header,
-.fi-modal-window .fi-modal-header {
-  background-color: #ffffff !important;
-  border-bottom: 1px solid #e5e7eb !important;
-  padding: 16px 20px 14px !important;
-}
-
-/* Título y subtítulo del slide-over */
-.fi-modal-slide-over-window .fi-modal-heading,
-.fi-modal-window .fi-modal-heading {
-  font-size: 1.125rem !important; /* 18px */
-  font-weight: 700 !important;
-  color: #111827 !important;
-  line-height: 1.3 !important;
-}
-
-.fi-modal-slide-over-window .fi-modal-description,
-.fi-modal-slide-over-window .fi-modal-description *,
-.fi-modal-window .fi-modal-description,
-.fi-modal-window .fi-modal-description * {
-  font-size: 0.8125rem !important; /* 13px */
-  font-weight: 400 !important;
-  color: #6b7280 !important;
-}
-
-/* Tabs de Editar y Ver detalle: NO cortar y scroll horizontal */
-.fi-modal-slide-over-window .fi-tabs,
-.fi-modal-window .fi-tabs,
-.fi-tabs {
-  background: #f8fafc !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 8px !important;
-  padding: 4px !important;
-  display: flex !important;
-  overflow-x: auto !important;
-  scrollbar-width: none !important;
-  -webkit-overflow-scrolling: touch !important;
-  flex-wrap: nowrap !important;
-  gap: 4px !important;
-  margin-bottom: 16px !important;
-}
-
-.fi-modal-slide-over-window .fi-tabs::-webkit-scrollbar,
-.fi-modal-window .fi-tabs::-webkit-scrollbar,
-.fi-tabs::-webkit-scrollbar {
-  display: none !important;
-}
-
-.fi-modal-slide-over-window .fi-tabs-item,
-.fi-modal-window .fi-tabs-item,
-.fi-tabs-item {
-  padding: 8px 14px !important;
-  border-radius: 6px !important;
-  font-size: 0.8125rem !important;
-  font-weight: 500 !important;
-  white-space: nowrap !important;
-  flex-shrink: 0 !important;
-  overflow: visible !important;
-  text-overflow: clip !important;
-  color: #64748b !important;
-  transition: all 0.15s ease !important;
-}
-
-.fi-modal-slide-over-window .fi-tabs-item-label,
-.fi-modal-window .fi-tabs-item-label,
-.fi-tabs-item-label,
-.fi-modal-slide-over-window .fi-tabs-item span,
-.fi-modal-window .fi-tabs-item span {
-  white-space: nowrap !important;
-  overflow: visible !important;
-  text-overflow: clip !important;
-}
-
-.fi-modal-slide-over-window .fi-tabs-item:hover,
-.fi-modal-window .fi-tabs-item:hover {
-  color: #1B396A !important;
-  background: rgba(255, 255, 255, 0.7) !important;
-}
-
-.fi-modal-slide-over-window .fi-tabs-item.fi-active,
-.fi-modal-slide-over-window .fi-tabs-item[aria-selected="true"],
-.fi-modal-window .fi-tabs-item.fi-active,
-.fi-modal-window .fi-tabs-item[aria-selected="true"] {
-  background: #ffffff !important;
-  color: #1B396A !important;
-  font-weight: 600 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
-}
-
-/* Secciones como Tarjetas (Fondo gris muy claro, bordes sutiles, espaciado consistente) */
-.fi-modal-slide-over-window .fi-section,
-.fi-modal-slide-over-window section.fi-section,
-.fi-modal-window .fi-section,
-.fi-modal-window section.fi-section,
-.sigem-form-section {
-  background-color: #f9fafb !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 10px !important;
-  padding: 16px !important;
-  margin-bottom: 16px !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
-  overflow: visible !important;
-}
-
-.fi-modal-slide-over-window .fi-section-header,
-.fi-modal-window .fi-section-header {
-  background-color: transparent !important;
-  border-bottom: 1px solid #e5e7eb !important;
-  padding: 0 0 10px 0 !important;
-  margin-bottom: 14px !important;
-  display: flex !important;
-  align-items: center !important;
-}
-
-.fi-modal-slide-over-window .fi-section-header-heading,
-.fi-modal-window .fi-section-header-heading {
-  font-size: 0.9375rem !important; /* 15px */
-  font-weight: 600 !important;
-  color: #111827 !important;
-  display: flex !important;
-  align-items: center !important;
-  gap: 6px !important;
-}
-
-.fi-modal-slide-over-window .fi-section-header svg,
-.fi-modal-window .fi-section-header svg {
-  color: #1B396A !important;
-  width: 18px !important;
-  height: 18px !important;
-}
-
-.fi-modal-slide-over-window .fi-section-header-description,
-.fi-modal-window .fi-section-header-description {
-  font-size: 0.8125rem !important;
-  color: #6b7280 !important;
-  margin-top: 2px !important;
-}
-
-.fi-modal-slide-over-window .fi-section-content,
-.fi-modal-window .fi-section-content {
-  padding: 0 !important;
-}
-
-/* Labels sutiles */
-.fi-modal-slide-over-window .fi-fo-field-wrp-label,
-.fi-modal-slide-over-window .fi-fo-field-wrp-label label,
-.fi-modal-slide-over-window .fi-fo-field-wrp-label span,
-.fi-modal-window .fi-fo-field-wrp-label,
-.fi-modal-window .fi-fo-field-wrp-label label,
-.fi-modal-window .fi-fo-field-wrp-label span {
-  font-size: 0.875rem !important; /* 14px */
-  font-weight: 500 !important;
-  color: #6b7280 !important;
-  line-height: 1.25 !important;
-  margin-bottom: 4px !important;
-}
-
-/* Helper text */
-.fi-modal-slide-over-window .fi-fo-field-wrp-helper-text,
-.fi-modal-window .fi-fo-field-wrp-helper-text {
-  font-size: 0.75rem !important; /* 12px */
-  color: #9ca3af !important;
-  font-weight: 400 !important;
-  margin-top: 4px !important;
-}
-
-/* Inputs y Selects */
-.fi-modal-slide-over-window .fi-input-wrp,
-.fi-modal-window .fi-input-wrp {
-  background-color: #ffffff !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 8px !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
-}
-
-.fi-modal-slide-over-window .fi-input-wrp input,
-.fi-modal-slide-over-window .fi-input-wrp select,
-.fi-modal-slide-over-window .fi-input-wrp textarea,
-.fi-modal-window .fi-input-wrp input,
-.fi-modal-window .fi-input-wrp select,
-.fi-modal-window .fi-input-wrp textarea {
-  font-size: 0.9375rem !important; /* 15px */
-  color: #111827 !important;
-  background: transparent !important;
-}
-
-.fi-modal-slide-over-window .fi-input-wrp:focus-within,
-.fi-modal-window .fi-input-wrp:focus-within {
-  border-color: #1B396A !important;
-  box-shadow: 0 0 0 3px rgba(27, 57, 106, 0.1) !important;
-}
-
-/* Inputs bloqueados / de solo lectura: valor en negrita y negro suave */
-.fi-modal-slide-over-window .fi-input-wrp:has(input:disabled),
-.fi-modal-slide-over-window .fi-input-wrp:has(textarea:disabled),
-.fi-modal-slide-over-window .fi-input-wrp[data-disabled],
-.fi-modal-window .fi-input-wrp:has(input:disabled),
-.fi-modal-window .fi-input-wrp:has(textarea:disabled) {
-  background-color: #ffffff !important;
-  border: 1px solid #e5e7eb !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
-}
-
-.fi-modal-slide-over-window input:disabled,
-.fi-modal-slide-over-window textarea:disabled,
-.fi-modal-window input:disabled,
-.fi-modal-window textarea:disabled {
-  font-size: 0.9375rem !important;
-  font-weight: 600 !important;
-  color: #111827 !important;
-  -webkit-text-fill-color: #111827 !important;
-  opacity: 1 !important;
-  cursor: default !important;
-}
-
-/* Botones del footer */
-.fi-modal-slide-over-window .fi-modal-footer,
-.fi-modal-window .fi-modal-footer {
-  background-color: #ffffff !important;
-  border-top: 1px solid #e5e7eb !important;
-  padding: 14px 20px !important;
-}
-
-.fi-modal-slide-over-window .fi-modal-footer button[type="submit"],
-.fi-modal-slide-over-window .fi-modal-footer .fi-btn-color-primary,
-.fi-modal-window .fi-modal-footer button[type="submit"],
-.fi-modal-window .fi-modal-footer .fi-btn-color-primary {
-  background-color: #1B396A !important;
-  color: #ffffff !important;
-  border-radius: 8px !important;
-  font-weight: 600 !important;
-  border: none !important;
-  padding: 8px 18px !important;
-}
-
-.fi-modal-slide-over-window .fi-modal-footer button[type="submit"]:hover,
-.fi-modal-window .fi-modal-footer button[type="submit"]:hover {
-  background-color: #132a4e !important;
-}
-
-/* Tabla Inventario: anchos de columna sin cortes y con tooltips */
-.fi-ta-table .fi-ta-cell:has(.td-main) {
-  min-width: 250px !important;
-  max-width: 340px !important;
-}
-
-.fi-ta-table .fi-ta-cell:has(.td-main) .td-main,
-.fi-ta-table .fi-ta-cell:has(.td-main) .td-sub {
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-}
-
-/* ==========================================================================
-   ARMOR OVERRIDE: Secciones como tarjetas en Modales y Slide-overs
-   ========================================================================== */
-.fi-modal-slide-over-window :is(.fi-fo-component-ctn, form, div) :is(.fi-section, section.fi-section),
-.fi-modal-window :is(.fi-fo-component-ctn, form, div) :is(.fi-section, section.fi-section),
-.fi-modal-slide-over-window .fi-section,
-.fi-modal-window .fi-section {
-  background-color: #f9fafb !important;
-  background: #f9fafb !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 10px !important;
-  padding: 16px 18px !important;
-  margin-bottom: 16px !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
-}
-
-.fi-modal-slide-over-window :is(.fi-fo-component-ctn, form, div) :is(.fi-section, section.fi-section) .fi-section-header,
-.fi-modal-window :is(.fi-fo-component-ctn, form, div) :is(.fi-section, section.fi-section) .fi-section-header {
-  border-bottom: 1px solid #e5e7eb !important;
-  padding: 0 0 10px 0 !important;
-  margin-bottom: 14px !important;
-  background: transparent !important;
-}
-
-.fi-modal-slide-over-window :is(.fi-fo-component-ctn, form, div) :is(.fi-section, section.fi-section) .fi-section-content,
-.fi-modal-window :is(.fi-fo-component-ctn, form, div) :is(.fi-section, section.fi-section) .fi-section-content {
-  padding: 0 !important;
-}
-
 /* Tabs en slide-over: que quepan en una sola fila sin cortarse */
 .fi-modal-slide-over-window .fi-tabs,
 .fi-modal-slide-over-window nav.fi-tabs,
@@ -6779,7 +6450,7 @@ textarea::placeholder,
 .fi-modal-slide-over .fi-tabs-item-button,
 .fi-modal-slide-over button.fi-tabs-item {
   padding: 5px 0.55rem !important;
-  font-size: 0.8125rem !important; /* 13px */
+  font-size: 0.8125rem !important;
   gap: 4px !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
@@ -6795,9 +6466,7 @@ textarea::placeholder,
   font-size: 0.8125rem !important;
 }
 
-/* ==========================================================================
-   TABLAS RESPONSIVAS Y ANCHOS MÍNIMOS SIN COMPRESIÓN
-   ========================================================================== */
+/* Tablas responsivas y anchos sin compresión */
 .fi-ta-ctn,
 .fi-ta-content,
 .sigem-rep-table-wrap {
@@ -6824,29 +6493,61 @@ textarea::placeholder,
   white-space: nowrap !important;
 }
 
-/* Emojis automáticos en encabezados de sección para Editar y Catálogos */
-.fi-modal-slide-over-window .fi-section[id*=informacion-del-equipo] .fi-section-header-heading::before,
-.fi-modal-slide-over-window .fi-section[id*=informacion] .fi-section-header-heading::before {
-  content: "🏷️" !important;
+/* ==========================================================================
+   TEMA GLOBAL: FONDO GRIS SUAVE (#f3f4f6) + TARJETAS BLANCAS (#ffffff)
+   ========================================================================== */
+body,
+.fi-body,
+html,
+.fi-main,
+.fi-main-ctn,
+main.fi-main {
+  background-color: #f3f4f6 !important;
+  background: #f3f4f6 !important;
 }
 
-.fi-modal-slide-over-window .fi-section[id*=datos-tecnicos] .fi-section-header-heading::before {
-  content: "⚙️" !important;
+/* Header / Topbar: MANTENER blanco */
+.fi-topbar,
+.fi-topbar nav,
+header.fi-topbar {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border-bottom: 1px solid var(--sig-border, #e5e7eb) !important;
 }
 
-.fi-modal-slide-over-window .fi-section[id*=ubicacion-y-asignacion] .fi-section-header-heading::before {
-  content: "📍" !important;
+/* Tarjetas sobre fondo gris suave: blanco puro #ffffff con borde y sombra sutil */
+.fi-ta-ctn,
+.sigem-stat,
+.sigem-quick,
+.sigem-rep-view,
+.sigem-cat-view,
+.sigem-rep-card,
+.sigem-cat-card,
+.sigem-inv-side,
+.sigem-cfg-card,
+.fi-section:not(.fi-modal-slide-over-window .fi-section):not(.fi-modal-window .fi-section) {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
 }
 
-.fi-modal-slide-over-window .fi-section[id*=red-y-conectividad] .fi-section-header-heading::before {
-  content: "🌐" !important;
+/* SLIDE-OVERS Y MODALES: MANTENER FONDO BLANCO */
+.fi-modal-slide-over-window,
+.fi-modal-slide-over-window .fi-modal-content,
+.fi-modal-slide-over-window .fi-modal-header,
+.fi-modal-slide-over-window .fi-modal-footer,
+.fi-modal-window,
+.fi-modal-window .fi-modal-content,
+.fi-modal-window .fi-modal-header,
+.fi-modal-window .fi-modal-footer {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
 }
 
-.fi-modal-slide-over-window .fi-section[id*=datos-de-facturacion] .fi-section-header-heading::before,
-.fi-modal-slide-over-window .fi-section[id*=facturacion] .fi-section-header-heading::before {
-  content: "🧾" !important;
-}
-
-.fi-modal-slide-over-window .fi-section[id*=estado-y-garantia] .fi-section-header-heading::before {
-  content: "🛡️" !important;
+/* Individual search cell inputs */
+:is(.fi-table-individual-search-cell, [class*=fi-table-individual-search-cell]) input {
+  width: 100% !important;
+  box-sizing: border-box !important;
 }
