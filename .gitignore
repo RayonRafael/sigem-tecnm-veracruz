@@ -3,6 +3,9 @@
 .env
 .env.backup
 .env.production
+.env.testing
+.env.local
+.env.*.local
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -30,3 +33,7 @@ Thumbs.db
 /public/css/filament/
 database/*.sqlite
 /scratch
+/screenshots/
+.vite/
+npm-debug.log*
+yarn-error.log*
