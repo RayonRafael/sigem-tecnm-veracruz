@@ -85,13 +85,15 @@
 
     {{-- Vista previa del reporte seleccionado --}}
     @if ($reporteActual)
-        <div class="sigem-rep-view">
-            <div class="sigem-rep-view-head">
+        <div class="sigem-rep-view" id="sigem-reporte-visor" x-on:scroll-to-report.window="$el.scrollIntoView({behavior:'smooth'})">
+            <div class="sigem-rep-vh">
                 <div>
-                    <h2>{{ $reporteActual['titulo'] }}</h2>
-                    <span class="sigem-rep-view-count">{{ count($reporteActual['rows']) }} registros</span>
+                    <h3>{{ $reporteActual['emoji'] ?? '📊' }} {{ $reporteActual['titulo'] }}</h3>
+                    <div class="sigem-rep-meta">
+                        {{ count($reporteActual['rows']) }} registros
+                    </div>
                 </div>
-                <div class="sigem-rep-view-actions">
+                <div style="display: inline-flex; align-items: center; gap: 8px;">
                     <button type="button"
                             wire:click="exportarReporte('{{ $livewire->reporteActivo }}', 'xlsx')"
                             class="sigem-btn-primary">
@@ -103,7 +105,7 @@
                         ↓ Exportar CSV
                     </button>
                     <button type="button"
-                            wire:click="cerrarVistaPrevia"
+                            wire:click="cerrarReporte"
                             class="sigem-rep-btn-sec">
                         ✕ Cerrar
                     </button>
@@ -124,7 +126,7 @@
                             @foreach ($reporteActual['rows'] as $row)
                                 <tr>
                                     @foreach ($row as $celda)
-                                        <td>{{ $celda }}</td>
+                                        <td>{!! $celda !!}</td>
                                     @endforeach
                                 </tr>
                             @endforeach
