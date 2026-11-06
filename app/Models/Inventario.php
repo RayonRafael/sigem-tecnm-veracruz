@@ -145,24 +145,17 @@ class Inventario extends Model
 
         $prefix = "{$marca}-{$modelo}";
 
-        // Buscar el último registro que coincida con el prefijo
-        $ultimoCodigo = static::where('codigo', 'LIKE', "{$prefix}-%")
-            ->orderByRaw('LENGTH(codigo) DESC, codigo DESC')
-            ->value('codigo');
+        // Obtener el consecutivo máximo para este prefijo en una sola consulta
+        $codigosExistentes = static::where('codigo', 'LIKE', "{$prefix}-%")
+            ->pluck('codigo')
+            ->map(function ($cod) {
+                return preg_match('/-(\d+)$/', $cod, $matches) ? (int) $matches[1] : 0;
+            });
 
-        $consecutivo = 1;
-        if ($ultimoCodigo && preg_match('/-(\d+)$/', $ultimoCodigo, $matches)) {
-            $consecutivo = ((int) $matches[1]) + 1;
-        }
+        $maxConsecutivo = $codigosExistentes->max() ?? 0;
+        $consecutivo = $maxConsecutivo + 1;
 
-        $codigoGenerado = sprintf('%s-%03d', $prefix, $consecutivo);
-
-        while (static::where('codigo', $codigoGenerado)->exists()) {
-            $consecutivo++;
-            $codigoGenerado = sprintf('%s-%03d', $prefix, $consecutivo);
-        }
-
-        return $codigoGenerado;
+        return sprintf('%s-%03d', $prefix, $consecutivo);
     }
 
     // Accessors / Mutators para campos dinámicos en especificaciones (JSON) y columnas físicas
