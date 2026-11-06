@@ -5,8 +5,8 @@
     "scripts": {
         "build:css": "sass public/css/sigem-theme.scss public/css/sigem-theme.css --no-source-map --style=expanded",
         "watch:css": "sass --watch public/css/sigem-theme.scss:public/css/sigem-theme.css --no-source-map",
-        "build": "npm run build:css && vite build",
-        "dev": "vite",
+        "build": "npm run build:css",
+        "dev": "npm run watch:css",
         "backstop:reference": "backstop reference",
         "backstop:test": "backstop test"
     },
