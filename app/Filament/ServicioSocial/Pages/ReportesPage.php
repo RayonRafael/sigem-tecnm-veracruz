@@ -35,7 +35,7 @@ class ReportesPage extends BaseReportesPage
     {
         return auth()->user() && (
             auth()->user()->hasRole(RoleEnum::SERVICIO_SOCIAL->value) ||
-            auth()->user()->hasPermissionTo(RoleEnum::PERM_ACCESS_SERVICIO_SOCIAL) ||
+            auth()->user()->hasPermissionTo(RoleEnum::PERM_ACCESS_SERVICIO) ||
             auth()->user()->hasRole(RoleEnum::ADMIN->value)
         );
     }

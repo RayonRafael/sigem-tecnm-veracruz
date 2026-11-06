@@ -63,7 +63,7 @@ class CatalogosPage extends Page
     {
         return auth()->user() && (
             auth()->user()->hasRole(RoleEnum::SERVICIO_SOCIAL->value) ||
-            auth()->user()->hasPermissionTo(RoleEnum::PERM_ACCESS_SERVICIO_SOCIAL) ||
+            auth()->user()->hasPermissionTo(RoleEnum::PERM_ACCESS_SERVICIO) ||
             auth()->user()->hasRole(RoleEnum::ADMIN->value)
         );
     }
@@ -179,7 +179,7 @@ class CatalogosPage extends Page
                 foreach ($query->limit(25)->get() as $m) {
                     $codigo = $m->modelo ?: ('#' . $m->id_producto);
                     $rows[] = [
-                        '<span class="sigem-td-folio">' . e($codigo) . '</span>',
+                        '<span class="sigem-td-folio" title="' . e($codigo) . '" style="white-space:nowrap;">' . e($codigo) . '</span>',
                         '<strong>' . e($m->nombre) . '</strong>',
                         e($m->marca?->nombre ?? 'N/A'),
                         e($m->tipo?->nombre ?? 'N/A'),
