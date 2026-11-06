@@ -41,7 +41,7 @@ class InventarioResource extends Resource
 
     protected static ?string $pluralModelLabel = 'registros de inventario';
 
-    protected static ?string $navigationGroup = 'GestiÃ³n de inventario';
+    protected static ?string $navigationGroup = 'Gestión de inventario';
 
     protected static ?int $navigationSort = 1;
 
@@ -101,7 +101,7 @@ class InventarioResource extends Resource
         $estacion = $record->estacion;
 
         if ($total > 1 && $estacion) {
-            return "Se registraron {$total} equipos como estaciÃ³n {$estacion}";
+            return "Se registraron {$total} equipos como estación {$estacion}";
         }
 
         return 'Equipo registrado exitosamente';
@@ -145,11 +145,11 @@ class InventarioResource extends Resource
             return 'aio';
         }
 
-        // 2. Laptop / PortÃ¡til
+        // 2. Laptop / Portátil
         if (
             str_contains($combined, 'laptop') ||
             str_contains($combined, 'notebook') ||
-            str_contains($combined, 'portÃ¡til') ||
+            str_contains($combined, 'portátil') ||
             str_contains($combined, 'portatil') ||
             $tipoEquipo === 'lap'
         ) {
@@ -200,7 +200,7 @@ class InventarioResource extends Resource
         // 7. Mouse
         if (
             str_contains($combined, 'mouse') ||
-            str_contains($combined, 'ratÃ³n') ||
+            str_contains($combined, 'ratón') ||
             str_contains($combined, 'raton') ||
             $componente === 'mou' ||
             $tipoEquipo === 'mou'
@@ -211,7 +211,7 @@ class InventarioResource extends Resource
         // 8. Proyector
         if (
             str_contains($combined, 'proyector') ||
-            str_contains($combined, 'caÃ±Ã³n') ||
+            str_contains($combined, 'cañón') ||
             str_contains($combined, 'canon') ||
             $tipoEquipo === 'proy'
         ) {
@@ -270,12 +270,12 @@ class InventarioResource extends Resource
             ?? '';
         $data['categoria_display'] = $record->material?->tipo?->nombre ?? $record->subtipo ?? 'General';
         $data['especificacion_texto'] = $record->especificacion_texto ?? ($record->especificaciones['especificaciones'] ?? '');
-        $data['procesador'] = $record->procesador ?? ($record->especificaciones['procesador'] ?? 'â€”');
-        $data['ram'] = $record->ram ?? ($record->especificaciones['ram'] ?? 'â€”');
-        $data['disco'] = $record->disco ?? ($record->especificaciones['disco'] ?? 'â€”');
-        $data['sistema_operativo'] = $record->sistema_operativo ?? ($record->especificaciones['sistema_operativo'] ?? 'â€”');
-        $data['tipo_impresora'] = $record->tipo_impresora ?? ($record->especificaciones['tipo_impresora'] ?? 'â€”');
-        $data['num_puertos'] = $record->especificaciones['num_puertos'] ?? 'â€”';
+        $data['procesador'] = $record->procesador ?? ($record->especificaciones['procesador'] ?? '—');
+        $data['ram'] = $record->ram ?? ($record->especificaciones['ram'] ?? '—');
+        $data['disco'] = $record->disco ?? ($record->especificaciones['disco'] ?? '—');
+        $data['sistema_operativo'] = $record->sistema_operativo ?? ($record->especificaciones['sistema_operativo'] ?? '—');
+        $data['tipo_impresora'] = $record->tipo_impresora ?? ($record->especificaciones['tipo_impresora'] ?? '—');
+        $data['num_puertos'] = $record->especificaciones['num_puertos'] ?? '—';
         $data['ip_address'] = $record->ip_address ?? ($record->especificaciones['ip_address'] ?? '');
         $data['mac_address'] = $record->mac_address ?? ($record->especificaciones['mac_address'] ?? '');
 
@@ -337,7 +337,7 @@ class InventarioResource extends Resource
             $record->especificaciones = $specs;
         }
 
-        // 5. Ãrea
+        // 5. Área
         if (isset($data['area_id']) && filled($data['area_id'])) {
             $record->area_id = $data['area_id'];
             $area = Area::find($data['area_id']);
@@ -365,7 +365,7 @@ class InventarioResource extends Resource
                     return $record->departamento?->nombre
                         ?? $record->area?->departamento?->nombre
                         ?? ($record->ubicacion_fisica ? explode(' > ', $record->ubicacion_fisica)[0] ?? null : null)
-                        ?? 'â€”';
+                        ?? '—';
                 })
                 ->searchable(query: function (Builder $query, string $search): Builder {
                     return $query->where(function (Builder $q) use ($search) {
@@ -379,7 +379,7 @@ class InventarioResource extends Resource
                         ->orderBy('departamento.nombre', $direction)
                         ->select('inventario.*');
                 })
-                ->placeholder('â€”'),
+                ->placeholder('—'),
 
             Tables\Columns\TextColumn::make('equipo')
                 ->label('Equipo')
@@ -415,7 +415,7 @@ class InventarioResource extends Resource
                 }),
 
             Tables\Columns\TextColumn::make('categoria')
-                ->label('CategorÃ­a')
+                ->label('Categoría')
                 ->badge()
                 ->color('gray')
                 ->extraHeaderAttributes(['style' => 'min-width: 120px;'])
@@ -456,7 +456,7 @@ class InventarioResource extends Resource
                             'dot' => '#d97706',
                             'class' => 'warn',
                         ],
-                        'Cambio de Ã¡rea', 'Asignado', 'Reasignado' => [
+                        'Cambio de área', 'Asignado', 'Reasignado' => [
                             'bg' => '#e0f2fe',
                             'text' => '#075985',
                             'border' => '#bae6fd',
@@ -470,7 +470,7 @@ class InventarioResource extends Resource
                             'dot' => '#f59e0b',
                             'class' => 'warn',
                         ],
-                        'Dado de baja', 'DaÃ±ado', 'Baja' => [
+                        'Dado de baja', 'Dañado', 'Baja' => [
                             'bg' => '#fee2e2',
                             'text' => '#991b1b',
                             'border' => '#fecaca',
@@ -497,7 +497,7 @@ class InventarioResource extends Resource
                 ->sortable(),
 
             Tables\Columns\TextColumn::make('area.nombre')
-                ->label('Ãrea')
+                ->label('Área')
                 ->extraHeaderAttributes(['style' => 'min-width: 180px;'])
                 ->extraCellAttributes(['style' => 'min-width: 180px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;'])
                 ->tooltip(function (Inventario $record): ?string {
@@ -518,7 +518,7 @@ class InventarioResource extends Resource
                         $parts = explode(' > ', $record->ubicacion_fisica);
                         return $parts[1] ?? $parts[0] ?? null;
                     }
-                    return 'â€”';
+                    return '—';
                 })
                 ->searchable(query: function (Builder $query, string $search): Builder {
                     return $query->where(function (Builder $q) use ($search) {
@@ -531,7 +531,7 @@ class InventarioResource extends Resource
                         ->orderBy('area.nombre', $direction)
                         ->select('inventario.*');
                 })
-                ->placeholder('â€”'),
+                ->placeholder('—'),
 
             Tables\Columns\TextColumn::make('aula')
                 ->label('Aula')
@@ -541,7 +541,7 @@ class InventarioResource extends Resource
                     return $record->salon?->nombre
                         ?? ($record->especificaciones['aula'] ?? null)
                         ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record->ubicacion_fisica ?? '', $m) ? $m[1] : null)
-                        ?? 'â€”';
+                        ?? '—';
                 })
                 ->searchable(query: function (Builder $query, string $search): Builder {
                     return $query->where(function (Builder $q) use ($search) {
@@ -555,7 +555,7 @@ class InventarioResource extends Resource
                         ->orderBy('salones.nombre', $direction)
                         ->select('inventario.*');
                 })
-                ->placeholder('â€”'),
+                ->placeholder('—'),
 
             Tables\Columns\TextColumn::make('num_serie')
                 ->label('No. de serie')
@@ -564,13 +564,13 @@ class InventarioResource extends Resource
                 ->tooltip(fn (?string $state): ?string => $state)
                 ->searchable(isIndividual: true)
                 ->sortable()
-                ->placeholder('â€”'),
+                ->placeholder('—'),
 
             Tables\Columns\TextColumn::make('ip_address')
                 ->label('IP')
                 ->extraHeaderAttributes(['style' => 'min-width: 120px;'])
                 ->extraCellAttributes(['style' => 'min-width: 120px; white-space: nowrap;'])
-                ->getStateUsing(fn (Inventario $record): string => $record->ip_address ?? ($record->especificaciones['ip_address'] ?? null) ?? 'â€”')
+                ->getStateUsing(fn (Inventario $record): string => $record->ip_address ?? ($record->especificaciones['ip_address'] ?? null) ?? '—')
                 ->searchable(query: function (Builder $query, string $search): Builder {
                     return $query->where(function (Builder $q) use ($search) {
                         $q->where('ip_address', 'like', "%{$search}%")
@@ -578,13 +578,13 @@ class InventarioResource extends Resource
                     });
                 }, isIndividual: true)
                 ->sortable()
-                ->placeholder('â€”'),
+                ->placeholder('—'),
 
             Tables\Columns\TextColumn::make('mac_address')
                 ->label('MAC')
                 ->extraHeaderAttributes(['style' => 'min-width: 150px;'])
                 ->extraCellAttributes(['style' => 'min-width: 150px; white-space: nowrap;'])
-                ->getStateUsing(fn (Inventario $record): string => $record->mac_address ?? ($record->especificaciones['mac_address'] ?? null) ?? 'â€”')
+                ->getStateUsing(fn (Inventario $record): string => $record->mac_address ?? ($record->especificaciones['mac_address'] ?? null) ?? '—')
                 ->searchable(query: function (Builder $query, string $search): Builder {
                     return $query->where(function (Builder $q) use ($search) {
                         $q->where('mac_address', 'like', "%{$search}%")
@@ -592,7 +592,7 @@ class InventarioResource extends Resource
                     });
                 }, isIndividual: true)
                 ->sortable()
-                ->placeholder('â€”'),
+                ->placeholder('—'),
         ];
     }
 
@@ -638,19 +638,19 @@ class InventarioResource extends Resource
             ->columns(static::getTableColumns())
             ->defaultSort('created_at', 'desc')
             ->striped()
-            ->searchPlaceholder('Buscar por equipo, cÃ³digo, IP, MAC, marca...')
+            ->searchPlaceholder('Buscar por equipo, código, IP, MAC, marca...')
             ->defaultPaginationPageOption(fn () => \App\Support\SigemPagination::getPageOption())
             ->paginationPageOptions(fn () => \App\Support\SigemPagination::getPageOptions())
             ->filters([])
             ->modifyQueryUsing(fn (Builder $query, $livewire): Builder => static::aplicarFiltrosTabla($query, $livewire))
             ->emptyStateHeading('No hay registros')
-            ->emptyStateDescription('Cuando se creen registros, aparecerÃ¡n aquÃ­.')
+            ->emptyStateDescription('Cuando se creen registros, aparecerán aquí.')
             ->emptyStateIcon('heroicon-o-document-text')
             ->recordUrl(null)
             ->recordAction(null)
             ->headerActions([
                 Tables\Actions\Action::make('export')
-                    ->label('â†“ Exportar')
+                    ->label('↓ Exportar')
                     ->color('gray')
                     ->action(fn ($livewire) => self::exportarInventarioExcel($livewire)),
             ])
@@ -662,7 +662,7 @@ class InventarioResource extends Resource
                     ->slideOver()
                     ->modalHeading(fn (?Inventario $record) => $record?->material?->nombre ?? $record?->subtipo ?? 'Detalle de equipo')
                     ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
-                        'ID: ' . e($record?->codigo ?? $record?->num_serie ?? 'â€”') . ' Â· ' . e($record?->material?->tipo?->nombre ?? $record?->subtipo ?? 'Sin categorÃ­a')
+                        'ID: ' . e($record?->codigo ?? $record?->num_serie ?? '—') . ' · ' . e($record?->material?->tipo?->nombre ?? $record?->subtipo ?? 'Sin categoría')
                     ))
                     ->modalCancelActionLabel('Cerrar')
                     ->extraModalFooterActions([
@@ -670,15 +670,15 @@ class InventarioResource extends Resource
                             ->label('Modificar')
                             ->color('warning')
                             ->icon('heroicon-m-pencil-square')
-                            ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Cambio de Ã¡rea'], true) && auth()->user()?->can('update', $record))
+                            ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Cambio de área'], true) && auth()->user()?->can('update', $record))
                             ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedTableAction('edit', '{$record?->getKey()}')"),
                         Tables\Actions\Action::make('desde_detalle_cambio')
                             ->label('Cambio')
                             ->color('info')
                             ->icon('heroicon-m-arrows-right-left')
-                            ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Cambio de Ã¡rea', 'Solicitud de baja'], true))
-                            ->modalHeading(fn () => static::esAdmin() ? 'Cambiar Ã¡rea de equipo' : 'Solicitar cambio de Ã¡rea')
-                            ->modalDescription(fn () => static::esAdmin() ? 'Se actualizarÃ¡ la ubicaciÃ³n fÃ­sica del equipo de forma inmediata.' : 'La solicitud quedarÃ¡ registrada en espera de revisiÃ³n y aprobaciÃ³n por el Administrador.')
+                            ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Cambio de área', 'Solicitud de baja'], true))
+                            ->modalHeading(fn () => static::esAdmin() ? 'Cambiar área de equipo' : 'Solicitar cambio de área')
+                            ->modalDescription(fn () => static::esAdmin() ? 'Se actualizará la ubicación física del equipo de forma inmediata.' : 'La solicitud quedará registrada en espera de revisión y aprobación por el Administrador.')
                             ->form(static::getModalCambioAreaFormSchema(static::esAdmin()))
                             ->modalSubmitActionLabel(fn () => static::esAdmin() ? 'Confirmar cambio' : 'Solicitar cambio')
                             ->modalCancelActionLabel('Cancelar')
@@ -692,7 +692,7 @@ class InventarioResource extends Resource
                                         $data['motivo'] ?? null,
                                         auth()->id()
                                     );
-                                    Notification::make()->title('Ãrea del equipo actualizada correctamente')->success()->send();
+                                    Notification::make()->title('Área del equipo actualizada correctamente')->success()->send();
                                 } else {
                                     $record->solicitarCambioArea(
                                         $data['departamento_id'],
@@ -702,47 +702,47 @@ class InventarioResource extends Resource
                                         $data['motivo'] ?? null,
                                         auth()->id()
                                     );
-                                    Notification::make()->title('Solicitud de cambio de Ã¡rea enviada a revisiÃ³n')->warning()->send();
+                                    Notification::make()->title('Solicitud de cambio de área enviada a revisión')->warning()->send();
                                 }
                             }),
                         Tables\Actions\Action::make('aprobar_cambio')
-                            ->label('âœ“ Aprobar cambio')
+                            ->label('✓ Aprobar cambio')
                             ->color('success')
-                            ->visible(fn (?Inventario $record) => $record && $record->estado === 'Cambio de Ã¡rea' && static::esAdmin())
+                            ->visible(fn (?Inventario $record) => $record && $record->estado === 'Cambio de área' && static::esAdmin())
                             ->requiresConfirmation()
-                            ->modalHeading('Aprobar cambio de Ã¡rea')
-                            ->modalDescription('Â¿Deseas autorizar el cambio de Ã¡rea solicitado? Se actualizarÃ¡ la ubicaciÃ³n del equipo.')
-                            ->modalSubmitActionLabel('SÃ­, autorizar cambio')
+                            ->modalHeading('Aprobar cambio de área')
+                            ->modalDescription('¿Deseas autorizar el cambio de área solicitado? Se actualizará la ubicación del equipo.')
+                            ->modalSubmitActionLabel('Sí, autorizar cambio')
                             ->modalCancelActionLabel('Cancelar')
                             ->action(function (Inventario $record) {
                                 $record->aprobarCambioArea(auth()->id());
-                                Notification::make()->title('Cambio de Ã¡rea aprobado exitosamente')->success()->send();
+                                Notification::make()->title('Cambio de área aprobado exitosamente')->success()->send();
                             }),
                         Tables\Actions\Action::make('rechazar_cambio')
-                            ->label('âœ• Rechazar cambio')
+                            ->label('✕ Rechazar cambio')
                             ->color('danger')
-                            ->visible(fn (?Inventario $record) => $record && $record->estado === 'Cambio de Ã¡rea' && static::esAdmin())
+                            ->visible(fn (?Inventario $record) => $record && $record->estado === 'Cambio de área' && static::esAdmin())
                             ->form([
                                 Forms\Components\Textarea::make('motivo_rechazo')
                                     ->label('Motivo del rechazo')
-                                    ->placeholder('Explica por quÃ© se rechaza el cambio de Ã¡rea...')
+                                    ->placeholder('Explica por qué se rechaza el cambio de área...')
                                     ->required(),
                             ])
-                            ->modalHeading('Rechazar cambio de Ã¡rea')
-                            ->modalDescription('El equipo regresarÃ¡ al estado previo y la solicitud quedarÃ¡ cancelada.')
+                            ->modalHeading('Rechazar cambio de área')
+                            ->modalDescription('El equipo regresará al estado previo y la solicitud quedará cancelada.')
                             ->modalSubmitActionLabel('Confirmar rechazo')
                             ->modalCancelActionLabel('Cancelar')
                             ->action(function (Inventario $record, array $data) {
                                 $record->rechazarCambioArea($data['motivo_rechazo'] ?? null, auth()->id());
-                                Notification::make()->title('Solicitud de cambio de Ã¡rea rechazada')->warning()->send();
+                                Notification::make()->title('Solicitud de cambio de área rechazada')->warning()->send();
                             }),
                         Tables\Actions\Action::make('desde_detalle_baja')
                             ->label('Baja')
                             ->color('danger')
                             ->icon('heroicon-m-arrow-down-circle')
-                            ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Solicitud de baja', 'Cambio de Ã¡rea'], true))
+                            ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Solicitud de baja', 'Cambio de área'], true))
                             ->modalHeading(fn () => static::esAdmin() ? 'Confirmar baja de equipo' : 'Solicitar baja de equipo')
-                            ->modalDescription(fn () => static::esAdmin() ? 'El equipo pasarÃ¡ a estado Dado de baja de manera inmediata.' : 'La solicitud quedarÃ¡ registrada en espera de revisiÃ³n y aprobaciÃ³n por el Administrador.')
+                            ->modalDescription(fn () => static::esAdmin() ? 'El equipo pasará a estado Dado de baja de manera inmediata.' : 'La solicitud quedará registrada en espera de revisión y aprobación por el Administrador.')
                             ->form(static::getModalBajaFormSchema())
                             ->modalSubmitActionLabel(fn () => static::esAdmin() ? 'Confirmar baja' : 'Solicitar baja')
                             ->modalCancelActionLabel('Cancelar')
@@ -752,34 +752,34 @@ class InventarioResource extends Resource
                                     Notification::make()->title('Equipo dado de baja correctamente')->danger()->send();
                                 } else {
                                     $record->solicitarBaja($data['motivo_baja'], $data['observaciones_baja'], auth()->id());
-                                    Notification::make()->title('Solicitud de baja enviada a revisiÃ³n')->warning()->send();
+                                    Notification::make()->title('Solicitud de baja enviada a revisión')->warning()->send();
                                 }
                             }),
                         Tables\Actions\Action::make('aprobar_baja')
-                            ->label('âœ“ Aprobar baja')
+                            ->label('✓ Aprobar baja')
                             ->color('success')
                             ->visible(fn (?Inventario $record) => $record && $record->estado === 'Solicitud de baja' && static::esAdmin())
                             ->requiresConfirmation()
                             ->modalHeading('Aprobar baja del equipo')
-                            ->modalDescription('Â¿Deseas autorizar la baja definitiva de este equipo? El estado pasarÃ¡ a Dado de baja.')
-                            ->modalSubmitActionLabel('SÃ­, autorizar baja')
+                            ->modalDescription('¿Deseas autorizar la baja definitiva de este equipo? El estado pasará a Dado de baja.')
+                            ->modalSubmitActionLabel('Sí, autorizar baja')
                             ->modalCancelActionLabel('Cancelar')
                             ->action(function (Inventario $record) {
                                 $record->aprobarBaja(auth()->id());
                                 Notification::make()->title('Baja aprobada exitosamente')->success()->send();
                             }),
                         Tables\Actions\Action::make('rechazar_baja')
-                            ->label('âœ• Rechazar baja')
+                            ->label('✕ Rechazar baja')
                             ->color('danger')
                             ->visible(fn (?Inventario $record) => $record && $record->estado === 'Solicitud de baja' && static::esAdmin())
                             ->form([
                                 Forms\Components\Textarea::make('motivo_rechazo')
                                     ->label('Motivo del rechazo')
-                                    ->placeholder('Explica por quÃ© se rechaza la solicitud de baja...')
+                                    ->placeholder('Explica por qué se rechaza la solicitud de baja...')
                                     ->required(),
                             ])
                             ->modalHeading('Rechazar solicitud de baja')
-                            ->modalDescription('El equipo regresarÃ¡ al estado previo y la solicitud quedarÃ¡ cancelada.')
+                            ->modalDescription('El equipo regresará al estado previo y la solicitud quedará cancelada.')
                             ->modalSubmitActionLabel('Confirmar rechazo')
                             ->modalCancelActionLabel('Cancelar')
                             ->action(function (Inventario $record, array $data) {
@@ -793,8 +793,8 @@ class InventarioResource extends Resource
                             ->visible(fn (?Inventario $record) => $record && $record->estado === 'Dado de baja' && static::esAdmin())
                             ->requiresConfirmation()
                             ->modalHeading('Reactivar equipo')
-                            ->modalDescription('El equipo volverÃ¡ al estado Disponible y se limpiarÃ¡ la informaciÃ³n de baja.')
-                            ->modalSubmitActionLabel('SÃ­, reactivar')
+                            ->modalDescription('El equipo volverá al estado Disponible y se limpiará la información de baja.')
+                            ->modalSubmitActionLabel('Sí, reactivar')
                             ->modalCancelActionLabel('Cancelar')
                             ->action(function (Inventario $record) {
                                 $record->reactivar(auth()->id());
@@ -807,7 +807,7 @@ class InventarioResource extends Resource
                     ->extraAttributes(['title' => 'Modificar', 'class' => 'icon-btn'])
                     ->modalHeading(fn (?Inventario $record) => 'Editar: ' . ($record?->material?->nombre ?? $record?->subtipo ?? 'equipo'))
                     ->modalDescription(fn (?Inventario $record) => new \Illuminate\Support\HtmlString(
-                        'ID: ' . e($record?->codigo ?? ('#' . $record?->id_inventario)) . ' Â· ' . e($record?->material?->tipo?->nombre ?? $record?->subtipo ?? 'General')
+                        'ID: ' . e($record?->codigo ?? ('#' . $record?->id_inventario)) . ' · ' . e($record?->material?->tipo?->nombre ?? $record?->subtipo ?? 'General')
                     ))
                     ->slideOver()
                     ->modalSubmitActionLabel('Guardar cambios')
@@ -953,7 +953,7 @@ class InventarioResource extends Resource
             $idx++;
         }
         if ($otras > 0) {
-            $top['Otras categorÃ­as'] = $otras;
+            $top['Otras categorías'] = $otras;
         }
 
         return $top;
