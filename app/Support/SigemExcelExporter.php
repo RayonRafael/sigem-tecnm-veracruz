@@ -118,6 +118,89 @@ class SigemExcelExporter
         ])->deleteFileAfterSend(true);
     }
 
+    public static function exportarInventario($livewire = null): BinaryFileResponse
+    {
+        $query = ($livewire && method_exists($livewire, 'getFilteredTableQuery'))
+            ? $livewire->getFilteredTableQuery()
+            : \App\Models\Inventario::query();
+
+        $registros = $query
+            ->with(['material.tipo', 'departamento', 'area.departamento', 'salon'])
+            ->latest('created_at')
+            ->get();
+
+        $headers = [
+            'Departamento',
+            'Código',
+            'Equipo',
+            'Categoría',
+            'Estado',
+            'Área',
+            'Aula',
+            'No. de serie',
+            'IP',
+            'MAC',
+        ];
+
+        $rows = [];
+        foreach ($registros as $record) {
+            $depto = $record->departamento?->nombre
+                ?? $record->area?->departamento?->nombre
+                ?? ($record->ubicacion_fisica ? (explode(' > ', $record->ubicacion_fisica)[0] ?? null) : null)
+                ?? '—';
+
+            $codigo = ! empty($record->codigo)
+                ? $record->codigo
+                : ($record->num_serie ?: ('#' . ($record->id_inventario ?? $record->id)));
+
+            $equipo = $record->material?->nombre ?? $record->subtipo ?? 'Equipo';
+            $categoria = $record->material?->tipo?->nombre ?? $record->subtipo ?? 'General';
+            $estado = $record->estado ?? 'Disponible';
+
+            $area = $record->area?->nombre;
+            if (! $area && ! empty($record->ubicacion_fisica)) {
+                $parts = explode(' > ', $record->ubicacion_fisica);
+                $area = $parts[1] ?? $parts[0] ?? null;
+            }
+            $area = $area ?: '—';
+
+            $aula = $record->salon?->nombre
+                ?? ($record->especificaciones['aula'] ?? null)
+                ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record->ubicacion_fisica ?? '', $m) ? $m[1] : null)
+                ?? '—';
+
+            $numSerie = $record->num_serie ?: '—';
+            $ip = $record->ip_address ?? ($record->especificaciones['ip_address'] ?? null) ?? '—';
+            $mac = $record->mac_address ?? ($record->especificaciones['mac_address'] ?? null) ?? '—';
+
+            $rows[] = [
+                $depto,
+                $codigo,
+                $equipo,
+                $categoria,
+                $estado,
+                $area,
+                $aula,
+                $numSerie,
+                $ip,
+                $mac,
+            ];
+        }
+
+        if (empty($rows)) {
+            $rows[] = ['Sin registros', '—', '—', '—', '—', '—', '—', '—', '—', '—'];
+        }
+
+        $fileName = 'inventario-sigem-' . now()->format('Y-m-d-His') . '.xlsx';
+
+        return self::export(
+            'Inventario de Equipos y Materiales',
+            $headers,
+            $rows,
+            $fileName
+        );
+    }
+
     public static function columnIndexToLetter(int $index): string
     {
         $letter = '';
