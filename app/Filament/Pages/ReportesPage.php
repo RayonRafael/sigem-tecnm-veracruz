@@ -702,26 +702,6 @@ class ReportesPage extends Page
         ];
     }
 
-    protected function renderBadge(string $estado): string
-    {
-        $tipo = match ($estado) {
-            'Disponible', 'Autorizado', 'Terminado', 'Completado', 'Aprobado' => 'ok',
-            'En proceso', 'Solicitado', 'Pendiente', 'Asignado' => 'warn',
-            'En revisión', 'Pendiente Revision Admin', 'Entregado' => 'info',
-            'Dañado', 'Baja', 'Rechazado', 'Cancelado' => 'danger',
-            default => 'neutral',
-        };
-
-        $label = match ($estado) {
-            'Pendiente Revision Admin' => 'En revisión',
-            'Completado' => 'Terminado',
-            'Cancelado' => 'Rechazado',
-            default => $estado,
-        };
-
-        return '<span class="sigem-pill ' . $tipo . '">' . e($label) . '</span>';
-    }
-
     protected function renderBadgeConteo(int $conteo, string $tipo): string
     {
         if ($conteo === 0) {

@@ -111,11 +111,6 @@ class Inventario extends Model
         return $this->belongsTo(User::class, 'aprobado_por', 'id');
     }
 
-    public function detallesSolicitud()
-    {
-        return $this->hasMany(DetalleSolicitud::class, 'id_inventario', 'id_inventario');
-    }
-
     public function mantenimientos()
     {
         return $this->hasMany(Mantenimiento::class, 'id_inventario', 'id_inventario');
@@ -124,32 +119,6 @@ class Inventario extends Model
     public function historial()
     {
         return $this->hasMany(HistorialEstado::class, 'id_inventario', 'id_inventario');
-    }
-
-    // Scopes de estado
-    public function scopeDisponibles($query)
-    {
-        return $query->where('estado', 'Disponible');
-    }
-
-    public function scopeAsignados($query)
-    {
-        return $query->where('estado', 'Asignado');
-    }
-
-    public function scopeReasignados($query)
-    {
-        return $query->where('estado', 'Reasignado');
-    }
-
-    public function scopeEnMantenimiento($query)
-    {
-        return $query->where('estado', 'En Mantenimiento');
-    }
-
-    public function scopeDanados($query)
-    {
-        return $query->whereIn('estado', ['Dañado', 'Baja']);
     }
 
     /**

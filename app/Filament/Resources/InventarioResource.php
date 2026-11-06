@@ -941,37 +941,6 @@ class InventarioResource extends Resource
         }
     }
 
-    public static function contarEquiposParaCrear(array $data): int
-    {
-        $tipo = $data['tipo_equipo'] ?? 'pc';
-        if ($tipo === 'pc') {
-            $count = 1; // CPU siempre se crea
-            if (empty($data['especificaciones']['no_tiene_monitor']) && filled($data['especificaciones']['monitor_sn'] ?? null)) {
-                $count++;
-            }
-            if (empty($data['especificaciones']['no_tiene_teclado']) && filled($data['especificaciones']['teclado_sn'] ?? null)) {
-                $count++;
-            }
-            if (empty($data['especificaciones']['no_tiene_mouse']) && filled($data['especificaciones']['mouse_sn'] ?? null)) {
-                $count++;
-            }
-            return $count;
-        }
-
-        if ($tipo === 'aio') {
-            $count = 1; // AIO siempre se crea
-            if (empty($data['especificaciones']['no_tiene_teclado']) && filled($data['especificaciones']['teclado_sn'] ?? null)) {
-                $count++;
-            }
-            if (empty($data['especificaciones']['no_tiene_mouse']) && filled($data['especificaciones']['mouse_sn'] ?? null)) {
-                $count++;
-            }
-            return $count;
-        }
-
-        return 1;
-    }
-
     public static function registrarMultiplesEquipos(array $data): Inventario
     {
         return DB::transaction(function () use ($data) {
