@@ -36,6 +36,7 @@
   --mod-cat-l: #fae8ff;
   --sig-info: #0284c7;
   --sig-info-light: #e0f2fe;
+  --sig-border-strong: #cbd5e1;
 }
 
 /* ===== 0. TOPBAR EN EL DASHBOARD Y PANEL ===== */
@@ -1384,6 +1385,20 @@ aside.fi-sidebar,
   border-radius: 50%;
   background: currentColor;
   flex-shrink: 0;
+}
+
+.sigem-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.sigem-pill:has(.sigem-dot)::before {
+  display: none !important;
 }
 
 .fi-ta-table .fi-badge svg {
