@@ -2,7 +2,7 @@ FROM php:8.4-apache
 
 RUN apt-get update && apt-get install -y \
     git unzip libzip-dev libsqlite3-dev libicu-dev \
-    && docker-php-ext-install pdo_sqlite zip intl \
+    && docker-php-ext-install pdo_sqlite pdo_mysql zip intl \
     && a2enmod rewrite headers expires deflate \
     && rm -rf /var/lib/apt/lists/*
 
@@ -33,12 +33,14 @@ RUN mkdir -p storage/framework/cache/data storage/framework/sessions storage/fra
     && chown -R www-data:www-data storage bootstrap/cache
 
 RUN composer install --no-dev --optimize-autoloader \
-    && php artisan filament:assets \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
+    && php artisan filament:assets
 
 EXPOSE 10000
 
-# Ajustar puerto dinámico de Render ($PORT) y arrancar Apache en primer plano
-CMD sh -c "sed -i 's/80/'\"\${PORT:-10000}\"'/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf && exec apache2-foreground"
+# Ajustar puerto dinámico de Render ($PORT), generar cachés de producción en runtime y arrancar Apache
+CMD sh -c "sed -i 's/80/'\"\${PORT:-10000}\"'/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache \
+    && php artisan icons:cache \
+    && exec apache2-foreground"
