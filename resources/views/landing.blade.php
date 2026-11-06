@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SIGEM — Sistema de Gestión de Equipos y Materiales del TecNM Campus Veracruz. Inventario, solicitudes, mantenimiento y reportes en tiempo real.">
     <title>SIGEM — TecNM Veracruz | Gestión de equipos y materiales</title>
     <link rel="icon" href="{{ asset('images/sigem-logo.svg') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,6 +14,7 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap">
     </noscript>
     <link rel="preload" as="image" href="{{ asset('images/fondo.webp') }}" type="image/webp" fetchpriority="high">
+    <link rel="preload" as="image" href="{{ asset('images/tecnm-logo.webp') }}" type="image/webp" fetchpriority="high">
     <script>
         (function() {
             try {
@@ -512,7 +514,7 @@
                 <div class="brand-sub">TecNM Veracruz</div>
             </div>
             <div class="header-logos" style="display: flex; gap: 12px; margin-left: 20px; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 20px;">
-                <img src="{{ asset('images/tecnm-logo.webp') }}" alt="TecNM" width="93" height="40" style="height: 40px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+                <img src="{{ asset('images/tecnm-logo.webp') }}" alt="TecNM" width="93" height="40" fetchpriority="high" style="height: 40px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
                 <img src="{{ asset('images/itv-logo.webp') }}" alt="ITV" width="53" height="40" style="height: 40px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
             </div>
         </div>
