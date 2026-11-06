@@ -920,25 +920,7 @@ class InventarioResource extends Resource
 
     public static function actualizarUbicacionDescriptiva(Forms\Set $set, Forms\Get $get): void
     {
-        $partes = [];
-        if ($deptoId = $get('departamento_id')) {
-            $depto = Departamento::find($deptoId);
-            if ($depto) {
-                $partes[] = $depto->nombre;
-            }
-        }
-        if ($areaId = $get('area_id')) {
-            $area = Area::find($areaId);
-            if ($area) {
-                $partes[] = $area->nombre;
-            }
-        }
-        if ($aula = $get('especificaciones.aula')) {
-            $partes[] = "Aula {$aula}";
-        }
-        if (! empty($partes)) {
-            $set('ubicacion_fisica', implode(' > ', $partes));
-        }
+        \App\Support\UbicacionHelper::actualizarDescriptiva($set, $get);
     }
 
     public static function registrarMultiplesEquipos(array $data): Inventario

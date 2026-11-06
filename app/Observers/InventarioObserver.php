@@ -128,43 +128,7 @@ class InventarioObserver
 
     public function construirUbicacion(?int $departamentoId, ?int $areaId, ?int $salonId, ?string $estacion): string
     {
-        $partes = [];
-
-        $departamento = $departamentoId ? Departamento::find($departamentoId) : null;
-        $area = $areaId ? Area::with('departamento')->find($areaId) : null;
-        $salon = $salonId ? Salon::with('area.departamento')->find($salonId) : null;
-
-        if (! $area && $salon?->area) {
-            $area = $salon->area;
-        }
-
-        if (! $departamento && $area?->departamento) {
-            $departamento = $area->departamento;
-        }
-
-        if ($departamento?->nombre) {
-            $partes[] = trim($departamento->nombre);
-        }
-
-        if ($area?->nombre) {
-            $partes[] = trim($area->nombre);
-        }
-
-        if ($salon?->nombre) {
-            $nombreSalon = trim($salon->nombre);
-            $partes[] = str_starts_with(strtolower($nombreSalon), 'aula')
-                ? $nombreSalon
-                : 'Aula ' . $nombreSalon;
-        }
-
-        if (! empty($estacion)) {
-            $estacionStr = trim($estacion);
-            $partes[] = str_starts_with(strtolower($estacionStr), 'estación') || str_starts_with(strtolower($estacionStr), 'estacion')
-                ? $estacionStr
-                : 'Estación ' . $estacionStr;
-        }
-
-        return implode(' > ', $partes);
+        return \App\Support\UbicacionHelper::construir($departamentoId, $areaId, $salonId, $estacion);
     }
 
     protected function autoMatchMaterial(Inventario $inventario): void

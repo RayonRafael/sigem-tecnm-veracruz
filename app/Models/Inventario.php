@@ -404,9 +404,9 @@ class Inventario extends Model
         }
 
         $ubicacionAnterior = $this->ubicacion_fisica
-            ?: (app(\App\Observers\InventarioObserver::class)->construirUbicacion($this->departamento_id, $this->area_id, $this->salon_id, $this->estacion) ?: 'Sin ubicación previa');
+            ?: (\App\Support\UbicacionHelper::construir($this->departamento_id, $this->area_id, $this->salon_id, $this->estacion) ?: 'Sin ubicación previa');
 
-        $ubicacionNueva = app(\App\Observers\InventarioObserver::class)->construirUbicacion($departamentoId, $areaId, $salonId, $estacion);
+        $ubicacionNueva = \App\Support\UbicacionHelper::construir($departamentoId, $areaId, $salonId, $estacion);
 
         $this->skipHistorialObserver = true;
 
@@ -494,7 +494,7 @@ class Inventario extends Model
         $this->ubicacion_solicitada = null;
         $this->estado_previo_cambio = null;
 
-        $ubicacionNueva = app(\App\Observers\InventarioObserver::class)->construirUbicacion($depto, $area, $salon, $estacion);
+        $ubicacionNueva = \App\Support\UbicacionHelper::construir($depto, $area, $salon, $estacion);
         if (!empty($ubicacionNueva)) {
             $this->ubicacion_fisica = substr($ubicacionNueva, 0, 150);
         }
