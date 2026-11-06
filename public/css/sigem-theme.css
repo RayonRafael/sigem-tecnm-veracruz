@@ -10,7 +10,6 @@
    6. RESPONSIVE & OVERRIDES (tablet, móvil, fixes consolidados)
    ========================================================================== */
 /* ===== 1. VARIABLES & DESIGN TOKENS ===== */
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap");
 :root {
   --sig-bg: #f4f6f9;
   --sig-surface: #ffffff;
@@ -607,12 +606,12 @@ body:has(.sigem-professional) .fi-topbar nav,
 .font-mono,
 .fi-ta-text-item-label code,
 .fi-ta-text-item-label[style*=monospace] {
-  font-family: "JetBrains Mono", monospace !important;
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
 }
 
 /* ===== LOGIN CUSTOMIZATION ===== */
 .fi-simple-layout {
-  background-image: url("../images/fondo.jpg") !important;
+  background-image: url("../images/fondo.webp") !important;
   background-size: cover !important;
   background-position: center !important;
   background-attachment: fixed !important;

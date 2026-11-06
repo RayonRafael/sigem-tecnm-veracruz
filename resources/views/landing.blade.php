@@ -6,7 +6,13 @@
     <title>SIGEM — TecNM Veracruz | Gestión de equipos y materiales</title>
     <link rel="icon" href="{{ asset('images/sigem-logo.svg') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap">
+    </noscript>
+    <link rel="preload" as="image" href="{{ asset('images/fondo.webp') }}" type="image/webp" fetchpriority="high">
     <script>
         (function() {
             try {
@@ -104,7 +110,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-image: url('{{ asset("images/fondo.jpg") }}');
+            background-image: url('{{ asset("images/fondo.webp") }}');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -500,14 +506,14 @@
     <!-- Header -->
     <header class="header">
         <div class="header-brand">
-            <img src="{{ asset('images/sigem-logo.svg') }}" alt="SIGEM" height="40">
+            <img src="{{ asset('images/sigem-logo.svg') }}" alt="SIGEM" width="40" height="40">
             <div class="brand-text">
                 <div class="brand-title">SIGEM</div>
                 <div class="brand-sub">TecNM Veracruz</div>
             </div>
             <div class="header-logos" style="display: flex; gap: 12px; margin-left: 20px; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 20px;">
-                <img src="{{ asset('images/tecnm-logo.png') }}" alt="TecNM" style="height: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
-                <img src="{{ asset('images/itv-logo.png') }}" alt="ITV" style="height: 40px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+                <img src="{{ asset('images/tecnm-logo.webp') }}" alt="TecNM" width="93" height="40" style="height: 40px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+                <img src="{{ asset('images/itv-logo.webp') }}" alt="ITV" width="53" height="40" style="height: 40px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
             </div>
         </div>
         <div class="header-actions">
@@ -576,9 +582,9 @@
     <footer class="footer">
         <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 20px;">
             <span style="color: rgba(255,255,255,0.7); font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Instituciones:</span>
-            <img src="{{ asset('images/sigem-logo.svg') }}" alt="SIGEM" loading="lazy" style="height: 38px; opacity: 0.95; object-fit: contain;">
-            <img src="{{ asset('images/tecnm-logo.png') }}" alt="TecNM" loading="lazy" style="height: 38px; opacity: 0.95; object-fit: contain;">
-            <img src="{{ asset('images/itv-logo.png') }}" alt="ITV" loading="lazy" style="height: 38px; opacity: 0.95; object-fit: contain;">
+            <img src="{{ asset('images/sigem-logo.svg') }}" alt="SIGEM" loading="lazy" width="38" height="38" style="height: 38px; width: auto; opacity: 0.95; object-fit: contain;">
+            <img src="{{ asset('images/tecnm-logo.webp') }}" alt="TecNM" loading="lazy" width="89" height="38" style="height: 38px; width: auto; opacity: 0.95; object-fit: contain;">
+            <img src="{{ asset('images/itv-logo.webp') }}" alt="ITV" loading="lazy" width="51" height="38" style="height: 38px; width: auto; opacity: 0.95; object-fit: contain;">
         </div>
         <p>&copy; {{ date('Y') }} SIGEM — Tecnológico Nacional de México Campus Veracruz. Todos los derechos reservados.</p>
     </footer>
