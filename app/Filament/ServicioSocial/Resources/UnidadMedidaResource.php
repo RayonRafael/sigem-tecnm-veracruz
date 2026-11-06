@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class UnidadMedidaResource extends Resource
 {
+    use \App\Filament\Concerns\ConCatalogoSoloLectura;
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = UnidadMedida::class;
@@ -29,26 +31,6 @@ class UnidadMedidaResource extends Resource
     protected static ?string $modelLabel = 'unidad de medida';
 
     protected static ?string $pluralModelLabel = 'unidades de medida';
-
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        return false;
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        return false;
-    }
-
-    public static function hasRecordTitle(): bool
-    {
-        return false;
-    }
 
     public static function form(Form $form): Form
     {

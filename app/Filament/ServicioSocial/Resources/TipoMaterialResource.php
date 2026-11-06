@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class TipoMaterialResource extends Resource
 {
+    use \App\Filament\Concerns\ConCatalogoSoloLectura;
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = TipoMaterial::class;
@@ -29,26 +31,6 @@ class TipoMaterialResource extends Resource
     protected static ?string $modelLabel = 'tipo de material';
 
     protected static ?string $pluralModelLabel = 'tipos de material';
-
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        return false;
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        return false;
-    }
-
-    public static function hasRecordTitle(): bool
-    {
-        return false;
-    }
 
     public static function form(Form $form): Form
     {

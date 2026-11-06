@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ReceptorResource extends Resource
 {
+    use \App\Filament\Concerns\ConCatalogoSoloLectura;
+
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $model = Receptor::class;
@@ -34,16 +36,6 @@ class ReceptorResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return \App\Filament\Resources\ReceptorResource::getEloquentQuery();
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        return false;
-    }
-
-    public static function hasRecordTitle(): bool
-    {
-        return false;
     }
 
     public static function form(Form $form): Form
