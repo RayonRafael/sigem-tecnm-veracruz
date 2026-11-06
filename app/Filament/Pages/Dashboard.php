@@ -186,6 +186,9 @@ class Dashboard extends BaseDashboard
                 COUNT(CASE WHEN estado = 'Asignado' THEN 1 END) as asignados,
                 COUNT(CASE WHEN estado = 'En Mantenimiento' THEN 1 END) as en_mantenimiento,
                 COUNT(CASE WHEN estado = 'Dañado' THEN 1 END) as danados,
+                COUNT(CASE WHEN estado = 'Solicitud de baja' THEN 1 END) as solicitudes_baja,
+                COUNT(CASE WHEN estado = 'Cambio de área' THEN 1 END) as solicitudes_cambio_area,
+                COUNT(CASE WHEN estado = 'Dado de baja' THEN 1 END) as dados_de_baja,
                 COUNT(CASE WHEN created_at BETWEEN ? AND ? THEN 1 END) as creados_este_mes
             ", [$startOfMonth, $endOfMonth])
             ->first();
@@ -195,6 +198,9 @@ class Dashboard extends BaseDashboard
         $inventarioAsignados = (int) ($inventarioStats->asignados ?? 0);
         $inventarioEnMantenimiento = (int) ($inventarioStats->en_mantenimiento ?? 0);
         $inventarioDanados = (int) ($inventarioStats->danados ?? 0);
+        $inventarioSolicitudesBaja = (int) ($inventarioStats->solicitudes_baja ?? 0);
+        $inventarioSolicitudesCambioArea = (int) ($inventarioStats->solicitudes_cambio_area ?? 0);
+        $inventarioDadosDeBaja = (int) ($inventarioStats->dados_de_baja ?? 0);
         $creadosEsteMes = (int) ($inventarioStats->creados_este_mes ?? 0);
 
         // 2. Estadísticas de Mantenimiento
@@ -225,6 +231,9 @@ class Dashboard extends BaseDashboard
             'inventarioAsignados' => $inventarioAsignados,
             'inventarioEnMantenimiento' => $inventarioEnMantenimiento,
             'inventarioDanados' => $inventarioDanados,
+            'inventarioSolicitudesBaja' => $inventarioSolicitudesBaja,
+            'inventarioSolicitudesCambioArea' => $inventarioSolicitudesCambioArea,
+            'inventarioDadosDeBaja' => $inventarioDadosDeBaja,
 
             'categoriasFiltro' => $categoriasFiltro,
             'areasFiltro' => $areasFiltro,

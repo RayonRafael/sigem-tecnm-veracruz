@@ -5,7 +5,6 @@ namespace App\Filament\ServicioSocial\Resources\SolicitudResource\Pages;
 use App\Filament\Concerns\ConDashboardBreadcrumb;
 use App\Filament\ServicioSocial\Resources\SolicitudResource;
 use App\Models\DetalleSolicitud;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditSolicitud extends EditRecord

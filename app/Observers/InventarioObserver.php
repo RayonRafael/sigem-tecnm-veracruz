@@ -2,11 +2,16 @@
 
 namespace App\Observers;
 
+use App\Models\Area;
+use App\Models\Departamento;
+use App\Models\HistorialEstado;
 use App\Models\Inventario;
 use App\Models\MarcaMaterial;
 use App\Models\Material;
+use App\Models\Salon;
 use App\Models\TipoMaterial;
 use App\Models\UnidadMedida;
+use App\Models\User;
 
 class InventarioObserver
 {
@@ -24,13 +29,142 @@ class InventarioObserver
         if (empty($inventario->codigo)) {
             $inventario->codigo = $inventario->generarCodigo();
         }
+
+        // 3. Sincronizar ubicación física inicial si no viene asignada
+        if (empty($inventario->ubicacion_fisica)) {
+            $ubicacion = $this->construirUbicacion(
+                $inventario->departamento_id,
+                $inventario->area_id,
+                $inventario->salon_id,
+                $inventario->estacion
+            );
+            if (! empty($ubicacion)) {
+                $inventario->ubicacion_fisica = substr($ubicacion, 0, 150);
+            }
+        }
+    }
+
+    public function created(Inventario $inventario): void
+    {
+        $ubicacion = $this->construirUbicacion(
+            $inventario->departamento_id,
+            $inventario->area_id,
+            $inventario->salon_id,
+            $inventario->estacion
+        );
+
+        $usuarioId = auth()->id() ?? $inventario->id_usuario ?? User::where('email', 'admin@tecnm.edu.mx')->value('id') ?? User::first()?->id ?? 1;
+
+        HistorialEstado::create([
+            'id_inventario' => $inventario->id_inventario,
+            'id_usuario' => $usuarioId,
+            'estado_anterior' => null,
+            'estado_nuevo' => $inventario->estado ?? 'Disponible',
+            'motivo_cambio' => 'Alta inicial en el inventario',
+            'ubicacion_fisica' => $ubicacion ?: ($inventario->ubicacion_fisica ?: 'Sin ubicación asignada'),
+            'fecha_cambio' => now(),
+        ]);
     }
 
     public function updating(Inventario $inventario): void
     {
-        if ($inventario->isDirty('estado') && $inventario->estado === 'Baja' && empty($inventario->fecha_baja)) {
+        if ($inventario->isDirty('estado') && in_array($inventario->estado, ['Baja', 'Dado de baja'], true) && empty($inventario->fecha_baja)) {
             $inventario->fecha_baja = now();
         }
+
+        if ($inventario->isDirty(['departamento_id', 'area_id', 'salon_id', 'estacion'])) {
+            $ubicacion = $this->construirUbicacion(
+                $inventario->departamento_id,
+                $inventario->area_id,
+                $inventario->salon_id,
+                $inventario->estacion
+            );
+            if (! empty($ubicacion)) {
+                $inventario->ubicacion_fisica = substr($ubicacion, 0, 150);
+            }
+        }
+    }
+
+    public function updated(Inventario $inventario): void
+    {
+        if ($inventario->skipHistorialObserver) {
+            return;
+        }
+
+        $cambioUbicacion = $inventario->wasChanged(['departamento_id', 'area_id', 'salon_id', 'estacion']);
+
+        if ($cambioUbicacion) {
+            $ubicacionAnterior = $this->construirUbicacion(
+                $inventario->getOriginal('departamento_id'),
+                $inventario->getOriginal('area_id'),
+                $inventario->getOriginal('salon_id'),
+                $inventario->getOriginal('estacion')
+            );
+
+            $ubicacionNueva = $this->construirUbicacion(
+                $inventario->departamento_id,
+                $inventario->area_id,
+                $inventario->salon_id,
+                $inventario->estacion
+            );
+
+            if ($ubicacionAnterior !== $ubicacionNueva) {
+                $textoAnterior = $ubicacionAnterior ?: 'Sin ubicación previa';
+                $textoNuevo = $ubicacionNueva ?: 'Sin ubicación asignada';
+                $usuarioId = auth()->id() ?? $inventario->id_usuario ?? User::where('email', 'admin@tecnm.edu.mx')->value('id') ?? User::first()?->id ?? 1;
+
+                HistorialEstado::create([
+                    'id_inventario' => $inventario->id_inventario,
+                    'id_usuario' => $usuarioId,
+                    'estado_anterior' => $inventario->getOriginal('estado') ?? $inventario->estado ?? 'Disponible',
+                    'estado_nuevo' => $inventario->estado ?? 'Disponible',
+                    'motivo_cambio' => "Cambio de ubicación: {$textoAnterior} → {$textoNuevo}",
+                    'ubicacion_fisica' => $ubicacionNueva ?: null,
+                    'fecha_cambio' => now(),
+                ]);
+            }
+        }
+    }
+
+    public function construirUbicacion(?int $departamentoId, ?int $areaId, ?int $salonId, ?string $estacion): string
+    {
+        $partes = [];
+
+        $departamento = $departamentoId ? Departamento::find($departamentoId) : null;
+        $area = $areaId ? Area::with('departamento')->find($areaId) : null;
+        $salon = $salonId ? Salon::with('area.departamento')->find($salonId) : null;
+
+        if (! $area && $salon?->area) {
+            $area = $salon->area;
+        }
+
+        if (! $departamento && $area?->departamento) {
+            $departamento = $area->departamento;
+        }
+
+        if ($departamento?->nombre) {
+            $partes[] = trim($departamento->nombre);
+        }
+
+        if ($area?->nombre) {
+            $partes[] = trim($area->nombre);
+        }
+
+        if ($salon?->nombre) {
+            $nombreSalon = trim($salon->nombre);
+            $partes[] = str_starts_with(strtolower($nombreSalon), 'aula')
+                ? $nombreSalon
+                : 'Aula ' . $nombreSalon;
+        }
+
+        if (! empty($estacion)) {
+            $estacionStr = trim($estacion);
+            $partes[] = str_starts_with(strtolower($estacionStr), 'estación') || str_starts_with(strtolower($estacionStr), 'estacion')
+                ? $estacionStr
+                : 'Estación ' . $estacionStr;
+        }
+
+        return implode(' > ', $partes);
     }
 
     protected function autoMatchMaterial(Inventario $inventario): void

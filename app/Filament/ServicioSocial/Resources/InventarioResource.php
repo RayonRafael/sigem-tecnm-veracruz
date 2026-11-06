@@ -44,7 +44,7 @@ class InventarioResource extends Resource
 
     public static function canEdit(Model $record): bool
     {
-        return true;
+        return $record->estado !== 'Dado de baja';
     }
 
     public static function form(Form $form): Form

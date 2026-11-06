@@ -201,20 +201,21 @@
                             <table class="fi-ta-table">
                                 <thead>
                                     <tr>
-                                        <th style="width: 130px;">CÓDIGO</th>
-                                        <th>EQUIPO</th>
-                                        <th style="width: 125px;">CATEGORÍA</th>
-                                        <th style="width: 130px;">ESTADO</th>
-                                        <th style="width: 130px;">ÁREA</th>
-                                        <th style="width: 104px; text-align: center;">ACCIONES</th>
+                                        <th style="min-width: 250px; width: 250px;">CÓDIGO</th>
+                                        <th style="min-width: 220px;">EQUIPO</th>
+                                        <th style="min-width: 120px; width: 120px;">CATEGORÍA</th>
+                                        <th style="min-width: 130px; width: 130px;">ESTADO</th>
+                                        <th style="min-width: 180px; width: 180px;">ÁREA</th>
+                                        <th style="min-width: 104px; width: 104px; text-align: center;">ACCIONES</th>
                                     </tr>
                                     <tr class="sigem-dash-filter-row">
-                                        <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
+                                        <th class="fi-table-individual-search-cell" style="min-width: 250px; width: 250px; padding: 4px 6px;">
                                             <input
                                                 type="search"
                                                 wire:model.live.debounce.500ms="tableColumnSearches.num_serie"
-                                                placeholder="ej. BM6R..."
+                                                placeholder="ej. CISCO-..."
                                                 class="sigem-dash-filter-input"
+                                                style="width: 100%; box-sizing: border-box;"
                                             />
                                         </th>
                                         <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
@@ -246,6 +247,8 @@
                                                 <option value="Reasignado">Reasignado</option>
                                                 <option value="En Mantenimiento">En Mantenimiento</option>
                                                 <option value="Dañado">Dañado</option>
+                                                <option value="Solicitud de baja">Solicitud de baja</option>
+                                                <option value="Dado de baja">Dado de baja</option>
                                                 <option value="Baja">Baja</option>
                                             </select>
                                         </th>
@@ -331,33 +334,33 @@
                                                     'Asignado' => 'info',
                                                     'Reasignado' => 'reassign',
                                                     'En Mantenimiento' => 'warn',
-                                                    'Dañado' => 'danger',
-                                                    'Baja' => 'neutral',
+                                                    'Solicitud de baja' => 'warn',
+                                                    'Dado de baja', 'Baja', 'Dañado' => 'danger',
                                                     default => 'neutral',
                                                 };
                                             @endphp
                                             <tr>
-                                                <td>
-                                                    <span class="sigem-td-folio" style="font-weight: 700;">{{ $codigo }}</span>
+                                                <td style="min-width: 250px; width: 250px; white-space: nowrap;">
+                                                    <span class="sigem-td-folio" style="font-weight: 700; white-space: nowrap; display: inline-block;" title="{{ $codigo }}">{{ $codigo }}</span>
                                                 </td>
-                                                <td>
+                                                <td style="min-width: 220px;">
                                                     <div style="display: flex; flex-direction: column;">
-                                                        <strong style="color: var(--sig-text);">{{ $nombreEquipo }}</strong>
-                                                        <span style="font-size: 13px; color: var(--sig-muted);">{{ $serieSub }}</span>
+                                                        <strong style="color: var(--sig-text);" title="{{ $nombreEquipo }}">{{ $nombreEquipo }}</strong>
+                                                        <span style="font-size: 13px; color: var(--sig-muted); white-space: nowrap;" title="{{ $serieSub }}">{{ $serieSub }}</span>
                                                     </div>
                                                 </td>
-                                                <td>
-                                                    <span class="sigem-pill neutral" style="font-weight: 500;">{{ $categoria }}</span>
+                                                <td style="min-width: 120px; white-space: nowrap;">
+                                                    <span class="sigem-pill neutral" style="font-weight: 500; white-space: nowrap;" title="{{ $categoria }}">{{ $categoria }}</span>
                                                 </td>
-                                                <td>
-                                                    <span class="sigem-pill {{ $pillCls }}">
+                                                <td style="min-width: 130px; white-space: nowrap;">
+                                                    <span class="sigem-pill {{ $pillCls }}" style="white-space: nowrap;">
                                                         <span class="sigem-dot"></span>{{ $estado }}
                                                     </span>
                                                 </td>
-                                                <td>
-                                                    <span style="font-size: 14.5px; color: var(--sig-muted);">{{ $areaUbicacion }}</span>
+                                                <td style="min-width: 180px; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $areaUbicacion }}">
+                                                    <span style="font-size: 14px; color: var(--sig-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $areaUbicacion }}">{{ $areaUbicacion }}</span>
                                                 </td>
-                                                <td class="fi-ta-actions-cell" style="width: 104px; text-align: center; white-space: nowrap;">
+                                                <td class="fi-ta-actions-cell" style="min-width: 104px; width: 104px; text-align: center; white-space: nowrap;">
                                                     <div class="fi-ta-actions" style="display: inline-flex; align-items: center; justify-content: center; gap: 3px;">
                                                         <button type="button"
                                                                 wire:click="verEquipo({{ $inv->id_inventario }})"

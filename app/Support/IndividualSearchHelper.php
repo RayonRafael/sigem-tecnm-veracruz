@@ -155,6 +155,9 @@ class IndividualSearchHelper
             'Reasignado' => 'Reasignado',
             'En Mantenimiento' => 'En Mantenimiento',
             'Dañado' => 'Dañado',
+            'Cambio de área' => 'Cambio de área',
+            'Solicitud de baja' => 'Solicitud de baja',
+            'Dado de baja' => 'Dado de baja',
             'Baja' => 'Baja',
         ];
     }

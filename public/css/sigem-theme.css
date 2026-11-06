@@ -4844,8 +4844,9 @@ body:has(.sigem-professional) .fi-main {
 }
 .sigem-dash-table .fi-ta-table thead th:first-child,
 .sigem-dash-table .fi-ta-table tbody td:first-child {
-  width: 130px !important;
-  max-width: 130px !important;
+  width: 250px !important;
+  min-width: 250px !important;
+  max-width: none !important;
 }
 .sigem-dash-table .fi-ta-table thead th:last-child,
 .sigem-dash-table .fi-ta-table tbody td:last-child {
@@ -5104,6 +5105,8 @@ body:has(.sigem-professional) .fi-main {
   border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
 }
 :is(.fi-table-individual-search-cell, [class*=fi-table-individual-search-cell]) input {
+  width: 100% !important;
+  box-sizing: border-box !important;
   font-size: 12.5px !important;
   height: 32px !important;
   min-height: 32px !important;
@@ -5160,19 +5163,36 @@ body:has(.sigem-professional) .fi-main {
 }
 
 /* ============================================
-   FIX 2: Fondo gris uniforme (sin huecos blancos)
+   FIX 2: Tarjetas de tabla blancas sobre fondo gris
    ============================================ */
-.fi-ta-ctn,
+.fi-ta-ctn {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+}
+
 .fi-ta-header-ctn,
 .fi-ta-header,
 .fi-ta-header-toolbar,
-.fi-ta-content,
+.fi-ta-content {
+  background: #ffffff !important;
+}
+
 .fi-ta-table thead,
-.fi-ta-table thead tr,
-.fi-ta-table thead th,
+.fi-ta-table thead tr {
+  background: #f8fafc !important;
+}
+
+.fi-ta-table thead th {
+  background: #f8fafc !important;
+}
+
 .fi-table-individual-search-cell,
 [class*=fi-table-individual-search-cell] {
-  background: var(--sig-bg, #f4f6f8) !important;
+  background: #f8fafc !important;
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
 }
 
 .fi-ta-header-ctn {
@@ -6736,33 +6756,72 @@ textarea::placeholder,
 
 /* Tabs en slide-over: que quepan en una sola fila sin cortarse */
 .fi-modal-slide-over-window .fi-tabs,
-.fi-modal-slide-over-window nav.fi-tabs {
+.fi-modal-slide-over-window nav.fi-tabs,
+.fi-modal-slide-over .fi-tabs,
+.fi-modal-slide-over nav.fi-tabs {
   display: flex !important;
   flex-direction: row !important;
   flex-wrap: nowrap !important;
   overflow-x: auto !important;
-  gap: 4px !important;
-  padding: 4px !important;
+  gap: 3px !important;
+  padding: 3px !important;
   background: #f8fafc !important;
   border: 1px solid #e5e7eb !important;
   border-radius: 8px !important;
 }
 
 .fi-modal-slide-over-window .fi-tabs-item,
-.fi-modal-slide-over-window nav.fi-tabs .fi-tabs-item {
-  padding: 6px 10px !important;
+.fi-modal-slide-over-window nav.fi-tabs .fi-tabs-item,
+.fi-modal-slide-over-window .fi-tabs-item-button,
+.fi-modal-slide-over-window button.fi-tabs-item,
+.fi-modal-slide-over .fi-tabs-item,
+.fi-modal-slide-over nav.fi-tabs .fi-tabs-item,
+.fi-modal-slide-over .fi-tabs-item-button,
+.fi-modal-slide-over button.fi-tabs-item {
+  padding: 5px 0.55rem !important;
   font-size: 0.8125rem !important; /* 13px */
-  gap: 5px !important;
+  gap: 4px !important;
   white-space: nowrap !important;
   flex-shrink: 0 !important;
 }
 
 .fi-modal-slide-over-window .fi-tabs-item-label,
-.fi-modal-slide-over-window .fi-tabs-item span {
+.fi-modal-slide-over-window .fi-tabs-item span,
+.fi-modal-slide-over .fi-tabs-item-label,
+.fi-modal-slide-over .fi-tabs-item span {
   white-space: nowrap !important;
   text-overflow: clip !important;
   overflow: visible !important;
   font-size: 0.8125rem !important;
+}
+
+/* ==========================================================================
+   TABLAS RESPONSIVAS Y ANCHOS MÍNIMOS SIN COMPRESIÓN
+   ========================================================================== */
+.fi-ta-ctn,
+.fi-ta-content,
+.sigem-rep-table-wrap {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+.sigem-inventario-table .fi-ta-table,
+.fi-ta-ctn:has(.sigem-inventario-table) .fi-ta-table,
+.fi-ta-table:has(th:nth-child(9)) {
+  min-width: 1250px !important;
+  table-layout: auto !important;
+}
+
+/* Catálogo Materiales: columna Modelo / ID ampliada a mínimo 120px */
+.sigem-cat-materiales .sigem-col-id,
+.sigem-cat-materiales thead th.sigem-col-id,
+.sigem-cat-materiales tbody td.sigem-col-id {
+  width: 140px !important;
+  min-width: 120px !important;
+  max-width: 200px !important;
+  text-align: left !important;
+  padding-left: 12px !important;
+  white-space: nowrap !important;
 }
 
 /* Emojis automáticos en encabezados de sección para Editar y Catálogos */

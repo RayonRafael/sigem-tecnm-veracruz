@@ -15,7 +15,19 @@ class HistorialEstado extends Model
 
     public $timestamps = false; // Desactiva created_at/updated_at
 
-    protected $fillable = ['id_inventario', 'id_usuario', 'estado_anterior', 'estado_nuevo', 'motivo_cambio', 'ubicacion_fisica'];
+    protected $fillable = [
+        'id_inventario',
+        'id_usuario',
+        'estado_anterior',
+        'estado_nuevo',
+        'motivo_cambio',
+        'ubicacion_fisica',
+        'fecha_cambio',
+    ];
+
+    protected $casts = [
+        'fecha_cambio' => 'datetime',
+    ];
 
     public function inventario()
     {
