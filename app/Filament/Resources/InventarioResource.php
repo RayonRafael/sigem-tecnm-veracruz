@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\EstadoInventario;
 use App\Enums\RoleEnum;
 use App\Filament\Resources\InventarioResource\Pages;
 use App\Models\Area;

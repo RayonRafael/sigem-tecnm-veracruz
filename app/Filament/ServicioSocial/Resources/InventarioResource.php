@@ -2,6 +2,7 @@
 
 namespace App\Filament\ServicioSocial\Resources;
 
+use App\Enums\EstadoInventario;
 use App\Filament\Resources\InventarioResource as AdminInventarioResource;
 use App\Filament\ServicioSocial\Resources\InventarioResource\Pages;
 use App\Models\Inventario;
@@ -44,7 +45,7 @@ class InventarioResource extends Resource
 
     public static function canEdit(Model $record): bool
     {
-        return $record->estado !== 'Dado de baja';
+        return $record->estado !== EstadoInventario::DadoDeBaja->value;
     }
 
     public static function form(Form $form): Form

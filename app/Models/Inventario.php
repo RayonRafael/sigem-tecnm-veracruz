@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\EstadoInventario;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -276,10 +277,10 @@ class Inventario extends Model
     public function darBajaDirecta(string $motivo, string $observaciones, ?int $usuarioId = null): void
     {
         $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
-        $estadoAnterior = $this->estado ?? 'Disponible';
+        $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
         $this->update([
-            'estado' => 'Dado de baja',
+            'estado' => EstadoInventario::DadoDeBaja->value,
             'fecha_baja' => now(),
             'motivo_baja' => $motivo,
             'observaciones_baja' => $observaciones,
@@ -290,7 +291,7 @@ class Inventario extends Model
             'id_inventario' => $this->id_inventario,
             'id_usuario' => $userId,
             'estado_anterior' => $estadoAnterior,
-            'estado_nuevo' => 'Dado de baja',
+            'estado_nuevo' => EstadoInventario::DadoDeBaja->value,
             'motivo_cambio' => "Baja directa: {$motivo}",
             'ubicacion_fisica' => $this->ubicacion_fisica,
             'fecha_cambio' => now(),
@@ -300,10 +301,10 @@ class Inventario extends Model
     public function solicitarBaja(string $motivo, string $observaciones, ?int $usuarioId = null): void
     {
         $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
-        $estadoAnterior = $this->estado ?? 'Disponible';
+        $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
         $this->update([
-            'estado' => 'Solicitud de baja',
+            'estado' => EstadoInventario::SolicitudDeBaja->value,
             'estado_previo_baja' => $estadoAnterior,
             'motivo_baja' => $motivo,
             'observaciones_baja' => $observaciones,
@@ -314,7 +315,7 @@ class Inventario extends Model
             'id_inventario' => $this->id_inventario,
             'id_usuario' => $userId,
             'estado_anterior' => $estadoAnterior,
-            'estado_nuevo' => 'Solicitud de baja',
+            'estado_nuevo' => EstadoInventario::SolicitudDeBaja->value,
             'motivo_cambio' => "Solicitud de baja: {$motivo}",
             'ubicacion_fisica' => $this->ubicacion_fisica,
             'fecha_cambio' => now(),
@@ -327,7 +328,7 @@ class Inventario extends Model
         $motivo = $this->motivo_baja ?? 'Sin motivo especificado';
 
         $this->update([
-            'estado' => 'Dado de baja',
+            'estado' => EstadoInventario::DadoDeBaja->value,
             'fecha_baja' => now(),
             'id_usuario_baja' => $userId,
         ]);
@@ -335,8 +336,8 @@ class Inventario extends Model
         HistorialEstado::create([
             'id_inventario' => $this->id_inventario,
             'id_usuario' => $userId,
-            'estado_anterior' => 'Solicitud de baja',
-            'estado_nuevo' => 'Dado de baja',
+            'estado_anterior' => EstadoInventario::SolicitudDeBaja->value,
+            'estado_nuevo' => EstadoInventario::DadoDeBaja->value,
             'motivo_cambio' => "Baja aprobada: {$motivo}",
             'ubicacion_fisica' => $this->ubicacion_fisica,
             'fecha_cambio' => now(),
@@ -346,7 +347,7 @@ class Inventario extends Model
     public function rechazarBaja(?string $observaciones = null, ?int $usuarioId = null): void
     {
         $userId = $usuarioId ?? auth()->id() ?? 1;
-        $estadoRestaurar = $this->estado_previo_baja ?? 'Disponible';
+        $estadoRestaurar = $this->estado_previo_baja ?? EstadoInventario::Disponible->value;
         $obsTexto = !empty($observaciones) ? $observaciones : ($this->observaciones_baja ?? 'Sin observaciones');
 
         $this->update([
@@ -361,7 +362,7 @@ class Inventario extends Model
         HistorialEstado::create([
             'id_inventario' => $this->id_inventario,
             'id_usuario' => $userId,
-            'estado_anterior' => 'Solicitud de baja',
+            'estado_anterior' => EstadoInventario::SolicitudDeBaja->value,
             'estado_nuevo' => $estadoRestaurar,
             'motivo_cambio' => "Baja rechazada: {$obsTexto}",
             'ubicacion_fisica' => $this->ubicacion_fisica,
@@ -374,7 +375,7 @@ class Inventario extends Model
         $userId = $usuarioId ?? auth()->id() ?? 1;
 
         $this->update([
-            'estado' => 'Disponible',
+            'estado' => EstadoInventario::Disponible->value,
             'fecha_baja' => null,
             'motivo_baja' => null,
             'observaciones_baja' => null,
@@ -385,8 +386,8 @@ class Inventario extends Model
         HistorialEstado::create([
             'id_inventario' => $this->id_inventario,
             'id_usuario' => $userId,
-            'estado_anterior' => 'Dado de baja',
-            'estado_nuevo' => 'Disponible',
+            'estado_anterior' => EstadoInventario::DadoDeBaja->value,
+            'estado_nuevo' => EstadoInventario::Disponible->value,
             'motivo_cambio' => 'Reactivación del equipo',
             'ubicacion_fisica' => $this->ubicacion_fisica,
             'fecha_cambio' => now(),
@@ -396,7 +397,7 @@ class Inventario extends Model
     public function cambiarAreaDirecto($departamentoId, $areaId, $salonId = null, $estacion = null, ?string $motivo = null, ?int $usuarioId = null): void
     {
         $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
-        $estadoAnterior = $this->estado ?? 'Disponible';
+        $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
         if (!empty($salonId) && !is_numeric($salonId) && is_string($salonId)) {
             $salonObj = Salon::firstOrCreate(['nombre' => $salonId, 'area_id' => $areaId]);
@@ -428,7 +429,7 @@ class Inventario extends Model
             'id_inventario' => $this->id_inventario,
             'id_usuario' => $userId,
             'estado_anterior' => $estadoAnterior,
-            'estado_nuevo' => $this->estado ?? 'Disponible',
+            'estado_nuevo' => $this->estado ?? EstadoInventario::Disponible->value,
             'motivo_cambio' => $motivoTexto,
             'ubicacion_fisica' => $this->ubicacion_fisica,
             'fecha_cambio' => now(),
@@ -438,7 +439,7 @@ class Inventario extends Model
     public function solicitarCambioArea($departamentoId, $areaId, $salonId = null, $estacion = null, ?string $motivo = null, ?int $usuarioId = null): void
     {
         $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
-        $estadoAnterior = $this->estado ?? 'Disponible';
+        $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
         if (!empty($salonId) && !is_numeric($salonId) && is_string($salonId)) {
             $salonObj = Salon::firstOrCreate(['nombre' => $salonId, 'area_id' => $areaId]);
@@ -454,7 +455,7 @@ class Inventario extends Model
         ];
 
         $this->update([
-            'estado' => 'Cambio de área',
+            'estado' => EstadoInventario::CambioDeArea->value,
             'estado_previo_cambio' => $estadoAnterior,
             'ubicacion_solicitada' => $solicitudData,
         ]);
@@ -465,7 +466,7 @@ class Inventario extends Model
             'id_inventario' => $this->id_inventario,
             'id_usuario' => $userId,
             'estado_anterior' => $estadoAnterior,
-            'estado_nuevo' => 'Cambio de área',
+            'estado_nuevo' => EstadoInventario::CambioDeArea->value,
             'motivo_cambio' => $motivoHistorial,
             'ubicacion_fisica' => $this->ubicacion_fisica,
             'fecha_cambio' => now(),
@@ -476,7 +477,7 @@ class Inventario extends Model
     {
         $userId = $usuarioId ?? auth()->id() ?? 1;
         $solicitud = $this->ubicacion_solicitada ?? [];
-        $estadoPrevio = $this->estado_previo_cambio ?? 'Disponible';
+        $estadoPrevio = $this->estado_previo_cambio ?? EstadoInventario::Disponible->value;
 
         $depto = $solicitud['departamento_id'] ?? $this->departamento_id;
         $area = $solicitud['area_id'] ?? $this->area_id;
@@ -505,7 +506,7 @@ class Inventario extends Model
         HistorialEstado::create([
             'id_inventario' => $this->id_inventario,
             'id_usuario' => $userId,
-            'estado_anterior' => 'Cambio de área',
+            'estado_anterior' => EstadoInventario::CambioDeArea->value,
             'estado_nuevo' => $estadoPrevio,
             'motivo_cambio' => "Cambio de área aprobado: {$ubicacionTexto}",
             'ubicacion_fisica' => $this->ubicacion_fisica,
@@ -516,7 +517,7 @@ class Inventario extends Model
     public function rechazarCambioArea(?string $motivoRechazo = null, ?int $usuarioId = null): void
     {
         $userId = $usuarioId ?? auth()->id() ?? 1;
-        $estadoPrevio = $this->estado_previo_cambio ?? 'Disponible';
+        $estadoPrevio = $this->estado_previo_cambio ?? EstadoInventario::Disponible->value;
 
         $this->update([
             'estado' => $estadoPrevio,
@@ -529,7 +530,7 @@ class Inventario extends Model
         HistorialEstado::create([
             'id_inventario' => $this->id_inventario,
             'id_usuario' => $userId,
-            'estado_anterior' => 'Cambio de área',
+            'estado_anterior' => EstadoInventario::CambioDeArea->value,
             'estado_nuevo' => $estadoPrevio,
             'motivo_cambio' => $motivoTexto,
             'ubicacion_fisica' => $this->ubicacion_fisica,

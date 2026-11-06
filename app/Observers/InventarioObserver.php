@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\EstadoInventario;
 use App\Models\Area;
 use App\Models\Departamento;
 use App\Models\HistorialEstado;
@@ -59,7 +60,7 @@ class InventarioObserver
             'id_inventario' => $inventario->id_inventario,
             'id_usuario' => $usuarioId,
             'estado_anterior' => null,
-            'estado_nuevo' => $inventario->estado ?? 'Disponible',
+            'estado_nuevo' => $inventario->estado ?? EstadoInventario::Disponible->value,
             'motivo_cambio' => 'Alta inicial en el inventario',
             'ubicacion_fisica' => $ubicacion ?: ($inventario->ubicacion_fisica ?: 'Sin ubicación asignada'),
             'fecha_cambio' => now(),
@@ -68,7 +69,7 @@ class InventarioObserver
 
     public function updating(Inventario $inventario): void
     {
-        if ($inventario->isDirty('estado') && in_array($inventario->estado, ['Baja', 'Dado de baja'], true) && empty($inventario->fecha_baja)) {
+        if ($inventario->isDirty('estado') && in_array($inventario->estado, ['Baja', EstadoInventario::DadoDeBaja->value], true) && empty($inventario->fecha_baja)) {
             $inventario->fecha_baja = now();
         }
 
@@ -116,8 +117,8 @@ class InventarioObserver
                 HistorialEstado::create([
                     'id_inventario' => $inventario->id_inventario,
                     'id_usuario' => $usuarioId,
-                    'estado_anterior' => $inventario->getOriginal('estado') ?? $inventario->estado ?? 'Disponible',
-                    'estado_nuevo' => $inventario->estado ?? 'Disponible',
+                    'estado_anterior' => $inventario->getOriginal('estado') ?? $inventario->estado ?? EstadoInventario::Disponible->value,
+                    'estado_nuevo' => $inventario->estado ?? EstadoInventario::Disponible->value,
                     'motivo_cambio' => "Cambio de ubicación: {$textoAnterior} → {$textoNuevo}",
                     'ubicacion_fisica' => $ubicacionNueva ?: null,
                     'fecha_cambio' => now(),
