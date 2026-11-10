@@ -633,116 +633,260 @@
                x-cloak>
             @php
                 $cantSel = count($selectedRows);
-                $firstSelId = reset($selectedRows);
-                $selRecord = !empty($firstSelId) ? \App\Models\Inventario::with(['material.tipo', 'departamento', 'area', 'salon'])->find($firstSelId) : null;
+                $selectedRecords = !empty($selectedRows)
+                    ? \App\Models\Inventario::with(['material.tipo', 'departamento', 'area', 'salon'])
+                        ->whereIn('id_inventario', $selectedRows)
+                        ->get()
+                    : collect();
+                $selRecord = $selectedRecords->first();
+
+                $getEstadoStyle = function (?string $st) {
+                    $estadoReal = match ($st) {
+                        'En mantenimiento' => 'En Mantenimiento',
+                        'Baja' => 'Dado de baja',
+                        default => $st ?: 'Disponible',
+                    };
+                    return match ($estadoReal) {
+                        'Disponible' => ['label' => 'Disponible', 'dot' => '#22c55e', 'bg' => '#dcfce7', 'text' => '#166534'],
+                        'Asignado' => ['label' => 'Asignado', 'dot' => '#3b82f6', 'bg' => '#dbeafe', 'text' => '#1e40af'],
+                        'Reasignado' => ['label' => 'Reasignado', 'dot' => '#3b82f6', 'bg' => '#dbeafe', 'text' => '#1e40af'],
+                        'En Mantenimiento' => ['label' => 'En Mantenimiento', 'dot' => '#f59e0b', 'bg' => '#fef3c7', 'text' => '#92400e'],
+                        'Cambio de área' => ['label' => 'Cambio de área', 'dot' => '#9ca3af', 'bg' => '#f3f4f6', 'text' => '#374151'],
+                        'Solicitud de baja' => ['label' => 'Solicitud de baja', 'dot' => '#f59e0b', 'bg' => '#fef3c7', 'text' => '#92400e'],
+                        'Dado de baja' => ['label' => 'Dado de baja', 'dot' => '#ef4444', 'bg' => '#fee2e2', 'text' => '#991b1b'],
+                        'Dañado' => ['label' => 'Dañado', 'dot' => '#ef4444', 'bg' => '#fee2e2', 'text' => '#991b1b'],
+                        'Devuelto a Proveedor' => ['label' => 'Devuelto a Proveedor', 'dot' => '#f59e0b', 'bg' => '#fef3c7', 'text' => '#92400e'],
+                        default => ['label' => $estadoReal, 'dot' => '#9ca3af', 'bg' => '#f3f4f6', 'text' => '#374151'],
+                    };
+                };
+
+                $formatItemDesc = function ($rec) {
+                    $matNom = $rec->material?->nombre ?? $rec->subtipo ?? 'Equipo';
+                    $areaNom = $rec->area?->nombre;
+                    if (empty($areaNom) && !empty($rec->ubicacion_fisica)) {
+                        $parts = explode(' > ', $rec->ubicacion_fisica);
+                        $areaNom = $parts[1] ?? $parts[0] ?? null;
+                    }
+                    $areaNom = $areaNom ?: 'Sin área';
+                    $aulaNom = $rec->salon?->nombre
+                        ?? ($rec->especificaciones['aula'] ?? null)
+                        ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $rec->ubicacion_fisica ?? '', $m) ? $m[1] : null);
+                    return $matNom . ' · ' . $areaNom . (!empty($aulaNom) ? ' · Aula ' . $aulaNom : '');
+                };
+
+                $resumenEstados = [];
+                foreach ($selectedRecords as $rec) {
+                    $stData = $getEstadoStyle($rec->estado);
+                    $lbl = $stData['label'];
+                    if (!isset($resumenEstados[$lbl])) {
+                        $resumenEstados[$lbl] = ['info' => $stData, 'count' => 0];
+                    }
+                    $resumenEstados[$lbl]['count']++;
+                }
             @endphp
 
             @if($cantSel === 1)
-                {{-- PANEL LATERAL: 1 EQUIPO SELECCIONADO --}}
-                <div class="sigem-inv-side-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                    <span style="font-size: 15px; font-weight: 700; color: var(--sig-text);">📦 1 equipo seleccionado</span>
-                    <button type="button" wire:click="deseleccionarTodos" style="background: none; border: none; cursor: pointer; color: var(--sig-muted); font-size: 16px; line-height: 1; padding: 2px 6px;" title="Deseleccionar">✕</button>
+                @php
+                    $selId = $selRecord?->id_inventario ?? $selRecord?->id ?? reset($selectedRows);
+                    $selCodigo = $selRecord ? ($selRecord->codigo ?: ($selRecord->num_serie ?: ('#' . $selId))) : ('#' . $selId);
+                    $selNombre = $selRecord?->material?->nombre ?? $selRecord?->subtipo ?? 'Equipo general';
+                @endphp
+
+                {{-- HEADER (1 EQUIPO) --}}
+                <div class="sigem-sel-header">
+                    <div style="min-width: 0; flex: 1;">
+                        <div class="sigem-sel-header-title" title="{{ $selCodigo }}">{{ $selCodigo }}</div>
+                        <div class="sigem-sel-header-sub" title="{{ $selNombre }}">{{ $selNombre }}</div>
+                    </div>
+                    <button type="button" wire:click="deseleccionarTodos" class="sigem-sel-close-btn" title="Cerrar">✕</button>
                 </div>
 
-                @if($selRecord)
-                    <div class="sigem-selection-summary">
-                        <div class="sigem-selection-card">
-                            <div class="sigem-selection-card-name">{{ $selRecord->material?->nombre ?? $selRecord->subtipo ?? 'Equipo general' }}</div>
-                            <div class="sigem-selection-card-meta">ID / Código: <b>{{ $selRecord->codigo ?: ($selRecord->num_serie ?: ('#' . ($selRecord->id_inventario ?? $selRecord->id))) }}</b></div>
-                            <div class="sigem-selection-card-meta">Categoría: <b>{{ $selRecord->material?->tipo?->nombre ?? $selRecord->subtipo ?? 'General' }}</b></div>
-                            <div style="margin-top: 6px;">
-                                @php
-                                    $st = $selRecord->estado ?? 'Disponible';
-                                    $pillClsSel = match ($st) {
-                                        'Disponible' => 'ok',
-                                        'Asignado' => 'info',
-                                        'Reasignado' => 'reassign',
-                                        'En Mantenimiento', 'En mantenimiento' => 'warn',
-                                        'Solicitud de baja' => 'warn',
-                                        'Cambio de área' => 'info',
-                                        'Dado de baja', 'Baja', 'Dañado' => 'danger',
-                                        default => 'neutral',
-                                    };
-                                @endphp
-                                <span class="sigem-pill {{ $pillClsSel }}">
-                                    <span class="sigem-dot"></span>{{ $st }}
-                                </span>
-                            </div>
-                            <div class="sigem-selection-card-meta" style="margin-top: 6px;">
-                                Ubicación: <b>{{ $selRecord->area?->nombre ?? $selRecord->ubicacion_fisica ?? 'Sin ubicación' }}</b>
-                            </div>
+                {{-- BODY (1 EQUIPO) --}}
+                <div class="sigem-sel-body">
+                    {{-- SECCIÓN ACCIONES (GRID 2 COLUMNAS) --}}
+                    <div>
+                        <div class="sigem-sel-section-label">ACCIONES</div>
+                        <div class="sigem-sel-actions-grid">
+                            <button type="button" wire:click="verEquipo({{ $selId }})" class="sigem-sel-action-card" title="Ver ficha del equipo">
+                                <span class="sigem-sel-action-icon">👁</span>
+                                <span class="sigem-sel-action-title">Ver ficha</span>
+                                <span class="sigem-sel-action-desc">Características, IP/MAC e historial</span>
+                            </button>
+
+                            <button type="button" wire:click="editarEquipo({{ $selId }})" class="sigem-sel-action-card" title="Modificar datos del equipo">
+                                <span class="sigem-sel-action-icon">✏️</span>
+                                <span class="sigem-sel-action-title">Modificar</span>
+                                <span class="sigem-sel-action-desc">Editar los datos del equipo</span>
+                            </button>
+
+                            <button type="button" wire:click="mountAction('cambioMasivo')" class="sigem-sel-action-card" title="Cambio de estado o área">
+                                <span class="sigem-sel-action-icon">🔄</span>
+                                <span class="sigem-sel-action-title">Cambio de estado o área</span>
+                                <span class="sigem-sel-action-desc">Cambiar su estado o moverlo de área</span>
+                            </button>
+
+                            <button type="button" wire:click="mountAction('bajaMasiva')" class="sigem-sel-action-card is-danger" title="Dar de baja">
+                                <span class="sigem-sel-action-icon">↓</span>
+                                <span class="sigem-sel-action-title">Dar de baja</span>
+                                <span class="sigem-sel-action-desc">Pasa a Solicitud de baja</span>
+                            </button>
+
+                            <button type="button" wire:click="exportarSeleccion" class="sigem-sel-action-card is-export" title="Exportar a Excel">
+                                <span class="sigem-sel-action-icon">📥</span>
+                                <span class="sigem-sel-action-title">Exportar</span>
+                                <span class="sigem-sel-action-desc">Descargar en Excel</span>
+                            </button>
                         </div>
                     </div>
-                @endif
 
-                <div class="sigem-selection-actions">
-                    <button type="button" wire:click="mountAction('modificarTodos')" class="sigem-btn-side warning" title="Modificar campos del equipo">
-                        ✏️ Modificar equipo
-                    </button>
-                    <button type="button" wire:click="mountAction('cambioMasivo')" class="sigem-btn-side info" title="Cambiar área o estado del equipo">
-                        🔄 Cambio de área
-                    </button>
-                    <button type="button" wire:click="mountAction('bajaMasiva')" class="sigem-btn-side danger" title="Dar de baja o solicitar baja">
-                        ⬇️ Dar de baja
-                    </button>
-                    <button type="button" wire:click="exportarSeleccion" class="sigem-btn-side secondary" title="Descargar Excel con este equipo">
-                        📊 Exportar selección (.xlsx)
-                    </button>
-                    <button type="button" wire:click="deseleccionarTodos" class="sigem-btn-side ghost" title="Limpiar selección">
-                        ✕ Deseleccionar
-                    </button>
+                    {{-- SECCIÓN RESUMEN POR ESTADO --}}
+                    <div>
+                        <div class="sigem-sel-section-label">RESUMEN POR ESTADO</div>
+                        <div class="sigem-sel-state-pills">
+                            @foreach($resumenEstados as $resItem)
+                                <span class="sigem-sel-state-badge" style="background-color: {{ $resItem['info']['bg'] }}; color: {{ $resItem['info']['text'] }};">
+                                    <span style="width: 8px; height: 8px; border-radius: 50%; background-color: {{ $resItem['info']['dot'] }}; display: inline-block; flex-shrink: 0;"></span>
+                                    <span>{{ $resItem['info']['label'] }} · {{ $resItem['count'] }}</span>
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- SECCIÓN EQUIPO SELECCIONADO --}}
+                    @if($selRecord)
+                        @php
+                            $selStInfo = $getEstadoStyle($selRecord->estado);
+                            $selDesc = $formatItemDesc($selRecord);
+                        @endphp
+                        <div>
+                            <div class="sigem-sel-section-label">EQUIPO SELECCIONADO</div>
+                            <div class="sigem-sel-items-list">
+                                <div class="sigem-sel-item-card">
+                                    <div style="min-width: 0; flex: 1;">
+                                        <div class="sigem-sel-item-code">{{ $selCodigo }}</div>
+                                        <div class="sigem-sel-item-desc" title="{{ $selDesc }}">{{ $selDesc }}</div>
+                                    </div>
+                                    <div style="display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                                        <span class="sigem-sel-mini-badge" style="background-color: {{ $selStInfo['bg'] }}; color: {{ $selStInfo['text'] }};">
+                                            <span style="width: 7px; height: 7px; border-radius: 50%; background-color: {{ $selStInfo['dot'] }}; display: inline-block; flex-shrink: 0;"></span>
+                                            <span>{{ $selStInfo['label'] }}</span>
+                                        </span>
+                                        <button type="button" wire:click="deseleccionarTodos" class="sigem-sel-item-remove" title="Quitar de la selección">✕</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- NOTA BITÁCORA --}}
+                    <div class="sigem-sel-bitacora-note">
+                        <span>🔒</span>
+                        <span>Cada acción queda registrada en la bitácora con tu usuario</span>
+                    </div>
                 </div>
             @else
-                {{-- PANEL LATERAL: MÚLTIPLES EQUIPOS SELECCIONADOS --}}
-                <div class="sigem-inv-side-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                    <span style="font-size: 15px; font-weight: 700; color: var(--sig-text);">📦 {{ $cantSel }} equipos seleccionados</span>
-                    <button type="button" wire:click="deseleccionarTodos" style="background: none; border: none; cursor: pointer; color: var(--sig-muted); font-size: 16px; line-height: 1; padding: 2px 6px;" title="Deseleccionar todos">✕</button>
+                {{-- HEADER (MÚLTIPLES EQUIPOS) --}}
+                <div class="sigem-sel-header">
+                    <div style="min-width: 0; flex: 1;">
+                        <div class="sigem-sel-header-title">{{ $cantSel }} equipos seleccionados</div>
+                        <div class="sigem-sel-header-sub">Elige una acción para aplicarla a todos</div>
+                    </div>
+                    <button type="button" wire:click="deseleccionarTodos" class="sigem-sel-close-btn" title="Cerrar">✕</button>
                 </div>
 
-                <div class="sigem-selection-summary">
-                    <div style="font-size: 12px; font-weight: 600; color: var(--sig-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
-                        Equipos en la selección ({{ $cantSel }})
-                    </div>
-                    <div style="display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto;">
-                        @php
-                            $previewList = !empty($selectedRows) ? \App\Models\Inventario::with(['material.tipo'])->whereIn('id_inventario', array_slice($selectedRows, 0, 5))->get() : collect();
-                        @endphp
-                        @foreach($previewList as $pItem)
-                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; padding: 4px 6px; background: white; border: 1px solid var(--sig-border); border-radius: 6px;">
-                                <span style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px;" title="{{ $pItem->material?->nombre ?? $pItem->subtipo }}">
-                                    {{ $pItem->material?->nombre ?? $pItem->subtipo ?? 'Equipo' }}
-                                </span>
-                                <span style="font-size: 11px; font-family: monospace; color: var(--sig-muted);">
-                                    #{{ $pItem->codigo ?: ($pItem->num_serie ?: ($pItem->id_inventario ?? $pItem->id)) }}
-                                </span>
-                            </div>
-                        @endforeach
-                        @if($cantSel > 5)
-                            <div style="text-align: center; font-size: 11.5px; color: var(--sig-muted); padding: 2px 0;">
-                                + {{ $cantSel - 5 }} equipos más seleccionados
-                            </div>
-                        @endif
-                    </div>
-                </div>
+                {{-- BODY (MÚLTIPLES EQUIPOS) --}}
+                <div class="sigem-sel-body">
+                    {{-- SECCIÓN ACCIONES (GRID 2 COLUMNAS) --}}
+                    <div>
+                        <div class="sigem-sel-section-label">ACCIONES</div>
+                        <div class="sigem-sel-actions-grid">
+                            <button type="button" wire:click="mountAction('modificarTodos')" class="sigem-sel-action-card" title="Modificar todos los equipos seleccionados">
+                                <span class="sigem-sel-action-icon">✏️</span>
+                                <span class="sigem-sel-action-title">Modificar todos</span>
+                                <span class="sigem-sel-action-desc">Cambiar un mismo campo en todos</span>
+                            </button>
 
-                <div class="sigem-selection-actions">
-                    <button type="button" wire:click="mountAction('modificarTodos')" class="sigem-btn-side warning" title="Modificar todos los equipos seleccionados">
-                        ✏️ Modificar todos ({{ $cantSel }})
-                    </button>
-                    <button type="button" wire:click="mountAction('cambioMasivo')" class="sigem-btn-side info" title="Cambio masivo de área o estado">
-                        🔄 Cambio (masivo)
-                    </button>
-                    <button type="button" wire:click="mountAction('bajaMasiva')" class="sigem-btn-side danger" title="Dar de baja o solicitar baja masiva">
-                        ⬇️ Dar de baja (masivo)
-                    </button>
-                    <button type="button" wire:click="exportarSeleccion" class="sigem-btn-side secondary" title="Descargar Excel con los equipos seleccionados">
-                        📊 Exportar selección (.xlsx)
-                    </button>
-                    <button type="button" wire:click="deseleccionarTodos" class="sigem-btn-side ghost" title="Limpiar la selección">
-                        ✕ Deseleccionar todos
-                    </button>
+                            <button type="button" wire:click="mountAction('cambioMasivo')" class="sigem-sel-action-card" title="Cambio masivo de estado o área">
+                                <span class="sigem-sel-action-icon">🔄</span>
+                                <span class="sigem-sel-action-title">Cambio de estado o área</span>
+                                <span class="sigem-sel-action-desc">Cambiar su estado o moverlo de área</span>
+                            </button>
+
+                            <button type="button" wire:click="mountAction('bajaMasiva')" class="sigem-sel-action-card is-danger" title="Dar de baja">
+                                <span class="sigem-sel-action-icon">↓</span>
+                                <span class="sigem-sel-action-title">Dar de baja</span>
+                                <span class="sigem-sel-action-desc">Pasa a Solicitud de baja</span>
+                            </button>
+
+                            <button type="button" wire:click="exportarSeleccion" class="sigem-sel-action-card is-export" title="Exportar selección a Excel">
+                                <span class="sigem-sel-action-icon">📥</span>
+                                <span class="sigem-sel-action-title">Exportar selección</span>
+                                <span class="sigem-sel-action-desc">Descargar en Excel</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    {{-- SECCIÓN RESUMEN POR ESTADO --}}
+                    <div>
+                        <div class="sigem-sel-section-label">RESUMEN POR ESTADO</div>
+                        <div class="sigem-sel-state-pills">
+                            @foreach($resumenEstados as $resItem)
+                                <span class="sigem-sel-state-badge" style="background-color: {{ $resItem['info']['bg'] }}; color: {{ $resItem['info']['text'] }};">
+                                    <span style="width: 8px; height: 8px; border-radius: 50%; background-color: {{ $resItem['info']['dot'] }}; display: inline-block; flex-shrink: 0;"></span>
+                                    <span>{{ $resItem['info']['label'] }} · {{ $resItem['count'] }}</span>
+                                </span>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- SECCIÓN EQUIPOS SELECCIONADOS (N) --}}
+                    <div>
+                        <div class="sigem-sel-section-label">EQUIPOS SELECCIONADOS ({{ $cantSel }})</div>
+                        <div class="sigem-sel-items-list">
+                            @foreach($selectedRecords as $pItem)
+                                @php
+                                    $pId = (string) ($pItem->id_inventario ?? $pItem->id);
+                                    $pCodigo = $pItem->codigo ?: ($pItem->num_serie ?: ('#' . $pId));
+                                    $pDesc = $formatItemDesc($pItem);
+                                    $pStInfo = $getEstadoStyle($pItem->estado);
+                                @endphp
+                                <div class="sigem-sel-item-card">
+                                    <div style="min-width: 0; flex: 1;">
+                                        <div class="sigem-sel-item-code">{{ $pCodigo }}</div>
+                                        <div class="sigem-sel-item-desc" title="{{ $pDesc }}">{{ $pDesc }}</div>
+                                    </div>
+                                    <div style="display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;">
+                                        <span class="sigem-sel-mini-badge" style="background-color: {{ $pStInfo['bg'] }}; color: {{ $pStInfo['text'] }};">
+                                            <span style="width: 7px; height: 7px; border-radius: 50%; background-color: {{ $pStInfo['dot'] }}; display: inline-block; flex-shrink: 0;"></span>
+                                            <span>{{ $pStInfo['label'] }}</span>
+                                        </span>
+                                        <button type="button"
+                                                x-on:click="$wire.set('selectedRows', ($wire.selectedRows || []).filter(id => String(id) !== '{{ $pId }}'))"
+                                                class="sigem-sel-item-remove"
+                                                title="Quitar de la selección">✕</button>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- NOTA BITÁCORA --}}
+                    <div class="sigem-sel-bitacora-note">
+                        <span>🔒</span>
+                        <span>Cada acción queda registrada en la bitácora con tu usuario</span>
+                    </div>
                 </div>
             @endif
+
+            {{-- FOOTER COMÚN --}}
+            <div class="sigem-sel-footer">
+                <button type="button" wire:click="deseleccionarTodos" class="sigem-sel-footer-btn" title="Quitar selección">
+                    ✕ Quitar selección
+                </button>
+                <button type="button" wire:click="deseleccionarTodos" class="sigem-sel-footer-btn" title="Cerrar panel">
+                    Cerrar
+                </button>
+            </div>
         </aside>
     @endif
 </div>
