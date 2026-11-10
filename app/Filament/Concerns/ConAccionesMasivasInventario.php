@@ -36,11 +36,38 @@ trait ConAccionesMasivasInventario
     public bool $showSidePanel = false;
 
     /**
+     * Vista interna del panel slide-over: 'principal', 'cambio', 'baja', 'modificar'
+     */
+    public string $slideOverStep = 'principal';
+
+    /**
+     * Campos de formulario interno para Cambio masivo
+     */
+    public ?string $cambioNuevoEstado = '';
+    public ?string $cambioNuevaAreaId = '';
+    public ?string $cambioMotivo = '';
+
+    /**
+     * Campos de formulario interno para Baja masiva
+     */
+    public ?string $bajaMotivo = '';
+    public ?string $bajaObservaciones = '';
+
+    /**
+     * Campos de formulario interno para Modificar todos
+     */
+    public ?string $modificarCampo = '';
+    public ?string $modificarNuevoValor = '';
+
+    /**
      * Se dispara cuando se actualiza la lista de filas seleccionadas.
      */
     public function updatedSelectedRows(): void
     {
         $this->showSidePanel = ! empty($this->selectedRows);
+        if (empty($this->selectedRows)) {
+            $this->slideOverStep = 'principal';
+        }
     }
 
     /**
@@ -58,16 +85,54 @@ trait ConAccionesMasivasInventario
         }
 
         $this->showSidePanel = ! empty($this->selectedRows);
+        if (empty($this->selectedRows)) {
+            $this->slideOverStep = 'principal';
+        }
     }
 
     /**
-     * Limpia la selección activa.
+     * Limpia la selección activa y regresa la vista del slide-over al paso principal.
      */
     public function deseleccionarTodos(): void
     {
         $this->selectedRows = [];
         $this->selectAll = false;
         $this->showSidePanel = false;
+        $this->slideOverStep = 'principal';
+        $this->cambioNuevoEstado = '';
+        $this->cambioNuevaAreaId = '';
+        $this->cambioMotivo = '';
+        $this->bajaMotivo = '';
+        $this->bajaObservaciones = '';
+        $this->modificarCampo = '';
+        $this->modificarNuevoValor = '';
+    }
+
+    /**
+     * Cambia la vista interna del slide-over.
+     */
+    public function setSlideOverStep(string $step): void
+    {
+        $this->slideOverStep = $step;
+        if ($step === 'cambio') {
+            $this->cambioNuevoEstado = '';
+            $this->cambioNuevaAreaId = '';
+            $this->cambioMotivo = '';
+        } elseif ($step === 'baja') {
+            $this->bajaMotivo = '';
+            $this->bajaObservaciones = '';
+        } elseif ($step === 'modificar') {
+            $this->modificarCampo = '';
+            $this->modificarNuevoValor = '';
+        }
+    }
+
+    /**
+     * Regresa la navegación interna del slide-over a la vista principal.
+     */
+    public function volverAPanelPrincipal(): void
+    {
+        $this->slideOverStep = 'principal';
     }
 
     /**
@@ -82,6 +147,59 @@ trait ConAccionesMasivasInventario
         return Inventario::with(['material.tipo', 'departamento', 'area', 'salon'])
             ->whereIn('id_inventario', $this->selectedRows)
             ->get();
+    }
+
+    /**
+     * Ejecuta el cambio masivo desde el formulario integrado en el slide-over.
+     */
+    public function ejecutarCambioSlideOver(): void
+    {
+        $data = [
+            'nuevo_estado' => $this->cambioNuevoEstado ?: null,
+            'nueva_area_id' => $this->cambioNuevaAreaId ?: null,
+            'motivo' => $this->cambioMotivo ?: 'Cambio masivo',
+        ];
+
+        $this->procesarCambioMasivo($data);
+    }
+
+    /**
+     * Ejecuta la baja masiva desde el formulario integrado en el slide-over.
+     */
+    public function ejecutarBajaSlideOver(): void
+    {
+        if (empty($this->bajaMotivo)) {
+            Notification::make()->title('Debe seleccionar un motivo de baja')->danger()->send();
+            return;
+        }
+
+        $data = [
+            'motivo_baja' => $this->bajaMotivo,
+            'observaciones_baja' => $this->bajaObservaciones ?: 'Baja masiva',
+        ];
+
+        $this->procesarBajaMasiva($data);
+    }
+
+    /**
+     * Ejecuta la modificación masiva desde el formulario integrado en el slide-over.
+     */
+    public function ejecutarModificarSlideOver(): void
+    {
+        if (empty($this->modificarCampo)) {
+            Notification::make()->title('Debe seleccionar un campo a modificar')->danger()->send();
+            return;
+        }
+
+        $data = [
+            'campo_a_modificar' => $this->modificarCampo,
+            'nuevo_estado' => $this->modificarCampo === 'estado' ? $this->modificarNuevoValor : null,
+            'nueva_area_id' => $this->modificarCampo === 'area' ? $this->modificarNuevoValor : null,
+            'nuevo_departamento_id' => $this->modificarCampo === 'departamento' ? $this->modificarNuevoValor : null,
+            'nueva_ubicacion_fisica' => $this->modificarCampo === 'ubicacion_fisica' ? $this->modificarNuevoValor : null,
+        ];
+
+        $this->procesarModificarTodos($data);
     }
 
     /**
@@ -134,115 +252,123 @@ trait ConAccionesMasivasInventario
                     ->required(fn (Get $get) => $get('campo_a_modificar') === 'ubicacion_fisica'),
             ])
             ->action(function (array $data) {
-                if (empty($this->selectedRows)) {
-                    Notification::make()->title('No hay equipos seleccionados')->warning()->send();
-                    return;
-                }
-
-                $esAdmin = ! ($this instanceof \App\Filament\ServicioSocial\Pages\Dashboard);
-                $userId = auth()->id() ?? 1;
-                $campo = $data['campo_a_modificar'];
-                $aplicados = 0;
-                $omitidos = 0;
-
-                DB::transaction(function () use ($data, $campo, $esAdmin, $userId, &$aplicados, &$omitidos) {
-                    $records = Inventario::whereIn('id_inventario', $this->selectedRows)->get();
-
-                    foreach ($records as $record) {
-                        $estadoAnterior = $record->estado ?? EstadoInventario::Disponible->value;
-
-                        if ($campo === 'estado') {
-                            $nuevoEstado = $data['nuevo_estado'];
-
-                            if ($nuevoEstado === EstadoInventario::DadoDeBaja->value) {
-                                if ($esAdmin) {
-                                    $record->darBajaDirecta('Modificación masiva', 'Actualización de estado masiva', $userId);
-                                } else {
-                                    $record->solicitarBaja('Modificación masiva', 'Actualización de estado masiva', $userId);
-                                }
-                            } else {
-                                $record->update(['estado' => $nuevoEstado]);
-
-                                HistorialEstado::create([
-                                    'id_inventario' => $record->id_inventario,
-                                    'id_usuario' => $userId,
-                                    'estado_anterior' => $estadoAnterior,
-                                    'estado_nuevo' => $nuevoEstado,
-                                    'motivo_cambio' => "Modificación masiva de estado a {$nuevoEstado}",
-                                    'ubicacion_fisica' => $record->ubicacion_fisica,
-                                    'fecha_cambio' => now(),
-                                ]);
-                            }
-                            $aplicados++;
-                        } elseif ($campo === 'area') {
-                            $areaId = $data['nueva_area_id'];
-                            $area = Area::find($areaId);
-                            $deptoId = $area?->id_departamento ?? $record->departamento_id;
-
-                            $record->departamento_id = $deptoId;
-                            $record->area_id = $areaId;
-                            $ubicacionNueva = UbicacionHelper::construir($deptoId, $areaId, $record->salon_id, null);
-                            if ($ubicacionNueva) {
-                                $record->ubicacion_fisica = substr($ubicacionNueva, 0, 150);
-                            }
-                            $record->save();
-
-                            HistorialEstado::create([
-                                'id_inventario' => $record->id_inventario,
-                                'id_usuario' => $userId,
-                                'estado_anterior' => $estadoAnterior,
-                                'estado_nuevo' => $record->estado,
-                                'motivo_cambio' => 'Modificación masiva de área: ' . ($area?->nombre ?? 'Nueva área'),
-                                'ubicacion_fisica' => $record->ubicacion_fisica,
-                                'fecha_cambio' => now(),
-                            ]);
-                            $aplicados++;
-                        } elseif ($campo === 'departamento') {
-                            $deptoId = $data['nuevo_departamento_id'];
-                            $depto = Departamento::find($deptoId);
-
-                            $record->departamento_id = $deptoId;
-                            $ubicacionNueva = UbicacionHelper::construir($deptoId, $record->area_id, $record->salon_id, null);
-                            if ($ubicacionNueva) {
-                                $record->ubicacion_fisica = substr($ubicacionNueva, 0, 150);
-                            }
-                            $record->save();
-
-                            HistorialEstado::create([
-                                'id_inventario' => $record->id_inventario,
-                                'id_usuario' => $userId,
-                                'estado_anterior' => $estadoAnterior,
-                                'estado_nuevo' => $record->estado,
-                                'motivo_cambio' => 'Modificación masiva de departamento: ' . ($depto?->nombre ?? 'Nuevo depto'),
-                                'ubicacion_fisica' => $record->ubicacion_fisica,
-                                'fecha_cambio' => now(),
-                            ]);
-                            $aplicados++;
-                        } elseif ($campo === 'ubicacion_fisica') {
-                            $ubicacion = $data['nueva_ubicacion_fisica'];
-                            $record->update(['ubicacion_fisica' => substr($ubicacion, 0, 150)]);
-
-                            HistorialEstado::create([
-                                'id_inventario' => $record->id_inventario,
-                                'id_usuario' => $userId,
-                                'estado_anterior' => $estadoAnterior,
-                                'estado_nuevo' => $record->estado,
-                                'motivo_cambio' => "Modificación masiva de ubicación: {$ubicacion}",
-                                'ubicacion_fisica' => $record->ubicacion_fisica,
-                                'fecha_cambio' => now(),
-                            ]);
-                            $aplicados++;
-                        }
-                    }
-                });
-
-                $this->deseleccionarTodos();
-
-                Notification::make()
-                    ->title("Modificación aplicada a {$aplicados} equipos" . ($omitidos > 0 ? " ({$omitidos} omitidos)" : ''))
-                    ->success()
-                    ->send();
+                $this->procesarModificarTodos($data);
             });
+    }
+
+    /**
+     * Procesa la lógica de modificación masiva.
+     */
+    public function procesarModificarTodos(array $data): void
+    {
+        if (empty($this->selectedRows)) {
+            Notification::make()->title('No hay equipos seleccionados')->warning()->send();
+            return;
+        }
+
+        $esAdmin = ! ($this instanceof \App\Filament\ServicioSocial\Pages\Dashboard);
+        $userId = auth()->id() ?? 1;
+        $campo = $data['campo_a_modificar'];
+        $aplicados = 0;
+        $omitidos = 0;
+
+        DB::transaction(function () use ($data, $campo, $esAdmin, $userId, &$aplicados, &$omitidos) {
+            $records = Inventario::whereIn('id_inventario', $this->selectedRows)->get();
+
+            foreach ($records as $record) {
+                $estadoAnterior = $record->estado ?? EstadoInventario::Disponible->value;
+
+                if ($campo === 'estado') {
+                    $nuevoEstado = $data['nuevo_estado'];
+
+                    if ($nuevoEstado === EstadoInventario::DadoDeBaja->value) {
+                        if ($esAdmin) {
+                            $record->darBajaDirecta('Modificación masiva', 'Actualización de estado masiva', $userId);
+                        } else {
+                            $record->solicitarBaja('Modificación masiva', 'Actualización de estado masiva', $userId);
+                        }
+                    } else {
+                        $record->update(['estado' => $nuevoEstado]);
+
+                        HistorialEstado::create([
+                            'id_inventario' => $record->id_inventario,
+                            'id_usuario' => $userId,
+                            'estado_anterior' => $estadoAnterior,
+                            'estado_nuevo' => $nuevoEstado,
+                            'motivo_cambio' => "Modificación masiva de estado a {$nuevoEstado}",
+                            'ubicacion_fisica' => $record->ubicacion_fisica,
+                            'fecha_cambio' => now(),
+                        ]);
+                    }
+                    $aplicados++;
+                } elseif ($campo === 'area') {
+                    $areaId = $data['nueva_area_id'];
+                    $area = Area::find($areaId);
+                    $deptoId = $area?->id_departamento ?? $record->departamento_id;
+
+                    $record->departamento_id = $deptoId;
+                    $record->area_id = $areaId;
+                    $ubicacionNueva = UbicacionHelper::construir($deptoId, $areaId, $record->salon_id, null);
+                    if ($ubicacionNueva) {
+                        $record->ubicacion_fisica = substr($ubicacionNueva, 0, 150);
+                    }
+                    $record->save();
+
+                    HistorialEstado::create([
+                        'id_inventario' => $record->id_inventario,
+                        'id_usuario' => $userId,
+                        'estado_anterior' => $estadoAnterior,
+                        'estado_nuevo' => $record->estado,
+                        'motivo_cambio' => 'Modificación masiva de área: ' . ($area?->nombre ?? 'Nueva área'),
+                        'ubicacion_fisica' => $record->ubicacion_fisica,
+                        'fecha_cambio' => now(),
+                    ]);
+                    $aplicados++;
+                } elseif ($campo === 'departamento') {
+                    $deptoId = $data['nuevo_departamento_id'];
+                    $depto = Departamento::find($deptoId);
+
+                    $record->departamento_id = $deptoId;
+                    $ubicacionNueva = UbicacionHelper::construir($deptoId, $record->area_id, $record->salon_id, null);
+                    if ($ubicacionNueva) {
+                        $record->ubicacion_fisica = substr($ubicacionNueva, 0, 150);
+                    }
+                    $record->save();
+
+                    HistorialEstado::create([
+                        'id_inventario' => $record->id_inventario,
+                        'id_usuario' => $userId,
+                        'estado_anterior' => $estadoAnterior,
+                        'estado_nuevo' => $record->estado,
+                        'motivo_cambio' => 'Modificación masiva de departamento: ' . ($depto?->nombre ?? 'Nuevo depto'),
+                        'ubicacion_fisica' => $record->ubicacion_fisica,
+                        'fecha_cambio' => now(),
+                    ]);
+                    $aplicados++;
+                } elseif ($campo === 'ubicacion_fisica') {
+                    $ubicacion = $data['nueva_ubicacion_fisica'];
+                    $record->update(['ubicacion_fisica' => substr($ubicacion, 0, 150)]);
+
+                    HistorialEstado::create([
+                        'id_inventario' => $record->id_inventario,
+                        'id_usuario' => $userId,
+                        'estado_anterior' => $estadoAnterior,
+                        'estado_nuevo' => $record->estado,
+                        'motivo_cambio' => "Modificación masiva de ubicación: {$ubicacion}",
+                        'ubicacion_fisica' => $record->ubicacion_fisica,
+                        'fecha_cambio' => now(),
+                    ]);
+                    $aplicados++;
+                }
+            }
+        });
+
+        $this->deseleccionarTodos();
+
+        Notification::make()
+            ->title("Modificación aplicada a {$aplicados} equipos" . ($omitidos > 0 ? " ({$omitidos} omitidos)" : ''))
+            ->success()
+            ->send();
     }
 
     /**
@@ -273,71 +399,79 @@ trait ConAccionesMasivasInventario
                     ->placeholder('Motivo del cambio (opcional)...'),
             ])
             ->action(function (array $data) {
-                if (empty($this->selectedRows)) {
-                    Notification::make()->title('No hay equipos seleccionados')->warning()->send();
-                    return;
+                $this->procesarCambioMasivo($data);
+            });
+    }
+
+    /**
+     * Procesa la lógica de cambio masivo de área o estado.
+     */
+    public function procesarCambioMasivo(array $data): void
+    {
+        if (empty($this->selectedRows)) {
+            Notification::make()->title('No hay equipos seleccionados')->warning()->send();
+            return;
+        }
+
+        $esAdmin = ! ($this instanceof \App\Filament\ServicioSocial\Pages\Dashboard);
+        $userId = auth()->id() ?? 1;
+        $nuevoEstado = ! empty($data['nuevo_estado']) ? $data['nuevo_estado'] : null;
+        $nuevaAreaId = ! empty($data['nueva_area_id']) ? $data['nueva_area_id'] : null;
+        $motivo = ! empty($data['motivo']) ? $data['motivo'] : 'Cambio masivo';
+        $aplicados = 0;
+        $omitidos = 0;
+
+        DB::transaction(function () use ($esAdmin, $userId, $nuevoEstado, $nuevaAreaId, $motivo, &$aplicados, &$omitidos) {
+            $records = Inventario::whereIn('id_inventario', $this->selectedRows)->get();
+
+            foreach ($records as $record) {
+                // Filtrar equipos no aptos (ya dados de baja o con solicitud pendiente)
+                if (in_array($record->estado, [
+                    EstadoInventario::DadoDeBaja->value,
+                    EstadoInventario::SolicitudDeBaja->value,
+                    EstadoInventario::CambioDeArea->value,
+                    'Baja',
+                ], true)) {
+                    $omitidos++;
+                    continue;
                 }
 
-                $esAdmin = ! ($this instanceof \App\Filament\ServicioSocial\Pages\Dashboard);
-                $userId = auth()->id() ?? 1;
-                $nuevoEstado = ! empty($data['nuevo_estado']) ? $data['nuevo_estado'] : null;
-                $nuevaAreaId = ! empty($data['nueva_area_id']) ? $data['nueva_area_id'] : null;
-                $motivo = ! empty($data['motivo']) ? $data['motivo'] : 'Cambio masivo';
-                $aplicados = 0;
-                $omitidos = 0;
+                if ($nuevaAreaId) {
+                    $area = Area::find($nuevaAreaId);
+                    $deptoId = $area?->id_departamento ?? $record->departamento_id;
 
-                DB::transaction(function () use ($esAdmin, $userId, $nuevoEstado, $nuevaAreaId, $motivo, &$aplicados, &$omitidos) {
-                    $records = Inventario::whereIn('id_inventario', $this->selectedRows)->get();
-
-                    foreach ($records as $record) {
-                        // Filtrar equipos no aptos (ya dados de baja o con solicitud pendiente)
-                        if (in_array($record->estado, [
-                            EstadoInventario::DadoDeBaja->value,
-                            EstadoInventario::SolicitudDeBaja->value,
-                            EstadoInventario::CambioDeArea->value,
-                            'Baja',
-                        ], true)) {
-                            $omitidos++;
-                            continue;
-                        }
-
-                        if ($nuevaAreaId) {
-                            $area = Area::find($nuevaAreaId);
-                            $deptoId = $area?->id_departamento ?? $record->departamento_id;
-
-                            if ($esAdmin) {
-                                $record->cambiarAreaDirecto($deptoId, $nuevaAreaId, $record->salon_id, null, $motivo, $userId);
-                            } else {
-                                $record->solicitarCambioArea($deptoId, $nuevaAreaId, $record->salon_id, null, $motivo, $userId);
-                            }
-                        }
-
-                        if ($nuevoEstado && $record->estado !== EstadoInventario::CambioDeArea->value) {
-                            $estadoAnt = $record->estado ?? EstadoInventario::Disponible->value;
-                            $record->update(['estado' => $nuevoEstado]);
-
-                            HistorialEstado::create([
-                                'id_inventario' => $record->id_inventario,
-                                'id_usuario' => $userId,
-                                'estado_anterior' => $estadoAnt,
-                                'estado_nuevo' => $nuevoEstado,
-                                'motivo_cambio' => "Cambio masivo de estado a {$nuevoEstado}: {$motivo}",
-                                'ubicacion_fisica' => $record->ubicacion_fisica,
-                                'fecha_cambio' => now(),
-                            ]);
-                        }
-
-                        $aplicados++;
+                    if ($esAdmin) {
+                        $record->cambiarAreaDirecto($deptoId, $nuevaAreaId, $record->salon_id, null, $motivo, $userId);
+                    } else {
+                        $record->solicitarCambioArea($deptoId, $nuevaAreaId, $record->salon_id, null, $motivo, $userId);
                     }
-                });
+                }
 
-                $this->deseleccionarTodos();
+                if ($nuevoEstado && $record->estado !== EstadoInventario::CambioDeArea->value) {
+                    $estadoAnt = $record->estado ?? EstadoInventario::Disponible->value;
+                    $record->update(['estado' => $nuevoEstado]);
 
-                Notification::make()
-                    ->title("Cambio procesado para {$aplicados} equipos" . ($omitidos > 0 ? " ({$omitidos} omitidos por estar en baja o con solicitud)" : ''))
-                    ->success()
-                    ->send();
-            });
+                    HistorialEstado::create([
+                        'id_inventario' => $record->id_inventario,
+                        'id_usuario' => $userId,
+                        'estado_anterior' => $estadoAnt,
+                        'estado_nuevo' => $nuevoEstado,
+                        'motivo_cambio' => "Cambio masivo de estado a {$nuevoEstado}: {$motivo}",
+                        'ubicacion_fisica' => $record->ubicacion_fisica,
+                        'fecha_cambio' => now(),
+                    ]);
+                }
+
+                $aplicados++;
+            }
+        });
+
+        $this->deseleccionarTodos();
+
+        Notification::make()
+            ->title("Cambio procesado para {$aplicados} equipos" . ($omitidos > 0 ? " ({$omitidos} omitidos por estar en baja o con solicitud)" : ''))
+            ->success()
+            ->send();
     }
 
     /**
@@ -371,50 +505,58 @@ trait ConAccionesMasivasInventario
                     ->placeholder('Observaciones detalladas (opcional)...'),
             ])
             ->action(function (array $data) {
-                if (empty($this->selectedRows)) {
-                    Notification::make()->title('No hay equipos seleccionados')->warning()->send();
-                    return;
+                $this->procesarBajaMasiva($data);
+            });
+    }
+
+    /**
+     * Procesa la lógica de dar de baja o solicitar baja masiva.
+     */
+    public function procesarBajaMasiva(array $data): void
+    {
+        if (empty($this->selectedRows)) {
+            Notification::make()->title('No hay equipos seleccionados')->warning()->send();
+            return;
+        }
+
+        $esAdmin = ! ($this instanceof \App\Filament\ServicioSocial\Pages\Dashboard);
+        $userId = auth()->id() ?? 1;
+        $motivo = $data['motivo_baja'];
+        $obs = ! empty($data['observaciones_baja']) ? $data['observaciones_baja'] : 'Baja masiva';
+        $aplicados = 0;
+        $omitidos = 0;
+
+        DB::transaction(function () use ($esAdmin, $userId, $motivo, $obs, &$aplicados, &$omitidos) {
+            $records = Inventario::whereIn('id_inventario', $this->selectedRows)->get();
+
+            foreach ($records as $record) {
+                // Filtrar equipos no aptos (ya dados de baja o con solicitud)
+                if (in_array($record->estado, [
+                    EstadoInventario::DadoDeBaja->value,
+                    EstadoInventario::SolicitudDeBaja->value,
+                    EstadoInventario::CambioDeArea->value,
+                    'Baja',
+                ], true)) {
+                    $omitidos++;
+                    continue;
                 }
 
-                $esAdmin = ! ($this instanceof \App\Filament\ServicioSocial\Pages\Dashboard);
-                $userId = auth()->id() ?? 1;
-                $motivo = $data['motivo_baja'];
-                $obs = ! empty($data['observaciones_baja']) ? $data['observaciones_baja'] : 'Baja masiva';
-                $aplicados = 0;
-                $omitidos = 0;
+                if ($esAdmin) {
+                    $record->darBajaDirecta($motivo, $obs, $userId);
+                } else {
+                    $record->solicitarBaja($motivo, $obs, $userId);
+                }
 
-                DB::transaction(function () use ($esAdmin, $userId, $motivo, $obs, &$aplicados, &$omitidos) {
-                    $records = Inventario::whereIn('id_inventario', $this->selectedRows)->get();
+                $aplicados++;
+            }
+        });
 
-                    foreach ($records as $record) {
-                        // Filtrar equipos no aptos (ya dados de baja o con solicitud)
-                        if (in_array($record->estado, [
-                            EstadoInventario::DadoDeBaja->value,
-                            EstadoInventario::SolicitudDeBaja->value,
-                            EstadoInventario::CambioDeArea->value,
-                            'Baja',
-                        ], true)) {
-                            $omitidos++;
-                            continue;
-                        }
+        $this->deseleccionarTodos();
 
-                        if ($esAdmin) {
-                            $record->darBajaDirecta($motivo, $obs, $userId);
-                        } else {
-                            $record->solicitarBaja($motivo, $obs, $userId);
-                        }
-
-                        $aplicados++;
-                    }
-                });
-
-                $this->deseleccionarTodos();
-
-                Notification::make()
-                    ->title("Baja procesada para {$aplicados} equipos" . ($omitidos > 0 ? " ({$omitidos} omitidos por estar en baja o con solicitud)" : ''))
-                    ->success()
-                    ->send();
-            });
+        Notification::make()
+            ->title("Baja procesada para {$aplicados} equipos" . ($omitidos > 0 ? " ({$omitidos} omitidos por estar en baja o con solicitud)" : ''))
+            ->success()
+            ->send();
     }
 
     /**
@@ -430,4 +572,3 @@ trait ConAccionesMasivasInventario
         return SigemExcelExporter::exportarInventario($this, $this->selectedRows);
     }
 }
-

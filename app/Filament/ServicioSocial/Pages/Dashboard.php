@@ -348,6 +348,8 @@ class Dashboard extends BaseDashboard
             'selectedRows' => $this->selectedRows,
             'selectAll' => $this->selectAll,
             'showSidePanel' => $this->showSidePanel,
+            'slideOverStep' => $this->slideOverStep,
+            'modificarCampo' => $this->modificarCampo,
         ];
     }
 }
