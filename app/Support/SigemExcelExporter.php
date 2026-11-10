@@ -118,11 +118,15 @@ class SigemExcelExporter
         ])->deleteFileAfterSend(true);
     }
 
-    public static function exportarInventario($livewire = null): BinaryFileResponse
+    public static function exportarInventario($livewire = null, ?array $selectedIds = null): BinaryFileResponse
     {
         $query = ($livewire && method_exists($livewire, 'getFilteredTableQuery'))
             ? $livewire->getFilteredTableQuery()
             : \App\Models\Inventario::query();
+
+        if (! empty($selectedIds)) {
+            $query = $query->whereIn('inventario.id_inventario', $selectedIds);
+        }
 
         $registros = $query
             ->with(['material.tipo', 'departamento', 'area.departamento', 'salon'])

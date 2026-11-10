@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\ConAccionesMasivasInventario;
 use App\Filament\Concerns\ConModalesBajaCambio;
 use App\Filament\Resources\InventarioResource;
 use App\Models\Inventario;
@@ -25,6 +26,7 @@ use Livewire\WithPagination;
 class Dashboard extends BaseDashboard
 {
     use WithPagination;
+    use ConAccionesMasivasInventario;
 
     public array $tableColumnSearches = [];
     public int $perPage = 10;
@@ -345,6 +347,8 @@ class Dashboard extends BaseDashboard
             'sortDirection' => $this->sortDirection,
             'perPage' => $this->perPage,
             'categoriasTop' => InventarioResource::obtenerCategoriasTop(),
+            'selectedRows' => $this->selectedRows,
+            'selectAll' => $this->selectAll,
         ];
     }
 }

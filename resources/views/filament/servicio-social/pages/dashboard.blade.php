@@ -53,6 +53,8 @@
             :inventario-asignados="$inventarioAsignados ?? 0"
             :inventario-danados="$inventarioDanados ?? 0"
             :categorias-top="$categoriasTop ?? []"
+            :selected-rows="$selectedRows ?? []"
+            :select-all="$selectAll ?? false"
         />
 
     </div>
