@@ -6,7 +6,9 @@ use App\Filament\Resources\InventarioResource;
 use App\Models\Area;
 use App\Models\Inventario;
 use App\Models\MarcaMaterial;
+use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action;
 
 class EditFormTabs
 {
@@ -33,18 +35,39 @@ class EditFormTabs
                                         ->options(fn (): array => MarcaMaterial::orderBy('nombre')->pluck('nombre', 'nombre')->toArray())
                                         ->searchable()
                                         ->preload()
+                                        ->createOptionForm([
+                                            SubformSlideOverHelper::headerNav(),
+                                            Forms\Components\TextInput::make('nombre')
+                                                ->label('Nombre de la marca')
+                                                ->placeholder('Ej. Dell, HP, Lenovo...')
+                                                ->required()
+                                                ->maxLength(100),
+                                            SubformSlideOverHelper::catalogTip('La marca estará disponible inmediatamente en el catálogo.'),
+                                        ])
+                                        ->createOptionUsing(function (array $data) {
+                                            $clean = trim($data['nombre']);
+                                            $marca = MarcaMaterial::firstOrCreate(['nombre' => $clean]);
+                                            return $marca->nombre;
+                                        })
+                                        ->createOptionAction(function (Action $action) {
+                                            return SubformSlideOverHelper::configureAction(
+                                                $action,
+                                                '✏️ Agregar marca como nueva opción',
+                                                '+ Agregar',
+                                                'Marca creada correctamente'
+                                            );
+                                        })
                                         ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->especificaciones['marca'] ?? $record?->especificaciones['cpu_marca'] ?? $record?->material?->marca?->nombre ?? '')),
 
                                     Forms\Components\TextInput::make('modelo')
                                         ->label('Modelo')
-                                        ->disabled()
-                                        ->dehydrated(false)
-                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->modelo ?? $record?->material?->modelo ?? '—')),
+                                        ->maxLength(100)
+                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->modelo ?? $record?->material?->modelo ?? '')),
 
                                     Forms\Components\TextInput::make('num_serie')
                                         ->label('No. de serie (S/N)')
-                                        ->disabled()
-                                        ->dehydrated(false),
+                                        ->maxLength(100)
+                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->num_serie ?? '')),
 
                                     Forms\Components\TextInput::make('subtipo')
                                         ->label('Subtipo')
@@ -89,7 +112,7 @@ class EditFormTabs
                         ]),
 
                     Forms\Components\Section::make('Datos técnicos')
-                        ->description('Hardware y configuración técnica (solo lectura)')
+                        ->description('Hardware y configuración técnica')
                         ->collapsible()
                         ->visible(fn (?Inventario $record = null, ?Forms\Get $get = null): bool => in_array(InventarioResource::obtenerTipoEquipoNormalizado($record, $get), ['cpu', 'lap', 'aio'], true))
                         ->schema([
@@ -97,34 +120,30 @@ class EditFormTabs
                                 ->schema([
                                     Forms\Components\TextInput::make('procesador')
                                         ->label('Procesador')
-                                        ->disabled()
-                                        ->dehydrated(false)
-                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->procesador ?? ($record?->especificaciones['procesador'] ?? '—'))),
+                                        ->maxLength(100)
+                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->procesador ?? ($record?->especificaciones['procesador'] ?? ''))),
 
                                     Forms\Components\TextInput::make('ram')
                                         ->label('Memoria RAM')
-                                        ->disabled()
-                                        ->dehydrated(false)
-                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->ram ?? ($record?->especificaciones['ram'] ?? '—'))),
+                                        ->maxLength(100)
+                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->ram ?? ($record?->especificaciones['ram'] ?? ''))),
 
                                     Forms\Components\TextInput::make('disco')
                                         ->label('Disco duro')
-                                        ->disabled()
-                                        ->dehydrated(false)
-                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->disco ?? ($record?->especificaciones['disco'] ?? '—'))),
+                                        ->maxLength(100)
+                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->disco ?? ($record?->especificaciones['disco'] ?? ''))),
 
                                     Forms\Components\TextInput::make('sistema_operativo')
                                         ->label('Sistema operativo')
-                                        ->disabled()
-                                        ->dehydrated(false)
-                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->sistema_operativo ?? ($record?->especificaciones['sistema_operativo'] ?? '—'))),
+                                        ->maxLength(100)
+                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->sistema_operativo ?? ($record?->especificaciones['sistema_operativo'] ?? ''))),
                                 ]),
                         ]),
 
                     Forms\Components\Section::make('Ubicación y asignación')
                         ->description('Ubicación física asignada del equipo')
                         ->schema([
-                            Forms\Components\Grid::make(2)
+                            Forms\Components\Grid::make(['default' => 1, 'sm' => 2, 'lg' => 3])
                                 ->schema([
                                     Forms\Components\Select::make('area_id')
                                         ->label('Área')
@@ -139,6 +158,13 @@ class EditFormTabs
                                         ->placeholder('Ej. E101')
                                         ->maxLength(5)
                                         ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->salon?->nombre ?? ($record?->especificaciones['aula'] ?? null) ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record?->ubicacion_fisica ?? '', $m) ? $m[1] : null) ?? '')),
+
+                                    Forms\Components\TextInput::make('jefe_departamento')
+                                        ->label('Jefe del Departamento')
+                                        ->disabled()
+                                        ->dehydrated(false)
+                                        ->prefixIcon('heroicon-m-user')
+                                        ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->departamento?->encargado ?? $record?->area?->departamento?->encargado ?? 'Sin jefe asignado')),
                                 ]),
                         ]),
 

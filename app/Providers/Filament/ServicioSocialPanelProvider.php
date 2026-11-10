@@ -33,7 +33,7 @@ class ServicioSocialPanelProvider extends PanelProvider
             ->brandName('SIGEM - Servicio Social')
             ->brandLogo(new HtmlString('<div class="sigem-brand"><img src="' . asset('images/sigem-icon.svg') . '" alt="SIGEM" class="sigem-brand-logo"></div>'))
             ->brandLogoHeight('auto')
-            ->favicon(asset('images/sigem-favicon.svg?v=2'))
+            ->favicon(asset('images/sigem-icon.svg'))
             ->font('DM Sans')
             ->globalSearch(false)
             ->darkMode(false)
@@ -53,6 +53,7 @@ class ServicioSocialPanelProvider extends PanelProvider
 <meta http-equiv="Expires" content="0">
 <link rel="stylesheet" href="{{ asset(\'css/sigem-theme.css\') }}">
 <script src="{{ asset(\'js/sigem-network.js\') }}" defer></script>
+<script src="{{ asset(\'js/sigem-titles.js\') }}" defer></script>
 ')
             )
             ->renderHook(
@@ -97,11 +98,34 @@ class ServicioSocialPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE,
                 fn (): string => Blade::render('
-<div class="flex justify-center items-center gap-4 mb-6">
-    <img src="{{ asset(\'images/sigem-logo.svg\') }}" alt="SIGEM" style="height: 40px; object-fit: contain;">
-    <img src="{{ asset(\'images/tecnm-logo.png\') }}" alt="TecNM" loading="lazy" style="height: 40px; object-fit: contain;">
-    <img src="{{ asset(\'images/itv-logo.png\') }}" alt="ITV" loading="lazy" style="height: 40px; object-fit: contain;">
+<div class="flex flex-col items-center gap-3 mb-6">
+    <div class="flex justify-center items-center gap-4">
+        <img src="{{ asset(\'images/sigem-logo.svg\') }}" alt="SIGEM" style="height: 38px; object-fit: contain;">
+        <img src="{{ asset(\'images/tecnm-logo.webp\') }}" alt="TecNM" loading="lazy" style="height: 38px; object-fit: contain;">
+        <img src="{{ asset(\'images/itv-logo.webp\') }}" alt="ITV" loading="lazy" style="height: 38px; object-fit: contain;">
+    </div>
+    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
+        👥 Panel de Servicio Social
+    </span>
 </div>
+<script>
+    (function() {
+        function applyPlaceholders() {
+            var email = document.querySelector(\'.fi-simple-main input[type="email"], input[type="email"]\');
+            if (email && !email.getAttribute(\'placeholder\')) {
+                email.setAttribute(\'placeholder\', \'usuario@veracruz.tecnm.mx\');
+            }
+            var pass = document.querySelector(\'.fi-simple-main input[type="password"], input[type="password"]\');
+            if (pass && !pass.getAttribute(\'placeholder\')) {
+                pass.setAttribute(\'placeholder\', \'••••••••\');
+            }
+        }
+        applyPlaceholders();
+        setTimeout(applyPlaceholders, 50);
+        setTimeout(applyPlaceholders, 200);
+        setTimeout(applyPlaceholders, 600);
+    })();
+</script>
 ')
             )
             ->renderHook(

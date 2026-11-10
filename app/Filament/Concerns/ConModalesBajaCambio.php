@@ -44,17 +44,10 @@ trait ConModalesBajaCambio
                             : [])
                         ->required(),
                 ]),
-            Forms\Components\Grid::make(2)
-                ->schema([
-                    Forms\Components\TextInput::make('aula')
-                        ->label('Nueva Aula')
-                        ->placeholder('ej. E201')
-                        ->maxLength(50),
-                    Forms\Components\TextInput::make('estacion')
-                        ->label('Nueva Estación')
-                        ->placeholder('ej. AC001')
-                        ->maxLength(50),
-                ]),
+            Forms\Components\TextInput::make('aula')
+                ->label('Nueva Aula')
+                ->placeholder('ej. E201')
+                ->maxLength(50),
             Forms\Components\Textarea::make('motivo')
                 ->label('Motivo del cambio')
                 ->placeholder('Explicación detallada del motivo del cambio...')

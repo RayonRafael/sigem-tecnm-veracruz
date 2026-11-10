@@ -54,7 +54,7 @@ class DepartamentoResource extends Resource
                             ->prefixIcon('heroicon-m-tag')
                             ->maxLength(100),
                         Forms\Components\TextInput::make('encargado')
-                            ->label('Encargado')
+                            ->label('Jefe del Departamento')
                             ->placeholder('Ej. Dr. Juan Pérez')
                             ->helperText('Jefe o responsable del departamento')
                             ->nullable()
@@ -69,7 +69,7 @@ class DepartamentoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)->label('Nombre')->searchable(isIndividual: true)->sortable(),
-                Tables\Columns\TextColumn::make('encargado')->wrap(false)->limit(30)->grow(false)->label('Encargado')->placeholder('—')->searchable(isIndividual: true)->sortable(),
+                Tables\Columns\TextColumn::make('encargado')->wrap(false)->limit(30)->grow(false)->label('Jefe del Departamento')->placeholder('—')->searchable(isIndividual: true)->sortable(),
             ])
             ->defaultSort('nombre', 'asc')
             ->searchPlaceholder('Buscar por nombre del departamento...')
@@ -100,7 +100,7 @@ class DepartamentoResource extends Resource
                                     ->schema([
                                         TextEntry::make('nombre')->label('Nombre del departamento')->icon('heroicon-m-building-office-2'),
                                         TextEntry::make('encargado')
-                                            ->label('Encargado')
+                                            ->label('Jefe del Departamento')
                                             ->placeholder('—')
                                             ->icon('heroicon-m-user'),
                                         TextEntry::make('areas_count')

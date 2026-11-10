@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/images/sigem-logo.svg" alt="SIGEM Logo" width="280">
+</p>
+
 # SIGEM — Sistema de Gestión de Equipos y Materiales
 
 Sistema integral para el control de inventario, gestión de préstamos, rentas y seguimiento de mantenimiento para el equipamiento del **TecNM Campus Veracruz**. El sistema centraliza la operación de activos y proporciona interfaces distintas para administradores y prestadores de servicio social.

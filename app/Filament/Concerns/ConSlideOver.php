@@ -61,8 +61,14 @@ trait ConSlideOver
 
         $action->url(null)->slideOver()->createAnother(false);
 
-        if (method_exists($this, 'mutateSlideOverData')) {
+        if (method_exists($this, 'mutateSlideOverCreateData')) {
+            $action->mutateFormDataUsing(fn (array $data): array => $this->mutateSlideOverCreateData($data));
+        } elseif (method_exists($this, 'mutateSlideOverData')) {
             $action->mutateFormDataUsing(fn (array $data): array => $this->mutateSlideOverData($data));
+        }
+
+        if (method_exists($this, 'afterSlideOverCreate')) {
+            $action->after(fn ($record, array $data) => $this->afterSlideOverCreate($record, $data));
         }
     }
 
@@ -72,8 +78,21 @@ trait ConSlideOver
 
         $action->url(null)->slideOver();
 
-        if (method_exists($this, 'mutateSlideOverData')) {
+        if (method_exists($this, 'mutateSlideOverFillData')) {
+            $action->mutateRecordDataUsing(fn (array $data, $record): array => $this->mutateSlideOverFillData($data, $record));
+        }
+
+        if (method_exists($this, 'mutateSlideOverSaveData')) {
+            $action->mutateFormDataUsing(function (array $data, $record = null) use ($action): array {
+                $record ??= $action->getRecord();
+                return $this->mutateSlideOverSaveData($data, $record);
+            });
+        } elseif (method_exists($this, 'mutateSlideOverData')) {
             $action->mutateFormDataUsing(fn (array $data): array => $this->mutateSlideOverData($data));
+        }
+
+        if (method_exists($this, 'afterSlideOverSave')) {
+            $action->after(fn ($record, array $data) => $this->afterSlideOverSave($record, $data));
         }
     }
 }

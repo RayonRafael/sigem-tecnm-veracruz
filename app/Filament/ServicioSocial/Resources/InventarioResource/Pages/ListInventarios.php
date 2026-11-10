@@ -5,6 +5,7 @@ namespace App\Filament\ServicioSocial\Resources\InventarioResource\Pages;
 use App\Filament\Concerns\ConDashboardBreadcrumb;
 use App\Filament\Concerns\ConSlideOver;
 use App\Filament\ServicioSocial\Resources\InventarioResource;
+use App\Models\Inventario;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 

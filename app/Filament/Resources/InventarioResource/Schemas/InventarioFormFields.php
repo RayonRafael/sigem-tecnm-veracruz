@@ -4,78 +4,99 @@ namespace App\Filament\Resources\InventarioResource\Schemas;
 
 use App\Models\Inventario;
 use App\Models\MarcaMaterial;
+use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 
 trait InventarioFormFields
 {
-    protected static function getDatosTecnicosSection(string $heading = '⚙️ Datos técnicos (opcional, se pueden capturar después)'): Forms\Components\Section
-    {
+    protected static function getDatosTecnicosSection(
+        string $heading = '⚙️ Datos técnicos (opcional, se pueden capturar después)',
+        ?\Closure $dehydratedCondition = null
+    ): Forms\Components\Section {
+        $fields = [
+            Forms\Components\TextInput::make('ip_address')
+                ->label('Dirección IP')
+                ->placeholder('192.168.1.__')
+                ->prefixIcon('heroicon-m-globe-alt')
+                ->maxLength(50),
+
+            Forms\Components\TextInput::make('mac_address')
+                ->label('Dirección MAC')
+                ->placeholder('AA:BB:CC:DD:EE:FF')
+                ->prefixIcon('heroicon-m-signal')
+                ->maxLength(50),
+
+            Forms\Components\TextInput::make('procesador')
+                ->label('Procesador')
+                ->placeholder('ej. Intel Core i5-8500')
+                ->prefixIcon('heroicon-m-cpu-chip')
+                ->maxLength(100),
+
+            Forms\Components\TextInput::make('ram')
+                ->label('Memoria RAM')
+                ->placeholder('ej. 8 GB DDR4')
+                ->prefixIcon('heroicon-m-circle-stack')
+                ->maxLength(100),
+
+            Forms\Components\TextInput::make('disco')
+                ->label('Disco duro')
+                ->placeholder('ej. 256 GB SSD')
+                ->prefixIcon('heroicon-m-circle-stack')
+                ->maxLength(100),
+
+            Forms\Components\TextInput::make('sistema_operativo')
+                ->label('Sistema operativo')
+                ->placeholder('ej. Windows 11 Pro')
+                ->prefixIcon('heroicon-m-computer-desktop')
+                ->maxLength(100),
+        ];
+
+        if ($dehydratedCondition) {
+            foreach ($fields as $field) {
+                $field->dehydrated($dehydratedCondition);
+            }
+        }
+
         return Forms\Components\Section::make($heading)
             ->collapsible()
             ->collapsed()
             ->schema([
                 Forms\Components\Grid::make(['default' => 1, 'sm' => 2])
-                    ->schema([
-                        Forms\Components\TextInput::make('ip_address')
-                            ->label('Dirección IP')
-                            ->placeholder('192.168.1.__')
-                            ->prefixIcon('heroicon-m-globe-alt')
-                            ->maxLength(50),
-
-                        Forms\Components\TextInput::make('mac_address')
-                            ->label('Dirección MAC')
-                            ->placeholder('AA:BB:CC:DD:EE:FF')
-                            ->prefixIcon('heroicon-m-signal')
-                            ->maxLength(50),
-
-                        Forms\Components\TextInput::make('procesador')
-                            ->label('Procesador')
-                            ->placeholder('ej. Intel Core i5-8500')
-                            ->prefixIcon('heroicon-m-cpu-chip')
-                            ->maxLength(100),
-
-                        Forms\Components\TextInput::make('ram')
-                            ->label('Memoria RAM')
-                            ->placeholder('ej. 8 GB DDR4')
-                            ->prefixIcon('heroicon-m-circle-stack')
-                            ->maxLength(100),
-
-                        Forms\Components\TextInput::make('disco')
-                            ->label('Disco duro')
-                            ->placeholder('ej. 256 GB SSD')
-                            ->prefixIcon('heroicon-m-circle-stack')
-                            ->maxLength(100),
-
-                        Forms\Components\TextInput::make('sistema_operativo')
-                            ->label('Sistema operativo')
-                            ->placeholder('ej. Windows 11 Pro')
-                            ->prefixIcon('heroicon-m-computer-desktop')
-                            ->maxLength(100),
-                    ]),
+                    ->schema($fields),
             ]);
     }
 
-    protected static function getDatosRedSection(string $heading = '🌐 Datos de red (opcional)'): Forms\Components\Section
-    {
+    protected static function getDatosRedSection(
+        string $heading = '🌐 Datos de red (opcional)',
+        ?\Closure $dehydratedCondition = null
+    ): Forms\Components\Section {
+        $fields = [
+            Forms\Components\TextInput::make('ip_address')
+                ->label('Dirección IP')
+                ->placeholder('192.168.1.__')
+                ->prefixIcon('heroicon-m-globe-alt')
+                ->maxLength(50),
+
+            Forms\Components\TextInput::make('mac_address')
+                ->label('Dirección MAC')
+                ->placeholder('AA:BB:CC:DD:EE:FF')
+                ->prefixIcon('heroicon-m-signal')
+                ->maxLength(50),
+        ];
+
+        if ($dehydratedCondition) {
+            foreach ($fields as $field) {
+                $field->dehydrated($dehydratedCondition);
+            }
+        }
+
         return Forms\Components\Section::make($heading)
             ->collapsible()
             ->collapsed()
             ->schema([
                 Forms\Components\Grid::make(['default' => 1, 'sm' => 2])
-                    ->schema([
-                        Forms\Components\TextInput::make('ip_address')
-                            ->label('Dirección IP')
-                            ->placeholder('192.168.1.__')
-                            ->prefixIcon('heroicon-m-globe-alt')
-                            ->maxLength(50),
-
-                        Forms\Components\TextInput::make('mac_address')
-                            ->label('Dirección MAC')
-                            ->placeholder('AA:BB:CC:DD:EE:FF')
-                            ->prefixIcon('heroicon-m-signal')
-                            ->maxLength(50),
-                    ]),
+                    ->schema($fields),
             ]);
     }
 
@@ -196,10 +217,13 @@ trait InventarioFormFields
                 }
             })
             ->createOptionForm([
+                SubformSlideOverHelper::headerNav(),
                 Forms\Components\TextInput::make('nombre')
                     ->label('Nombre de la marca')
+                    ->placeholder('Ej. Dell, HP, Lenovo...')
                     ->required()
                     ->maxLength(100),
+                SubformSlideOverHelper::catalogTip('La marca estará disponible inmediatamente en el catálogo.'),
             ])
             ->createOptionUsing(function (array $data) {
                 $clean = trim($data['nombre']);
@@ -207,9 +231,12 @@ trait InventarioFormFields
                 return $marca->nombre;
             })
             ->createOptionAction(function (Action $action) {
-                return $action
-                    ->modalHeading('＋ Agregar marca como nueva opción')
-                    ->modalButton('Agregar');
+                return SubformSlideOverHelper::configureAction(
+                    $action,
+                    '✏️ Agregar marca como nueva opción',
+                    '+ Agregar',
+                    'Marca creada correctamente'
+                );
             })
             ->prefixIcon('heroicon-m-tag');
 
@@ -284,18 +311,24 @@ trait InventarioFormFields
                 }
             })
             ->createOptionForm([
+                SubformSlideOverHelper::headerNav(),
                 Forms\Components\TextInput::make('especificacion')
                     ->label('Nueva especificación')
+                    ->placeholder('Ej. Core i7 16GB RAM 512GB SSD...')
                     ->required()
                     ->maxLength(150),
+                SubformSlideOverHelper::catalogTip('La especificación estará disponible inmediatamente para este y otros equipos.'),
             ])
             ->createOptionUsing(function (array $data) {
                 return static::agregarEspecificacionGlobal($data['especificacion']);
             })
             ->createOptionAction(function (Action $action) {
-                return $action
-                    ->modalHeading('＋ Agregar especificación como nueva opción')
-                    ->modalButton('Agregar');
+                return SubformSlideOverHelper::configureAction(
+                    $action,
+                    '✏️ Agregar especificación como nueva opción',
+                    '+ Agregar',
+                    'Especificación agregada correctamente'
+                );
             })
             ->prefixIcon('heroicon-m-adjustments-horizontal');
 

@@ -612,6 +612,7 @@ body:has(.sigem-professional) .fi-topbar nav,
 
 /* ===== LOGIN CUSTOMIZATION ===== */
 .fi-simple-layout {
+  background-color: #0b1d3a !important;
   background-image: url("../images/fondo.webp") !important;
   background-size: cover !important;
   background-position: center !important;
@@ -627,8 +628,13 @@ body:has(.sigem-professional) .fi-topbar nav,
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(11, 29, 58, 0.75) !important;
+  background: linear-gradient(180deg, rgba(11, 29, 58, 0.55) 0%, rgba(11, 29, 58, 0.72) 100%) !important;
   z-index: -1;
+}
+
+/* Ocultar encabezado superior de Filament en login para evitar logo duplicado */
+.fi-simple-layout .fi-simple-header {
+  display: none !important;
 }
 
 .fi-simple-main-ctn > div {
@@ -639,6 +645,25 @@ body:has(.sigem-professional) .fi-topbar nav,
   border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
+/* Excluir login del borde global de componentes */
+.fi-simple-main .fi-fo-component-ctn {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* Eliminar doble borde en inputs del login */
+.fi-simple-main .fi-input-wrp .fi-input {
+  border: none !important;
+}
+
+@media (max-width: 640px) {
+  .fi-simple-main-ctn {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
 /* ===== SIDEBAR RESTAURADO PARA FASE 2.5 ===== */
 /* ===== DASHBOARD: Componentes base ===== */
 /* Ocultar header nativo de Filament solo en esta pagina */
@@ -1237,10 +1262,20 @@ img.sigem-brand-logo {
   display: flex !important;
   justify-content: center !important;
   text-decoration: none !important;
+  pointer-events: none !important;
+  cursor: default !important;
 }
 .fi-sidebar-header button,
 .fi-sidebar-header .fi-icon-btn {
   display: none !important;
+}
+
+/* Logo del sidebar/topbar solo decorativo (sin navegación ni recarga) */
+.fi-sidebar-header a,
+.fi-topbar a.fi-topbar-brand,
+.sigem-brand {
+  pointer-events: none !important;
+  cursor: default !important;
 }
 
 /* Tooltip al hover */
@@ -1486,6 +1521,415 @@ aside.fi-sidebar,
   font-size: 16px;
   font-weight: 700;
   margin-bottom: 12px;
+}
+
+@keyframes sigemSlideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+/* ==========================================================================
+   LAYOUT DEL DASHBOARD CON PANEL LATERAL (EMPUJA EL CONTENIDO)
+   ========================================================================== */
+.sigem-dashboard-layout {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+  width: 100%;
+  position: relative;
+  transition: gap 0.3s ease;
+}
+.sigem-dashboard-layout.has-panel-open {
+  gap: 20px;
+}
+
+.sigem-dashboard-main {
+  flex: 1 1 0%;
+  min-width: 0;
+  width: 100%;
+  transition: flex 0.3s ease, width 0.3s ease;
+}
+
+/* Panel Lateral Slide-Over de Selección de Equipos (Empuja contenido, ancho 420px) */
+.sigem-selection-side-panel {
+  position: sticky !important;
+  top: 16px !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 420px !important;
+  min-width: 420px !important;
+  max-width: 420px !important;
+  flex: 0 0 420px !important;
+  height: calc(100vh - 32px) !important;
+  max-height: calc(100vh - 32px) !important;
+  background: #ffffff !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08) !important;
+  z-index: 20 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  transition: all 0.3s ease !important;
+  animation: sigemSlideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.sigem-selection-side-panel[style*="display: none"] {
+  display: none !important;
+}
+
+.sigem-sel-backdrop {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .sigem-dashboard-layout {
+    flex-direction: column;
+    gap: 16px !important;
+  }
+  .sigem-selection-side-panel {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 auto !important;
+    position: static !important;
+    height: auto !important;
+    max-height: 80vh !important;
+  }
+}
+.sigem-sel-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+.sigem-sel-back-btn:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+.sigem-sel-form-summary {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+
+.sigem-sel-form-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  color: #4b5563;
+  line-height: 1.4;
+  padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 10px;
+}
+
+.sigem-sel-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.sigem-sel-form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.sigem-sel-form-control {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13.5px;
+  color: #111827;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.sigem-sel-form-control:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.sigem-sel-form-textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.sigem-sel-header {
+  padding: 18px 20px 14px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  background: #ffffff;
+  flex-shrink: 0;
+}
+
+.sigem-sel-header-title {
+  font-weight: 700;
+  font-size: 18px;
+  color: #111827;
+  line-height: 1.25;
+}
+
+.sigem-sel-header-sub {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 3px;
+  line-height: 1.35;
+}
+
+.sigem-sel-close-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+.sigem-sel-close-btn:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.sigem-sel-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.sigem-sel-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+
+.sigem-sel-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sigem-sel-action-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+.sigem-sel-action-card:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
+}
+.sigem-sel-action-card .sigem-sel-action-icon {
+  font-size: 20px;
+  line-height: 1;
+  margin-bottom: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.sigem-sel-action-card .sigem-sel-action-title {
+  font-weight: 700;
+  font-size: 14px;
+  color: #111827;
+  line-height: 1.25;
+}
+.sigem-sel-action-card .sigem-sel-action-desc {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.35;
+  font-weight: 400;
+}
+.sigem-sel-action-card.is-danger .sigem-sel-action-title,
+.sigem-sel-action-card.is-danger .sigem-sel-action-icon {
+  color: #dc2626;
+}
+.sigem-sel-action-card.is-export .sigem-sel-action-title,
+.sigem-sel-action-card.is-export .sigem-sel-action-icon {
+  color: #2563eb;
+}
+
+.sigem-sel-state-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sigem-sel-state-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.sigem-sel-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.sigem-sel-item-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sigem-sel-item-code {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.3;
+}
+
+.sigem-sel-item-desc {
+  font-size: 11px;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.sigem-sel-mini-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sigem-sel-item-remove {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+.sigem-sel-item-remove:hover {
+  color: #ef4444;
+  background: #fee2e2;
+}
+
+.sigem-sel-bitacora-note {
+  background: #ecfdf5;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #065f46;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.4;
+}
+
+.sigem-sel-footer {
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.sigem-sel-footer-btn {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.sigem-sel-footer-btn:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  color: #111827;
+}
+
+.sigem-checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid var(--sig-border, #cbd5e1);
+  accent-color: #0284c7;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.sigem-selection-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e0f2fe;
+  color: #0284c7;
+  font-weight: 600;
+  font-size: 12.5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid #bae6fd;
 }
 
 /* Dona SVG */
@@ -6488,6 +6932,26 @@ textarea::placeholder,
   -webkit-overflow-scrolling: touch !important;
 }
 
+/* Scroll horizontal arriba de la tabla */
+.sigem-scroll-top,
+.sigem-rep-table-wrap.sigem-scroll-top,
+.fi-ta-content {
+  overflow-x: auto !important;
+  transform: rotateX(180deg);
+  -webkit-overflow-scrolling: touch !important;
+}
+.sigem-scroll-top > table,
+.sigem-scroll-top > .fi-ta-table,
+.sigem-scroll-top > div,
+.sigem-rep-table-wrap.sigem-scroll-top > table,
+.sigem-rep-table-wrap.sigem-scroll-top > .fi-ta-table,
+.sigem-rep-table-wrap.sigem-scroll-top > div,
+.fi-ta-content > table,
+.fi-ta-content > .fi-ta-table,
+.fi-ta-content > div {
+  transform: rotateX(180deg);
+}
+
 .sigem-inventario-table .fi-ta-table,
 .fi-ta-ctn:has(.sigem-inventario-table) .fi-ta-table,
 .fi-ta-table:has(th:nth-child(9)) {
@@ -6564,4 +7028,55 @@ header.fi-topbar {
 :is(.fi-table-individual-search-cell, [class*=fi-table-individual-search-cell]) input {
   width: 100% !important;
   box-sizing: border-box !important;
+}
+
+/* ==========================================================================
+   Sub-formularios "+ Agregar" DENTRO del slide-over
+   ========================================================================== */
+.sigem-subform-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--sig-border, #e5e7eb);
+}
+
+.sigem-subform-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  color: #0284c7;
+  background-color: #f0f9ff;
+  border: 1px solid #bae6fd;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  text-decoration: none;
+}
+.sigem-subform-back-btn:hover {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border-color: #7dd3fc;
+}
+
+.sigem-subform-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background-color: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+.sigem-subform-tip strong {
+  color: #78350f;
 }

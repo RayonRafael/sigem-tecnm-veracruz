@@ -157,6 +157,13 @@ class MantenimientoResource extends Resource
                         'Equipo: <b>' . e($record?->inventario?->codigo ?? $record?->inventario?->num_serie ?? '—') . '</b> · ' . e($record?->fecha_solicitud?->format('d/m/Y') ?? '—')
                     ))
                     ->modalCancelActionLabel('Cerrar'),
+
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Editar')
+                    ->extraAttributes(['title' => 'Editar'])
+                    ->modalHeading(fn (?Mantenimiento $record) => 'Editar Mantenimiento #' . ($record?->id_mantenimiento ? str_pad($record->id_mantenimiento, 4, '0', STR_PAD_LEFT) : '—'))
+                    ->successNotificationTitle('Mantenimiento actualizado exitosamente'),
             ])
             ->bulkActions([]);
     }

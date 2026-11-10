@@ -4,7 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AreaResource\Pages;
 use App\Models\Area;
+use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Tabs;
@@ -70,11 +72,22 @@ class AreaResource extends Resource
                             ->prefixIcon('heroicon-m-building-office-2')
                             ->columnSpanFull()
                             ->createOptionForm([
+                                SubformSlideOverHelper::headerNav(),
                                 Forms\Components\TextInput::make('nombre')
                                     ->label('Nombre del departamento')
+                                    ->placeholder('Ej. Sistemas y Computación')
                                     ->required()
                                     ->maxLength(100),
-                            ]),
+                                SubformSlideOverHelper::catalogTip('El departamento estará disponible inmediatamente en el catálogo.'),
+                            ])
+                            ->createOptionAction(function (Action $action) {
+                                return SubformSlideOverHelper::configureAction(
+                                    $action,
+                                    '✏️ Agregar departamento como nueva opción',
+                                    '+ Agregar',
+                                    'Departamento creado correctamente'
+                                );
+                            }),
                     ])->columns(2),
             ]);
     }

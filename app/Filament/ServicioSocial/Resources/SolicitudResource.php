@@ -144,6 +144,13 @@ class SolicitudResource extends Resource
                         }) . '</b> · ' . e($record?->fecha_solicitud?->format('d/m/Y') ?? '—')
                     ))
                     ->modalCancelActionLabel('Cerrar'),
+
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Editar')
+                    ->extraAttributes(['title' => 'Editar'])
+                    ->modalHeading(fn (?Solicitud $record) => 'Editar Solicitud ' . ($record?->id_solicitud ? 'FOLIO-' . str_pad($record->id_solicitud, 5, '0', STR_PAD_LEFT) : ''))
+                    ->successNotificationTitle('Solicitud actualizada exitosamente'),
             ])
             ->bulkActions([]);
     }

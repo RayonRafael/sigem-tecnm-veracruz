@@ -22,6 +22,7 @@ class ComponentCardsSchema
                                 ->placeholder('ej. B4HPS22')
                                 ->prefixIcon('heroicon-m-qr-code')
                                 ->required(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'pc')
+                                ->dehydrated(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'pc')
                                 ->maxLength(100),
 
                             static::getMarcaSelectField('especificaciones.cpu_marca', fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'pc'),
@@ -30,6 +31,7 @@ class ComponentCardsSchema
                                 ->label('Modelo')
                                 ->placeholder('ej. OptiPlex 7040')
                                 ->prefixIcon('heroicon-m-tag')
+                                ->dehydrated(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'pc')
                                 ->maxLength(100),
 
                             static::getEspecificacionesField('especificacion_texto'),
@@ -38,10 +40,11 @@ class ComponentCardsSchema
                                 ->label('Descripción del equipo')
                                 ->placeholder('ej. Equipo completo, formateado')
                                 ->rows(2)
+                                ->dehydrated(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'pc')
                                 ->columnSpanFull(),
                         ]),
 
-                    static::getDatosTecnicosSection(),
+                    static::getDatosTecnicosSection(dehydratedCondition: fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'pc'),
                 ])
                 ->columnSpanFull(),
 
@@ -112,6 +115,7 @@ class ComponentCardsSchema
                                 ->placeholder('ej. 3CG4251XYZ')
                                 ->prefixIcon('heroicon-m-qr-code')
                                 ->required(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'aio')
+                                ->dehydrated(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'aio')
                                 ->maxLength(100),
 
                             static::getMarcaSelectField('especificaciones.marca', fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'aio'),
@@ -120,6 +124,7 @@ class ComponentCardsSchema
                                 ->label('Modelo')
                                 ->placeholder('ej. ProOne 400 G5')
                                 ->prefixIcon('heroicon-m-tag')
+                                ->dehydrated(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'aio')
                                 ->maxLength(100),
 
                             static::getEspecificacionesField('especificacion_texto'),
@@ -128,10 +133,11 @@ class ComponentCardsSchema
                                 ->label('Descripción del equipo')
                                 ->placeholder('ej. AIO HP + teclado y mouse')
                                 ->rows(2)
+                                ->dehydrated(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'aio')
                                 ->columnSpanFull(),
                         ]),
 
-                    static::getDatosTecnicosSection(),
+                    static::getDatosTecnicosSection(dehydratedCondition: fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'aio'),
                 ])
                 ->columnSpanFull(),
 
@@ -281,6 +287,7 @@ class ComponentCardsSchema
                                 })
                                 ->prefixIcon('heroicon-m-qr-code')
                                 ->required(fn (Forms\Get $get) => ! in_array($get('tipo_equipo') ?? 'pc', ['pc', 'aio']))
+                                ->dehydrated(fn (Forms\Get $get) => ! in_array($get('tipo_equipo') ?? 'pc', ['pc', 'aio']))
                                 ->maxLength(100),
 
                             static::getMarcaSelectField('especificaciones.marca', fn (Forms\Get $get) => ! in_array($get('tipo_equipo') ?? 'pc', ['pc', 'aio'])),
@@ -300,6 +307,7 @@ class ComponentCardsSchema
                                     default => 'ej. Modelo',
                                 })
                                 ->prefixIcon('heroicon-m-tag')
+                                ->dehydrated(fn (Forms\Get $get) => ! in_array($get('tipo_equipo') ?? 'pc', ['pc', 'aio']))
                                 ->maxLength(100),
 
                             static::getEspecificacionesField('especificacion_texto'),
@@ -346,15 +354,16 @@ class ComponentCardsSchema
                                     default => 'ej. Descripción del artículo',
                                 })
                                 ->rows(2)
+                                ->dehydrated(fn (Forms\Get $get) => ! in_array($get('tipo_equipo') ?? 'pc', ['pc', 'aio']))
                                 ->columnSpanFull(),
                         ]),
 
                     // Datos técnicos expandibles para Laptop o CPU individual
-                    static::getDatosTecnicosSection()
+                    static::getDatosTecnicosSection(dehydratedCondition: fn (Forms\Get $get) => in_array($get('tipo_equipo'), ['lap', 'cpu']))
                         ->visible(fn (Forms\Get $get) => in_array($get('tipo_equipo'), ['lap', 'cpu'])),
 
                     // Datos de red expandibles para Impresora o Switch de red
-                    static::getDatosRedSection()
+                    static::getDatosRedSection(dehydratedCondition: fn (Forms\Get $get) => in_array($get('tipo_equipo'), ['imp', 'swi']))
                         ->visible(fn (Forms\Get $get) => in_array($get('tipo_equipo'), ['imp', 'swi'])),
                 ])
                 ->columnSpanFull(),
