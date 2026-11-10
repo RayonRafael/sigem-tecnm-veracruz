@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="SIGEM — Sistema de Gestión de Equipos y Materiales del TecNM Campus Veracruz. Inventario, solicitudes, mantenimiento y reportes en tiempo real.">
     <title>SIGEM — TecNM Veracruz | Gestión de equipos y materiales</title>
-    <link rel="icon" href="{{ asset('images/sigem-logo.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('images/sigem-icon.svg') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap">
@@ -508,7 +508,7 @@
     <!-- Header -->
     <header class="header">
         <div class="header-brand">
-            <img src="{{ asset('images/sigem-logo.svg') }}" alt="SIGEM" width="40" height="40">
+            <img src="{{ asset('images/sigem-icon.svg') }}" alt="SIGEM" width="40" height="40" style="object-fit: contain;">
             <div class="brand-text">
                 <div class="brand-title">SIGEM</div>
                 <div class="brand-sub">TecNM Veracruz</div>

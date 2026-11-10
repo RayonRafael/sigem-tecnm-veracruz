@@ -113,7 +113,7 @@
             </div>
 
             @if (count($reporteActual['rows']) > 0)
-                <div class="sigem-rep-table-wrap">
+                <div class="sigem-rep-table-wrap sigem-scroll-top">
                     <table class="sigem-rep-table">
                         <thead>
                             <tr>

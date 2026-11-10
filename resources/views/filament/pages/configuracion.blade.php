@@ -137,7 +137,7 @@
                 </div>
 
                 @if (count($catActivo['rows']) > 0)
-                    <div class="sigem-rep-table-wrap">
+                    <div class="sigem-rep-table-wrap sigem-scroll-top">
                         <table class="fi-ta-table sigem-cat-table sigem-cat-{{ $catActivo['id'] }}">
                             <thead>
                                 <tr>
@@ -226,7 +226,7 @@
                 </div>
 
                 @if (count($bitacoraRows) > 0)
-                    <div class="sigem-rep-table-wrap">
+                    <div class="sigem-rep-table-wrap sigem-scroll-top">
                         <table class="fi-ta-table">
                             <thead>
                                 <tr>

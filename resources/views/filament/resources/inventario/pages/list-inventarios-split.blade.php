@@ -69,7 +69,7 @@
                     @if(request()->boolean('skeleton'))
                         {{-- SKELETON PREVIEW: TABLA INVENTARIO (5 FILAS × 7 CELDAS) --}}
                         <div class="fi-ta-ctn sigem-skeleton-table-preview" style="background: var(--sig-surface); border: 1px solid var(--sig-border); border-radius: 12px; overflow: hidden;">
-                            <div class="sigem-rep-table-wrap">
+                            <div class="sigem-rep-table-wrap sigem-scroll-top">
                                 <table class="fi-ta-table" style="width: 100%;">
                                     <thead>
                                         <tr>

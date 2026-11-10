@@ -7163,13 +7163,15 @@ textarea::placeholder,
 
 /* Scroll horizontal arriba de la tabla */
 .sigem-scroll-top,
-.sigem-rep-table-wrap.sigem-scroll-top {
+.sigem-rep-table-wrap.sigem-scroll-top,
+.fi-ta-content {
   overflow-x: auto !important;
   transform: rotateX(180deg);
   -webkit-overflow-scrolling: touch !important;
 
   > table,
-  > .fi-ta-table {
+  > .fi-ta-table,
+  > div {
     transform: rotateX(180deg);
   }
 }

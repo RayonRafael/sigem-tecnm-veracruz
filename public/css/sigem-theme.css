@@ -6899,15 +6899,21 @@ textarea::placeholder,
 
 /* Scroll horizontal arriba de la tabla */
 .sigem-scroll-top,
-.sigem-rep-table-wrap.sigem-scroll-top {
+.sigem-rep-table-wrap.sigem-scroll-top,
+.fi-ta-content {
   overflow-x: auto !important;
   transform: rotateX(180deg);
   -webkit-overflow-scrolling: touch !important;
 }
 .sigem-scroll-top > table,
 .sigem-scroll-top > .fi-ta-table,
+.sigem-scroll-top > div,
 .sigem-rep-table-wrap.sigem-scroll-top > table,
-.sigem-rep-table-wrap.sigem-scroll-top > .fi-ta-table {
+.sigem-rep-table-wrap.sigem-scroll-top > .fi-ta-table,
+.sigem-rep-table-wrap.sigem-scroll-top > div,
+.fi-ta-content > table,
+.fi-ta-content > .fi-ta-table,
+.fi-ta-content > div {
   transform: rotateX(180deg);
 }
 
