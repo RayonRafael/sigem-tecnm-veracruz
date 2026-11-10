@@ -1488,7 +1488,29 @@ aside.fi-sidebar,
   margin-bottom: 12px;
 }
 
-/* Panel Lateral de Selección de Equipos */
+/* Panel Lateral de Selección de Equipos (Fixed Right Dock) */
+.sigem-selection-side-panel {
+  position: fixed !important;
+  top: 64px !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 380px !important;
+  max-width: 90vw !important;
+  background: var(--sig-surface, #ffffff) !important;
+  border-left: 1px solid var(--sig-border, #e2e8f0) !important;
+  box-shadow: -6px 0 28px rgba(15, 23, 42, 0.16) !important;
+  z-index: 35 !important;
+  overflow-y: auto !important;
+  padding: 22px 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out !important;
+}
+
+.sigem-selection-side-panel[style*="display: none"] {
+  display: none !important;
+}
+
 .sigem-selection-summary {
   background: var(--sig-bg, #f8fafc);
   border: 1px solid var(--sig-border);

@@ -31,6 +31,19 @@ trait ConAccionesMasivasInventario
     public bool $selectAll = false;
 
     /**
+     * Controla la visibilidad del panel lateral de acciones masivas.
+     */
+    public bool $showSidePanel = false;
+
+    /**
+     * Se dispara cuando se actualiza la lista de filas seleccionadas.
+     */
+    public function updatedSelectedRows(): void
+    {
+        $this->showSidePanel = ! empty($this->selectedRows);
+    }
+
+    /**
      * Alterna la selección de todos los registros que cumplen el filtro actual.
      */
     public function updatedSelectAll($value): void
@@ -43,6 +56,8 @@ trait ConAccionesMasivasInventario
         } else {
             $this->selectedRows = [];
         }
+
+        $this->showSidePanel = ! empty($this->selectedRows);
     }
 
     /**
@@ -52,6 +67,7 @@ trait ConAccionesMasivasInventario
     {
         $this->selectedRows = [];
         $this->selectAll = false;
+        $this->showSidePanel = false;
     }
 
     /**
@@ -414,3 +430,4 @@ trait ConAccionesMasivasInventario
         return SigemExcelExporter::exportarInventario($this, $this->selectedRows);
     }
 }
+

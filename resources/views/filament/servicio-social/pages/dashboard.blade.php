@@ -55,6 +55,7 @@
             :categorias-top="$categoriasTop ?? []"
             :selected-rows="$selectedRows ?? []"
             :select-all="$selectAll ?? false"
+            :show-side-panel="$showSidePanel ?? false"
         />
 
     </div>

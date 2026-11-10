@@ -17,6 +17,7 @@
     'categoriasTop' => [],
     'selectedRows' => [],
     'selectAll' => false,
+    'showSidePanel' => false,
 ])
 
 @php
@@ -64,7 +65,7 @@
         </div>
     </div>
 
-    <div class="sigem-inv-layout" :class="(showGrafica || {{ count($selectedRows ?? []) > 0 ? 'true' : 'false' }}) ? '' : 'sigem-inv-no-chart'" style="margin-top: 14px;">
+    <div class="sigem-inv-layout" :class="showGrafica ? '' : 'sigem-inv-no-chart'" style="margin-top: 14px;">
         <div class="sigem-inv-main" style="min-width: 0;">
             <div class="sigem-rep-view sigem-dash-table" style="margin-bottom: 0;">
                 {{-- TOOLBAR: [Buscador general] + [Desde] + [Hasta] + [Quitar filtros] + [Pill Selección] --}}
@@ -539,204 +540,209 @@
             </div>
         </div>
 
-        {{-- Panel lateral derecho: Selección de equipos o Gráfica del inventario --}}
-        <aside class="sigem-inv-side" x-show="showGrafica || {{ count($selectedRows ?? []) > 0 ? 'true' : 'false' }}">
-            @if(count($selectedRows ?? []) > 0)
-                @php
-                    $cantSel = count($selectedRows);
-                    $firstSelId = reset($selectedRows);
-                    $selRecord = !empty($firstSelId) ? \App\Models\Inventario::with(['material.tipo', 'departamento', 'area', 'salon'])->find($firstSelId) : null;
-                @endphp
+        {{-- Panel lateral derecho: Gráfica del inventario --}}
+        <aside class="sigem-inv-side" x-show="showGrafica" x-cloak>
+            <div class="sigem-inv-side-title">Resumen del inventario</div>
 
-                @if($cantSel === 1)
-                    {{-- PANEL LATERAL: 1 EQUIPO SELECCIONADO --}}
-                    <div class="sigem-inv-side-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                        <span style="font-size: 15px; font-weight: 700; color: var(--sig-text);">📦 1 equipo seleccionado</span>
-                        <button type="button" wire:click="deseleccionarTodos" style="background: none; border: none; cursor: pointer; color: var(--sig-muted); font-size: 16px; line-height: 1; padding: 2px 6px;" title="Deseleccionar">✕</button>
-                    </div>
+            @php
+                $dashTotal = $totalActivos ?? 0;
+                $circunf = 263.89;
+                $donutSegs = [
+                    ['label' => 'Disponible', 'cant' => $inventarioDisponibles ?? 0, 'color' => '#059669'],
+                    ['label' => 'En Mantenimiento', 'cant' => $inventarioEnMantenimiento ?? 0, 'color' => '#d97706'],
+                    ['label' => 'Asignado', 'cant' => $inventarioAsignados ?? 0, 'color' => '#0891b2'],
+                    ['label' => 'Dañado', 'cant' => $inventarioDanados ?? 0, 'color' => '#dc2626'],
+                ];
+                $dashOffset = 0;
+            @endphp
 
-                    @if($selRecord)
-                        <div class="sigem-selection-summary">
-                            <div class="sigem-selection-card">
-                                <div class="sigem-selection-card-name">{{ $selRecord->material?->nombre ?? $selRecord->subtipo ?? 'Equipo general' }}</div>
-                                <div class="sigem-selection-card-meta">ID / Código: <b>{{ $selRecord->codigo ?: ($selRecord->num_serie ?: ('#' . ($selRecord->id_inventario ?? $selRecord->id))) }}</b></div>
-                                <div class="sigem-selection-card-meta">Categoría: <b>{{ $selRecord->material?->tipo?->nombre ?? $selRecord->subtipo ?? 'General' }}</b></div>
-                                <div style="margin-top: 6px;">
-                                    @php
-                                        $st = $selRecord->estado ?? 'Disponible';
-                                        $pillClsSel = match ($st) {
-                                            'Disponible' => 'ok',
-                                            'Asignado' => 'info',
-                                            'Reasignado' => 'reassign',
-                                            'En Mantenimiento', 'En mantenimiento' => 'warn',
-                                            'Solicitud de baja' => 'warn',
-                                            'Cambio de área' => 'info',
-                                            'Dado de baja', 'Baja', 'Dañado' => 'danger',
-                                            default => 'neutral',
-                                        };
-                                    @endphp
-                                    <span class="sigem-pill {{ $pillClsSel }}">
-                                        <span class="sigem-dot"></span>{{ $st }}
-                                    </span>
-                                </div>
-                                <div class="sigem-selection-card-meta" style="margin-top: 6px;">
-                                    Ubicación: <b>{{ $selRecord->area?->nombre ?? $selRecord->ubicacion_fisica ?? 'Sin ubicación' }}</b>
-                                </div>
+            {{-- 1. Dona SVG --}}
+            <div class="sigem-donut">
+                <svg viewBox="0 0 120 120" width="120" height="120">
+                    <circle cx="60" cy="60" r="42" fill="none" stroke="var(--sig-border)" stroke-width="16" />
+                    @if($dashTotal > 0)
+                        @foreach($donutSegs as $seg)
+                            @php
+                                $segLen = ($seg['cant'] / $dashTotal) * $circunf;
+                                $dashArray = $segLen . ' ' . ($circunf - $segLen);
+                            @endphp
+                            @if($seg['cant'] > 0)
+                                <circle cx="60" cy="60" r="42" fill="none"
+                                        stroke="{{ $seg['color'] }}" stroke-width="16"
+                                        stroke-dasharray="{{ $dashArray }}"
+                                        stroke-dashoffset="{{ -$dashOffset }}"
+                                        transform="rotate(-90 60 60)" />
+                                @php $dashOffset += $segLen; @endphp
+                            @endif
+                        @endforeach
+                    @endif
+                </svg>
+                <div class="sigem-donut-center">
+                    <b>{{ $dashTotal }}</b>
+                    <span>Total</span>
+                </div>
+            </div>
+
+            {{-- 2. Leyenda interactiva (filtra por estado al dar clic) --}}
+            <div class="sigem-leg" style="margin-top: 10px;">
+                @foreach($donutSegs as $seg)
+                    <button type="button"
+                            wire:click="$set('tableColumnSearches.estado', '{{ $seg['label'] }}')"
+                            class="sigem-leg-item"
+                            style="background: none; border: none; cursor: pointer; text-align: left; width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 4px 0;"
+                            title="Filtrar por {{ $seg['label'] }}">
+                        <span style="display: inline-flex; align-items: center; gap: 6px;">
+                            <span style="width: 8px; height: 8px; border-radius: 50%; background-color: {{ $seg['color'] }}; display: inline-block;"></span>
+                            <span>{{ $seg['label'] }}</span>
+                        </span>
+                        <b>{{ $seg['cant'] }}</b>
+                    </button>
+                @endforeach
+            </div>
+
+            {{-- 3. Barras por categoría interactivas (filtra por categoría al dar clic) --}}
+            <div style="margin-top: 18px; border-top: 1px solid var(--sig-border); padding-top: 14px;">
+                <div style="font-size: 13.5px; font-weight: 700; color: var(--sig-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px;">
+                    Por categoría
+                </div>
+                @forelse(($categoriasTop ?? []) as $catNom => $catCant)
+                    @php
+                        $pct = ($dashTotal ?? 0) > 0 ? round(($catCant / $dashTotal) * 100) : 0;
+                    @endphp
+                    <button type="button"
+                            wire:click="$set('tableColumnSearches.categoria', '{{ $catNom }}')"
+                            class="sigem-cb"
+                            style="text-decoration: none; color: inherit; width: 100%; border: none; background: none; cursor: pointer; text-align: left; padding: 4px 0;"
+                            title="Filtrar por {{ $catNom }}">
+                        <span title="{{ $catNom }}">{{ $catNom }}</span>
+                        <div><span style="width: {{ $pct }}%;"></span></div>
+                        <span style="text-align: right; font-weight: 600;">{{ $catCant }}</span>
+                    </button>
+                @empty
+                    <div style="font-size: 13px; color: var(--sig-muted);">Sin categorías registradas</div>
+                @endforelse
+            </div>
+        </aside>
+    </div>
+
+    {{-- Panel Lateral Flotante de Acciones Masivas / Selección (Dock Derecho) --}}
+    @if(count($selectedRows ?? []) > 0)
+        <aside class="sigem-selection-side-panel"
+               x-data
+               x-show="$wire.showSidePanel || ($wire.selectedRows && $wire.selectedRows.length > 0)"
+               x-cloak>
+            @php
+                $cantSel = count($selectedRows);
+                $firstSelId = reset($selectedRows);
+                $selRecord = !empty($firstSelId) ? \App\Models\Inventario::with(['material.tipo', 'departamento', 'area', 'salon'])->find($firstSelId) : null;
+            @endphp
+
+            @if($cantSel === 1)
+                {{-- PANEL LATERAL: 1 EQUIPO SELECCIONADO --}}
+                <div class="sigem-inv-side-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                    <span style="font-size: 15px; font-weight: 700; color: var(--sig-text);">📦 1 equipo seleccionado</span>
+                    <button type="button" wire:click="deseleccionarTodos" style="background: none; border: none; cursor: pointer; color: var(--sig-muted); font-size: 16px; line-height: 1; padding: 2px 6px;" title="Deseleccionar">✕</button>
+                </div>
+
+                @if($selRecord)
+                    <div class="sigem-selection-summary">
+                        <div class="sigem-selection-card">
+                            <div class="sigem-selection-card-name">{{ $selRecord->material?->nombre ?? $selRecord->subtipo ?? 'Equipo general' }}</div>
+                            <div class="sigem-selection-card-meta">ID / Código: <b>{{ $selRecord->codigo ?: ($selRecord->num_serie ?: ('#' . ($selRecord->id_inventario ?? $selRecord->id))) }}</b></div>
+                            <div class="sigem-selection-card-meta">Categoría: <b>{{ $selRecord->material?->tipo?->nombre ?? $selRecord->subtipo ?? 'General' }}</b></div>
+                            <div style="margin-top: 6px;">
+                                @php
+                                    $st = $selRecord->estado ?? 'Disponible';
+                                    $pillClsSel = match ($st) {
+                                        'Disponible' => 'ok',
+                                        'Asignado' => 'info',
+                                        'Reasignado' => 'reassign',
+                                        'En Mantenimiento', 'En mantenimiento' => 'warn',
+                                        'Solicitud de baja' => 'warn',
+                                        'Cambio de área' => 'info',
+                                        'Dado de baja', 'Baja', 'Dañado' => 'danger',
+                                        default => 'neutral',
+                                    };
+                                @endphp
+                                <span class="sigem-pill {{ $pillClsSel }}">
+                                    <span class="sigem-dot"></span>{{ $st }}
+                                </span>
+                            </div>
+                            <div class="sigem-selection-card-meta" style="margin-top: 6px;">
+                                Ubicación: <b>{{ $selRecord->area?->nombre ?? $selRecord->ubicacion_fisica ?? 'Sin ubicación' }}</b>
                             </div>
                         </div>
-                    @endif
-
-                    <div class="sigem-selection-actions">
-                        <button type="button" wire:click="mountAction('modificarTodos')" class="sigem-btn-side warning" title="Modificar campos del equipo">
-                            ✏️ Modificar equipo
-                        </button>
-                        <button type="button" wire:click="mountAction('cambioMasivo')" class="sigem-btn-side info" title="Cambiar área o estado del equipo">
-                            🔄 Cambio de área
-                        </button>
-                        <button type="button" wire:click="mountAction('bajaMasiva')" class="sigem-btn-side danger" title="Dar de baja o solicitar baja">
-                            ⬇️ Dar de baja
-                        </button>
-                        <button type="button" wire:click="exportarSeleccion" class="sigem-btn-side secondary" title="Descargar Excel con este equipo">
-                            📊 Exportar selección (.xlsx)
-                        </button>
-                        <button type="button" wire:click="deseleccionarTodos" class="sigem-btn-side ghost" title="Limpiar selección">
-                            ✕ Deseleccionar
-                        </button>
-                    </div>
-                @else
-                    {{-- PANEL LATERAL: MÚLTIPLES EQUIPOS SELECCIONADOS --}}
-                    <div class="sigem-inv-side-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                        <span style="font-size: 15px; font-weight: 700; color: var(--sig-text);">📦 {{ $cantSel }} equipos seleccionados</span>
-                        <button type="button" wire:click="deseleccionarTodos" style="background: none; border: none; cursor: pointer; color: var(--sig-muted); font-size: 16px; line-height: 1; padding: 2px 6px;" title="Deseleccionar todos">✕</button>
-                    </div>
-
-                    <div class="sigem-selection-summary">
-                        <div style="font-size: 12px; font-weight: 600; color: var(--sig-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
-                            Equipos en la selección ({{ $cantSel }})
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto;">
-                            @php
-                                $previewList = !empty($selectedRows) ? \App\Models\Inventario::with(['material.tipo'])->whereIn('id_inventario', array_slice($selectedRows, 0, 5))->get() : collect();
-                            @endphp
-                            @foreach($previewList as $pItem)
-                                <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; padding: 4px 6px; background: white; border: 1px solid var(--sig-border); border-radius: 6px;">
-                                    <span style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px;" title="{{ $pItem->material?->nombre ?? $pItem->subtipo }}">
-                                        {{ $pItem->material?->nombre ?? $pItem->subtipo ?? 'Equipo' }}
-                                    </span>
-                                    <span style="font-size: 11px; font-family: monospace; color: var(--sig-muted);">
-                                        #{{ $pItem->codigo ?: ($pItem->num_serie ?: ($pItem->id_inventario ?? $pItem->id)) }}
-                                    </span>
-                                </div>
-                            @endforeach
-                            @if($cantSel > 5)
-                                <div style="text-align: center; font-size: 11.5px; color: var(--sig-muted); padding: 2px 0;">
-                                    + {{ $cantSel - 5 }} equipos más seleccionados
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="sigem-selection-actions">
-                        <button type="button" wire:click="mountAction('modificarTodos')" class="sigem-btn-side warning" title="Modificar todos los equipos seleccionados">
-                            ✏️ Modificar todos ({{ $cantSel }})
-                        </button>
-                        <button type="button" wire:click="mountAction('cambioMasivo')" class="sigem-btn-side info" title="Cambio masivo de área o estado">
-                            🔄 Cambio (masivo)
-                        </button>
-                        <button type="button" wire:click="mountAction('bajaMasiva')" class="sigem-btn-side danger" title="Dar de baja o solicitar baja masiva">
-                            ⬇️ Dar de baja (masivo)
-                        </button>
-                        <button type="button" wire:click="exportarSeleccion" class="sigem-btn-side secondary" title="Descargar Excel con los equipos seleccionados">
-                            📊 Exportar selección (.xlsx)
-                        </button>
-                        <button type="button" wire:click="deseleccionarTodos" class="sigem-btn-side ghost" title="Limpiar la selección">
-                            ✕ Deseleccionar todos
-                        </button>
                     </div>
                 @endif
+
+                <div class="sigem-selection-actions">
+                    <button type="button" wire:click="mountAction('modificarTodos')" class="sigem-btn-side warning" title="Modificar campos del equipo">
+                        ✏️ Modificar equipo
+                    </button>
+                    <button type="button" wire:click="mountAction('cambioMasivo')" class="sigem-btn-side info" title="Cambiar área o estado del equipo">
+                        🔄 Cambio de área
+                    </button>
+                    <button type="button" wire:click="mountAction('bajaMasiva')" class="sigem-btn-side danger" title="Dar de baja o solicitar baja">
+                        ⬇️ Dar de baja
+                    </button>
+                    <button type="button" wire:click="exportarSeleccion" class="sigem-btn-side secondary" title="Descargar Excel con este equipo">
+                        📊 Exportar selección (.xlsx)
+                    </button>
+                    <button type="button" wire:click="deseleccionarTodos" class="sigem-btn-side ghost" title="Limpiar selección">
+                        ✕ Deseleccionar
+                    </button>
+                </div>
             @else
-                {{-- MODO NORMAL: RESUMEN DE DONA Y CATEGORÍAS --}}
-                <div class="sigem-inv-side-title">Resumen del inventario</div>
-
-                @php
-                    $dashTotal = $totalActivos ?? 0;
-                    $circunf = 263.89;
-                    $donutSegs = [
-                        ['label' => 'Disponible', 'cant' => $inventarioDisponibles ?? 0, 'color' => '#059669'],
-                        ['label' => 'En Mantenimiento', 'cant' => $inventarioEnMantenimiento ?? 0, 'color' => '#d97706'],
-                        ['label' => 'Asignado', 'cant' => $inventarioAsignados ?? 0, 'color' => '#0891b2'],
-                        ['label' => 'Dañado', 'cant' => $inventarioDanados ?? 0, 'color' => '#dc2626'],
-                    ];
-                    $dashOffset = 0;
-                @endphp
-
-                {{-- 1. Dona SVG --}}
-                <div class="sigem-donut">
-                    <svg viewBox="0 0 120 120" width="120" height="120">
-                        <circle cx="60" cy="60" r="42" fill="none" stroke="var(--sig-border)" stroke-width="16" />
-                        @if($dashTotal > 0)
-                            @foreach($donutSegs as $seg)
-                                @php
-                                    $segLen = ($seg['cant'] / $dashTotal) * $circunf;
-                                    $dashArray = $segLen . ' ' . ($circunf - $segLen);
-                                @endphp
-                                @if($seg['cant'] > 0)
-                                    <circle cx="60" cy="60" r="42" fill="none"
-                                            stroke="{{ $seg['color'] }}" stroke-width="16"
-                                            stroke-dasharray="{{ $dashArray }}"
-                                            stroke-dashoffset="{{ -$dashOffset }}"
-                                            transform="rotate(-90 60 60)" />
-                                    @php $dashOffset += $segLen; @endphp
-                                @endif
-                            @endforeach
-                        @endif
-                    </svg>
-                    <div class="sigem-donut-center">
-                        <b>{{ $dashTotal }}</b>
-                        <span>Total</span>
-                    </div>
+                {{-- PANEL LATERAL: MÚLTIPLES EQUIPOS SELECCIONADOS --}}
+                <div class="sigem-inv-side-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                    <span style="font-size: 15px; font-weight: 700; color: var(--sig-text);">📦 {{ $cantSel }} equipos seleccionados</span>
+                    <button type="button" wire:click="deseleccionarTodos" style="background: none; border: none; cursor: pointer; color: var(--sig-muted); font-size: 16px; line-height: 1; padding: 2px 6px;" title="Deseleccionar todos">✕</button>
                 </div>
 
-                {{-- 2. Leyenda interactiva (filtra por estado al dar clic) --}}
-                <div class="sigem-leg" style="margin-top: 10px;">
-                    @foreach($donutSegs as $seg)
-                        <button type="button"
-                                wire:click="$set('tableColumnSearches.estado', '{{ $seg['label'] }}')"
-                                class="sigem-leg-item"
-                                style="background: none; border: none; cursor: pointer; text-align: left; width: 100%; display: flex; align-items: center; justify-content: space-between; padding: 4px 0;"
-                                title="Filtrar por {{ $seg['label'] }}">
-                            <span style="display: inline-flex; align-items: center; gap: 6px;">
-                                <span style="width: 8px; height: 8px; border-radius: 50%; background-color: {{ $seg['color'] }}; display: inline-block;"></span>
-                                <span>{{ $seg['label'] }}</span>
-                            </span>
-                            <b>{{ $seg['cant'] }}</b>
-                        </button>
-                    @endforeach
-                </div>
-
-                {{-- 3. Barras por categoría interactivas (filtra por categoría al dar clic) --}}
-                <div style="margin-top: 18px; border-top: 1px solid var(--sig-border); padding-top: 14px;">
-                    <div style="font-size: 13.5px; font-weight: 700; color: var(--sig-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px;">
-                        Por categoría
+                <div class="sigem-selection-summary">
+                    <div style="font-size: 12px; font-weight: 600; color: var(--sig-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+                        Equipos en la selección ({{ $cantSel }})
                     </div>
-                    @forelse(($categoriasTop ?? []) as $catNom => $catCant)
+                    <div style="display: flex; flex-direction: column; gap: 6px; max-height: 160px; overflow-y: auto;">
                         @php
-                            $pct = ($dashTotal ?? 0) > 0 ? round(($catCant / $dashTotal) * 100) : 0;
+                            $previewList = !empty($selectedRows) ? \App\Models\Inventario::with(['material.tipo'])->whereIn('id_inventario', array_slice($selectedRows, 0, 5))->get() : collect();
                         @endphp
-                        <button type="button"
-                                wire:click="$set('tableColumnSearches.categoria', '{{ $catNom }}')"
-                                class="sigem-cb"
-                                style="text-decoration: none; color: inherit; width: 100%; border: none; background: none; cursor: pointer; text-align: left; padding: 4px 0;"
-                                title="Filtrar por {{ $catNom }}">
-                            <span title="{{ $catNom }}">{{ $catNom }}</span>
-                            <div><span style="width: {{ $pct }}%;"></span></div>
-                            <span style="text-align: right; font-weight: 600;">{{ $catCant }}</span>
-                        </button>
-                    @empty
-                        <div style="font-size: 13px; color: var(--sig-muted);">Sin categorías registradas</div>
-                    @endforelse
+                        @foreach($previewList as $pItem)
+                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px; padding: 4px 6px; background: white; border: 1px solid var(--sig-border); border-radius: 6px;">
+                                <span style="font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 170px;" title="{{ $pItem->material?->nombre ?? $pItem->subtipo }}">
+                                    {{ $pItem->material?->nombre ?? $pItem->subtipo ?? 'Equipo' }}
+                                </span>
+                                <span style="font-size: 11px; font-family: monospace; color: var(--sig-muted);">
+                                    #{{ $pItem->codigo ?: ($pItem->num_serie ?: ($pItem->id_inventario ?? $pItem->id)) }}
+                                </span>
+                            </div>
+                        @endforeach
+                        @if($cantSel > 5)
+                            <div style="text-align: center; font-size: 11.5px; color: var(--sig-muted); padding: 2px 0;">
+                                + {{ $cantSel - 5 }} equipos más seleccionados
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="sigem-selection-actions">
+                    <button type="button" wire:click="mountAction('modificarTodos')" class="sigem-btn-side warning" title="Modificar todos los equipos seleccionados">
+                        ✏️ Modificar todos ({{ $cantSel }})
+                    </button>
+                    <button type="button" wire:click="mountAction('cambioMasivo')" class="sigem-btn-side info" title="Cambio masivo de área o estado">
+                        🔄 Cambio (masivo)
+                    </button>
+                    <button type="button" wire:click="mountAction('bajaMasiva')" class="sigem-btn-side danger" title="Dar de baja o solicitar baja masiva">
+                        ⬇️ Dar de baja (masivo)
+                    </button>
+                    <button type="button" wire:click="exportarSeleccion" class="sigem-btn-side secondary" title="Descargar Excel con los equipos seleccionados">
+                        📊 Exportar selección (.xlsx)
+                    </button>
+                    <button type="button" wire:click="deseleccionarTodos" class="sigem-btn-side ghost" title="Limpiar la selección">
+                        ✕ Deseleccionar todos
+                    </button>
                 </div>
             @endif
         </aside>
-    </div>
+    @endif
 </div>

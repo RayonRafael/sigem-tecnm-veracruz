@@ -349,6 +349,7 @@ class Dashboard extends BaseDashboard
             'categoriasTop' => InventarioResource::obtenerCategoriasTop(),
             'selectedRows' => $this->selectedRows,
             'selectAll' => $this->selectAll,
+            'showSidePanel' => $this->showSidePanel,
         ];
     }
 }
