@@ -2,11 +2,13 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\ConModalesBajaCambio;
 use App\Filament\Resources\InventarioResource;
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
 use App\Models\Material;
 use App\Models\Solicitud;
+use App\Support\SigemExcelExporter;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -14,16 +16,60 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Tabs;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Pages\Dashboard as BaseDashboard;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Livewire\WithPagination;
 
 class Dashboard extends BaseDashboard
 {
+    use WithPagination;
+
     public array $tableColumnSearches = [];
+    public int $perPage = 10;
+    public string $sortColumn = 'created_at';
+    public string $sortDirection = 'desc';
+
+    public function updatedTableColumnSearches(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage(): void
+    {
+        $this->resetPage();
+    }
 
     public function resetTableColumnSearches(): void
     {
         $this->tableColumnSearches = [];
+        $this->resetPage();
+    }
+
+    public function sortBy(string $column): void
+    {
+        if ($this->sortColumn === $column) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortColumn = $column;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function getFilteredTableQuery(): Builder
+    {
+        return InventarioResource::obtenerInventariosDashboardQuery(
+            $this->tableColumnSearches,
+            $this->sortColumn,
+            $this->sortDirection
+        );
+    }
+
+    public function exportarExcel()
+    {
+        return SigemExcelExporter::exportarInventario($this);
     }
 
     protected static ?string $navigationIcon = 'heroicon-o-home';
@@ -95,20 +141,75 @@ class Dashboard extends BaseDashboard
                     ->label('Cambio')
                     ->color('info')
                     ->icon('heroicon-m-arrows-right-left')
-                    ->visible(fn (?Inventario $record) => $record && auth()->user()?->can('update', $record))
-                    ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedAction('editarEquipo', { id: '{$record?->getKey()}', record: '{$record?->getKey()}' })"),
+                    ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Cambio de área', 'Solicitud de baja'], true) && auth()->user()?->can('update', $record))
+                    ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedAction('cambiarArea', { id: '{$record?->getKey()}', record: '{$record?->getKey()}' })"),
                 \Filament\Actions\Action::make('desde_detalle_baja')
                     ->label('Baja')
                     ->color('danger')
                     ->icon('heroicon-m-arrow-down-circle')
-                    ->visible(fn (?Inventario $record) => $record && auth()->user()?->can('delete', $record))
-                    ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedAction('eliminarEquipo', { id: '{$record?->getKey()}', record: '{$record?->getKey()}' })"),
+                    ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Solicitud de baja', 'Cambio de área'], true) && auth()->user()?->can('delete', $record))
+                    ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedAction('darBaja', { id: '{$record?->getKey()}', record: '{$record?->getKey()}' })"),
             ]);
     }
 
     public function verEquipo($id): void
     {
         $this->mountAction('verEquipo', ['id' => $id, 'record' => $id]);
+    }
+
+    public function cambiarAreaAction(): Action
+    {
+        return Action::make('cambiarArea')
+            ->label('Cambiar área')
+            ->modalHeading('Cambiar área de equipo')
+            ->modalDescription('Se actualizará la ubicación física del equipo de forma inmediata.')
+            ->model(Inventario::class)
+            ->record(fn (array $arguments) => Inventario::find($arguments['id'] ?? $arguments['record']))
+            ->form(ConModalesBajaCambio::getModalCambioAreaFormSchema(true))
+            ->modalSubmitActionLabel('Confirmar cambio')
+            ->modalCancelActionLabel('Cancelar')
+            ->action(function (Inventario $record, array $data) {
+                $record->cambiarAreaDirecto(
+                    $data['departamento_id'],
+                    $data['area_id'],
+                    $data['aula'] ?? null,
+                    null,
+                    $data['motivo'] ?? null,
+                    auth()->id()
+                );
+                Notification::make()->title('Área del equipo actualizada correctamente')->success()->send();
+            });
+    }
+
+    public function cambiarArea($id): void
+    {
+        $this->mountAction('cambiarArea', ['id' => $id, 'record' => $id]);
+    }
+
+    public function darBajaAction(): Action
+    {
+        return Action::make('darBaja')
+            ->label('Dar de baja')
+            ->modalHeading('Confirmar baja de equipo')
+            ->modalDescription('El equipo pasará a estado Dado de baja de manera inmediata.')
+            ->model(Inventario::class)
+            ->record(fn (array $arguments) => Inventario::find($arguments['id'] ?? $arguments['record']))
+            ->form(ConModalesBajaCambio::getModalBajaFormSchema())
+            ->modalSubmitActionLabel('Confirmar baja')
+            ->modalCancelActionLabel('Cancelar')
+            ->action(function (Inventario $record, array $data) {
+                $record->darBajaDirecta(
+                    $data['motivo_baja'],
+                    $data['observaciones_baja'],
+                    auth()->id()
+                );
+                Notification::make()->title('Equipo dado de baja correctamente')->success()->send();
+            });
+    }
+
+    public function darBaja($id): void
+    {
+        $this->mountAction('darBaja', ['id' => $id, 'record' => $id]);
     }
 
     public function editarEquipoAction(): Action
@@ -216,9 +317,9 @@ class Dashboard extends BaseDashboard
         // 4. Materiales con Stock Bajo (Usa el scope derivado)
         $materialesStockBajoCount = Material::stockBajo()->count();
 
-        // 5. Opciones de filtros y registros filtrados
-        [$categoriasFiltro, $areasFiltro] = InventarioResource::obtenerOpcionesFiltrosDashboard();
-        $inventariosCompletos = InventarioResource::obtenerInventariosDashboard($this->tableColumnSearches);
+        // 5. Opciones de filtros y registros filtrados paginados
+        [$categoriasFiltro, $areasFiltro, $departamentosFiltro] = InventarioResource::obtenerOpcionesFiltrosDashboard();
+        $inventariosPaginados = $this->getFilteredTableQuery()->paginate($this->perPage);
 
         return [
             'totalActivos' => $totalActivos,
@@ -237,7 +338,12 @@ class Dashboard extends BaseDashboard
 
             'categoriasFiltro' => $categoriasFiltro,
             'areasFiltro' => $areasFiltro,
-            'inventariosCompletos' => $inventariosCompletos,
+            'departamentosFiltro' => $departamentosFiltro,
+            'inventariosPaginados' => $inventariosPaginados,
+            'inventariosCompletos' => $inventariosPaginados,
+            'sortColumn' => $this->sortColumn,
+            'sortDirection' => $this->sortDirection,
+            'perPage' => $this->perPage,
             'categoriasTop' => InventarioResource::obtenerCategoriasTop(),
         ];
     }

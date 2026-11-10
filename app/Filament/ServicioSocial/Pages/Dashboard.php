@@ -2,26 +2,72 @@
 
 namespace App\Filament\ServicioSocial\Pages;
 
+use App\Filament\Concerns\ConModalesBajaCambio;
 use App\Filament\Resources\InventarioResource as AdminInventarioResource;
 use App\Filament\ServicioSocial\Resources\InventarioResource;
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
 use App\Models\Solicitud;
+use App\Support\SigemExcelExporter;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Tabs;
 use Filament\Infolists\Infolist;
+use Filament\Notifications\Notification;
 use Filament\Pages\Dashboard as BaseDashboard;
+use Illuminate\Database\Eloquent\Builder;
+use Livewire\WithPagination;
 
 class Dashboard extends BaseDashboard
 {
+    use WithPagination;
+
     public array $tableColumnSearches = [];
+    public int $perPage = 10;
+    public string $sortColumn = 'created_at';
+    public string $sortDirection = 'desc';
+
+    public function updatedTableColumnSearches(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage(): void
+    {
+        $this->resetPage();
+    }
 
     public function resetTableColumnSearches(): void
     {
         $this->tableColumnSearches = [];
+        $this->resetPage();
+    }
+
+    public function sortBy(string $column): void
+    {
+        if ($this->sortColumn === $column) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortColumn = $column;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
+
+    public function getFilteredTableQuery(): Builder
+    {
+        return AdminInventarioResource::obtenerInventariosDashboardQuery(
+            $this->tableColumnSearches,
+            $this->sortColumn,
+            $this->sortDirection
+        );
+    }
+
+    public function exportarExcel()
+    {
+        return SigemExcelExporter::exportarInventario($this);
     }
 
     protected static ?string $navigationIcon = 'heroicon-o-home';
@@ -95,14 +141,81 @@ class Dashboard extends BaseDashboard
                     ->label('Modificar')
                     ->color('warning')
                     ->icon('heroicon-m-pencil-square')
-                    ->visible(true)
+                    ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Cambio de área'], true))
                     ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedAction('editarEquipo', { id: '{$record?->getKey()}', record: '{$record?->getKey()}' })"),
+                \Filament\Actions\Action::make('desde_detalle_cambio')
+                    ->label('Cambio')
+                    ->color('info')
+                    ->icon('heroicon-m-arrows-right-left')
+                    ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Cambio de área', 'Solicitud de baja'], true))
+                    ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedAction('solicitarCambioArea', { id: '{$record?->getKey()}', record: '{$record?->getKey()}' })"),
+                \Filament\Actions\Action::make('desde_detalle_baja')
+                    ->label('Baja')
+                    ->color('danger')
+                    ->icon('heroicon-m-arrow-down-circle')
+                    ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Solicitud de baja', 'Cambio de área'], true))
+                    ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedAction('solicitarBaja', { id: '{$record?->getKey()}', record: '{$record?->getKey()}' })"),
             ]);
     }
 
     public function verEquipo($id): void
     {
         $this->mountAction('verEquipo', ['id' => $id, 'record' => $id]);
+    }
+
+    public function solicitarCambioAreaAction(): Action
+    {
+        return Action::make('solicitarCambioArea')
+            ->label('Solicitar cambio de área')
+            ->modalHeading('Solicitar cambio de área')
+            ->modalDescription('La solicitud quedará registrada en espera de revisión y aprobación por el Administrador.')
+            ->model(Inventario::class)
+            ->record(fn (array $arguments) => Inventario::find($arguments['id'] ?? $arguments['record']))
+            ->form(ConModalesBajaCambio::getModalCambioAreaFormSchema(false))
+            ->modalSubmitActionLabel('Solicitar cambio')
+            ->modalCancelActionLabel('Cancelar')
+            ->action(function (Inventario $record, array $data) {
+                $record->solicitarCambioArea(
+                    $data['departamento_id'],
+                    $data['area_id'],
+                    $data['aula'] ?? null,
+                    null,
+                    $data['motivo'] ?? null,
+                    auth()->id()
+                );
+                Notification::make()->title('Solicitud de cambio de área enviada a revisión')->warning()->send();
+            });
+    }
+
+    public function solicitarCambioArea($id): void
+    {
+        $this->mountAction('solicitarCambioArea', ['id' => $id, 'record' => $id]);
+    }
+
+    public function solicitarBajaAction(): Action
+    {
+        return Action::make('solicitarBaja')
+            ->label('Solicitar baja')
+            ->modalHeading('Solicitar baja de equipo')
+            ->modalDescription('La solicitud quedará registrada en espera de revisión y aprobación por el Administrador.')
+            ->model(Inventario::class)
+            ->record(fn (array $arguments) => Inventario::find($arguments['id'] ?? $arguments['record']))
+            ->form(ConModalesBajaCambio::getModalBajaFormSchema())
+            ->modalSubmitActionLabel('Solicitar baja')
+            ->modalCancelActionLabel('Cancelar')
+            ->action(function (Inventario $record, array $data) {
+                $record->solicitarBaja(
+                    $data['motivo_baja'],
+                    $data['observaciones_baja'],
+                    auth()->id()
+                );
+                Notification::make()->title('Solicitud de baja enviada a revisión')->warning()->send();
+            });
+    }
+
+    public function solicitarBaja($id): void
+    {
+        $this->mountAction('solicitarBaja', ['id' => $id, 'record' => $id]);
     }
 
     public function editarEquipoAction(): Action
@@ -200,9 +313,9 @@ class Dashboard extends BaseDashboard
         $inventarioEnMantenimiento = (int) ($inventarioStats->en_mantenimiento ?? 0);
         $inventarioDanados = (int) ($inventarioStats->danados ?? 0);
 
-        // 4. Opciones de filtros y registros filtrados
-        [$categoriasFiltro, $areasFiltro] = AdminInventarioResource::obtenerOpcionesFiltrosDashboard();
-        $inventariosCompletos = AdminInventarioResource::obtenerInventariosDashboard($this->tableColumnSearches);
+        // 4. Opciones de filtros y registros filtrados paginados
+        [$categoriasFiltro, $areasFiltro, $departamentosFiltro] = AdminInventarioResource::obtenerOpcionesFiltrosDashboard();
+        $inventariosPaginados = $this->getFilteredTableQuery()->paginate($this->perPage);
 
         return [
             'misSolicitudes' => $misSolicitudes,
@@ -223,7 +336,12 @@ class Dashboard extends BaseDashboard
 
             'categoriasFiltro' => $categoriasFiltro,
             'areasFiltro' => $areasFiltro,
-            'inventariosCompletos' => $inventariosCompletos,
+            'departamentosFiltro' => $departamentosFiltro,
+            'inventariosPaginados' => $inventariosPaginados,
+            'inventariosCompletos' => $inventariosPaginados,
+            'sortColumn' => $this->sortColumn,
+            'sortDirection' => $this->sortDirection,
+            'perPage' => $this->perPage,
             'categoriasTop' => AdminInventarioResource::obtenerCategoriasTop(),
         ];
     }

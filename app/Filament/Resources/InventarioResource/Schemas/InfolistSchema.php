@@ -129,7 +129,7 @@ class InfolistSchema
                                                 $depto = $record->departamento ?? $record->area?->departamento;
                                                 if ($depto) {
                                                     return $depto->encargado
-                                                        ? "{$depto->nombre} (Encargado: {$depto->encargado})"
+                                                        ? "{$depto->nombre} (Jefe del Departamento: {$depto->encargado})"
                                                         : $depto->nombre;
                                                 }
                                                 if ($record->ubicacion_fisica) {

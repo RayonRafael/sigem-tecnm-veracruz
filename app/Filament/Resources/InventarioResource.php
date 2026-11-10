@@ -31,6 +31,8 @@ class InventarioResource extends Resource
     use \App\Filament\Resources\InventarioResource\Schemas\InventarioFormFields;
     protected static ?string $model = Inventario::class;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $recordTitleAttribute = 'num_serie';
 
     protected static ?string $navigationIcon = 'heroicon-o-cube';
@@ -347,7 +349,25 @@ class InventarioResource extends Resource
                 }
             }
 
-            // 6. Fill other allowable fields
+            // 6. Datos técnicos, modelo y número de serie
+            $specs = $record->especificaciones ?? [];
+            foreach (['num_serie', 'modelo', 'procesador', 'ram', 'disco', 'sistema_operativo'] as $campo) {
+                if (array_key_exists($campo, $data)) {
+                    $val = filled($data[$campo]) ? trim((string) $data[$campo]) : null;
+                    $record->{$campo} = $val;
+                    if ($val !== null) {
+                        $specs[$campo] = $val;
+                    } else {
+                        unset($specs[$campo]);
+                    }
+                }
+            }
+            if (isset($data['modelo']) && filled($data['modelo']) && $record->material) {
+                $record->material->update(['modelo' => trim((string) $data['modelo'])]);
+            }
+            $record->especificaciones = $specs;
+
+            // 7. Fill other allowable fields
             $record->fill($data);
             $record->save();
 
@@ -872,44 +892,113 @@ class InventarioResource extends Resource
             $areasFiltro += Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
         } catch (\Throwable $e) {}
 
-        return [$categoriasFiltro, $areasFiltro];
+        $departamentosFiltro = ['' => 'Todos'];
+        try {
+            $departamentosFiltro += Departamento::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+        } catch (\Throwable $e) {}
+
+        return [$categoriasFiltro, $areasFiltro, $departamentosFiltro];
     }
 
-    public static function obtenerInventariosDashboard(array $searches): Collection
-    {
-        $invQuery = Inventario::with(['material.marca', 'material.tipo', 'proveedor', 'usuario', 'area', 'departamento', 'salon']);
+    public static function obtenerInventariosDashboardQuery(
+        array $searches = [],
+        string $sortColumn = 'created_at',
+        string $sortDirection = 'desc'
+    ): Builder {
+        $invQuery = Inventario::query()
+            ->with(['material.marca', 'material.tipo', 'proveedor', 'usuario', 'area', 'departamento', 'salon'])
+            ->select('inventario.*');
 
+        // Filtro Departamento
+        $deptoSearch = $searches['departamento'] ?? $searches['departamento_nombre'] ?? null;
+        if (filled($deptoSearch)) {
+            $termDepto = '%' . trim((string) $deptoSearch) . '%';
+            $invQuery->where(function (Builder $q) use ($termDepto) {
+                $q->whereHas('departamento', fn ($sub) => $sub->where('nombre', 'like', $termDepto))
+                  ->orWhereHas('area.departamento', fn ($sub) => $sub->where('nombre', 'like', $termDepto))
+                  ->orWhere('ubicacion_fisica', 'like', $termDepto);
+            });
+        }
+
+        // Filtro Equipo
+        $equipoSearch = $searches['equipo'] ?? $searches['material_nombre'] ?? null;
+        if (filled($equipoSearch)) {
+            $termEquipo = '%' . trim((string) $equipoSearch) . '%';
+            $invQuery->where(function (Builder $q) use ($termEquipo) {
+                $q->whereHas('material', fn ($sub) => $sub->where('nombre', 'like', $termEquipo))
+                  ->orWhere('subtipo', 'like', $termEquipo)
+                  ->orWhere('codigo', 'like', $termEquipo)
+                  ->orWhere('num_serie', 'like', $termEquipo)
+                  ->orWhere('modelo', 'like', $termEquipo);
+            });
+        }
+
+        // Filtro Categoría
+        $catSearch = $searches['categoria'] ?? $searches['material_tipo_nombre'] ?? null;
+        if (filled($catSearch)) {
+            $catTrim = trim((string) $catSearch);
+            $invQuery->where(function (Builder $q) use ($catTrim) {
+                $q->whereHas('material.tipo', fn ($sub) => $sub->where('nombre', 'like', $catTrim . '%'))
+                  ->orWhere('subtipo', 'like', "%{$catTrim}%");
+            });
+        }
+
+        // Filtro Estado
+        if (filled($searches['estado'] ?? null)) {
+            $invQuery->where('estado', trim((string) $searches['estado']));
+        }
+
+        // Filtro Área
+        $areaSearch = $searches['area'] ?? $searches['ubicacion_fisica'] ?? null;
+        if (filled($areaSearch)) {
+            $termArea = '%' . trim((string) $areaSearch) . '%';
+            $invQuery->where(function (Builder $q) use ($termArea) {
+                $q->whereHas('area', fn ($sub) => $sub->where('nombre', 'like', $termArea))
+                  ->orWhere('ubicacion_fisica', 'like', $termArea);
+            });
+        }
+
+        // Filtro Aula
+        if (filled($searches['aula'] ?? null)) {
+            $termAula = '%' . trim((string) $searches['aula']) . '%';
+            $invQuery->where(function (Builder $q) use ($termAula) {
+                $q->whereHas('salon', fn ($sub) => $sub->where('nombre', 'like', $termAula))
+                  ->orWhere('especificaciones->aula', 'like', $termAula)
+                  ->orWhere('ubicacion_fisica', 'like', $termAula);
+            });
+        }
+
+        // Filtro No. de Serie
         if (filled($searches['num_serie'] ?? null)) {
-            $termSerie = '%' . trim($searches['num_serie']) . '%';
-            $invQuery->where(function ($q) use ($termSerie) {
+            $termSerie = '%' . trim((string) $searches['num_serie']) . '%';
+            $invQuery->where(function (Builder $q) use ($termSerie) {
                 $q->where('num_serie', 'like', $termSerie)
                   ->orWhere('codigo', 'like', $termSerie);
             });
         }
-        if (filled($searches['material_nombre'] ?? null)) {
-            $termMat = '%' . trim($searches['material_nombre']) . '%';
-            $invQuery->where(function ($q) use ($termMat) {
-                $q->whereHas('material', fn ($m) => $m->where('nombre', 'like', $termMat))
-                  ->orWhere('subtipo', 'like', $termMat);
-            });
-        }
-        if (filled($searches['material_tipo_nombre'] ?? null)) {
-            $invQuery->whereHas('material.tipo', fn ($q) => $q->where('nombre', trim($searches['material_tipo_nombre'])));
-        }
-        if (filled($searches['estado'] ?? null)) {
-            $invQuery->where('estado', $searches['estado']);
-        }
-        if (filled($searches['ubicacion_fisica'] ?? null)) {
-            $termArea = '%' . trim($searches['ubicacion_fisica']) . '%';
-            $invQuery->where(function ($q) use ($termArea) {
-                $q->where('ubicacion_fisica', 'like', $termArea)
-                  ->orWhereHas('area', fn ($a) => $a->where('nombre', 'like', $termArea));
+
+        // Filtro IP
+        if (filled($searches['ip_address'] ?? null)) {
+            $termIp = '%' . trim((string) $searches['ip_address']) . '%';
+            $invQuery->where(function (Builder $q) use ($termIp) {
+                $q->where('ip_address', 'like', $termIp)
+                  ->orWhere('especificaciones->ip_address', 'like', $termIp);
             });
         }
 
+        // Filtro MAC
+        if (filled($searches['mac_address'] ?? null)) {
+            $termMac = '%' . trim((string) $searches['mac_address']) . '%';
+            $invQuery->where(function (Builder $q) use ($termMac) {
+                $q->where('mac_address', 'like', $termMac)
+                  ->orWhere('especificaciones->mac_address', 'like', $termMac);
+            });
+        }
+
+        // Búsqueda general
         if (filled($searches['busqueda'] ?? null)) {
-            $term = '%' . trim($searches['busqueda']) . '%';
-            $invQuery->where(function ($q) use ($term) {
+            $term = '%' . trim((string) $searches['busqueda']) . '%';
+            $invQuery->where(function (Builder $q) use ($term) {
                 $q->where('num_serie', 'like', $term)
                     ->orWhere('codigo', 'like', $term)
                     ->orWhere('subtipo', 'like', $term)
@@ -922,6 +1011,8 @@ class InventarioResource extends Resource
                         ->orWhereHas('marca', fn ($b) => $b->where('nombre', 'like', $term)));
             });
         }
+
+        // Fechas
         if (filled($searches['fecha_desde'] ?? null)) {
             $invQuery->whereDate('fecha_registro', '>=', $searches['fecha_desde']);
         }
@@ -929,7 +1020,31 @@ class InventarioResource extends Resource
             $invQuery->whereDate('fecha_registro', '<=', $searches['fecha_hasta']);
         }
 
-        return $invQuery->latest('created_at')->take(50)->get();
+        // Ordenamiento
+        $direction = strtolower($sortDirection) === 'asc' ? 'asc' : 'desc';
+        return match ($sortColumn) {
+            'departamento' => $invQuery->leftJoin('departamento', 'inventario.departamento_id', '=', 'departamento.id_departamento')
+                ->orderBy('departamento.nombre', $direction),
+            'equipo' => $invQuery->leftJoin('material', 'inventario.id_producto', '=', 'material.id_producto')
+                ->orderBy('material.nombre', $direction),
+            'categoria' => $invQuery->leftJoin('material', 'inventario.id_producto', '=', 'material.id_producto')
+                ->leftJoin('tipo_material', 'material.id_tipodematerial', '=', 'tipo_material.id_tipodematerial')
+                ->orderBy('tipo_material.nombre', $direction),
+            'estado' => $invQuery->orderBy('estado', $direction),
+            'area' => $invQuery->leftJoin('area', 'inventario.area_id', '=', 'area.id_area')
+                ->orderBy('area.nombre', $direction),
+            'aula' => $invQuery->leftJoin('salones', 'inventario.salon_id', '=', 'salones.id')
+                ->orderBy('salones.nombre', $direction),
+            'num_serie' => $invQuery->orderBy('num_serie', $direction),
+            'ip_address' => $invQuery->orderBy('ip_address', $direction),
+            'mac_address' => $invQuery->orderBy('mac_address', $direction),
+            default => $invQuery->orderBy('inventario.created_at', $direction),
+        };
+    }
+
+    public static function obtenerInventariosDashboard(array $searches): Collection
+    {
+        return static::obtenerInventariosDashboardQuery($searches)->take(50)->get();
     }
 
     public static function obtenerCategoriasTop(): array

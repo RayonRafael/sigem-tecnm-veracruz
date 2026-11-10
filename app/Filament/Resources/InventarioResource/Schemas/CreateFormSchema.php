@@ -82,11 +82,20 @@ class CreateFormSchema
                                 ->preload()
                                 ->live()
                                 ->required()
-                                ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                                ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get, $state) {
                                     $set('area_id', null);
+                                    $encargado = $state ? Departamento::find($state)?->encargado : null;
+                                    $set('jefe_departamento', $encargado ?? 'Sin jefe asignado');
                                     UbicacionHelper::actualizarDescriptiva($set, $get);
                                 })
                                 ->prefixIcon('heroicon-m-building-office'),
+
+                            Forms\Components\TextInput::make('jefe_departamento')
+                                ->label('Jefe del Departamento')
+                                ->placeholder('Selecciona departamento...')
+                                ->disabled()
+                                ->dehydrated(false)
+                                ->prefixIcon('heroicon-m-user'),
 
                             Forms\Components\Select::make('area_id')
                                 ->label('Área')
@@ -120,15 +129,6 @@ class CreateFormSchema
                                 ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
                                     UbicacionHelper::actualizarDescriptiva($set, $get);
                                 }),
-
-                            Forms\Components\TextInput::make('estacion')
-                                ->label('Estación')
-                                ->placeholder('ej. AC001')
-                                ->maxLength(20)
-                                ->helperText('Identificador del puesto de trabajo')
-                                ->prefixIcon('heroicon-m-hashtag')
-                                ->visible(fn (Forms\Get $get) => in_array($get('tipo_equipo') ?? 'pc', ['pc', 'aio', 'lap']))
-                                ->required(fn (Forms\Get $get) => in_array($get('tipo_equipo') ?? 'pc', ['pc', 'aio', 'lap'])),
                         ]),
                 ])
                 ->columnSpanFull(),

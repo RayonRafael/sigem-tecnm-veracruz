@@ -19,7 +19,11 @@ class IndividualSearchHelper
     {
         // 1. Inventario
         if ($model === Inventario::class || $model === 'App\\Models\\Inventario' || str_ends_with((string) $model, 'Inventario')) {
-            if ($columnName === 'material.tipo.nombre' || $columnName === 'id_tipodematerial' || $columnName === 'tipo') {
+            if (in_array($columnName, ['departamento.nombre', 'departamento'], true)) {
+                return self::getDepartamentos();
+            }
+
+            if (in_array($columnName, ['categoria', 'material.tipo.nombre', 'id_tipodematerial', 'tipo'], true)) {
                 return self::getTiposMaterial();
             }
 
@@ -31,7 +35,7 @@ class IndividualSearchHelper
                 return self::getTiposPropiedad();
             }
 
-            if ($columnName === 'ubicacion_fisica') {
+            if (in_array($columnName, ['area.nombre', 'ubicacion_fisica'], true)) {
                 return self::getAreas();
             }
         }
@@ -46,7 +50,7 @@ class IndividualSearchHelper
                 return self::getEstadosSolicitud();
             }
 
-            if ($columnName === 'receptor.area.departamento.nombre' || $columnName === 'departamento') {
+            if (in_array($columnName, ['receptor.area.departamento.nombre', 'departamento'], true)) {
                 return self::getDepartamentos();
             }
         }
@@ -75,12 +79,20 @@ class IndividualSearchHelper
             return self::getTiposMantenimiento();
         }
 
-        if ($columnName === 'ubicacion_fisica') {
+        if (in_array($columnName, ['area.nombre', 'ubicacion_fisica'], true)) {
             return self::getAreas();
         }
 
-        if ($columnName === 'receptor.area.departamento.nombre' || $columnName === 'departamento') {
+        if (in_array($columnName, ['departamento.nombre', 'departamento', 'receptor.area.departamento.nombre'], true)) {
             return self::getDepartamentos();
+        }
+
+        if (in_array($columnName, ['categoria', 'material.tipo.nombre', 'id_tipodematerial', 'tipo'], true)) {
+            return self::getTiposMaterial();
+        }
+
+        if ($columnName === 'estado') {
+            return self::getEstadosInventario();
         }
 
         return null;
@@ -94,7 +106,10 @@ class IndividualSearchHelper
         if ($model === Inventario::class || $model === 'App\\Models\\Inventario' || str_ends_with((string) $model, 'Inventario')) {
             return match ($columnName) {
                 'num_serie' => 'ej. BM6R...',
-                'material.nombre' => 'Filtrar...',
+                'equipo', 'material.nombre' => 'ej. Impresora HP...',
+                'aula' => 'ej. E101',
+                'ip_address' => 'ej. 192.168.1.1',
+                'mac_address' => 'ej. AA:BB:CC...',
                 default => 'Filtrar...',
             };
         }
@@ -122,6 +137,10 @@ class IndividualSearchHelper
 
         return match ($columnName) {
             'num_serie' => 'ej. BM6R...',
+            'equipo', 'material.nombre' => 'ej. Impresora HP...',
+            'aula' => 'ej. E101',
+            'ip_address' => 'ej. 192.168.1.1',
+            'mac_address' => 'ej. AA:BB:CC...',
             'id_solicitud' => 'ej. FOLIO-00001',
             'usuario.name' => 'ej. Juan Pérez',
             'receptor.nombre' => 'ej. Alejandro',
