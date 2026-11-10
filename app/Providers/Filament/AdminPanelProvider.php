@@ -70,11 +70,34 @@ class AdminPanelProvider extends PanelProvider
             ->renderHook(
                 PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE,
                 fn (): string => Blade::render('
-<div class="flex justify-center items-center gap-4 mb-6">
-    <img src="{{ asset(\'images/sigem-logo.svg\') }}" alt="SIGEM" style="height: 40px; object-fit: contain;">
-    <img src="{{ asset(\'images/tecnm-logo.png\') }}" alt="TecNM" loading="lazy" style="height: 40px; object-fit: contain;">
-    <img src="{{ asset(\'images/itv-logo.png\') }}" alt="ITV" loading="lazy" style="height: 40px; object-fit: contain;">
+<div class="flex flex-col items-center gap-3 mb-6">
+    <div class="flex justify-center items-center gap-4">
+        <img src="{{ asset(\'images/sigem-logo.svg\') }}" alt="SIGEM" style="height: 38px; object-fit: contain;">
+        <img src="{{ asset(\'images/tecnm-logo.webp\') }}" alt="TecNM" loading="lazy" style="height: 38px; object-fit: contain;">
+        <img src="{{ asset(\'images/itv-logo.webp\') }}" alt="ITV" loading="lazy" style="height: 38px; object-fit: contain;">
+    </div>
+    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
+        🔒 Panel de Administración
+    </span>
 </div>
+<script>
+    (function() {
+        function applyPlaceholders() {
+            var email = document.querySelector(\'.fi-simple-main input[type="email"], input[type="email"]\');
+            if (email && !email.getAttribute(\'placeholder\')) {
+                email.setAttribute(\'placeholder\', \'usuario@veracruz.tecnm.mx\');
+            }
+            var pass = document.querySelector(\'.fi-simple-main input[type="password"], input[type="password"]\');
+            if (pass && !pass.getAttribute(\'placeholder\')) {
+                pass.setAttribute(\'placeholder\', \'••••••••\');
+            }
+        }
+        applyPlaceholders();
+        setTimeout(applyPlaceholders, 50);
+        setTimeout(applyPlaceholders, 200);
+        setTimeout(applyPlaceholders, 600);
+    })();
+</script>
 ')
             )
             ->renderHook(

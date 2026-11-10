@@ -59,12 +59,31 @@
         }
     }
 
+    function applyLoginPlaceholders() {
+        if (!window.location.pathname.toLowerCase().includes('/login')) return;
+        const email = document.querySelector('.fi-simple-main input[type="email"], input[type="email"]');
+        if (email && !email.getAttribute('placeholder')) {
+            email.setAttribute('placeholder', 'usuario@veracruz.tecnm.mx');
+        }
+        const pass = document.querySelector('.fi-simple-main input[type="password"], input[type="password"]');
+        if (pass && !pass.getAttribute('placeholder')) {
+            pass.setAttribute('placeholder', '••••••••');
+        }
+    }
+
+    function init() {
+        applyShortTitle();
+        applyLoginPlaceholders();
+    }
+
     // Ejecución inicial y en eventos de navegación
-    applyShortTitle();
-    document.addEventListener('DOMContentLoaded', applyShortTitle);
-    document.addEventListener('livewire:navigated', applyShortTitle);
-    document.addEventListener('livewire:load', applyShortTitle);
-    window.addEventListener('popstate', applyShortTitle);
+    init();
+    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('livewire:navigated', init);
+    document.addEventListener('livewire:load', init);
+    window.addEventListener('popstate', init);
+    setTimeout(init, 100);
+    setTimeout(init, 500);
 
     // Observador para cambios reactivos de Livewire
     let isUpdating = false;

@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="SIGEM — Sistema de Gestión de Equipos y Materiales del TecNM Campus Veracruz. Inventario, solicitudes, mantenimiento y reportes en tiempo real.">
+    <meta property="og:title" content="SIGEM — Gestión de equipos y materiales">
+    <meta property="og:description" content="Sistema integral para el control de inventario, gestión de préstamos, rentas y seguimiento de mantenimiento del TecNM Campus Veracruz.">
+    <meta property="og:image" content="{{ asset('images/sigem-logo.svg') }}">
+    <meta property="og:url" content="{{ url('/') }}">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
     <title>SIGEM · TecNM Veracruz</title>
     <link rel="icon" href="{{ asset('images/sigem-icon.svg') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -84,11 +90,17 @@
             background: #334155;
         }
 
-        .dark .header-logos img, .dark .footer img {
-            background: rgba(255, 255, 255, 0.85);
-            padding: 4px 8px;
-            border-radius: 6px;
+        .header-logos img,
+        .footer img {
+            background: rgba(255, 255, 255, 0.92);
+            padding: 4px 10px;
+            border-radius: 8px;
             backdrop-filter: blur(4px);
+            transition: all 0.2s ease;
+        }
+
+        .dark .header-logos img, .dark .footer img {
+            background: rgba(255, 255, 255, 0.95);
         }
 
         * {
@@ -100,6 +112,7 @@
         body {
             font-family: 'DM Sans', sans-serif;
             color: var(--text-primary);
+            background-color: #0b1d3a;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
@@ -112,6 +125,7 @@
             left: 0;
             width: 100vw;
             height: 100vh;
+            background-color: #0b1d3a;
             background-image: url('{{ asset("images/fondo.webp") }}');
             background-size: cover;
             background-position: center;
@@ -126,7 +140,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(11, 29, 58, 0.75);
+            background: linear-gradient(
+                180deg,
+                rgba(11, 29, 58, 0.55) 0%,
+                rgba(11, 29, 58, 0.72) 100%
+            );
             z-index: -1;
         }
 
@@ -469,22 +487,17 @@
                 margin-bottom: 24px;
             }
             .hero-actions {
-                display: none; /* Oculto en móvil a favor del sticky */
+                display: flex;
+                justify-content: center;
+                width: 100%;
+            }
+            .hero-actions .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
             }
             .mobile-login-bar {
-                display: block !important;
-                position: sticky;
-                bottom: 0;
-                background: rgba(11, 29, 58, 0.95);
-                backdrop-filter: blur(10px);
-                padding: 16px 20px;
-                z-index: 100;
-                border-top: 1px solid rgba(255,255,255,0.1);
-            }
-            .mobile-login-bar .btn {
-                width: 100%;
-                justify-content: center;
-                min-height: 48px;
+                display: none !important;
             }
             .modules-section {
                 padding: 0 20px 60px;
@@ -493,7 +506,9 @@
                 padding: 30px 20px;
             }
             .footer > div {
-                flex-direction: column;
+                flex-direction: row !important;
+                flex-wrap: wrap !important;
+                justify-content: center !important;
                 gap: 12px !important;
             }
             .footer img {
@@ -590,14 +605,6 @@
         </div>
         <p>&copy; {{ date('Y') }} SIGEM — Tecnológico Nacional de México Campus Veracruz. Todos los derechos reservados.</p>
     </footer>
-
-    <!-- Mobile Sticky Login Bar -->
-    <div class="mobile-login-bar" style="display: none;">
-        <a href="{{ url('/admin/login') }}" class="btn btn-primary">
-            <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-            Iniciar sesión
-        </a>
-    </div>
 
 </body>
 </html>
