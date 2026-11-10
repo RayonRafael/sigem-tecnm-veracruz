@@ -4,7 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReceptorResource\Pages;
 use App\Models\Receptor;
+use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Tabs;
@@ -154,6 +156,7 @@ class ReceptorResource extends Resource
                             ->preload()
                             ->prefixIcon('heroicon-m-building-office')
                             ->createOptionForm([
+                                SubformSlideOverHelper::headerNav(),
                                 Forms\Components\TextInput::make('nombre')
                                     ->label('Nombre del área')
                                     ->placeholder('Ej. Laboratorio de Cómputo')
@@ -165,10 +168,19 @@ class ReceptorResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->required(),
+                                SubformSlideOverHelper::catalogTip('El área estará disponible inmediatamente en el catálogo.'),
                             ])
                             ->createOptionUsing(function (array $data): int {
                                 $area = \App\Models\Area::create($data);
                                 return $area->id_area;
+                            })
+                            ->createOptionAction(function (Action $action) {
+                                return SubformSlideOverHelper::configureAction(
+                                    $action,
+                                    '✏️ Agregar área como nueva opción',
+                                    '+ Agregar',
+                                    'Área creada correctamente'
+                                );
                             }),
                     ])->columns(2),
             ]);

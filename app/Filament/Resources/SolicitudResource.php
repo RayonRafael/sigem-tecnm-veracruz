@@ -5,7 +5,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SolicitudResource\Pages;
 use App\Models\Receptor;
 use App\Models\Solicitud;
+use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Tabs;
@@ -79,7 +81,38 @@ class SolicitudResource extends Resource
                                     })
                                     ->searchable()
                                     ->preload()
-                                    ->required(),
+                                    ->required()
+                                    ->createOptionForm([
+                                        SubformSlideOverHelper::headerNav(),
+                                        Forms\Components\TextInput::make('nombre')
+                                            ->label('Nombre del material')
+                                            ->placeholder('Ej. Bobina cable UTP, Pasta térmica...')
+                                            ->required()
+                                            ->maxLength(100),
+                                        SubformSlideOverHelper::catalogTip('El material estará disponible inmediatamente en el catálogo.'),
+                                    ])
+                                    ->createOptionUsing(function (array $data): int {
+                                        $tipoDefault = \App\Models\TipoMaterial::first()->id_tipodematerial ?? 1;
+                                        $unidadDefault = \App\Models\UnidadMedida::first()->id_unidad ?? 1;
+                                        $marcaDefault = \App\Models\MarcaMaterial::first()->id_marca ?? 1;
+                                        $mat = \App\Models\Material::create([
+                                            'nombre' => trim($data['nombre']),
+                                            'id_marca' => $marcaDefault,
+                                            'id_tipodematerial' => $tipoDefault,
+                                            'id_unidad' => $unidadDefault,
+                                            'stock_minimo' => 0,
+                                            'stock_maximo' => 100,
+                                        ]);
+                                        return $mat->id_producto;
+                                    })
+                                    ->createOptionAction(function (Action $action) {
+                                        return SubformSlideOverHelper::configureAction(
+                                            $action,
+                                            '✏️ Agregar material como nueva opción',
+                                            '+ Agregar',
+                                            'Material creado correctamente'
+                                        );
+                                    }),
                             ]),
 
                         Forms\Components\Textarea::make('observaciones')

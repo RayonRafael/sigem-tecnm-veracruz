@@ -6,7 +6,9 @@ use App\Filament\Resources\InventarioResource;
 use App\Models\Area;
 use App\Models\Inventario;
 use App\Models\MarcaMaterial;
+use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action;
 
 class EditFormTabs
 {
@@ -33,6 +35,28 @@ class EditFormTabs
                                         ->options(fn (): array => MarcaMaterial::orderBy('nombre')->pluck('nombre', 'nombre')->toArray())
                                         ->searchable()
                                         ->preload()
+                                        ->createOptionForm([
+                                            SubformSlideOverHelper::headerNav(),
+                                            Forms\Components\TextInput::make('nombre')
+                                                ->label('Nombre de la marca')
+                                                ->placeholder('Ej. Dell, HP, Lenovo...')
+                                                ->required()
+                                                ->maxLength(100),
+                                            SubformSlideOverHelper::catalogTip('La marca estará disponible inmediatamente en el catálogo.'),
+                                        ])
+                                        ->createOptionUsing(function (array $data) {
+                                            $clean = trim($data['nombre']);
+                                            $marca = MarcaMaterial::firstOrCreate(['nombre' => $clean]);
+                                            return $marca->nombre;
+                                        })
+                                        ->createOptionAction(function (Action $action) {
+                                            return SubformSlideOverHelper::configureAction(
+                                                $action,
+                                                '✏️ Agregar marca como nueva opción',
+                                                '+ Agregar',
+                                                'Marca creada correctamente'
+                                            );
+                                        })
                                         ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->especificaciones['marca'] ?? $record?->especificaciones['cpu_marca'] ?? $record?->material?->marca?->nombre ?? '')),
 
                                     Forms\Components\TextInput::make('modelo')

@@ -4,7 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\MaterialResource\Pages;
 use App\Models\Material;
+use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\Section;
@@ -86,12 +88,22 @@ class MaterialResource extends Resource
                                         ->preload()
                                         ->prefixIcon('heroicon-m-star')
                                         ->createOptionForm([
+                                            SubformSlideOverHelper::headerNav(),
                                             Forms\Components\TextInput::make('nombre')
                                                 ->label('Nombre de la marca')
                                                 ->placeholder('Ej. Dell')
                                                 ->required()
                                                 ->maxLength(100),
-                                        ]),
+                                            SubformSlideOverHelper::catalogTip('La marca estará disponible inmediatamente en el catálogo.'),
+                                        ])
+                                        ->createOptionAction(function (Action $action) {
+                                            return SubformSlideOverHelper::configureAction(
+                                                $action,
+                                                '✏️ Agregar marca como nueva opción',
+                                                '+ Agregar',
+                                                'Marca creada correctamente'
+                                            );
+                                        }),
                                     Forms\Components\Select::make('id_tipodematerial')->placeholder('Selecciona...')
                                         ->label('Tipo de material')
                                         ->relationship('tipo', 'nombre')
@@ -100,12 +112,22 @@ class MaterialResource extends Resource
                                         ->preload()
                                         ->prefixIcon('heroicon-m-square-3-stack-3d')
                                         ->createOptionForm([
+                                            SubformSlideOverHelper::headerNav(),
                                             Forms\Components\TextInput::make('nombre')
                                                 ->label('Nombre del tipo de material')
                                                 ->placeholder('Ej. Equipo de Cómputo')
                                                 ->required()
                                                 ->maxLength(100),
-                                        ]),
+                                            SubformSlideOverHelper::catalogTip('El tipo de material estará disponible inmediatamente en el catálogo.'),
+                                        ])
+                                        ->createOptionAction(function (Action $action) {
+                                            return SubformSlideOverHelper::configureAction(
+                                                $action,
+                                                '✏️ Agregar tipo de material como nueva opción',
+                                                '+ Agregar',
+                                                'Tipo de material creado correctamente'
+                                            );
+                                        }),
                                     Forms\Components\Select::make('id_unidad')->placeholder('Selecciona...')
                                         ->label('Unidad de medida')
                                         ->relationship('unidad', 'nombre')
@@ -115,12 +137,22 @@ class MaterialResource extends Resource
                                         ->prefixIcon('heroicon-m-scale')
                                         ->columnSpanFull()
                                         ->createOptionForm([
+                                            SubformSlideOverHelper::headerNav(),
                                             Forms\Components\TextInput::make('nombre')
                                                 ->label('Nombre de la unidad de medida')
                                                 ->placeholder('Ej. Pieza')
                                                 ->required()
                                                 ->maxLength(100),
-                                        ]),
+                                            SubformSlideOverHelper::catalogTip('La unidad de medida estará disponible inmediatamente en el catálogo.'),
+                                        ])
+                                        ->createOptionAction(function (Action $action) {
+                                            return SubformSlideOverHelper::configureAction(
+                                                $action,
+                                                '✏️ Agregar unidad de medida como nueva opción',
+                                                '+ Agregar',
+                                                'Unidad de medida creada correctamente'
+                                            );
+                                        }),
                                 ]),
                         ]),
 

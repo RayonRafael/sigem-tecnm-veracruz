@@ -4,6 +4,7 @@ namespace App\Filament\Resources\InventarioResource\Schemas;
 
 use App\Models\Inventario;
 use App\Models\MarcaMaterial;
+use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 
@@ -216,10 +217,13 @@ trait InventarioFormFields
                 }
             })
             ->createOptionForm([
+                SubformSlideOverHelper::headerNav(),
                 Forms\Components\TextInput::make('nombre')
                     ->label('Nombre de la marca')
+                    ->placeholder('Ej. Dell, HP, Lenovo...')
                     ->required()
                     ->maxLength(100),
+                SubformSlideOverHelper::catalogTip('La marca estará disponible inmediatamente en el catálogo.'),
             ])
             ->createOptionUsing(function (array $data) {
                 $clean = trim($data['nombre']);
@@ -227,9 +231,12 @@ trait InventarioFormFields
                 return $marca->nombre;
             })
             ->createOptionAction(function (Action $action) {
-                return $action
-                    ->modalHeading('＋ Agregar marca como nueva opción')
-                    ->modalButton('Agregar');
+                return SubformSlideOverHelper::configureAction(
+                    $action,
+                    '✏️ Agregar marca como nueva opción',
+                    '+ Agregar',
+                    'Marca creada correctamente'
+                );
             })
             ->prefixIcon('heroicon-m-tag');
 
@@ -304,18 +311,24 @@ trait InventarioFormFields
                 }
             })
             ->createOptionForm([
+                SubformSlideOverHelper::headerNav(),
                 Forms\Components\TextInput::make('especificacion')
                     ->label('Nueva especificación')
+                    ->placeholder('Ej. Core i7 16GB RAM 512GB SSD...')
                     ->required()
                     ->maxLength(150),
+                SubformSlideOverHelper::catalogTip('La especificación estará disponible inmediatamente para este y otros equipos.'),
             ])
             ->createOptionUsing(function (array $data) {
                 return static::agregarEspecificacionGlobal($data['especificacion']);
             })
             ->createOptionAction(function (Action $action) {
-                return $action
-                    ->modalHeading('＋ Agregar especificación como nueva opción')
-                    ->modalButton('Agregar');
+                return SubformSlideOverHelper::configureAction(
+                    $action,
+                    '✏️ Agregar especificación como nueva opción',
+                    '+ Agregar',
+                    'Especificación agregada correctamente'
+                );
             })
             ->prefixIcon('heroicon-m-adjustments-horizontal');
 
