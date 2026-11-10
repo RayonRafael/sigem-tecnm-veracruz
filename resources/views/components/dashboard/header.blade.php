@@ -18,10 +18,10 @@
             <p>Gestiona tus solicitudes de material, reportes de mantenimiento y consulta el inventario del instituto.</p>
         </div>
         <div class="sigem-hero-actions" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <a href="{{ url('/servicio-social/solicituds/create') }}" class="sigem-btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <a href="{{ url('/servicio-social/solicituds?abrir=create') }}" class="sigem-btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
                 ＋ Crear solicitud
             </a>
-            <a href="{{ url('/servicio-social/mantenimientos/create') }}" class="sigem-rep-btn-sec" style="background: white; border: 1px solid var(--sig-border); color: var(--sig-text); padding: 8px 14px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <a href="{{ url('/servicio-social/mantenimientos?abrir=create') }}" class="sigem-rep-btn-sec" style="background: white; border: 1px solid var(--sig-border); color: var(--sig-text); padding: 8px 14px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
                 🔧 Reportar mantenimiento
             </a>
         </div>

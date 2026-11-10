@@ -284,6 +284,13 @@ class MantenimientoResource extends Resource
                             }),
                     ]),
 
+                Tables\Actions\EditAction::make()
+                    ->iconButton()
+                    ->tooltip('Editar')
+                    ->extraAttributes(['title' => 'Editar'])
+                    ->modalHeading(fn (?Mantenimiento $record) => 'Editar Mantenimiento #' . ($record?->id_mantenimiento ? str_pad($record->id_mantenimiento, 4, '0', STR_PAD_LEFT) : '—'))
+                    ->successNotificationTitle('Mantenimiento actualizado exitosamente'),
+
                 Tables\Actions\Action::make('autorizar')
                     ->iconButton()
                     ->color('success')

@@ -6,8 +6,13 @@ use App\Filament\Resources\SolicitudResource as AdminSolicitudResource;
 use App\Filament\ServicioSocial\Resources\SolicitudResource as SSSolicitudResource;
 use App\Models\Area;
 use App\Models\Departamento;
+use App\Models\DetalleSolicitud;
+use App\Models\MarcaMaterial;
+use App\Models\Material;
 use App\Models\Receptor;
 use App\Models\Solicitud;
+use App\Models\TipoMaterial;
+use App\Models\UnidadMedida;
 use App\Models\User;
 use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -200,5 +205,161 @@ class SolicitudFlujoTest extends TestCase
 
         // Admin sí puede autorizar y modificar
         $this->assertTrue($adminUser->can('update', $solicitudAdmin));
+    }
+
+    public function test_slide_over_nueva_solicitud_mapea_tipo_y_crea_detalle(): void
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $adminUser = $this->getAdminUser();
+        $this->actingAs($adminUser);
+
+        $receptor = Receptor::firstOrCreate([
+            'nombre' => 'Receptor Test',
+            'apellido_paterno' => 'Paterno',
+            'apellido_materno' => 'Materno',
+            'id_area' => $this->getOrCreateArea()->id_area,
+        ]);
+
+        $unidad = UnidadMedida::firstOrCreate(['nombre' => 'Pza']);
+        $marca = MarcaMaterial::firstOrCreate(['nombre' => 'Genérico']);
+        $tipoMat = TipoMaterial::firstOrCreate(['nombre' => 'Consumible']);
+        $material = Material::create([
+            'nombre' => 'Material SlideOver Test',
+            'id_unidad' => $unidad->id_unidad,
+            'id_marca' => $marca->id_marca,
+            'id_tipodematerial' => $tipoMat->id_tipodematerial,
+            'stock_actual' => 10,
+            'requiere_control_individual' => 0,
+        ]);
+
+        \Livewire\Livewire::test(\App\Filament\Resources\SolicitudResource\Pages\ListSolicituds::class)
+            ->callAction('create', [
+                'tipo_solicitud' => 'Entrada',
+                'fecha_solicitud' => now()->toDateString(),
+                'id_producto' => $material->id_producto,
+                'observaciones' => 'Solicitud slide-over de prueba',
+            ])
+            ->assertHasNoActionErrors();
+
+        $solicitud = Solicitud::latest('id_solicitud')->first();
+        $this->assertNotNull($solicitud);
+        $this->assertEquals('Asignacion Temporal', $solicitud->tipo_movimiento);
+        $this->assertEquals('Pendiente', $solicitud->estado);
+        $this->assertEquals($adminUser->id, $solicitud->id_usuario);
+
+        $detalle = DetalleSolicitud::where('id_solicitud', $solicitud->id_solicitud)->first();
+        $this->assertNotNull($detalle);
+        $this->assertEquals($material->id_producto, $detalle->id_producto);
+        $this->assertEquals(1, $detalle->cantidad);
+    }
+
+    public function test_slide_over_editar_solicitud_actualiza_detalle(): void
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $adminUser = $this->getAdminUser();
+        $this->actingAs($adminUser);
+
+        $unidad = UnidadMedida::firstOrCreate(['nombre' => 'Pza']);
+        $marca = MarcaMaterial::firstOrCreate(['nombre' => 'Genérico']);
+        $tipoMat = TipoMaterial::firstOrCreate(['nombre' => 'Consumible']);
+        $materialA = Material::create([
+            'nombre' => 'Material A',
+            'id_unidad' => $unidad->id_unidad,
+            'id_marca' => $marca->id_marca,
+            'id_tipodematerial' => $tipoMat->id_tipodematerial,
+            'stock_actual' => 10,
+            'requiere_control_individual' => 0,
+        ]);
+        $materialB = Material::create([
+            'nombre' => 'Material B',
+            'id_unidad' => $unidad->id_unidad,
+            'id_marca' => $marca->id_marca,
+            'id_tipodematerial' => $tipoMat->id_tipodematerial,
+            'stock_actual' => 10,
+            'requiere_control_individual' => 0,
+        ]);
+
+        $receptor = Receptor::firstOrCreate([
+            'nombre' => 'Receptor SlideOver',
+            'apellido_paterno' => 'Paterno',
+            'apellido_materno' => 'Materno',
+            'id_area' => $this->getOrCreateArea()->id_area,
+        ]);
+
+        $solicitud = Solicitud::create([
+            'id_usuario' => $adminUser->id,
+            'id_receptor' => $receptor->id_receptor,
+            'tipo_movimiento' => 'Asignacion Permanente',
+            'fecha_solicitud' => now(),
+            'estado' => 'Pendiente',
+            'observaciones' => 'Observación original',
+        ]);
+
+        DetalleSolicitud::create([
+            'id_solicitud' => $solicitud->id_solicitud,
+            'id_producto' => $materialA->id_producto,
+            'cantidad' => 1,
+        ]);
+
+        \Livewire\Livewire::test(\App\Filament\Resources\SolicitudResource\Pages\ListSolicituds::class)
+            ->callTableAction('edit', $solicitud, [
+                'tipo_solicitud' => 'Traslado',
+                'id_producto' => $materialB->id_producto,
+                'observaciones' => 'Observación actualizada',
+            ])
+            ->assertHasNoTableActionErrors();
+
+        $solicitud->refresh();
+        $this->assertEquals('Renta Externa', $solicitud->tipo_movimiento);
+        $this->assertEquals('Observación actualizada', $solicitud->observaciones);
+
+        $detalle = $solicitud->detalles()->first();
+        $this->assertNotNull($detalle);
+        $this->assertEquals($materialB->id_producto, $detalle->id_producto);
+    }
+
+    public function test_ss_slide_over_crear_solicitud(): void
+    {
+        Filament::setCurrentPanel(Filament::getPanel('servicio-social'));
+        $ssUser = $this->getServicioSocialUser();
+        $this->actingAs($ssUser);
+
+        $receptor = Receptor::firstOrCreate([
+            'nombre' => 'Receptor SS Test',
+            'apellido_paterno' => 'Paterno',
+            'apellido_materno' => 'Materno',
+            'id_area' => $this->getOrCreateArea()->id_area,
+        ]);
+
+        $unidad = UnidadMedida::firstOrCreate(['nombre' => 'Pza']);
+        $marca = MarcaMaterial::firstOrCreate(['nombre' => 'Genérico']);
+        $tipoMat = TipoMaterial::firstOrCreate(['nombre' => 'Consumible']);
+        $material = Material::create([
+            'nombre' => 'Material SS SlideOver',
+            'id_unidad' => $unidad->id_unidad,
+            'id_marca' => $marca->id_marca,
+            'id_tipodematerial' => $tipoMat->id_tipodematerial,
+            'stock_actual' => 10,
+            'requiere_control_individual' => 0,
+        ]);
+
+        \Livewire\Livewire::test(\App\Filament\ServicioSocial\Resources\SolicitudResource\Pages\ListSolicituds::class)
+            ->callAction('create', [
+                'tipo_solicitud' => 'Salida',
+                'fecha_solicitud' => now()->toDateString(),
+                'id_producto' => $material->id_producto,
+                'observaciones' => 'Solicitud SS slide-over',
+            ])
+            ->assertHasNoActionErrors();
+
+        $solicitud = Solicitud::latest('id_solicitud')->first();
+        $this->assertNotNull($solicitud);
+        $this->assertEquals('Asignacion Permanente', $solicitud->tipo_movimiento);
+        $this->assertEquals('Pendiente', $solicitud->estado);
+        $this->assertEquals($ssUser->id, $solicitud->id_usuario);
+
+        $detalle = DetalleSolicitud::where('id_solicitud', $solicitud->id_solicitud)->first();
+        $this->assertNotNull($detalle);
+        $this->assertEquals($material->id_producto, $detalle->id_producto);
     }
 }

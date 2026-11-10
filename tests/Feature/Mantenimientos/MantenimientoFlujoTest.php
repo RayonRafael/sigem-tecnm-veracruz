@@ -179,4 +179,85 @@ class MantenimientoFlujoTest extends TestCase
         $this->assertEquals('Completado', $mant->fresh()->estado);
         $this->assertNotNull($mant->fresh()->fecha_fin);
     }
+
+    public function test_slide_over_crear_mantenimiento_guarda_registro(): void
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $adminUser = $this->getAdminUser();
+        $this->actingAs($adminUser);
+        $inv = $this->crearInventario($adminUser);
+
+        \Livewire\Livewire::test(\App\Filament\Resources\MantenimientoResource\Pages\ListMantenimientos::class)
+            ->callAction('create', [
+                'tipo_mantenimiento' => 'Correctivo',
+                'id_inventario' => $inv->id_inventario,
+                'nombre_tecnico' => 'Juan Pérez',
+                'num_control_tecnico' => '20240001',
+                'descripcion_falla' => 'Ventilador no funciona correctamente',
+            ])
+            ->assertHasNoActionErrors();
+
+        $this->assertDatabaseHas('mantenimiento', [
+            'id_inventario' => $inv->id_inventario,
+            'tipo_mantenimiento' => 'Correctivo',
+            'estado' => 'Pendiente Revision Admin',
+            'id_usuario_solicita' => $adminUser->id,
+        ]);
+    }
+
+    public function test_slide_over_editar_mantenimiento_actualiza_registro(): void
+    {
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+        $adminUser = $this->getAdminUser();
+        $this->actingAs($adminUser);
+        $inv = $this->crearInventario($adminUser);
+
+        $mant = Mantenimiento::create([
+            'id_inventario' => $inv->id_inventario,
+            'id_usuario_solicita' => $adminUser->id,
+            'tipo_mantenimiento' => 'Preventivo',
+            'tipo_servicio' => 'Servicio Social',
+            'nombre_tecnico' => 'Carlos López',
+            'num_control_tecnico' => '20240001',
+            'descripcion_falla' => 'Falla inicial',
+            'fecha_solicitud' => now(),
+            'estado' => 'Pendiente Revision Admin',
+        ]);
+
+        \Livewire\Livewire::test(\App\Filament\Resources\MantenimientoResource\Pages\ListMantenimientos::class)
+            ->callTableAction('edit', $mant, [
+                'tipo_mantenimiento' => 'Preventivo',
+                'id_inventario' => $inv->id_inventario,
+                'nombre_tecnico' => 'Carlos López',
+                'num_control_tecnico' => '20240001',
+                'descripcion_falla' => 'Falla corregida y actualizada',
+            ])
+            ->assertHasNoTableActionErrors();
+
+        $this->assertEquals('Falla corregida y actualizada', $mant->fresh()->descripcion_falla);
+    }
+
+    public function test_ss_slide_over_crear_mantenimiento(): void
+    {
+        Filament::setCurrentPanel(Filament::getPanel('servicio-social'));
+        $ssUser = $this->getServicioSocialUser();
+        $this->actingAs($ssUser);
+        $inv = $this->crearInventario($ssUser);
+
+        \Livewire\Livewire::test(\App\Filament\ServicioSocial\Resources\MantenimientoResource\Pages\ListMantenimientos::class)
+            ->callAction('create', [
+                'tipo_mantenimiento' => 'Correctivo',
+                'id_inventario' => $inv->id_inventario,
+                'nombre_tecnico' => 'Carlos López',
+                'num_control_tecnico' => '20240002',
+                'descripcion_falla' => 'Equipo no enciende',
+            ])
+            ->assertHasNoActionErrors();
+
+        $this->assertDatabaseHas('mantenimiento', [
+            'id_inventario' => $inv->id_inventario,
+            'id_usuario_solicita' => $ssUser->id,
+            'estado' => 'Pendiente Revision Admin',
+        ]);
+    }
 }
