@@ -53,6 +53,7 @@ class ServicioSocialPanelProvider extends PanelProvider
 <meta http-equiv="Expires" content="0">
 <link rel="stylesheet" href="{{ asset(\'css/sigem-theme.css\') }}">
 <script src="{{ asset(\'js/sigem-network.js\') }}" defer></script>
+<script src="{{ asset(\'js/sigem-titles.js\') }}" defer></script>
 ')
             )
             ->renderHook(

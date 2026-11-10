@@ -1342,12 +1342,22 @@ img.sigem-brand-logo {
     display: flex !important;
     justify-content: center !important;
     text-decoration: none !important;
+    pointer-events: none !important;
+    cursor: default !important;
   }
 
   button,
   .fi-icon-btn {
     display: none !important;
   }
+}
+
+/* Logo del sidebar/topbar solo decorativo (sin navegación ni recarga) */
+.fi-sidebar-header a,
+.fi-topbar a.fi-topbar-brand,
+.sigem-brand {
+  pointer-events: none !important;
+  cursor: default !important;
 }
 
 /* Tooltip al hover */
