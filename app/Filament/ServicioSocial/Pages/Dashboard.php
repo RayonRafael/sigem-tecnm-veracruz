@@ -209,7 +209,8 @@ class Dashboard extends BaseDashboard
                 $record->solicitarBaja(
                     $data['motivo_baja'],
                     $data['observaciones_baja'],
-                    auth()->id()
+                    auth()->id(),
+                    ConModalesBajaCambio::extraerDatosAdicionalesBaja($data)
                 );
                 Notification::make()->title('Solicitud de baja enviada a revisión')->warning()->send();
             });

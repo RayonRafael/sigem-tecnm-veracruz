@@ -45,7 +45,7 @@ class MantenimientoResource extends Resource
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['descripcion_falla', 'nombre_tecnico', 'observaciones'];
+        return ['descripcion_falla', 'descripcion_trabajo', 'nombre_tecnico', 'observaciones'];
     }
 
     public static function form(Form $form): Form
@@ -101,6 +101,14 @@ class MantenimientoResource extends Resource
                             ->helperText('Entre más detalle des, más rápido se autoriza el servicio.')
                             ->required()
                             ->rows(3)
+                            ->columnSpanFull(),
+
+                        Forms\Components\Textarea::make('descripcion_trabajo')
+                            ->label('Trabajo realizado / Hallazgo')
+                            ->placeholder('Ej. Se reinstaló el sistema operativo y se aplicó limpieza interna...')
+                            ->helperText('Se registra como hallazgo en la Lista de Verificación de Mantenimiento.')
+                            ->rows(3)
+                            ->visible(fn (?Mantenimiento $record): bool => $record !== null)
                             ->columnSpanFull(),
 
                         Forms\Components\Hidden::make('id_usuario_solicita')
@@ -273,15 +281,11 @@ class MantenimientoResource extends Resource
                             ->label('Completar')
                             ->color('success')
                             ->visible(fn (?Mantenimiento $record): bool => $record?->estado === 'En proceso')
-                            ->requiresConfirmation()
                             ->modalHeading('Completar mantenimiento')
                             ->modalDescription('Se marcará el servicio como finalizado y el equipo volverá a Disponible.')
+                            ->form(static::getCompletarFormSchema())
                             ->modalSubmitActionLabel('Completar')
-                            ->action(function (Mantenimiento $record) {
-                                $record->update(['estado' => 'Completado', 'fecha_fin' => now()]);
-                                $record->inventario?->update(['estado' => 'Disponible']);
-                                Notification::make()->title('Mantenimiento completado')->success()->send();
-                            }),
+                            ->action(fn (Mantenimiento $record, array $data) => static::completarMantenimiento($record, $data)),
                     ]),
 
                 Tables\Actions\EditAction::make()
@@ -315,15 +319,11 @@ class MantenimientoResource extends Resource
                     ->tooltip('Completar')
                     ->extraAttributes(['title' => 'Completar'])
                     ->visible(fn (Mantenimiento $record): bool => $record->estado === 'En proceso')
-                    ->requiresConfirmation()
                     ->modalHeading(fn (Mantenimiento $record) => 'Completar mantenimiento #' . str_pad($record->id_mantenimiento, 4, '0', STR_PAD_LEFT))
                     ->modalDescription('Se marcará el servicio como finalizado y el equipo volverá a Disponible.')
+                    ->form(static::getCompletarFormSchema())
                     ->modalSubmitActionLabel('Completar')
-                    ->action(function (Mantenimiento $record) {
-                        $record->update(['estado' => 'Completado', 'fecha_fin' => now()]);
-                        $record->inventario?->update(['estado' => 'Disponible']);
-                        Notification::make()->title('Mantenimiento completado')->success()->send();
-                    }),
+                    ->action(fn (Mantenimiento $record, array $data) => static::completarMantenimiento($record, $data)),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -395,6 +395,10 @@ class MantenimientoResource extends Resource
                                             ->label('Descripción de la falla')
                                             ->default('Sin descripción registrada.')
                                             ->columnSpanFull(),
+                                        TextEntry::make('descripcion_trabajo')
+                                            ->label('Trabajo realizado / Hallazgo')
+                                            ->default('Pendiente de registrar.')
+                                            ->columnSpanFull(),
                                     ])
                                     ->columns(2),
 
@@ -427,6 +431,34 @@ class MantenimientoResource extends Resource
                     ])
                     ->columnSpanFull(),
             ]);
+    }
+
+    public static function getCompletarFormSchema(): array
+    {
+        return [
+            Forms\Components\Textarea::make('descripcion_trabajo')
+                ->label('Trabajo realizado / Hallazgo')
+                ->placeholder('Describe las acciones efectuadas o el hallazgo encontrado (opcional)...')
+                ->default(fn (?Mantenimiento $record): ?string => $record?->descripcion_trabajo)
+                ->rows(3),
+        ];
+    }
+
+    public static function completarMantenimiento(Mantenimiento $record, array $data = []): void
+    {
+        $update = [
+            'estado' => 'Completado',
+            'fecha_fin' => now(),
+        ];
+
+        if (filled($data['descripcion_trabajo'] ?? null)) {
+            $update['descripcion_trabajo'] = trim((string) $data['descripcion_trabajo']);
+        }
+
+        $record->update($update);
+        $record->inventario?->update(['estado' => 'Disponible']);
+
+        Notification::make()->title('Mantenimiento completado')->success()->send();
     }
 
     public static function getRelations(): array

@@ -769,11 +769,12 @@ class InventarioResource extends Resource
                             ->modalSubmitActionLabel(fn () => static::esAdmin() ? 'Confirmar baja' : 'Solicitar baja')
                             ->modalCancelActionLabel('Cancelar')
                             ->action(function (Inventario $record, array $data) {
+                                $datosAdicionales = static::extraerDatosAdicionalesBaja($data);
                                 if (static::esAdmin()) {
-                                    $record->darBajaDirecta($data['motivo_baja'], $data['observaciones_baja'], auth()->id());
+                                    $record->darBajaDirecta($data['motivo_baja'], $data['observaciones_baja'], auth()->id(), $datosAdicionales);
                                     Notification::make()->title('Equipo dado de baja correctamente')->danger()->send();
                                 } else {
-                                    $record->solicitarBaja($data['motivo_baja'], $data['observaciones_baja'], auth()->id());
+                                    $record->solicitarBaja($data['motivo_baja'], $data['observaciones_baja'], auth()->id(), $datosAdicionales);
                                     Notification::make()->title('Solicitud de baja enviada a revisión')->warning()->send();
                                 }
                             }),

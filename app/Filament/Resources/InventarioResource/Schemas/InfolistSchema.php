@@ -41,6 +41,15 @@ class InfolistSchema
                                             ->label('Observaciones de baja')
                                             ->columnSpanFull()
                                             ->placeholder('Sin observaciones registradas'),
+                                        Infolists\Components\TextEntry::make('folio_sibsep_display')
+                                            ->label('Folio SIBESEP')
+                                            ->getStateUsing(fn (Inventario $record): ?string => $record->especificaciones['folio_sibsep'] ?? null)
+                                            ->placeholder('Por asignar (Recursos Materiales)')
+                                            ->visible(fn (?Inventario $record): bool => filled($record?->especificaciones['folio_sibsep'] ?? null)),
+                                        Infolists\Components\TextEntry::make('posible_area_utilizacion_display')
+                                            ->label('Posible área de utilización')
+                                            ->getStateUsing(fn (Inventario $record): ?string => $record->especificaciones['posible_area_utilizacion'] ?? null)
+                                            ->visible(fn (?Inventario $record): bool => filled($record?->especificaciones['posible_area_utilizacion'] ?? null)),
                                     ])
                                     ->columns(3),
 

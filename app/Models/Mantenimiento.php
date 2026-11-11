@@ -48,4 +48,12 @@ class Mantenimiento extends Model
     {
         return $this->belongsTo(Inventario::class, 'id_inventario', 'id_inventario');
     }
+
+    /**
+     * Usuario que solicita el mantenimiento.
+     */
+    public function usuarioSolicita()
+    {
+        return $this->belongsTo(User::class, 'id_usuario_solicita');
+    }
 }

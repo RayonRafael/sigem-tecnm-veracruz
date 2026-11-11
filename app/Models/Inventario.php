@@ -268,19 +268,43 @@ class Inventario extends Model
         $this->especificaciones = $specs;
     }
 
-    public function darBajaDirecta(string $motivo, string $observaciones, ?int $usuarioId = null): void
+    private function aplicarDatosBajaEnEspecificaciones(array $datosAdicionales): array
     {
-        DB::transaction(function () use ($motivo, $observaciones, $usuarioId) {
-    $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
+        $specs = is_array($this->especificaciones) ? $this->especificaciones : [];
+
+        foreach (['folio_sibsep', 'posible_area_utilizacion'] as $campo) {
+            if (array_key_exists($campo, $datosAdicionales)) {
+                $valor = $datosAdicionales[$campo];
+                if (filled($valor)) {
+                    $specs[$campo] = trim((string) $valor);
+                } else {
+                    unset($specs[$campo]);
+                }
+            }
+        }
+
+        return $specs;
+    }
+
+    public function darBajaDirecta(string $motivo, string $observaciones, ?int $usuarioId = null, array $datosAdicionales = []): void
+    {
+        DB::transaction(function () use ($motivo, $observaciones, $usuarioId, $datosAdicionales) {
+            $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
             $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
-            $this->update([
+            $payload = [
                 'estado' => EstadoInventario::DadoDeBaja->value,
                 'fecha_baja' => now(),
                 'motivo_baja' => $motivo,
                 'observaciones_baja' => $observaciones,
                 'id_usuario_baja' => $userId,
-            ]);
+            ];
+
+            if (! empty($datosAdicionales)) {
+                $payload['especificaciones'] = $this->aplicarDatosBajaEnEspecificaciones($datosAdicionales);
+            }
+
+            $this->update($payload);
 
             HistorialEstado::create([
                 'id_inventario' => $this->id_inventario,
@@ -294,19 +318,25 @@ class Inventario extends Model
         });
     }
 
-    public function solicitarBaja(string $motivo, string $observaciones, ?int $usuarioId = null): void
+    public function solicitarBaja(string $motivo, string $observaciones, ?int $usuarioId = null, array $datosAdicionales = []): void
     {
-        DB::transaction(function () use ($motivo, $observaciones, $usuarioId) {
-    $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
+        DB::transaction(function () use ($motivo, $observaciones, $usuarioId, $datosAdicionales) {
+            $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
             $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
-            $this->update([
+            $payload = [
                 'estado' => EstadoInventario::SolicitudDeBaja->value,
                 'estado_previo_baja' => $estadoAnterior,
                 'motivo_baja' => $motivo,
                 'observaciones_baja' => $observaciones,
                 'id_usuario_baja' => $userId,
-            ]);
+            ];
+
+            if (! empty($datosAdicionales)) {
+                $payload['especificaciones'] = $this->aplicarDatosBajaEnEspecificaciones($datosAdicionales);
+            }
+
+            $this->update($payload);
 
             HistorialEstado::create([
                 'id_inventario' => $this->id_inventario,
@@ -344,10 +374,18 @@ class Inventario extends Model
         });
     }
 
+    private function limpiarDatosBajaDeEspecificaciones(): array
+    {
+        $specs = is_array($this->especificaciones) ? $this->especificaciones : [];
+        unset($specs['folio_sibsep'], $specs['posible_area_utilizacion']);
+
+        return $specs;
+    }
+
     public function rechazarBaja(?string $observaciones = null, ?int $usuarioId = null): void
     {
         DB::transaction(function () use ($observaciones, $usuarioId) {
-    $userId = $usuarioId ?? auth()->id() ?? 1;
+            $userId = $usuarioId ?? auth()->id() ?? 1;
             $estadoRestaurar = $this->estado_previo_baja ?? EstadoInventario::Disponible->value;
             $obsTexto = !empty($observaciones) ? $observaciones : ($this->observaciones_baja ?? 'Sin observaciones');
 
@@ -358,6 +396,7 @@ class Inventario extends Model
                 'observaciones_baja' => null,
                 'id_usuario_baja' => null,
                 'fecha_baja' => null,
+                'especificaciones' => $this->limpiarDatosBajaDeEspecificaciones(),
             ]);
 
             HistorialEstado::create([
@@ -375,7 +414,7 @@ class Inventario extends Model
     public function reactivar(?int $usuarioId = null): void
     {
         DB::transaction(function () use ($usuarioId) {
-    $userId = $usuarioId ?? auth()->id() ?? 1;
+            $userId = $usuarioId ?? auth()->id() ?? 1;
 
             $this->update([
                 'estado' => EstadoInventario::Disponible->value,
@@ -384,6 +423,7 @@ class Inventario extends Model
                 'observaciones_baja' => null,
                 'id_usuario_baja' => null,
                 'estado_previo_baja' => null,
+                'especificaciones' => $this->limpiarDatosBajaDeEspecificaciones(),
             ]);
 
             HistorialEstado::create([

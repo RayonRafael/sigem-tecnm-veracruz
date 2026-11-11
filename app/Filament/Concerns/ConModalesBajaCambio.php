@@ -5,6 +5,7 @@ namespace App\Filament\Concerns;
 use App\Models\Area;
 use App\Models\Departamento;
 use App\Models\Inventario;
+use App\Support\SigemBajaFormatHelper;
 use Filament\Forms;
 
 trait ConModalesBajaCambio
@@ -58,23 +59,43 @@ trait ConModalesBajaCambio
     /**
      * Esquema del formulario modal para Baja de Equipo.
      */
-    public static function getModalBajaFormSchema(): array
+    public static function getModalBajaFormSchema(bool $observacionesRequeridas = true): array
     {
         return [
             Forms\Components\Select::make('motivo_baja')
                 ->label('Motivo de baja')
-                ->options([
-                    'Daño irreparable' => 'Daño irreparable',
-                    'Obsolescencia' => 'Obsolescencia',
-                    'Pérdida' => 'Pérdida',
-                    'Robo' => 'Robo',
-                    'Otro' => 'Otro',
-                ])
+                ->options(fn () => SigemBajaFormatHelper::motivosBajaOptions())
                 ->required(),
             Forms\Components\Textarea::make('observaciones_baja')
-                ->label('Observaciones detalladas')
-                ->placeholder('Explicación detallada del motivo de la baja...')
-                ->required(),
+                ->label($observacionesRequeridas ? 'Observaciones detalladas' : 'Observaciones')
+                ->placeholder($observacionesRequeridas
+                    ? 'Explicación detallada del motivo de la baja...'
+                    : 'Observaciones detalladas (opcional)...')
+                ->required($observacionesRequeridas),
+            Forms\Components\Grid::make(2)
+                ->schema([
+                    Forms\Components\TextInput::make('folio_sibsep')
+                        ->label('Folio SIBESEP (opcional)')
+                        ->placeholder('Vacío por defecto; lo asigna Recursos Materiales')
+                        ->maxLength(100),
+                    Forms\Components\Select::make('posible_area_utilizacion')
+                        ->label('Posible área de utilización (opcional)')
+                        ->placeholder('Seleccionar si aplica para reaprovechamiento...')
+                        ->options(fn () => Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray())
+                        ->searchable()
+                        ->preload(),
+                ]),
+        ];
+    }
+
+    /**
+     * Extrae los campos adicionales opcionales del formato de baja para guardarlos en especificaciones.
+     */
+    public static function extraerDatosAdicionalesBaja(array $data): array
+    {
+        return [
+            'folio_sibsep' => $data['folio_sibsep'] ?? null,
+            'posible_area_utilizacion' => $data['posible_area_utilizacion'] ?? null,
         ];
     }
 }

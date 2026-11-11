@@ -52,6 +52,8 @@ trait ConAccionesMasivasInventario
      */
     public ?string $bajaMotivo = '';
     public ?string $bajaObservaciones = '';
+    public ?string $bajaFolioSibsep = '';
+    public ?string $bajaPosibleAreaUtilizacion = '';
 
     /**
      * Campos de formulario interno para Modificar todos
@@ -104,6 +106,8 @@ trait ConAccionesMasivasInventario
         $this->cambioMotivo = '';
         $this->bajaMotivo = '';
         $this->bajaObservaciones = '';
+        $this->bajaFolioSibsep = '';
+        $this->bajaPosibleAreaUtilizacion = '';
         $this->modificarCampo = '';
         $this->modificarNuevoValor = '';
     }
@@ -121,6 +125,8 @@ trait ConAccionesMasivasInventario
         } elseif ($step === 'baja') {
             $this->bajaMotivo = '';
             $this->bajaObservaciones = '';
+            $this->bajaFolioSibsep = '';
+            $this->bajaPosibleAreaUtilizacion = '';
         } elseif ($step === 'modificar') {
             $this->modificarCampo = '';
             $this->modificarNuevoValor = '';
@@ -176,6 +182,8 @@ trait ConAccionesMasivasInventario
         $data = [
             'motivo_baja' => $this->bajaMotivo,
             'observaciones_baja' => $this->bajaObservaciones ?: 'Baja masiva',
+            'folio_sibsep' => $this->bajaFolioSibsep ?: null,
+            'posible_area_utilizacion' => $this->bajaPosibleAreaUtilizacion ?: null,
         ];
 
         $this->procesarBajaMasiva($data);
@@ -488,22 +496,7 @@ trait ConAccionesMasivasInventario
                 : 'Los ' . count($this->selectedRows) . ' equipos seleccionados pasarán a estado Dado de baja de forma inmediata.')
             ->modalSubmitActionLabel('Solicitar baja')
             ->modalCancelActionLabel('Cancelar')
-            ->form([
-                Select::make('motivo_baja')
-                    ->label('Motivo de baja')
-                    ->options([
-                        'Daño irreparable' => 'Daño irreparable',
-                        'Obsolescencia' => 'Obsolescencia',
-                        'Pérdida' => 'Pérdida',
-                        'Robo' => 'Robo',
-                        'Otro' => 'Otro',
-                    ])
-                    ->required(),
-
-                Textarea::make('observaciones_baja')
-                    ->label('Observaciones')
-                    ->placeholder('Observaciones detalladas (opcional)...'),
-            ])
+            ->form(fn () => ConModalesBajaCambio::getModalBajaFormSchema(false))
             ->action(function (array $data) {
                 $this->procesarBajaMasiva($data);
             });
@@ -523,10 +516,11 @@ trait ConAccionesMasivasInventario
         $userId = auth()->id() ?? 1;
         $motivo = $data['motivo_baja'];
         $obs = ! empty($data['observaciones_baja']) ? $data['observaciones_baja'] : 'Baja masiva';
+        $datosAdicionales = ConModalesBajaCambio::extraerDatosAdicionalesBaja($data);
         $aplicados = 0;
         $omitidos = 0;
 
-        DB::transaction(function () use ($esAdmin, $userId, $motivo, $obs, &$aplicados, &$omitidos) {
+        DB::transaction(function () use ($esAdmin, $userId, $motivo, $obs, $datosAdicionales, &$aplicados, &$omitidos) {
             $records = Inventario::whereIn('id_inventario', $this->selectedRows)->get();
 
             foreach ($records as $record) {
@@ -542,9 +536,9 @@ trait ConAccionesMasivasInventario
                 }
 
                 if ($esAdmin) {
-                    $record->darBajaDirecta($motivo, $obs, $userId);
+                    $record->darBajaDirecta($motivo, $obs, $userId, $datosAdicionales);
                 } else {
-                    $record->solicitarBaja($motivo, $obs, $userId);
+                    $record->solicitarBaja($motivo, $obs, $userId, $datosAdicionales);
                 }
 
                 $aplicados++;
