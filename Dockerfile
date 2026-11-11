@@ -1,14 +1,15 @@
 FROM php:8.4-apache
 
 RUN apt-get update && apt-get install -y \
-    git unzip libzip-dev libsqlite3-dev libicu-dev \
-    && docker-php-ext-install pdo_sqlite pdo_mysql zip intl \
+    git unzip libzip-dev libsqlite3-dev libicu-dev libpng-dev \
+    && docker-php-ext-install pdo_sqlite pdo_mysql zip intl gd \
     && a2enmod rewrite headers expires deflate \
     && rm -rf /var/lib/apt/lists/*
 
 # BATCH 3A: Habilitar compresión zlib para respuestas PHP/HTTP en Render
 RUN echo "zlib.output_compression = On" > /usr/local/etc/php/conf.d/compression.ini \
-    && echo "zlib.output_compression_level = 6" >> /usr/local/etc/php/conf.d/compression.ini
+    && echo "zlib.output_compression_level = 6" >> /usr/local/etc/php/conf.d/compression.ini \
+    && echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/compression.ini
 
 # Configurar DocumentRoot de Apache a la carpeta public de Laravel
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
@@ -28,7 +29,7 @@ ENV APP_ENV=production \
     DB_CONNECTION=sqlite \
     DB_DATABASE=database/database.sqlite
 
-RUN mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
+RUN mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs storage/fonts bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 

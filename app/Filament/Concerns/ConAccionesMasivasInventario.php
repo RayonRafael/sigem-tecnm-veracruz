@@ -583,9 +583,9 @@ trait ConAccionesMasivasInventario
     {
         $bajas = $this->obtenerRegistrosBajaSeleccionados();
 
-        if ($bajas->isEmpty()) {
+        if ($error = SigemBajaFormatHelper::mensajeErrorLote($bajas)) {
             Notification::make()
-                ->title('No hay equipos dados de baja o con solicitud de baja en la selección')
+                ->title($error)
                 ->warning()
                 ->send();
 

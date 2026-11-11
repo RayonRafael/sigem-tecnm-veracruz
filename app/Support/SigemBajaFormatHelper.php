@@ -5,6 +5,11 @@ namespace App\Support;
 class SigemBajaFormatHelper
 {
     /**
+     * Límite máximo de equipos por generación de PDF multipágina en lote (Formato 4).
+     */
+    public const MAX_LOTE_BAJAS = 50;
+
+    /**
      * Estados del inventario elegibles para el Formato 4 (Trámite de Baja).
      *
      * @var list<string>
@@ -36,6 +41,22 @@ class SigemBajaFormatHelper
             : collect($inventarios);
 
         return $coleccion->filter(fn ($item): bool => self::esEstadoBaja($item?->estado))->values();
+    }
+
+    /**
+     * Valida que el lote de bajas no esté vacío ni supere el máximo permitido.
+     */
+    public static function mensajeErrorLote(\Illuminate\Support\Collection $bajas): ?string
+    {
+        if ($bajas->isEmpty()) {
+            return 'No hay equipos dados de baja o con solicitud de baja en la selección';
+        }
+
+        if ($bajas->count() > self::MAX_LOTE_BAJAS) {
+            return 'Máximo ' . self::MAX_LOTE_BAJAS . " equipos por lote PDF (seleccionaste {$bajas->count()}). Reduce la selección e intenta de nuevo.";
+        }
+
+        return null;
     }
 
     /**

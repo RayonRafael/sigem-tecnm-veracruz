@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\Reportes;
 
+use App\Filament\Pages\Dashboard as AdminDashboard;
 use App\Filament\Pages\ReportesPage as AdminReportesPage;
+use App\Filament\Resources\InventarioResource\Pages\ListInventarios;
+use App\Filament\ServicioSocial\Pages\ReportesPage as SSReportesPage;
 use App\Models\Area;
 use App\Models\Departamento;
 use App\Models\DetalleSolicitud;
@@ -526,6 +529,179 @@ class Fase8VerificacionFinalTest extends TestCase
             $this->assertStringStartsWith('data:image/', $dataUri);
             $this->assertStringContainsString(';base64,', $dataUri);
         }
+    }
+
+    // ============================================
+    // PRE-MERGE: Dockerfile, Seguridad SS y Límite 50
+    // ============================================
+
+    public function test_dockerfile_configuracion_produccion_pdf(): void
+    {
+        $dockerfile = File::get(base_path('Dockerfile'));
+
+        $this->assertStringContainsString('libpng-dev', $dockerfile);
+        $this->assertStringContainsString('gd', $dockerfile);
+        $this->assertStringContainsString('storage/fonts', $dockerfile);
+        $this->assertStringContainsString('memory_limit = 512M', $dockerfile);
+    }
+
+    public function test_servicio_social_no_puede_ver_ni_descargar_formatos_de_otros_usuarios(): void
+    {
+        $inv = $this->crearInventario(['estado' => 'Disponible']);
+
+        $solAdmin = Solicitud::create([
+            'id_usuario' => $this->adminUser->id,
+            'id_receptor' => $this->receptor->id_receptor,
+            'tipo_movimiento' => 'Asignacion Permanente',
+            'fecha_solicitud' => '2026-10-10',
+            'estado' => 'Autorizado',
+        ]);
+        DetalleSolicitud::create([
+            'id_solicitud' => $solAdmin->id_solicitud,
+            'id_producto' => $this->material->id_producto,
+            'id_inventario' => $inv->id_inventario,
+            'cantidad' => 1,
+        ]);
+
+        $solSs = Solicitud::create([
+            'id_usuario' => $this->ssUser->id,
+            'id_receptor' => $this->receptor->id_receptor,
+            'tipo_movimiento' => 'Asignacion Permanente',
+            'fecha_solicitud' => '2026-10-11',
+            'estado' => 'Autorizado',
+        ]);
+        DetalleSolicitud::create([
+            'id_solicitud' => $solSs->id_solicitud,
+            'id_producto' => $this->material->id_producto,
+            'id_inventario' => $inv->id_inventario,
+            'cantidad' => 1,
+        ]);
+
+        $mantAdmin = Mantenimiento::create([
+            'id_inventario' => $inv->id_inventario,
+            'id_usuario_solicita' => $this->adminUser->id,
+            'tipo_mantenimiento' => 'Correctivo',
+            'tipo_servicio' => 'Personal Técnico',
+            'nombre_tecnico' => 'Técnico Admin',
+            'descripcion_falla' => 'Falla privada admin',
+            'descripcion_trabajo' => 'Reparado admin',
+            'fecha_solicitud' => '2026-10-10',
+            'fecha_fin' => '2026-10-11',
+            'estado' => 'Completado',
+        ]);
+
+        $mantSs = Mantenimiento::create([
+            'id_inventario' => $inv->id_inventario,
+            'id_usuario_solicita' => $this->ssUser->id,
+            'tipo_mantenimiento' => 'Preventivo',
+            'tipo_servicio' => 'Servicio Social',
+            'nombre_tecnico' => 'Técnico SS',
+            'descripcion_falla' => 'Falla SS',
+            'descripcion_trabajo' => 'Revisión SS',
+            'fecha_solicitud' => '2026-10-11',
+            'fecha_fin' => '2026-10-12',
+            'estado' => 'Completado',
+        ]);
+
+        $this->actingAs($this->ssUser);
+        Filament::setCurrentPanel(Filament::getPanel('servicio-social'));
+
+        $component = Livewire::test(SSReportesPage::class);
+        $instancia = $component->instance();
+
+        $solIds = $instancia->getSolicitudesParaFormato()->pluck('id_solicitud')->all();
+        $this->assertContains($solSs->id_solicitud, $solIds);
+        $this->assertNotContains($solAdmin->id_solicitud, $solIds);
+
+        $mantOrdenIds = $instancia->getMantenimientosParaOrdenFormato()->pluck('id_mantenimiento')->all();
+        $this->assertContains($mantSs->id_mantenimiento, $mantOrdenIds);
+        $this->assertNotContains($mantAdmin->id_mantenimiento, $mantOrdenIds);
+
+        $mantVerifIds = $instancia->getMantenimientosParaVerificacionFormato()->pluck('id_mantenimiento')->all();
+        $this->assertContains($mantSs->id_mantenimiento, $mantVerifIds);
+        $this->assertNotContains($mantAdmin->id_mantenimiento, $mantVerifIds);
+
+        // Intento de descarga forzada de registros ajenos debe responder 403
+        Livewire::test(SSReportesPage::class)
+            ->set('formatoSeleccionadoEntrega', (string) $solAdmin->id_solicitud)
+            ->call('descargarFormatoInstitucional', 'entrega')
+            ->assertForbidden();
+
+        Livewire::test(SSReportesPage::class)
+            ->set('formatoSeleccionadoOrden', (string) $mantAdmin->id_mantenimiento)
+            ->call('descargarFormatoInstitucional', 'orden_trabajo')
+            ->assertForbidden();
+
+        Livewire::test(SSReportesPage::class)
+            ->set('formatoSeleccionadoVerificacion', (string) $mantAdmin->id_mantenimiento)
+            ->call('descargarFormatoInstitucional', 'lista_verificacion')
+            ->assertForbidden();
+
+        Livewire::test(SSReportesPage::class)
+            ->set('formatoFiltroTipo', 'entrega')
+            ->set('formatoSeleccionadoEntrega', (string) $solAdmin->id_solicitud)
+            ->call('generarFormatosFiltrados')
+            ->assertForbidden();
+
+        // Con sus propios registros sí descarga el PDF correspondiente
+        Livewire::test(SSReportesPage::class)
+            ->set('formatoSeleccionadoEntrega', (string) $solSs->id_solicitud)
+            ->call('descargarFormatoInstitucional', 'entrega')
+            ->assertFileDownloaded("acta-entrega-{$solSs->id_solicitud}.pdf");
+    }
+
+    public function test_lote_de_bajas_limitado_a_50_registros(): void
+    {
+        $this->assertSame(50, SigemBajaFormatHelper::MAX_LOTE_BAJAS);
+
+        $ahora = now();
+        $filas = [];
+        for ($i = 1; $i <= 51; $i++) {
+            $filas[] = [
+                'id_producto' => $this->material->id_producto,
+                'id_usuario' => $this->adminUser->id,
+                'codigo' => sprintf('LOT-BAJA-%03d', $i),
+                'num_serie' => sprintf('SN-LOTE-%03d', $i),
+                'modelo' => '5430',
+                'tipo_propiedad' => 'Propio',
+                'estado' => 'Dado de baja',
+                'motivo_baja' => 'Obsolescencia',
+                'observaciones_baja' => 'Lote de prueba rendimiento',
+                'fecha_baja' => '2026-10-12',
+                'estado_registro' => 'Aprobado',
+                'aprobado' => true,
+                'departamento_id' => $this->deptoCentro->id_departamento,
+                'area_id' => $this->areaCentro->id_area,
+                'salon_id' => $this->salonCentro->id,
+                'fecha_registro' => $ahora,
+                'created_at' => $ahora,
+                'updated_at' => $ahora,
+            ];
+        }
+        Inventario::insert($filas);
+
+        $this->actingAs($this->adminUser);
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        // 1. Reportes limita la lista y descarga a máximo 50 registros
+        $reportes = Livewire::test(AdminReportesPage::class);
+        $this->assertCount(50, $reportes->instance()->getInventariosBajaParaFormato());
+
+        // 2. Dashboard (acciones masivas) bloquea lotes > 50 con notificación y retorna null
+        $ids51 = Inventario::where('estado', 'Dado de baja')
+            ->limit(51)
+            ->pluck('id_inventario')
+            ->map(fn ($id) => (string) $id)
+            ->all();
+
+        $dashboard = Livewire::test(AdminDashboard::class)->set('selectedRows', $ids51);
+        $this->assertNull($dashboard->instance()->descargarFormatosBajaLote());
+
+        // 3. InventarioResource bulk action rechaza lotes > 50 sin descargar
+        $registros51 = Inventario::where('estado', 'Dado de baja')->limit(51)->get();
+        Livewire::test(ListInventarios::class)
+            ->callTableBulkAction('formatosBajaLote', $registros51)
+            ->assertNoFileDownloaded();
     }
 }
 

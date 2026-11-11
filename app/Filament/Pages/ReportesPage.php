@@ -349,8 +349,8 @@ class ReportesPage extends Page
                 'Adaptación',
             ]);
 
-        if (! $this->esUsuarioAdminReportes() && auth()->id()) {
-            $query->where('id_usuario', auth()->id());
+        if (! $this->esUsuarioAdminReportes()) {
+            $query->where('id_usuario', auth()->id() ?? 0);
         }
 
         $this->aplicarFiltroFechaFormato($query, 'fecha_solicitud');
@@ -372,8 +372,8 @@ class ReportesPage extends Page
             ->with(['inventario.material', 'inventario.departamento', 'inventario.area.departamento'])
             ->where('estado', '!=', 'Cancelado');
 
-        if (! $this->esUsuarioAdminReportes() && auth()->id()) {
-            $query->where('id_usuario_solicita', auth()->id());
+        if (! $this->esUsuarioAdminReportes()) {
+            $query->where('id_usuario_solicita', auth()->id() ?? 0);
         }
 
         $this->aplicarFiltroFechaFormato($query, 'fecha_solicitud');
@@ -419,52 +419,91 @@ class ReportesPage extends Page
 
         return $query->orderByDesc('fecha_baja')
             ->orderByDesc('id_inventario')
-            ->limit(100)
+            ->limit(SigemBajaFormatHelper::MAX_LOTE_BAJAS)
             ->get();
+    }
+
+    /**
+     * Resuelve un registro de formato verificando propiedad del usuario cuando no es Administrador.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     * @param  \Illuminate\Support\Collection<int, TModel>  $candidatos
+     * @param  class-string<TModel>  $modeloClase
+     * @return TModel|null
+     */
+    protected function resolverRegistroFormatoAutorizado(
+        \Illuminate\Support\Collection $candidatos,
+        ?string $seleccionId,
+        string $clavePk,
+        string $modeloClase,
+        string $campoUsuario,
+        string $mensajeSinRegistros
+    ) {
+        $seleccionadoId = filled($seleccionId) ? (int) $seleccionId : null;
+
+        if ($seleccionadoId !== null && ! $this->esUsuarioAdminReportes()) {
+            $registroDestino = $modeloClase::find($seleccionadoId);
+            if ($registroDestino && (int) $registroDestino->{$campoUsuario} !== (int) (auth()->id() ?? 0)) {
+                abort(403, 'No tienes permiso para descargar formatos de otros usuarios.');
+            }
+        }
+
+        $registro = $seleccionadoId !== null
+            ? $candidatos->firstWhere($clavePk, $seleccionadoId)
+            : $candidatos->first();
+
+        if (! $registro) {
+            $this->notificarSinRegistrosFormato($mensajeSinRegistros);
+
+            return null;
+        }
+
+        if (! $this->esUsuarioAdminReportes() && (int) $registro->{$campoUsuario} !== (int) (auth()->id() ?? 0)) {
+            abort(403, 'No tienes permiso para descargar formatos de otros usuarios.');
+        }
+
+        return $registro;
     }
 
     public function descargarFormatoInstitucional(string $formatoId)
     {
         if ($formatoId === 'entrega') {
-            $candidatos = $this->getSolicitudesParaFormato();
-            $solicitud = filled($this->formatoSeleccionadoEntrega)
-                ? $candidatos->firstWhere('id_solicitud', (int) $this->formatoSeleccionadoEntrega)
-                : $candidatos->first();
+            $solicitud = $this->resolverRegistroFormatoAutorizado(
+                $this->getSolicitudesParaFormato(),
+                $this->formatoSeleccionadoEntrega,
+                'id_solicitud',
+                Solicitud::class,
+                'id_usuario',
+                'No hay solicitudes de entrega que coincidan con los filtros.'
+            );
 
-            if (! $solicitud) {
-                $this->notificarSinRegistrosFormato('No hay solicitudes de entrega que coincidan con los filtros.');
-                return null;
-            }
-
-            return SigemPdfGenerator::descargarActaEntrega($solicitud);
+            return $solicitud ? SigemPdfGenerator::descargarActaEntrega($solicitud) : null;
         }
 
         if ($formatoId === 'orden_trabajo') {
-            $candidatos = $this->getMantenimientosParaOrdenFormato();
-            $mant = filled($this->formatoSeleccionadoOrden)
-                ? $candidatos->firstWhere('id_mantenimiento', (int) $this->formatoSeleccionadoOrden)
-                : $candidatos->first();
+            $mant = $this->resolverRegistroFormatoAutorizado(
+                $this->getMantenimientosParaOrdenFormato(),
+                $this->formatoSeleccionadoOrden,
+                'id_mantenimiento',
+                Mantenimiento::class,
+                'id_usuario_solicita',
+                'No hay mantenimientos que coincidan con los filtros.'
+            );
 
-            if (! $mant) {
-                $this->notificarSinRegistrosFormato('No hay mantenimientos que coincidan con los filtros.');
-                return null;
-            }
-
-            return SigemPdfGenerator::descargarOrdenTrabajo($mant);
+            return $mant ? SigemPdfGenerator::descargarOrdenTrabajo($mant) : null;
         }
 
         if ($formatoId === 'lista_verificacion') {
-            $candidatos = $this->getMantenimientosParaVerificacionFormato();
-            $mant = filled($this->formatoSeleccionadoVerificacion)
-                ? $candidatos->firstWhere('id_mantenimiento', (int) $this->formatoSeleccionadoVerificacion)
-                : $candidatos->first();
+            $mant = $this->resolverRegistroFormatoAutorizado(
+                $this->getMantenimientosParaVerificacionFormato(),
+                $this->formatoSeleccionadoVerificacion,
+                'id_mantenimiento',
+                Mantenimiento::class,
+                'id_usuario_solicita',
+                'No hay mantenimientos disponibles para Lista de Verificación.'
+            );
 
-            if (! $mant) {
-                $this->notificarSinRegistrosFormato('No hay mantenimientos disponibles para Lista de Verificación.');
-                return null;
-            }
-
-            return SigemPdfGenerator::descargarListaVerificacion($mant);
+            return $mant ? SigemPdfGenerator::descargarListaVerificacion($mant) : null;
         }
 
         if ($formatoId === 'baja') {
@@ -477,6 +516,15 @@ class ReportesPage extends Page
             if ($bajas->isEmpty()) {
                 $this->notificarSinRegistrosFormato('No hay equipos dados de baja o en solicitud que coincidan con los filtros.');
                 return null;
+            }
+
+            if ($bajas->count() > SigemBajaFormatHelper::MAX_LOTE_BAJAS) {
+                $bajas = $bajas->take(SigemBajaFormatHelper::MAX_LOTE_BAJAS)->values();
+                Notification::make()
+                    ->title('Lote limitado a ' . SigemBajaFormatHelper::MAX_LOTE_BAJAS . ' equipos')
+                    ->body('Se generará el PDF con los primeros ' . SigemBajaFormatHelper::MAX_LOTE_BAJAS . ' equipos para optimizar el rendimiento.')
+                    ->warning()
+                    ->send();
             }
 
             if ($bajas->count() === 1) {

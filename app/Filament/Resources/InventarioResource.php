@@ -863,9 +863,9 @@ class InventarioResource extends Resource
                         ->color('primary')
                         ->action(function (Collection $records) {
                             $bajas = \App\Support\SigemBajaFormatHelper::filtrarInventariosEnBaja($records);
-                            if ($bajas->isEmpty()) {
+                            if ($error = \App\Support\SigemBajaFormatHelper::mensajeErrorLote($bajas)) {
                                 Notification::make()
-                                    ->title('No hay equipos dados de baja o con solicitud de baja en la selección')
+                                    ->title($error)
                                     ->warning()
                                     ->send();
                                 return null;
