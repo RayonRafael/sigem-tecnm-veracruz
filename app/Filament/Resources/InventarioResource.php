@@ -769,11 +769,12 @@ class InventarioResource extends Resource
                             ->modalSubmitActionLabel(fn () => static::esAdmin() ? 'Confirmar baja' : 'Solicitar baja')
                             ->modalCancelActionLabel('Cancelar')
                             ->action(function (Inventario $record, array $data) {
+                                $datosAdicionales = static::extraerDatosAdicionalesBaja($data);
                                 if (static::esAdmin()) {
-                                    $record->darBajaDirecta($data['motivo_baja'], $data['observaciones_baja'], auth()->id());
+                                    $record->darBajaDirecta($data['motivo_baja'], $data['observaciones_baja'], auth()->id(), $datosAdicionales);
                                     Notification::make()->title('Equipo dado de baja correctamente')->danger()->send();
                                 } else {
-                                    $record->solicitarBaja($data['motivo_baja'], $data['observaciones_baja'], auth()->id());
+                                    $record->solicitarBaja($data['motivo_baja'], $data['observaciones_baja'], auth()->id(), $datosAdicionales);
                                     Notification::make()->title('Solicitud de baja enviada a revisión')->warning()->send();
                                 }
                             }),
@@ -856,6 +857,22 @@ class InventarioResource extends Resource
                             Notification::make()->title('Registros aprobados exitosamente')->success()->send();
                         })
                         ->requiresConfirmation(),
+                    Tables\Actions\BulkAction::make('formatosBajaLote')
+                        ->label('📄 Formatos de Baja (lote)')
+                        ->icon('heroicon-o-document-text')
+                        ->color('primary')
+                        ->action(function (Collection $records) {
+                            $bajas = \App\Support\SigemBajaFormatHelper::filtrarInventariosEnBaja($records);
+                            if ($error = \App\Support\SigemBajaFormatHelper::mensajeErrorLote($bajas)) {
+                                Notification::make()
+                                    ->title($error)
+                                    ->warning()
+                                    ->send();
+                                return null;
+                            }
+
+                            return \App\Support\SigemPdfGenerator::descargarFormatosBajaLote($bajas);
+                        }),
                     Tables\Actions\DeleteBulkAction::make()->successNotificationTitle('Registro de inventario eliminado'),
                 ]),
             ]);

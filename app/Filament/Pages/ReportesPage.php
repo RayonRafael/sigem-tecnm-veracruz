@@ -2,12 +2,16 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\RoleEnum;
 use App\Models\Area;
+use App\Models\Departamento;
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
 use App\Models\Solicitud;
 use App\Models\TipoMaterial;
+use App\Support\SigemBajaFormatHelper;
 use App\Support\SigemExcelExporter;
+use App\Support\SigemPdfGenerator;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Carbon;
@@ -49,6 +53,23 @@ class ReportesPage extends Page
     public ?string $reporteActivo = null;
 
     public array $visibilidadServicioSocial = [];
+
+    public ?string $formatoFechaDesde = null;
+
+    public ?string $formatoFechaHasta = null;
+
+    public ?string $formatoDepartamentoId = '';
+
+    public ?string $formatoSeleccionadoEntrega = '';
+
+    public ?string $formatoSeleccionadoOrden = '';
+
+    public ?string $formatoSeleccionadoVerificacion = '';
+
+    /** @var array<int|string> */
+    public array $formatosSeleccionadosBaja = [];
+
+    public string $formatoFiltroTipo = 'baja';
 
     public function mount(): void
     {
@@ -193,6 +214,340 @@ class ReportesPage extends Page
                 'descripcion' => 'Registro cronológico de actividades y modificaciones realizadas en el sistema.',
             ],
         ];
+    }
+
+    /**
+     * Metadata de los 4 Formatos Institucionales en PDF del TecNM Veracruz.
+     *
+     * @return list<array{id: string, emoji: string, titulo: string, subtitulo: string, descripcion: string}>
+     */
+    public function getFormatosInstitucionales(): array
+    {
+        return [
+            [
+                'id' => 'entrega',
+                'emoji' => '📄',
+                'titulo' => 'Entrega de Equipo',
+                'subtitulo' => 'Formato 1',
+                'descripcion' => 'Genera acta oficial de entrega de equipo o bien con receptor y unidad orgánica.',
+            ],
+            [
+                'id' => 'orden_trabajo',
+                'emoji' => '📄',
+                'titulo' => 'Orden de Trabajo',
+                'subtitulo' => 'Formato 2',
+                'descripcion' => 'Genera orden de trabajo de mantenimiento y servicio técnico del Centro de Cómputo.',
+            ],
+            [
+                'id' => 'lista_verificacion',
+                'emoji' => '📄',
+                'titulo' => 'Lista Verificación',
+                'subtitulo' => 'Formato 3',
+                'descripcion' => 'Genera lista de verificación con hallazgo, atención y validación técnica.',
+            ],
+            [
+                'id' => 'baja',
+                'emoji' => '📄',
+                'titulo' => 'Trámite de Baja',
+                'subtitulo' => 'Formato 4',
+                'descripcion' => 'Genera trámite de baja de mobiliario y equipo individual o en lote multipágina.',
+            ],
+        ];
+    }
+
+    public function updatedFormatoFechaDesde(): void
+    {
+        $this->reiniciarSeleccionesFormatos();
+    }
+
+    public function updatedFormatoFechaHasta(): void
+    {
+        $this->reiniciarSeleccionesFormatos();
+    }
+
+    public function updatedFormatoDepartamentoId(): void
+    {
+        $this->reiniciarSeleccionesFormatos();
+    }
+
+    protected function reiniciarSeleccionesFormatos(): void
+    {
+        $this->formatoSeleccionadoEntrega = '';
+        $this->formatoSeleccionadoOrden = '';
+        $this->formatoSeleccionadoVerificacion = '';
+        $this->formatosSeleccionadosBaja = [];
+    }
+
+    public function limpiarFiltrosFormatos(): void
+    {
+        $this->formatoFechaDesde = null;
+        $this->formatoFechaHasta = null;
+        $this->formatoDepartamentoId = '';
+        $this->reiniciarSeleccionesFormatos();
+    }
+
+    protected function esUsuarioAdminReportes(): bool
+    {
+        $user = auth()->user();
+        if (! $user || $this instanceof \App\Filament\ServicioSocial\Pages\ReportesPage) {
+            return false;
+        }
+
+        return $user->hasRole(RoleEnum::ADMIN->value)
+            || $user->hasRole('admin')
+            || $user->can(RoleEnum::PERM_ACCESS_ADMIN);
+    }
+
+    protected function aplicarFiltroFechaFormato($query, string $columnaFecha): void
+    {
+        if (filled($this->formatoFechaDesde)) {
+            $desde = $this->formatoFechaDesde;
+            $query->where(function ($q) use ($columnaFecha, $desde): void {
+                $q->whereDate($columnaFecha, '>=', $desde)
+                    ->orWhere(fn ($sub) => $sub->whereNull($columnaFecha)->whereDate('created_at', '>=', $desde));
+            });
+        }
+
+        if (filled($this->formatoFechaHasta)) {
+            $hasta = $this->formatoFechaHasta;
+            $query->where(function ($q) use ($columnaFecha, $hasta): void {
+                $q->whereDate($columnaFecha, '<=', $hasta)
+                    ->orWhere(fn ($sub) => $sub->whereNull($columnaFecha)->whereDate('created_at', '<=', $hasta));
+            });
+        }
+    }
+
+    protected function aplicarFiltroDeptoInventario($query, ?int $deptoId): void
+    {
+        if (! $deptoId) {
+            return;
+        }
+
+        $query->where(function ($q) use ($deptoId): void {
+            $q->where('departamento_id', $deptoId)
+                ->orWhereHas('area', fn ($a) => $a->where('id_departamento', $deptoId));
+        });
+    }
+
+    public function getDepartamentosParaFiltros(): array
+    {
+        return Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento')->toArray();
+    }
+
+    public function getSolicitudesParaFormato(): \Illuminate\Support\Collection
+    {
+        $query = Solicitud::query()
+            ->with(['receptor.area.departamento', 'detalles.material'])
+            ->where('estado', '!=', 'Rechazado')
+            ->whereIn('tipo_movimiento', [
+                'Asignacion Permanente',
+                'Asignacion Temporal',
+                'Renta Externa',
+                'Salida',
+                'Traslado',
+                'Préstamo',
+                'Adaptación',
+            ]);
+
+        if (! $this->esUsuarioAdminReportes()) {
+            $query->where('id_usuario', auth()->id() ?? 0);
+        }
+
+        $this->aplicarFiltroFechaFormato($query, 'fecha_solicitud');
+
+        $deptoId = filled($this->formatoDepartamentoId) ? (int) $this->formatoDepartamentoId : null;
+        if ($deptoId) {
+            $query->whereHas('receptor.area', fn ($a) => $a->where('id_departamento', $deptoId));
+        }
+
+        return $query->orderByDesc('fecha_solicitud')
+            ->orderByDesc('id_solicitud')
+            ->limit(100)
+            ->get();
+    }
+
+    protected function baseQueryMantenimientosParaFormato()
+    {
+        $query = Mantenimiento::query()
+            ->with(['inventario.material', 'inventario.departamento', 'inventario.area.departamento'])
+            ->where('estado', '!=', 'Cancelado');
+
+        if (! $this->esUsuarioAdminReportes()) {
+            $query->where('id_usuario_solicita', auth()->id() ?? 0);
+        }
+
+        $this->aplicarFiltroFechaFormato($query, 'fecha_solicitud');
+
+        $deptoId = filled($this->formatoDepartamentoId) ? (int) $this->formatoDepartamentoId : null;
+        if ($deptoId) {
+            $query->whereHas('inventario', fn ($inv) => $this->aplicarFiltroDeptoInventario($inv, $deptoId));
+        }
+
+        return $query;
+    }
+
+    public function getMantenimientosParaOrdenFormato(): \Illuminate\Support\Collection
+    {
+        return $this->baseQueryMantenimientosParaFormato()
+            ->orderByDesc('fecha_solicitud')
+            ->orderByDesc('id_mantenimiento')
+            ->limit(100)
+            ->get();
+    }
+
+    public function getMantenimientosParaVerificacionFormato(): \Illuminate\Support\Collection
+    {
+        return $this->baseQueryMantenimientosParaFormato()
+            ->orderByRaw("CASE WHEN estado = 'Completado' THEN 0 ELSE 1 END")
+            ->orderByDesc('fecha_fin')
+            ->orderByDesc('fecha_solicitud')
+            ->orderByDesc('id_mantenimiento')
+            ->limit(100)
+            ->get();
+    }
+
+    public function getInventariosBajaParaFormato(): \Illuminate\Support\Collection
+    {
+        $query = Inventario::query()
+            ->with(['material.marca', 'departamento', 'area.departamento'])
+            ->whereIn('estado', SigemBajaFormatHelper::ESTADOS_BAJA);
+
+        $this->aplicarFiltroFechaFormato($query, 'fecha_baja');
+
+        $deptoId = filled($this->formatoDepartamentoId) ? (int) $this->formatoDepartamentoId : null;
+        $this->aplicarFiltroDeptoInventario($query, $deptoId);
+
+        return $query->orderByDesc('fecha_baja')
+            ->orderByDesc('id_inventario')
+            ->limit(SigemBajaFormatHelper::MAX_LOTE_BAJAS)
+            ->get();
+    }
+
+    /**
+     * Resuelve un registro de formato verificando propiedad del usuario cuando no es Administrador.
+     *
+     * @template TModel of \Illuminate\Database\Eloquent\Model
+     * @param  \Illuminate\Support\Collection<int, TModel>  $candidatos
+     * @param  class-string<TModel>  $modeloClase
+     * @return TModel|null
+     */
+    protected function resolverRegistroFormatoAutorizado(
+        \Illuminate\Support\Collection $candidatos,
+        ?string $seleccionId,
+        string $clavePk,
+        string $modeloClase,
+        string $campoUsuario,
+        string $mensajeSinRegistros
+    ) {
+        $seleccionadoId = filled($seleccionId) ? (int) $seleccionId : null;
+
+        if ($seleccionadoId !== null && ! $this->esUsuarioAdminReportes()) {
+            $registroDestino = $modeloClase::find($seleccionadoId);
+            if ($registroDestino && (int) $registroDestino->{$campoUsuario} !== (int) (auth()->id() ?? 0)) {
+                abort(403, 'No tienes permiso para descargar formatos de otros usuarios.');
+            }
+        }
+
+        $registro = $seleccionadoId !== null
+            ? $candidatos->firstWhere($clavePk, $seleccionadoId)
+            : $candidatos->first();
+
+        if (! $registro) {
+            $this->notificarSinRegistrosFormato($mensajeSinRegistros);
+
+            return null;
+        }
+
+        if (! $this->esUsuarioAdminReportes() && (int) $registro->{$campoUsuario} !== (int) (auth()->id() ?? 0)) {
+            abort(403, 'No tienes permiso para descargar formatos de otros usuarios.');
+        }
+
+        return $registro;
+    }
+
+    public function descargarFormatoInstitucional(string $formatoId)
+    {
+        if ($formatoId === 'entrega') {
+            $solicitud = $this->resolverRegistroFormatoAutorizado(
+                $this->getSolicitudesParaFormato(),
+                $this->formatoSeleccionadoEntrega,
+                'id_solicitud',
+                Solicitud::class,
+                'id_usuario',
+                'No hay solicitudes de entrega que coincidan con los filtros.'
+            );
+
+            return $solicitud ? SigemPdfGenerator::descargarActaEntrega($solicitud) : null;
+        }
+
+        if ($formatoId === 'orden_trabajo') {
+            $mant = $this->resolverRegistroFormatoAutorizado(
+                $this->getMantenimientosParaOrdenFormato(),
+                $this->formatoSeleccionadoOrden,
+                'id_mantenimiento',
+                Mantenimiento::class,
+                'id_usuario_solicita',
+                'No hay mantenimientos que coincidan con los filtros.'
+            );
+
+            return $mant ? SigemPdfGenerator::descargarOrdenTrabajo($mant) : null;
+        }
+
+        if ($formatoId === 'lista_verificacion') {
+            $mant = $this->resolverRegistroFormatoAutorizado(
+                $this->getMantenimientosParaVerificacionFormato(),
+                $this->formatoSeleccionadoVerificacion,
+                'id_mantenimiento',
+                Mantenimiento::class,
+                'id_usuario_solicita',
+                'No hay mantenimientos disponibles para Lista de Verificación.'
+            );
+
+            return $mant ? SigemPdfGenerator::descargarListaVerificacion($mant) : null;
+        }
+
+        if ($formatoId === 'baja') {
+            $candidatos = $this->getInventariosBajaParaFormato();
+            $ids = array_values(array_filter(array_map('intval', $this->formatosSeleccionadosBaja)));
+            $bajas = ! empty($ids)
+                ? $candidatos->whereIn('id_inventario', $ids)->values()
+                : $candidatos;
+
+            if ($bajas->isEmpty()) {
+                $this->notificarSinRegistrosFormato('No hay equipos dados de baja o en solicitud que coincidan con los filtros.');
+                return null;
+            }
+
+            if ($bajas->count() > SigemBajaFormatHelper::MAX_LOTE_BAJAS) {
+                $bajas = $bajas->take(SigemBajaFormatHelper::MAX_LOTE_BAJAS)->values();
+                Notification::make()
+                    ->title('Lote limitado a ' . SigemBajaFormatHelper::MAX_LOTE_BAJAS . ' equipos')
+                    ->body('Se generará el PDF con los primeros ' . SigemBajaFormatHelper::MAX_LOTE_BAJAS . ' equipos para optimizar el rendimiento.')
+                    ->warning()
+                    ->send();
+            }
+
+            if ($bajas->count() === 1) {
+                return SigemPdfGenerator::descargarFormatoBaja($bajas->first());
+            }
+
+            return SigemPdfGenerator::descargarFormatosBajaLote($bajas);
+        }
+
+        return null;
+    }
+
+    public function generarFormatosFiltrados()
+    {
+        return $this->descargarFormatoInstitucional($this->formatoFiltroTipo);
+    }
+
+    protected function notificarSinRegistrosFormato(string $mensaje): void
+    {
+        Notification::make()
+            ->title($mensaje)
+            ->warning()
+            ->send();
     }
 
     public function getDatosReporte(string $reportId, string $formato = 'pantalla'): ?array

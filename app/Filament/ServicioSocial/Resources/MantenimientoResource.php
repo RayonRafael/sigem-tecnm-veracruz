@@ -156,7 +156,8 @@ class MantenimientoResource extends Resource
                     ->modalDescription(fn (?Mantenimiento $record) => new \Illuminate\Support\HtmlString(
                         'Equipo: <b>' . e($record?->inventario?->codigo ?? $record?->inventario?->num_serie ?? '—') . '</b> · ' . e($record?->fecha_solicitud?->format('d/m/Y') ?? '—')
                     ))
-                    ->modalCancelActionLabel('Cerrar'),
+                    ->modalCancelActionLabel('Cerrar')
+                    ->extraModalFooterActions(\App\Filament\Resources\MantenimientoResource::getAccionesPdfMantenimiento(true)),
 
                 Tables\Actions\EditAction::make()
                     ->iconButton()
@@ -164,6 +165,8 @@ class MantenimientoResource extends Resource
                     ->extraAttributes(['title' => 'Editar'])
                     ->modalHeading(fn (?Mantenimiento $record) => 'Editar Mantenimiento #' . ($record?->id_mantenimiento ? str_pad($record->id_mantenimiento, 4, '0', STR_PAD_LEFT) : '—'))
                     ->successNotificationTitle('Mantenimiento actualizado exitosamente'),
+
+                ...\App\Filament\Resources\MantenimientoResource::getAccionesPdfMantenimiento(false),
             ])
             ->bulkActions([]);
     }

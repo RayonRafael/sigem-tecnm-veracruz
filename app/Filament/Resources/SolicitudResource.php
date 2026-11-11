@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SolicitudResource\Pages;
 use App\Models\Receptor;
 use App\Models\Solicitud;
+use App\Support\SigemPdfGenerator;
 use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
@@ -265,6 +266,7 @@ class SolicitudResource extends Resource
                             ->color('danger')
                             ->visible(fn (?Solicitud $record): bool => $record?->estado === 'Pendiente')
                             ->alpineClickHandler(fn (?Solicitud $record) => "\$wire.replaceMountedTableAction('rechazar', '{$record?->getKey()}')"),
+                        ...static::getAccionesPdfSolicitud(true),
                     ]),
 
                 Tables\Actions\EditAction::make()
@@ -273,6 +275,8 @@ class SolicitudResource extends Resource
                     ->extraAttributes(['title' => 'Editar'])
                     ->modalHeading(fn (?Solicitud $record) => 'Editar Solicitud ' . ($record?->id_solicitud ? 'FOLIO-' . str_pad($record->id_solicitud, 5, '0', STR_PAD_LEFT) : ''))
                     ->successNotificationTitle('Solicitud actualizada exitosamente'),
+
+                ...static::getAccionesPdfSolicitud(false),
 
                 Tables\Actions\Action::make('autorizar')
                     ->label('✓ Autorizar')
@@ -416,6 +420,52 @@ class SolicitudResource extends Resource
                     ])
                     ->columnSpanFull(),
             ]);
+    }
+
+    public static function puedeDescargarActaEntrega(?Solicitud $record): bool
+    {
+        if (! $record || $record->estado === 'Rechazado') {
+            return false;
+        }
+
+        return in_array($record->tipo_movimiento, [
+            'Asignacion Permanente',
+            'Asignacion Temporal',
+            'Renta Externa',
+            'Salida',
+            'Traslado',
+            'Préstamo',
+            'Adaptación',
+            'Asignación',
+        ], true);
+    }
+
+    /**
+     * Construye las acciones de descarga de Acta de Entrega (Formato 1) para fila o slide-over.
+     *
+     * @return array<int, Tables\Actions\Action>
+     */
+    public static function getAccionesPdfSolicitud(bool $enSlideOver = false): array
+    {
+        $sufijo = $enSlideOver ? 'Detalle' : '';
+
+        $acta = Tables\Actions\Action::make('actaEntrega' . $sufijo)
+            ->label('📄 Acta de Entrega')
+            ->color('primary')
+            ->tooltip('📄 Acta de Entrega')
+            ->visible(fn (?Solicitud $record): bool => static::puedeDescargarActaEntrega($record))
+            ->action(fn (Solicitud $record) => SigemPdfGenerator::descargarActaEntrega($record));
+
+        if ($enSlideOver) {
+            $acta->extraAttributes(['class' => 'sigem-pdf-btn']);
+        } else {
+            $acta->icon('heroicon-o-document-text')->iconButton()->extraAttributes([
+                'class' => 'sigem-pdf-row-btn',
+                'title' => '📄 Acta de Entrega',
+            ]);
+        }
+
+        return [$acta];
     }
 
     public static function getRelations(): array

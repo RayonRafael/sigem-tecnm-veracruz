@@ -74,6 +74,8 @@
             $todasLasAreas = \App\Models\Area::orderBy('nombre')->pluck('nombre', 'id_area');
             $todosLosDeptos = \App\Models\Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento');
             $estadosEnum = \App\Enums\EstadoInventario::cases();
+            $bajasSeleccionadas = \App\Support\SigemBajaFormatHelper::filtrarInventariosEnBaja($selectedRecords);
+            $cantBajas = $bajasSeleccionadas->count();
         @endphp
 
         @if($curStep === 'principal')
@@ -218,6 +220,14 @@
                                 <span class="sigem-sel-action-title">Exportar selección</span>
                                 <span class="sigem-sel-action-desc">Descargar en Excel</span>
                             </button>
+
+                            @if($cantBajas > 0)
+                                <button type="button" wire:click="descargarFormatosBajaLote" class="sigem-sel-action-card is-pdf" title="Descargar Formatos de Baja (lote) en PDF">
+                                    <span class="sigem-sel-action-icon">📄</span>
+                                    <span class="sigem-sel-action-title">Formatos de Baja (lote)</span>
+                                    <span class="sigem-sel-action-desc">PDF multipágina ({{ $cantBajas }} {{ $cantBajas === 1 ? 'bien' : 'bienes' }})</span>
+                                </button>
+                            @endif
                         </div>
                     </div>
 
@@ -392,17 +402,30 @@
                     <label class="sigem-sel-form-label">Motivo de baja *</label>
                     <select wire:model="bajaMotivo" class="sigem-sel-form-control" required>
                         <option value="">-- seleccione --</option>
-                        <option value="Daño irreparable">Daño irreparable</option>
-                        <option value="Obsolescencia">Obsolescencia</option>
-                        <option value="Pérdida">Pérdida</option>
-                        <option value="Robo">Robo</option>
-                        <option value="Otro">Otro</option>
+                        @foreach(\App\Support\SigemBajaFormatHelper::motivosBajaOptions() as $valor => $etiqueta)
+                            <option value="{{ $valor }}">{{ $etiqueta }}</option>
+                        @endforeach
                     </select>
                 </div>
 
                 <div class="sigem-sel-form-group">
                     <label class="sigem-sel-form-label">Observaciones</label>
                     <textarea wire:model="bajaObservaciones" rows="3" class="sigem-sel-form-control sigem-sel-form-textarea" placeholder="Observaciones detalladas (opcional)..."></textarea>
+                </div>
+
+                <div class="sigem-sel-form-group">
+                    <label class="sigem-sel-form-label">Folio SIBESEP (opcional)</label>
+                    <input type="text" wire:model="bajaFolioSibsep" maxlength="100" class="sigem-sel-form-control" placeholder="Vacío por defecto; lo asigna Recursos Materiales">
+                </div>
+
+                <div class="sigem-sel-form-group">
+                    <label class="sigem-sel-form-label">Posible área de utilización (opcional)</label>
+                    <select wire:model="bajaPosibleAreaUtilizacion" class="sigem-sel-form-control">
+                        <option value="">-- sin especificar --</option>
+                        @foreach($todasLasAreas as $idArea => $nomArea)
+                            <option value="{{ $nomArea }}">{{ $nomArea }}</option>
+                        @endforeach
+                    </select>
                 </div>
             </div>
 
