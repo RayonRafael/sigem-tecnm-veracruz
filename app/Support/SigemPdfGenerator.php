@@ -4,6 +4,7 @@ namespace App\Support;
 
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\File;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SigemPdfGenerator
 {
@@ -38,18 +39,33 @@ class SigemPdfGenerator
     }
 
     /**
+     * Envía un PDF como StreamedResponse compatible con descargas de Livewire y navegador.
+     */
+    protected static function descargarPdf(\Barryvdh\DomPDF\PDF $pdf, string $nombreArchivo): StreamedResponse
+    {
+        $contenido = $pdf->output();
+
+        return response()->streamDownload(function () use ($contenido): void {
+            echo $contenido;
+        }, $nombreArchivo, [
+            'Content-Type' => 'application/pdf',
+        ]);
+    }
+
+    /**
      * Genera y descarga un PDF.
      */
-    public static function descargar(string $vista, array $datos, string $nombreArchivo)
+    public static function descargar(string $vista, array $datos, string $nombreArchivo): StreamedResponse
     {
         $pdf = self::generar($vista, $datos, $nombreArchivo);
-        return $pdf->download($nombreArchivo . '.pdf');
+
+        return self::descargarPdf($pdf, $nombreArchivo . '.pdf');
     }
 
     /**
      * Genera un PDF multipágina (1 página por cada registro).
      */
-    public static function generarMultipagina(string $vista, array $registros, string $nombreArchivo)
+    public static function generarMultipagina(string $vista, array $registros, string $nombreArchivo): StreamedResponse
     {
         $config = self::datosInstitucionales();
 
@@ -58,7 +74,7 @@ class SigemPdfGenerator
             'config' => $config,
         ]);
 
-        return $pdf->download($nombreArchivo . '.pdf');
+        return self::descargarPdf($pdf, $nombreArchivo . '.pdf');
     }
 
     /**
@@ -170,10 +186,11 @@ class SigemPdfGenerator
     /**
      * Descarga el Formato 2.
      */
-    public static function descargarOrdenTrabajo(\App\Models\Mantenimiento $mantenimiento)
+    public static function descargarOrdenTrabajo(\App\Models\Mantenimiento $mantenimiento): StreamedResponse
     {
         $pdf = self::generarOrdenTrabajo($mantenimiento);
-        return $pdf->download('orden-trabajo-' . $mantenimiento->id_mantenimiento . '.pdf');
+
+        return self::descargarPdf($pdf, 'orden-trabajo-' . $mantenimiento->id_mantenimiento . '.pdf');
     }
 
     /**
@@ -240,10 +257,11 @@ class SigemPdfGenerator
     /**
      * Descarga el Formato 3.
      */
-    public static function descargarListaVerificacion(\App\Models\Mantenimiento $mantenimiento)
+    public static function descargarListaVerificacion(\App\Models\Mantenimiento $mantenimiento): StreamedResponse
     {
         $pdf = self::generarListaVerificacion($mantenimiento);
-        return $pdf->download('lista-verificacion-' . $mantenimiento->id_mantenimiento . '.pdf');
+
+        return self::descargarPdf($pdf, 'lista-verificacion-' . $mantenimiento->id_mantenimiento . '.pdf');
     }
 
     /**
@@ -344,9 +362,10 @@ class SigemPdfGenerator
     public static function descargarActaEntrega(
         \App\Models\Solicitud $solicitud,
         ?\App\Models\DetalleSolicitud $detalle = null
-    ) {
+    ): StreamedResponse {
         $pdf = self::generarActaEntrega($solicitud, $detalle);
-        return $pdf->download('acta-entrega-' . $solicitud->id_solicitud . '.pdf');
+
+        return self::descargarPdf($pdf, 'acta-entrega-' . $solicitud->id_solicitud . '.pdf');
     }
 
     /**
@@ -399,12 +418,12 @@ class SigemPdfGenerator
     /**
      * Descarga el Formato 4 (individual).
      */
-    public static function descargarFormatoBaja(\App\Models\Inventario $inventario)
+    public static function descargarFormatoBaja(\App\Models\Inventario $inventario): StreamedResponse
     {
         $pdf = self::generarFormatoBaja($inventario);
         $codigo = preg_replace('/[^A-Za-z0-9_-]+/', '-', (string) ($inventario->codigo ?: $inventario->num_serie ?: $inventario->id_inventario));
 
-        return $pdf->download('tramite-baja-' . trim((string) $codigo, '-') . '.pdf');
+        return self::descargarPdf($pdf, 'tramite-baja-' . trim((string) $codigo, '-') . '.pdf');
     }
 
     /**
@@ -412,10 +431,11 @@ class SigemPdfGenerator
      *
      * @param  iterable<\App\Models\Inventario>  $inventarios
      */
-    public static function descargarFormatosBajaLote($inventarios)
+    public static function descargarFormatosBajaLote($inventarios): StreamedResponse
     {
         $pdf = self::generarFormatosBaja($inventarios);
-        return $pdf->download('tramites-baja-lote.pdf');
+
+        return self::descargarPdf($pdf, 'tramites-baja-lote.pdf');
     }
 }
 

@@ -5,6 +5,40 @@ namespace App\Support;
 class SigemBajaFormatHelper
 {
     /**
+     * Estados del inventario elegibles para el Formato 4 (Trámite de Baja).
+     *
+     * @var list<string>
+     */
+    public const ESTADOS_BAJA = [
+        'Dado de baja',
+        'Solicitud de baja',
+        'Baja',
+    ];
+
+    /**
+     * Indica si un estado de inventario corresponde a baja o solicitud de baja.
+     */
+    public static function esEstadoBaja(?string $estado): bool
+    {
+        return $estado !== null && in_array($estado, self::ESTADOS_BAJA, true);
+    }
+
+    /**
+     * Filtra una colección o iterable de inventarios quedándose con los de baja / solicitud de baja.
+     *
+     * @param  iterable<\App\Models\Inventario>  $inventarios
+     * @return \Illuminate\Support\Collection<int, \App\Models\Inventario>
+     */
+    public static function filtrarInventariosEnBaja(iterable $inventarios): \Illuminate\Support\Collection
+    {
+        $coleccion = $inventarios instanceof \Illuminate\Support\Collection
+            ? $inventarios
+            : collect($inventarios);
+
+        return $coleccion->filter(fn ($item): bool => self::esEstadoBaja($item?->estado))->values();
+    }
+
+    /**
      * Opciones oficiales de motivo_baja en formularios de SIGEM (8 opciones).
      * Mantiene intactos los 5 valores históricos e incorpora los 3 nuevos del formato TecNM.
      *

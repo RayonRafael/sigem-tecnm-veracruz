@@ -1789,6 +1789,17 @@ aside.fi-sidebar,
 .sigem-sel-action-card.is-export .sigem-sel-action-icon {
   color: #2563eb;
 }
+.sigem-sel-action-card.is-pdf {
+  border-color: #dbeafe;
+}
+.sigem-sel-action-card.is-pdf .sigem-sel-action-title,
+.sigem-sel-action-card.is-pdf .sigem-sel-action-icon {
+  color: #2563eb;
+}
+.sigem-sel-action-card.is-pdf:hover {
+  background: #eff6ff;
+  border-color: #2563eb;
+}
 
 .sigem-sel-state-pills {
   display: flex;
@@ -4271,14 +4282,14 @@ header.fi-topbar {
 }
 
 /* Reemplazar iconos SVG de acciones por emojis (solo en celdas y filas de tabla) */
-:is(.fi-ta-table tbody .fi-ta-actions, .fi-ta-actions-cell) :is(button, .fi-icon-btn) svg,
-.sigem-row-actions button svg,
-:is(button, .fi-icon-btn):is([title*=Ver], [title*="Ver detalle"], [title*=Editar], [title*=Eliminar]) svg {
+:is(.fi-ta-table tbody .fi-ta-actions, .fi-ta-actions-cell) :is(button, .fi-icon-btn):not(.sigem-pdf-row-btn) svg,
+.sigem-row-actions button:not(.sigem-pdf-row-btn) svg,
+:is(button, .fi-icon-btn):not(.sigem-pdf-row-btn):is([title*=Ver], [title*="Ver detalle"], [title*=Editar], [title*=Eliminar]) svg {
   display: none !important;
 }
 
-:is(.fi-ta-actions button, .fi-icon-btn):is([title*=Ver], [x-tooltip*=Ver], [x-tooltip*=Detalle])::before,
-button:is([title*="Ver detalle"], [title*="Ver equipo"])::before,
+:is(.fi-ta-actions button, .fi-icon-btn):not(.sigem-pdf-row-btn):is([title*=Ver], [x-tooltip*=Ver], [x-tooltip*=Detalle])::before,
+button:not(.sigem-pdf-row-btn):is([title*="Ver detalle"], [title*="Ver equipo"])::before,
 .fi-ta-actions button:is([wire\:click*=ver], [wire\:click*=view])::before {
   content: "👁" !important;
   font-size: 16px !important;
@@ -4909,7 +4920,7 @@ body:has(.sigem-professional) .fi-main {
   font-size: 14px !important;
 }
 
-.fi-ta-actions-cell :is(button, a):is([title*="Ver detalle"], [title*=Detalle], [x-tooltip*=Ver], [x-tooltip*=Detalle])::before {
+.fi-ta-actions-cell :is(button, a):not(.sigem-pdf-row-btn):is([title*="Ver detalle"], [title*=Detalle], [x-tooltip*=Ver], [x-tooltip*=Detalle])::before {
   content: "👁" !important;
   font-size: 14px !important;
 }
@@ -4931,7 +4942,7 @@ body:has(.sigem-professional) .fi-main {
 }
 
 /* Ocultar iconos SVG dentro de botones de acción para dejar ver el emoji limpio */
-.fi-ta-actions-cell :is(button, a):is([title*=Aprobar], [x-tooltip*=Aprobar],
+.fi-ta-actions-cell :is(button, a):not(.sigem-pdf-row-btn):is([title*=Aprobar], [x-tooltip*=Aprobar],
 [title*=Autorizar], [x-tooltip*=Autorizar],
 [title*=Rechazar], [x-tooltip*=Rechazar],
 [title*=Completar], [x-tooltip*=Completar],
@@ -5139,9 +5150,9 @@ body:has(.sigem-professional) .fi-main {
 .fi-ta-table thead th:last-child,
 .fi-ta-table thead th.fi-ta-actions-cell,
 .fi-ta-table thead th.fi-ta-actions-header-cell {
-  min-width: 100px !important;
-  width: 100px !important;
-  max-width: 100px !important;
+  min-width: 148px !important;
+  width: 148px !important;
+  max-width: 180px !important;
   white-space: nowrap !important;
   text-align: center !important;
 }
@@ -7079,4 +7090,300 @@ header.fi-topbar {
 }
 .sigem-subform-tip strong {
   color: #78350f;
+}
+
+/* ==========================================================================
+   Fase 7: Botones PDF contextuales y Sección Formatos Institucionales (PDF)
+   ========================================================================== */
+.sigem-pdf-btn,
+a.fi-btn.sigem-pdf-btn,
+button.fi-btn.sigem-pdf-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 7px 14px !important;
+  border-radius: 8px !important;
+  background-color: #2563eb !important;
+  background: #2563eb !important;
+  border: 1px solid #2563eb !important;
+  color: #ffffff !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease !important;
+}
+.sigem-pdf-btn svg,
+.sigem-pdf-btn .fi-btn-icon,
+a.fi-btn.sigem-pdf-btn svg,
+a.fi-btn.sigem-pdf-btn .fi-btn-icon,
+button.fi-btn.sigem-pdf-btn svg,
+button.fi-btn.sigem-pdf-btn .fi-btn-icon {
+  color: #ffffff !important;
+}
+.sigem-pdf-btn .fi-btn-label,
+a.fi-btn.sigem-pdf-btn .fi-btn-label,
+button.fi-btn.sigem-pdf-btn .fi-btn-label {
+  color: #ffffff !important;
+}
+.sigem-pdf-btn:hover,
+a.fi-btn.sigem-pdf-btn:hover,
+button.fi-btn.sigem-pdf-btn:hover {
+  background-color: #1d4ed8 !important;
+  background: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28) !important;
+}
+.sigem-pdf-btn:disabled, .sigem-pdf-btn.is-loading,
+a.fi-btn.sigem-pdf-btn:disabled,
+a.fi-btn.sigem-pdf-btn.is-loading,
+button.fi-btn.sigem-pdf-btn:disabled,
+button.fi-btn.sigem-pdf-btn.is-loading {
+  opacity: 0.78 !important;
+  cursor: wait !important;
+}
+
+.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn,
+.fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn {
+  border-color: #bfdbfe !important;
+  background: #eff6ff !important;
+  color: #2563eb !important;
+}
+.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn::before,
+.fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn::before {
+  content: none !important;
+  display: none !important;
+}
+.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn svg:not(.animate-spin),
+.fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn svg:not(.animate-spin) {
+  display: inline-block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  width: 15px !important;
+  height: 15px !important;
+  color: #2563eb !important;
+  stroke: currentColor !important;
+}
+.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn:hover,
+.fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn:hover {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+  color: #ffffff !important;
+}
+.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn:hover svg:not(.animate-spin),
+.fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn:hover svg:not(.animate-spin) {
+  color: #ffffff !important;
+  stroke: currentColor !important;
+}
+
+.sigem-fmt-divider {
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+  margin: 26px 0 22px;
+}
+
+.sigem-fmt-section {
+  margin-bottom: 24px;
+}
+
+.sigem-fmt-header {
+  margin-bottom: 16px;
+}
+.sigem-fmt-header h2 {
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: var(--sig-text, #0f172a) !important;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 4px;
+  line-height: 1.25 !important;
+}
+.sigem-fmt-header p {
+  font-size: 13px !important;
+  color: var(--sig-muted, #64748b);
+  margin: 0;
+}
+
+.sigem-fmt-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sigem-fmt-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.sigem-fmt-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+  border-color: #cbd5e1;
+}
+
+.sigem-fmt-filters-card {
+  grid-column: span 2;
+  background: #f8fafc;
+}
+
+.sigem-fmt-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sigem-fmt-ico {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+}
+.sigem-fmt-ico.sigem-fmt-ico-filter {
+  background: #fef3c7;
+  border-color: #fde68a;
+}
+
+.sigem-fmt-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.sigem-fmt-title {
+  font-weight: 700 !important;
+  font-size: 15px !important;
+  color: var(--sig-text, #0f172a);
+  line-height: 1.3 !important;
+}
+
+.sigem-fmt-desc {
+  font-size: 12.5px !important;
+  color: var(--sig-muted, #64748b);
+  line-height: 1.45;
+}
+
+.sigem-fmt-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  margin-top: 2px;
+}
+
+.sigem-fmt-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.sigem-fmt-control {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  font-size: 12.5px;
+  color: #111827;
+  box-sizing: border-box;
+}
+.sigem-fmt-control:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.sigem-fmt-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f8fafc;
+  max-height: 112px;
+  overflow-y: auto;
+}
+
+.sigem-fmt-check-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #1f2937;
+  cursor: pointer;
+  line-height: 1.3;
+}
+.sigem-fmt-check-item input[type=checkbox] {
+  accent-color: #2563eb;
+  flex-shrink: 0;
+}
+
+.sigem-fmt-empty-note {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px dashed #cbd5e1;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.sigem-fmt-filters-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+  flex: 1;
+}
+
+.sigem-fmt-filter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sigem-fmt-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+@media (max-width: 1100px) {
+  .sigem-fmt-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sigem-fmt-filters-card {
+    grid-column: span 2;
+  }
+}
+@media (max-width: 768px) {
+  .sigem-fmt-grid {
+    grid-template-columns: 1fr;
+  }
+  .sigem-fmt-filters-card {
+    grid-column: span 1;
+  }
+  .sigem-fmt-filters-form {
+    grid-template-columns: 1fr;
+  }
 }

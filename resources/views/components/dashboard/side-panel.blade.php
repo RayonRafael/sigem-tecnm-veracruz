@@ -74,6 +74,8 @@
             $todasLasAreas = \App\Models\Area::orderBy('nombre')->pluck('nombre', 'id_area');
             $todosLosDeptos = \App\Models\Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento');
             $estadosEnum = \App\Enums\EstadoInventario::cases();
+            $bajasSeleccionadas = \App\Support\SigemBajaFormatHelper::filtrarInventariosEnBaja($selectedRecords);
+            $cantBajas = $bajasSeleccionadas->count();
         @endphp
 
         @if($curStep === 'principal')
@@ -218,6 +220,14 @@
                                 <span class="sigem-sel-action-title">Exportar selección</span>
                                 <span class="sigem-sel-action-desc">Descargar en Excel</span>
                             </button>
+
+                            @if($cantBajas > 0)
+                                <button type="button" wire:click="descargarFormatosBajaLote" class="sigem-sel-action-card is-pdf" title="Descargar Formatos de Baja (lote) en PDF">
+                                    <span class="sigem-sel-action-icon">📄</span>
+                                    <span class="sigem-sel-action-title">Formatos de Baja (lote)</span>
+                                    <span class="sigem-sel-action-desc">PDF multipágina ({{ $cantBajas }} {{ $cantBajas === 1 ? 'bien' : 'bienes' }})</span>
+                                </button>
+                            @endif
                         </div>
                     </div>
 

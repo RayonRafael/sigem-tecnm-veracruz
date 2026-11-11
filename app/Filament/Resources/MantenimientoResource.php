@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\MantenimientoResource\Pages;
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
+use App\Support\SigemPdfGenerator;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
@@ -286,6 +287,7 @@ class MantenimientoResource extends Resource
                             ->form(static::getCompletarFormSchema())
                             ->modalSubmitActionLabel('Completar')
                             ->action(fn (Mantenimiento $record, array $data) => static::completarMantenimiento($record, $data)),
+                        ...static::getAccionesPdfMantenimiento(true),
                     ]),
 
                 Tables\Actions\EditAction::make()
@@ -294,6 +296,8 @@ class MantenimientoResource extends Resource
                     ->extraAttributes(['title' => 'Editar'])
                     ->modalHeading(fn (?Mantenimiento $record) => 'Editar Mantenimiento #' . ($record?->id_mantenimiento ? str_pad($record->id_mantenimiento, 4, '0', STR_PAD_LEFT) : '—'))
                     ->successNotificationTitle('Mantenimiento actualizado exitosamente'),
+
+                ...static::getAccionesPdfMantenimiento(false),
 
                 Tables\Actions\Action::make('autorizar')
                     ->iconButton()
@@ -459,6 +463,64 @@ class MantenimientoResource extends Resource
         $record->inventario?->update(['estado' => 'Disponible']);
 
         Notification::make()->title('Mantenimiento completado')->success()->send();
+    }
+
+    public static function puedeDescargarOrdenTrabajo(?Mantenimiento $record): bool
+    {
+        return $record !== null && in_array($record->estado, [
+            'Pendiente Revision Admin',
+            'Pendiente',
+            'Solicitado',
+            'En revisión',
+            'En proceso',
+            'Completado',
+            'Terminado',
+        ], true);
+    }
+
+    public static function puedeDescargarListaVerificacion(?Mantenimiento $record): bool
+    {
+        return $record !== null && in_array($record->estado, ['Completado', 'Terminado'], true);
+    }
+
+    /**
+     * Construye las acciones de descarga PDF (Formato 2 y Formato 3) para filas o slide-over.
+     *
+     * @return array<int, Tables\Actions\Action>
+     */
+    public static function getAccionesPdfMantenimiento(bool $enSlideOver = false): array
+    {
+        $sufijo = $enSlideOver ? 'Detalle' : '';
+
+        $ordenTrabajo = Tables\Actions\Action::make('ordenTrabajo' . $sufijo)
+            ->label('📄 Orden de Trabajo')
+            ->color('primary')
+            ->tooltip('📄 Orden de Trabajo')
+            ->visible(fn (?Mantenimiento $record): bool => static::puedeDescargarOrdenTrabajo($record))
+            ->action(fn (Mantenimiento $record) => SigemPdfGenerator::descargarOrdenTrabajo($record));
+
+        $listaVerificacion = Tables\Actions\Action::make('listaVerificacion' . $sufijo)
+            ->label('📄 Lista Verificación')
+            ->color('primary')
+            ->tooltip('📄 Lista Verificación')
+            ->visible(fn (?Mantenimiento $record): bool => static::puedeDescargarListaVerificacion($record))
+            ->action(fn (Mantenimiento $record) => SigemPdfGenerator::descargarListaVerificacion($record));
+
+        if ($enSlideOver) {
+            $ordenTrabajo->extraAttributes(['class' => 'sigem-pdf-btn']);
+            $listaVerificacion->extraAttributes(['class' => 'sigem-pdf-btn']);
+        } else {
+            $ordenTrabajo->icon('heroicon-o-document-text')->iconButton()->extraAttributes([
+                'class' => 'sigem-pdf-row-btn',
+                'title' => '📄 Orden de Trabajo',
+            ]);
+            $listaVerificacion->icon('heroicon-o-clipboard-document-check')->iconButton()->extraAttributes([
+                'class' => 'sigem-pdf-row-btn',
+                'title' => '📄 Lista Verificación',
+            ]);
+        }
+
+        return [$ordenTrabajo, $listaVerificacion];
     }
 
     public static function getRelations(): array

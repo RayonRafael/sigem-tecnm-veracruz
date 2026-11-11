@@ -857,6 +857,22 @@ class InventarioResource extends Resource
                             Notification::make()->title('Registros aprobados exitosamente')->success()->send();
                         })
                         ->requiresConfirmation(),
+                    Tables\Actions\BulkAction::make('formatosBajaLote')
+                        ->label('📄 Formatos de Baja (lote)')
+                        ->icon('heroicon-o-document-text')
+                        ->color('primary')
+                        ->action(function (Collection $records) {
+                            $bajas = \App\Support\SigemBajaFormatHelper::filtrarInventariosEnBaja($records);
+                            if ($bajas->isEmpty()) {
+                                Notification::make()
+                                    ->title('No hay equipos dados de baja o con solicitud de baja en la selección')
+                                    ->warning()
+                                    ->send();
+                                return null;
+                            }
+
+                            return \App\Support\SigemPdfGenerator::descargarFormatosBajaLote($bajas);
+                        }),
                     Tables\Actions\DeleteBulkAction::make()->successNotificationTitle('Registro de inventario eliminado'),
                 ]),
             ]);

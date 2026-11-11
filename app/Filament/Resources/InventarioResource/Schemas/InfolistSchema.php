@@ -4,6 +4,7 @@ namespace App\Filament\Resources\InventarioResource\Schemas;
 
 use App\Models\HistorialEstado;
 use App\Models\Inventario;
+use App\Support\SigemBajaFormatHelper;
 use Filament\Infolists;
 use Filament\Infolists\Infolist;
 use Filament\Support\Enums\FontWeight;
@@ -22,7 +23,7 @@ class InfolistSchema
                             ->schema([
                                 Infolists\Components\Section::make('⚠️ Información de baja')
                                     ->icon('heroicon-m-exclamation-triangle')
-                                    ->visible(fn (?Inventario $record): bool => in_array($record?->estado, ['Dado de baja', 'Solicitud de baja', 'Baja'], true))
+                                    ->visible(fn (?Inventario $record): bool => SigemBajaFormatHelper::esEstadoBaja($record?->estado))
                                     ->schema([
                                         Infolists\Components\TextEntry::make('motivo_baja')
                                             ->label('Motivo de baja')
@@ -50,6 +51,14 @@ class InfolistSchema
                                             ->label('Posible área de utilización')
                                             ->getStateUsing(fn (Inventario $record): ?string => $record->especificaciones['posible_area_utilizacion'] ?? null)
                                             ->visible(fn (?Inventario $record): bool => filled($record?->especificaciones['posible_area_utilizacion'] ?? null)),
+                                        Infolists\Components\Actions::make([
+                                            Infolists\Components\Actions\Action::make('formatoBaja')
+                                                ->label('📄 Formato de Baja')
+                                                ->color('primary')
+                                                ->extraAttributes(['class' => 'sigem-pdf-btn'])
+                                                ->visible(fn (?Inventario $record): bool => SigemBajaFormatHelper::esEstadoBaja($record?->estado))
+                                                ->url(fn (?Inventario $record): ?string => $record ? route('sigem.pdf.baja', ['inventario' => $record->getKey()]) : null),
+                                        ])->columnSpanFull(),
                                     ])
                                     ->columns(3),
 
