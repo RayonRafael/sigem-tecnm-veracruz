@@ -300,7 +300,7 @@ class SigemPdfGenerator
             ? (self::unirNombre($usuarioEntrega->name, $usuarioEntrega->apellido_paterno, $usuarioEntrega->apellido_materno) ?: '—')
             : '—';
 
-        return [
+        return array_merge([
             'config' => $config,
             'bienEntrega' => $bienEntrega,
             'unidadOrganica' => $unidadOrganica,
@@ -311,6 +311,15 @@ class SigemPdfGenerator
             'observaciones' => $observaciones,
             'nombreEntrega' => $nombreEntrega,
             'nombreRecepcion' => $unidadOrganica,
+        ], self::logosInstitucionales($config));
+    }
+
+    /**
+     * Resuelve los Data URIs de los logos institucionales para formatos PDF.
+     */
+    protected static function logosInstitucionales(array $config): array
+    {
+        return [
             'logoSep' => self::logoDataUri($config['logos']['sep'] ?? 'images/sep-logo.png'),
             'logoTecnm' => self::logoDataUri($config['logos']['tecnm'] ?? 'images/tecnm-logo.png'),
             'logoItv' => self::logoDataUri($config['logos']['itv'] ?? 'images/itv-logo.png'),
@@ -338,6 +347,75 @@ class SigemPdfGenerator
     ) {
         $pdf = self::generarActaEntrega($solicitud, $detalle);
         return $pdf->download('acta-entrega-' . $solicitud->id_solicitud . '.pdf');
+    }
+
+    /**
+     * Construye los datos reales para el Formato 4: Trámite de Baja (lote o individual).
+     *
+     * @param  iterable<\App\Models\Inventario>  $inventarios
+     */
+    public static function datosFormatosBaja($inventarios): array
+    {
+        $registros = $inventarios instanceof \Illuminate\Support\Collection
+            ? $inventarios
+            : collect($inventarios);
+
+        if ($registros instanceof \Illuminate\Database\Eloquent\Collection) {
+            $registros->loadMissing(['departamento', 'material.marca']);
+        } else {
+            $registros->each(function ($item): void {
+                if ($item instanceof \App\Models\Inventario) {
+                    $item->loadMissing(['departamento', 'material.marca']);
+                }
+            });
+        }
+
+        $config = self::datosInstitucionales();
+
+        return array_merge([
+            'config' => $config,
+            'registros' => $registros,
+        ], self::logosInstitucionales($config));
+    }
+
+    /**
+     * Genera el PDF del Formato 4: Trámite de Baja (individual — 1 página).
+     */
+    public static function generarFormatoBaja(\App\Models\Inventario $inventario): \Barryvdh\DomPDF\PDF
+    {
+        return self::generarFormatosBaja(collect([$inventario]));
+    }
+
+    /**
+     * Genera el PDF del Formato 4: Trámite de Baja (lote multipágina: 1 página por bien).
+     *
+     * @param  iterable<\App\Models\Inventario>  $inventarios
+     */
+    public static function generarFormatosBaja($inventarios): \Barryvdh\DomPDF\PDF
+    {
+        return self::crearPdf('pdf.formato-baja', self::datosFormatosBaja($inventarios));
+    }
+
+    /**
+     * Descarga el Formato 4 (individual).
+     */
+    public static function descargarFormatoBaja(\App\Models\Inventario $inventario)
+    {
+        $pdf = self::generarFormatoBaja($inventario);
+        $codigo = preg_replace('/[^A-Za-z0-9_-]+/', '-', (string) ($inventario->codigo ?: $inventario->num_serie ?: $inventario->id_inventario));
+
+        return $pdf->download('tramite-baja-' . trim((string) $codigo, '-') . '.pdf');
+    }
+
+    /**
+     * Descarga el Formato 4 (lote multipágina).
+     *
+     * @param  iterable<\App\Models\Inventario>  $inventarios
+     */
+    public static function descargarFormatosBajaLote($inventarios)
+    {
+        $pdf = self::generarFormatosBaja($inventarios);
+        return $pdf->download('tramites-baja-lote.pdf');
     }
 }
 
