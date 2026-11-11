@@ -121,11 +121,11 @@ class SigemPdfGenerator
         // Solicitante (usuario que solicita o encargado del departamento)
         $solicitante = '';
         if ($mantenimiento->usuarioSolicita) {
-            $solicitante = trim(collect([
+            $solicitante = self::unirNombre(
                 $mantenimiento->usuarioSolicita->name,
                 $mantenimiento->usuarioSolicita->apellido_paterno,
-                $mantenimiento->usuarioSolicita->apellido_materno,
-            ])->filter()->implode(' '));
+                $mantenimiento->usuarioSolicita->apellido_materno
+            );
         }
         if ($solicitante === '' && $mantenimiento->inventario?->departamento?->encargado) {
             $solicitante = $mantenimiento->inventario->departamento->encargado;
@@ -139,6 +139,14 @@ class SigemPdfGenerator
             'fecha' => self::formatearFechaPdf($mantenimiento->fecha_solicitud),
             'descripcion_falla' => $mantenimiento->descripcion_falla ?: '—',
         ];
+    }
+
+    /**
+     * Une partes no vacías de un nombre propio en una sola cadena.
+     */
+    protected static function unirNombre(?string ...$partes): string
+    {
+        return trim(collect($partes)->filter(fn ($v) => filled($v))->implode(' '));
     }
 
     /**
@@ -236,6 +244,100 @@ class SigemPdfGenerator
     {
         $pdf = self::generarListaVerificacion($mantenimiento);
         return $pdf->download('lista-verificacion-' . $mantenimiento->id_mantenimiento . '.pdf');
+    }
+
+    /**
+     * Construye los datos reales para el Formato 1: Entrega de Equipo/Bien.
+     */
+    public static function datosActaEntrega(
+        \App\Models\Solicitud $solicitud,
+        ?\App\Models\DetalleSolicitud $detalle = null
+    ): array {
+        $solicitud->loadMissing([
+            'receptor',
+            'usuario',
+            'autorizadoPor',
+            'detalles.inventario.material.marca',
+            'detalles.material.marca',
+        ]);
+
+        $config = self::datosInstitucionales();
+        $detalle = $detalle ?? $solicitud->detalles->first();
+        $inventario = $detalle?->inventario;
+        $material = $inventario?->material ?? $detalle?->material;
+
+        $bienEntrega = self::unirNombre($material?->nombre, $inventario?->codigo) ?: '—';
+
+        $receptor = $solicitud->receptor;
+        $unidadOrganica = $receptor
+            ? (self::unirNombre($receptor->nombre, $receptor->apellido_paterno, $receptor->apellido_materno) ?: '—')
+            : '—';
+
+        $fecha = self::formatearFechaPdf($solicitud->fecha_solicitud ?: $inventario?->fecha_asignacion);
+        $hora = $solicitud->created_at
+            ? $solicitud->created_at->format('H:i')
+            : now()->format('H:i');
+
+        $descripcion = collect([
+            $inventario?->especificacion_texto,
+            $material?->descripcion,
+            $inventario?->subtipo,
+        ])->first(fn ($valor) => filled($valor)) ?? '—';
+
+        $marca = $material?->marca?->nombre
+            ?? (is_array($inventario?->especificaciones) ? ($inventario->especificaciones['marca'] ?? null) : null);
+        $modelo = $inventario?->modelo ?: $material?->modelo;
+        $numSerie = $inventario?->num_serie ?: 'S/N';
+        $marcaModeloSerie = self::unirNombre($marca, $modelo, $numSerie) ?: '—';
+
+        $observaciones = collect([
+            $solicitud->observaciones,
+            $inventario?->observaciones_generales,
+        ])->first(fn ($valor) => filled($valor)) ?? '—';
+
+        $usuarioEntrega = auth()->user() ?? $solicitud->autorizadoPor ?? $solicitud->usuario;
+        $nombreEntrega = $usuarioEntrega
+            ? (self::unirNombre($usuarioEntrega->name, $usuarioEntrega->apellido_paterno, $usuarioEntrega->apellido_materno) ?: '—')
+            : '—';
+
+        return [
+            'config' => $config,
+            'bienEntrega' => $bienEntrega,
+            'unidadOrganica' => $unidadOrganica,
+            'fecha' => $fecha,
+            'hora' => $hora,
+            'descripcion' => $descripcion,
+            'marcaModeloSerie' => $marcaModeloSerie,
+            'observaciones' => $observaciones,
+            'nombreEntrega' => $nombreEntrega,
+            'nombreRecepcion' => $unidadOrganica,
+            'logoSep' => self::logoDataUri($config['logos']['sep'] ?? 'images/sep-logo.png'),
+            'logoTecnm' => self::logoDataUri($config['logos']['tecnm'] ?? 'images/tecnm-logo.png'),
+            'logoItv' => self::logoDataUri($config['logos']['itv'] ?? 'images/itv-logo.png'),
+            'logoIso9001' => self::logoDataUri($config['logos']['iso_9001'] ?? 'images/iso-9001.png'),
+            'logoIso14001' => self::logoDataUri($config['logos']['iso_14001'] ?? 'images/iso-14001.png'),
+        ];
+    }
+
+    /**
+     * Genera el PDF del Formato 1: Entrega de Equipo/Bien.
+     */
+    public static function generarActaEntrega(
+        \App\Models\Solicitud $solicitud,
+        ?\App\Models\DetalleSolicitud $detalle = null
+    ): \Barryvdh\DomPDF\PDF {
+        return self::crearPdf('pdf.formato-entrega', self::datosActaEntrega($solicitud, $detalle));
+    }
+
+    /**
+     * Descarga el Formato 1.
+     */
+    public static function descargarActaEntrega(
+        \App\Models\Solicitud $solicitud,
+        ?\App\Models\DetalleSolicitud $detalle = null
+    ) {
+        $pdf = self::generarActaEntrega($solicitud, $detalle);
+        return $pdf->download('acta-entrega-' . $solicitud->id_solicitud . '.pdf');
     }
 }
 
