@@ -70,7 +70,8 @@ class SigemPdfGenerator
 
         // Buscar jefe del Centro de Cómputo desde BD
         try {
-            $departamento = \App\Models\Departamento::where('nombre', 'Centro de Cómputo')->first();
+            $departamento = \App\Models\Departamento::where('nombre', 'Centro de Cómputo')->first()
+                ?? \App\Models\Departamento::where('nombre', 'Centro de Computo')->first();
             if ($departamento && $departamento->encargado) {
                 $config['centro_computo']['jefe'] = $departamento->encargado;
             }
@@ -130,19 +131,24 @@ class SigemPdfGenerator
             $solicitante = $mantenimiento->inventario->departamento->encargado;
         }
 
-        // Fecha formateada
-        $fecha = $mantenimiento->fecha_solicitud
-            ? \Carbon\Carbon::parse($mantenimiento->fecha_solicitud)->format('d/m/Y')
-            : now()->format('d/m/Y');
-
         return [
             'config' => $config,
             'logoItv' => self::logoDataUri($config['logos']['itv'] ?? 'images/itv-logo.png'),
             'departamento' => $departamento,
             'solicitante' => $solicitante,
-            'fecha' => $fecha,
+            'fecha' => self::formatearFechaPdf($mantenimiento->fecha_solicitud),
             'descripcion_falla' => $mantenimiento->descripcion_falla ?: '—',
         ];
+    }
+
+    /**
+     * Formatea una fecha a dd/mm/YYYY con fallback a la fecha actual.
+     */
+    protected static function formatearFechaPdf(mixed $fecha): string
+    {
+        return filled($fecha)
+            ? \Carbon\Carbon::parse($fecha)->format('d/m/Y')
+            : now()->format('d/m/Y');
     }
 
     /**
@@ -160,6 +166,76 @@ class SigemPdfGenerator
     {
         $pdf = self::generarOrdenTrabajo($mantenimiento);
         return $pdf->download('orden-trabajo-' . $mantenimiento->id_mantenimiento . '.pdf');
+    }
+
+    /**
+     * Construye los datos reales para el Formato 3: Lista de Verificación de Mantenimiento.
+     */
+    public static function datosListaVerificacion(\App\Models\Mantenimiento $mantenimiento): array
+    {
+        $mantenimiento->loadMissing(['inventario.area']);
+
+        $config = self::datosInstitucionales();
+
+        $jefeCentroComputo = filled($config['centro_computo']['jefe'] ?? null)
+            ? $config['centro_computo']['jefe']
+            : '—';
+
+        $subdireccion = filled($config['subdireccion']['nombre'] ?? null)
+            ? $config['subdireccion']['nombre']
+            : '—';
+
+        $jefeSubdireccion = filled($config['subdireccion']['responsable'] ?? null)
+            ? $config['subdireccion']['responsable']
+            : '—';
+
+        $fecha = self::formatearFechaPdf($mantenimiento->fecha_fin ?: $mantenimiento->fecha_solicitud);
+
+        $espacioRevisado = filled($mantenimiento->inventario?->area?->nombre)
+            ? $mantenimiento->inventario->area->nombre
+            : 'Mantenimiento y Equipo';
+
+        $hallazgo = collect([
+            $mantenimiento->descripcion_trabajo,
+            $mantenimiento->observaciones,
+            $mantenimiento->descripcion_falla,
+        ])->first(fn ($valor) => filled($valor)) ?? '—';
+
+        $atendidoSi = $mantenimiento->estado === 'Completado';
+
+        $nombreTecnico = filled($mantenimiento->nombre_tecnico)
+            ? $mantenimiento->nombre_tecnico
+            : '—';
+
+        return [
+            'config' => $config,
+            'jefeCentroComputo' => $jefeCentroComputo,
+            'subdireccion' => $subdireccion,
+            'jefeSubdireccion' => $jefeSubdireccion,
+            'fecha' => $fecha,
+            'espacioRevisado' => $espacioRevisado,
+            'hallazgo' => $hallazgo,
+            'atendidoSi' => $atendidoSi,
+            'nombreTecnico' => $nombreTecnico,
+            'logoItv' => self::logoDataUri($config['logos']['itv'] ?? 'images/itv-logo.png'),
+        ];
+    }
+
+    /**
+     * Genera el PDF del Formato 3: Lista de Verificación de Mantenimiento.
+     */
+    public static function generarListaVerificacion(\App\Models\Mantenimiento $mantenimiento): \Barryvdh\DomPDF\PDF
+    {
+        return self::crearPdf('pdf.formato-lista-verificacion', self::datosListaVerificacion($mantenimiento));
+    }
+
+    /**
+     * Descarga el Formato 3.
+     */
+    public static function descargarListaVerificacion(\App\Models\Mantenimiento $mantenimiento)
+    {
+        $pdf = self::generarListaVerificacion($mantenimiento);
+        return $pdf->download('lista-verificacion-' . $mantenimiento->id_mantenimiento . '.pdf');
     }
 }
 
