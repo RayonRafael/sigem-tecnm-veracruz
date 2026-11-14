@@ -7404,3 +7404,260 @@ button.fi-btn.sigem-pdf-btn.is-loading {
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   PÁGINA MI PERFIL (EditProfile) — Diseño Institucional SIGEM TecNM
+   ========================================================================== */
+.sigem-profile-wrapper {
+  max-width: 640px;
+  width: 100%;
+  margin: 1.25rem auto 2.5rem;
+  padding: 0 4px;
+}
+
+.sigem-profile-card {
+  background: var(--sig-surface, #ffffff);
+  border: 1px solid var(--sig-border, #e2e8f0);
+  border-radius: var(--sig-radius, 14px);
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+}
+
+.sigem-profile-accent {
+  height: 5px;
+  width: 100%;
+  background: linear-gradient(90deg, #0b1d3a 0%, #1b65d4 55%, #3b82f6 100%);
+}
+
+.sigem-profile-logos-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 18px 28px 14px;
+  background: #f8fafc;
+  border-bottom: 1px solid var(--sig-border, #e2e8f0);
+}
+
+.sigem-profile-logos {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sigem-profile-logo {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+}
+
+.sigem-profile-panel-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.sigem-profile-panel-admin {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.sigem-profile-panel-ss {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.sigem-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 28px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  background: linear-gradient(180deg, rgba(232, 240, 254, 0.35) 0%, rgba(255, 255, 255, 0) 100%);
+}
+
+.sigem-profile-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sigem-profile-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1b65d4 0%, #0b1d3a 100%);
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(27, 101, 212, 0.25);
+  border: 3px solid #ffffff;
+}
+
+.sigem-profile-avatar-icon {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #eff6ff;
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.sigem-profile-title-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.sigem-profile-title {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: var(--sig-text, #0f172a) !important;
+  margin: 0 0 4px !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.sigem-profile-subtitle {
+  font-size: 0.875rem;
+  color: var(--sig-muted, #64748b);
+  margin: 0 0 10px;
+  line-height: 1.45;
+}
+
+.sigem-profile-meta {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  font-size: 12.5px;
+  color: #334155;
+}
+
+.sigem-profile-meta strong {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.sigem-profile-meta-sep {
+  color: #cbd5e1;
+}
+
+.sigem-profile-body {
+  padding: 24px 28px 28px;
+}
+
+/* Evitar doble recuadro y doble borde de inputs dentro de la card de perfil */
+.sigem-profile-card .fi-fo-component-ctn {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+.sigem-profile-card .fi-input-wrp {
+  border-radius: 8px !important;
+  border: 1px solid #cbd5e1 !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.sigem-profile-card .fi-input-wrp:focus-within {
+  border-color: var(--sig-primary, #1b65d4) !important;
+  box-shadow: 0 0 0 3px rgba(27, 101, 212, 0.16) !important;
+}
+
+.sigem-profile-card .fi-input-wrp .fi-input {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+.sigem-profile-card .fi-fo-field-wrp-helper-text {
+  font-size: 12px !important;
+  color: var(--sig-muted, #64748b) !important;
+}
+
+.sigem-profile-actions {
+  margin-top: 8px;
+  padding-top: 18px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.sigem-profile-actions .fi-ac {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: wrap !important;
+}
+
+.sigem-profile-actions .fi-btn-color-primary {
+  background-color: var(--sig-primary, #1b65d4) !important;
+  color: #ffffff !important;
+  padding: 9px 18px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 6px rgba(27, 101, 212, 0.22) !important;
+}
+
+.sigem-profile-actions .fi-btn-color-primary:hover {
+  background-color: var(--sig-primary-dark, #1557b0) !important;
+}
+
+.sigem-profile-actions .fi-btn-color-gray {
+  background-color: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+  padding: 9px 16px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+}
+
+.sigem-profile-actions .fi-btn-color-gray:hover {
+  background-color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+}
+
+@media (max-width: 640px) {
+  .sigem-profile-wrapper {
+    margin: 0.75rem auto 1.75rem;
+  }
+  .sigem-profile-logos-bar {
+    padding: 14px 18px;
+  }
+  .sigem-profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px;
+    gap: 12px;
+  }
+  .sigem-profile-body {
+    padding: 18px;
+  }
+  .sigem-profile-actions .fi-ac .fi-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

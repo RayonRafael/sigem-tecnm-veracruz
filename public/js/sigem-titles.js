@@ -10,6 +10,9 @@
         if (path.includes('/login')) {
             return 'Iniciar sesión';
         }
+        if (path.includes('/profile')) {
+            return 'Mi Perfil';
+        }
         if (path.includes('/solicituds')) {
             return 'Solicitudes';
         }

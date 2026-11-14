@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Dashboard;
+use App\Filament\Pages\EditProfile;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -30,7 +31,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->profile()
+            ->profile(EditProfile::class, isSimple: false)
             ->passwordReset()
             ->brandName('SIGEM - TecNM Veracruz')
             ->brandLogo(new HtmlString('<div class="sigem-brand"><img src="' . asset('images/sigem-icon.svg') . '" alt="SIGEM" class="sigem-brand-logo"></div>'))
@@ -143,6 +144,7 @@ class AdminPanelProvider extends PanelProvider
         str_contains($path, "configuracion") => "Configuración y Catálogos",
         str_contains($path, "reportes") => "Reportes",
         str_contains($path, "users") => "Usuarios",
+        str_contains($path, "profile") => "Mi Perfil",
         default => "Panel principal",
     };
 @endphp
