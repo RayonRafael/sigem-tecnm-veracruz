@@ -11,6 +11,8 @@ RUN echo "zlib.output_compression = On" > /usr/local/etc/php/conf.d/compression.
     && echo "zlib.output_compression_level = 6" >> /usr/local/etc/php/conf.d/compression.ini \
     && echo "memory_limit = 512M" >> /usr/local/etc/php/conf.d/compression.ini
 
+RUN echo "expose_php = Off" >> /usr/local/etc/php/conf.d/security.ini
+
 # Configurar DocumentRoot de Apache a la carpeta public de Laravel
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
@@ -27,7 +29,10 @@ COPY . .
 ENV APP_ENV=production \
     APP_DEBUG=false \
     DB_CONNECTION=sqlite \
-    DB_DATABASE=database/database.sqlite
+    DB_DATABASE=database/database.sqlite \
+    SESSION_SECURE_COOKIE=true \
+    SESSION_ENCRYPT=true \
+    SESSION_LIFETIME=30
 
 RUN mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs storage/fonts bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache \
@@ -40,6 +45,7 @@ EXPOSE 10000
 
 # Ajustar puerto dinámico de Render ($PORT), generar cachés de producción en runtime y arrancar Apache
 CMD sh -c "sed -i 's/80/'\"\${PORT:-10000}\"'/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf \
+    && php artisan migrate --force \
     && php artisan config:cache \
     && php artisan route:cache \
     && php artisan view:cache \

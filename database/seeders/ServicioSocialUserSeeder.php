@@ -11,9 +11,14 @@ class ServicioSocialUserSeeder extends Seeder
 {
     public function run(): void
     {
+        if (app()->isProduction()) {
+            return; // No tocar usuarios en producción
+        }
+
         $defaultPassword = app()->environment('local', 'testing') ? 'servicio123' : Str::random(24);
 
-        $servicio = User::updateOrCreate(
+        // Solo crear si NO existe — nunca sobrescribir
+        $servicio = User::firstOrCreate(
             ['email' => 'servicio@tecnm.edu.mx'],
             [
                 'name' => 'Alumno Servicio Social',

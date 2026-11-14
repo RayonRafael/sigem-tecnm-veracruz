@@ -67,7 +67,11 @@ class MaterialResource extends Resource
                     ->label('Stock actual')
                     ->numeric()
                     // Se ordena por el stock derivado, no por la columna fisica obsoleta.
-                    ->sortable(query: fn (Builder $query, string $direction) => $query->orderByRaw(\App\Models\Material::stockDerivadoSql().' '.$direction)),
+                    ->sortable(query: function (Builder $query, string $direction) {
+                        $direction = strtolower($direction) === 'desc' ? 'DESC' : 'ASC';
+
+                        return $query->orderByRaw(\App\Models\Material::stockDerivadoSql().' '.$direction);
+                    }),
                 Tables\Columns\TextColumn::make('stock_minimo')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
                     ->label('Stock mín.')
                     ->numeric()
