@@ -31,7 +31,8 @@ ENV APP_ENV=production \
     DB_CONNECTION=sqlite \
     DB_DATABASE=database/database.sqlite \
     SESSION_SECURE_COOKIE=true \
-    SESSION_ENCRYPT=true
+    SESSION_ENCRYPT=true \
+    SESSION_LIFETIME=30
 
 RUN mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs storage/fonts bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache \
@@ -44,6 +45,7 @@ EXPOSE 10000
 
 # Ajustar puerto dinámico de Render ($PORT), generar cachés de producción en runtime y arrancar Apache
 CMD sh -c "sed -i 's/80/'\"\${PORT:-10000}\"'/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf \
+    && php artisan migrate --force \
     && php artisan config:cache \
     && php artisan route:cache \
     && php artisan view:cache \
