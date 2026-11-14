@@ -145,8 +145,9 @@ class Inventario extends Model
 
         $prefix = "{$marca}-{$modelo}";
 
-        // Obtener el consecutivo máximo para este prefijo en una sola consulta
-        $codigosExistentes = static::where('codigo', 'LIKE', "{$prefix}-%")
+        // ✅ FIX: withTrashed() para incluir registros en papelera
+        $codigosExistentes = static::withTrashed()
+            ->where('codigo', 'LIKE', "{$prefix}-%")
             ->pluck('codigo')
             ->map(function ($cod) {
                 return preg_match('/-(\d+)$/', $cod, $matches) ? (int) $matches[1] : 0;
@@ -155,7 +156,15 @@ class Inventario extends Model
         $maxConsecutivo = $codigosExistentes->max() ?? 0;
         $consecutivo = $maxConsecutivo + 1;
 
-        return sprintf('%s-%03d', $prefix, $consecutivo);
+        $codigo = sprintf('%s-%03d', $prefix, $consecutivo);
+
+        // ✅ FIX: Verificación explícita de unicidad en bucle
+        while (static::withTrashed()->where('codigo', $codigo)->exists()) {
+            $consecutivo++;
+            $codigo = sprintf('%s-%03d', $prefix, $consecutivo);
+        }
+
+        return $codigo;
     }
 
     // Accessors / Mutators para campos dinámicos en especificaciones (JSON) y columnas físicas

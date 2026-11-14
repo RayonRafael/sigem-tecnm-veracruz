@@ -11,6 +11,14 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
+        // Bloquear seeders en producción
+        if (app()->isProduction()) {
+            if (isset($this->command)) {
+                $this->command->warn('Seeders bloqueados en producción.');
+            }
+            return;
+        }
+
         $this->call(RolesAndPermissionsSeeder::class);
         $this->call(AdminUserSeeder::class);
         $this->call(ServicioSocialUserSeeder::class);

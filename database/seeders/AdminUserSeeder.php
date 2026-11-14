@@ -11,9 +11,14 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
+        if (app()->isProduction()) {
+            return; // No tocar usuarios en producción
+        }
+
         $defaultPassword = app()->environment('local', 'testing') ? 'admin123' : Str::random(24);
 
-        $admin = User::updateOrCreate(
+        // Solo crear si NO existe — nunca sobrescribir
+        $admin = User::firstOrCreate(
             ['email' => 'admin@tecnm.edu.mx'],
             [
                 'name' => 'Administrador',

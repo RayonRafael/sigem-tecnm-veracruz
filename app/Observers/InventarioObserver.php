@@ -198,6 +198,8 @@ class InventarioObserver
 
         if (! empty($modelo)) {
             $materialQuery->where('modelo', $modelo);
+        } else {
+            $materialQuery->whereNull('modelo');
         }
 
         $material = $materialQuery->first();
