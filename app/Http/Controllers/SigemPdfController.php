@@ -25,7 +25,7 @@ class SigemPdfController
     /**
      * Descarga el Formato de Cambio de Área para un equipo de inventario.
      */
-    public function cambioArea(Inventario $inventario): StreamedResponse
+    public function cambioArea(Request $request, Inventario $inventario): StreamedResponse
     {
         $user = auth()->user();
         if (! $user) {
@@ -37,6 +37,13 @@ class SigemPdfController
             abort(403);
         }
 
-        return SigemPdfGenerator::descargarCambioArea($inventario);
+        $campos = $request->has('campos_pdf')
+            ? (array) $request->input('campos_pdf', [])
+            : ($request->has('campos') ? (array) $request->input('campos', []) : null);
+
+        $motivo = $request->input('motivo');
+        $jefeDestino = $request->input('jefe_destino');
+
+        return SigemPdfGenerator::descargarCambioArea($inventario, $motivo, $jefeDestino, null, $campos);
     }
 }

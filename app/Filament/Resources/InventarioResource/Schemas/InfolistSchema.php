@@ -135,6 +135,21 @@ class InfolistSchema
                                             ->label('Registrado por')
                                             ->icon('heroicon-m-user')
                                             ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('fecha_registro')
+                                            ->label('Fecha de registro')
+                                            ->date('d/m/Y')
+                                            ->icon('heroicon-m-calendar')
+                                            ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('descripcion_display')
+                                            ->label('Descripción')
+                                            ->getStateUsing(fn (Inventario $record): string => $record->observaciones_generales ?? $record->material?->descripcion ?? $record->especificacion_texto ?? 'Por capturar')
+                                            ->placeholder('Por capturar')
+                                            ->columnSpanFull(),
+                                        Infolists\Components\TextEntry::make('num_puertos_display')
+                                            ->label('Número de puertos')
+                                            ->getStateUsing(fn (Inventario $record): ?string => $record->especificaciones['num_puertos'] ?? null)
+                                            ->placeholder('No especificado')
+                                            ->visible(fn (?Inventario $record): bool => filled($record?->especificaciones['num_puertos'] ?? null)),
                                     ])->columns(2),
 
                                 Infolists\Components\Section::make('Ubicación y Asignación')
@@ -154,6 +169,15 @@ class InfolistSchema
                                                     return explode(' > ', $record->ubicacion_fisica)[0] ?? 'Por capturar';
                                                 }
                                                 return 'Por capturar';
+                                            }),
+                                        Infolists\Components\TextEntry::make('jefe_departamento_display')
+                                            ->label('Jefe de Departamento')
+                                            ->icon('heroicon-m-user')
+                                            ->getStateUsing(function (Inventario $record): string {
+                                                $depto = $record->departamento ?? $record->area?->departamento;
+                                                return $record->especificaciones['jefe_destino']
+                                                    ?? $depto?->encargado
+                                                    ?? 'Sin jefe asignado';
                                             }),
                                         Infolists\Components\TextEntry::make('area_display')
                                             ->label('Área')
@@ -347,6 +371,21 @@ class InfolistSchema
                                             ->label('Fecha de factura')
                                             ->date('d/m/Y')
                                             ->placeholder('Por capturar'),
+                                        Infolists\Components\TextEntry::make('fecha_inicio_renta')
+                                            ->label('Inicio de renta')
+                                            ->date('d/m/Y')
+                                            ->placeholder('Por capturar')
+                                            ->visible(fn (?Inventario $record): bool => $record?->tipo_propiedad === 'Rentado' || filled($record?->fecha_inicio_renta)),
+                                        Infolists\Components\TextEntry::make('fecha_fin_renta')
+                                            ->label('Fin de renta')
+                                            ->date('d/m/Y')
+                                            ->placeholder('Por capturar')
+                                            ->visible(fn (?Inventario $record): bool => $record?->tipo_propiedad === 'Rentado' || filled($record?->fecha_fin_renta)),
+                                        Infolists\Components\TextEntry::make('observaciones_renta')
+                                            ->label('Observaciones de renta')
+                                            ->placeholder('Por capturar')
+                                            ->columnSpanFull()
+                                            ->visible(fn (?Inventario $record): bool => $record?->tipo_propiedad === 'Rentado' || filled($record?->observaciones_renta)),
                                         Infolists\Components\TextEntry::make('tipo_impresora')
                                             ->label('Tipo de impresora')
                                             ->badge()

@@ -698,13 +698,17 @@ class InventarioResource extends Resource
                             ->label('Cambio')
                             ->color('info')
                             ->icon('heroicon-m-arrows-right-left')
+                            ->slideOver()
                             ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Cambio de área', 'Solicitud de baja'], true))
                             ->modalHeading(fn () => static::esAdmin() ? 'Cambiar área de equipo' : 'Solicitar cambio de área')
                             ->modalDescription(fn () => static::esAdmin() ? 'Se actualizará la ubicación física del equipo de forma inmediata.' : 'La solicitud quedará registrada en espera de revisión y aprobación por el Administrador.')
                             ->form(static::getModalCambioAreaFormSchema(static::esAdmin()))
                             ->modalSubmitActionLabel(fn () => static::esAdmin() ? 'Confirmar cambio' : 'Solicitar cambio')
                             ->modalCancelActionLabel('Cancelar')
-                            ->action(function (Inventario $record, array $data) {
+                            ->action(function (Inventario $record, array $data, $livewire = null) {
+                                $origenDeptoObj = $record->departamento ?? $record->area?->departamento;
+                                $origenAreaObj = $record->area;
+
                                 if (static::esAdmin()) {
                                     $record->cambiarAreaDirecto(
                                         $data['departamento_id'],
@@ -714,7 +718,8 @@ class InventarioResource extends Resource
                                         $data['motivo'] ?? null,
                                         auth()->id()
                                     );
-                                    Notification::make()->title('Área del equipo actualizada correctamente')->success()->send();
+                                    static::guardarMetadatosCambioArea($record, $data, $origenDeptoObj, $origenAreaObj);
+                                    Notification::make()->title('Cambio registrado')->body('Área del equipo actualizada correctamente')->success()->send();
                                 } else {
                                     $record->solicitarCambioArea(
                                         $data['departamento_id'],
@@ -724,7 +729,12 @@ class InventarioResource extends Resource
                                         $data['motivo'] ?? null,
                                         auth()->id()
                                     );
-                                    Notification::make()->title('Solicitud de cambio de área enviada a revisión')->warning()->send();
+                                    static::guardarMetadatosCambioArea($record, $data, $origenDeptoObj, $origenAreaObj);
+                                    Notification::make()->title('Cambio registrado')->body('Solicitud de cambio de área enviada a revisión')->warning()->send();
+                                }
+
+                                if ($livewire && method_exists($livewire, 'replaceMountedTableAction')) {
+                                    $livewire->replaceMountedTableAction('checklist_cambio_area', (string) $record->getKey());
                                 }
                             }),
                         Tables\Actions\Action::make('aprobar_cambio')
@@ -845,6 +855,28 @@ class InventarioResource extends Resource
                     ->mutateRecordDataUsing(fn (array $data, Inventario $record): array => static::hidratarDatosEdicion($data, $record))
                     ->using(fn (Inventario $record, array $data): Inventario => static::guardarCambiosEquipo($record, $data))
                     ->successNotificationTitle('Registro actualizado correctamente'),
+                Tables\Actions\Action::make('checklist_cambio_area')
+                    ->label('Generar Formato PDF')
+                    ->color('info')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->extraAttributes(['style' => 'display: none;'])
+                    ->slideOver()
+                    ->modalHeading('Cambio registrado')
+                    ->modalDescription('Selecciona qué datos mostrar en el formato de Cambio de Área.')
+                    ->form(static::getChecklistCambioAreaSchema())
+                    ->modalSubmitActionLabel('Generar Formato PDF')
+                    ->modalCancelActionLabel('Cerrar')
+                    ->action(function (Inventario $record, array $data) {
+                        $campos = $data['campos_pdf'] ?? [];
+
+                        return \App\Support\SigemPdfGenerator::descargarCambioArea(
+                            $record,
+                            $record->especificaciones['cambio_motivo'] ?? null,
+                            $record->especificaciones['jefe_destino'] ?? null,
+                            null,
+                            $campos
+                        );
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

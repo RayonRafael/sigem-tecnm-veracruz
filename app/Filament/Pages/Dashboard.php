@@ -163,6 +163,7 @@ class Dashboard extends BaseDashboard
     {
         return Action::make('cambiarArea')
             ->label('Cambiar área')
+            ->slideOver()
             ->modalHeading('Cambiar área de equipo')
             ->modalDescription('Se actualizará la ubicación física del equipo de forma inmediata.')
             ->model(Inventario::class)
@@ -171,6 +172,9 @@ class Dashboard extends BaseDashboard
             ->modalSubmitActionLabel('Confirmar cambio')
             ->modalCancelActionLabel('Cancelar')
             ->action(function (Inventario $record, array $data) {
+                $origenDeptoObj = $record->departamento ?? $record->area?->departamento;
+                $origenAreaObj = $record->area;
+
                 $record->cambiarAreaDirecto(
                     $data['departamento_id'],
                     $data['area_id'],
@@ -179,7 +183,34 @@ class Dashboard extends BaseDashboard
                     $data['motivo'] ?? null,
                     auth()->id()
                 );
-                Notification::make()->title('Área del equipo actualizada correctamente')->success()->send();
+                ConModalesBajaCambio::guardarMetadatosCambioArea($record, $data, $origenDeptoObj, $origenAreaObj);
+                Notification::make()->title('Cambio registrado')->body('Área del equipo actualizada correctamente')->success()->send();
+                $this->replaceMountedAction('checklistCambioArea', ['id' => $record->getKey(), 'record' => $record->getKey()]);
+            });
+    }
+
+    public function checklistCambioAreaAction(): Action
+    {
+        return Action::make('checklistCambioArea')
+            ->label('Generar Formato PDF')
+            ->slideOver()
+            ->modalHeading('Cambio registrado')
+            ->modalDescription('Selecciona qué datos mostrar en el formato de Cambio de Área.')
+            ->model(Inventario::class)
+            ->record(fn (array $arguments) => Inventario::find($arguments['id'] ?? $arguments['record']))
+            ->form(ConModalesBajaCambio::getChecklistCambioAreaSchema())
+            ->modalSubmitActionLabel('Generar Formato PDF')
+            ->modalCancelActionLabel('Cerrar')
+            ->action(function (Inventario $record, array $data) {
+                $campos = $data['campos_pdf'] ?? [];
+
+                return \App\Support\SigemPdfGenerator::descargarCambioArea(
+                    $record,
+                    $record->especificaciones['cambio_motivo'] ?? null,
+                    $record->especificaciones['jefe_destino'] ?? null,
+                    null,
+                    $campos
+                );
             });
     }
 

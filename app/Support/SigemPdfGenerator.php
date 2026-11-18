@@ -447,7 +447,8 @@ class SigemPdfGenerator
         \App\Models\Inventario $inventario,
         ?string $motivo = null,
         ?string $destinatarioNombre = null,
-        ?string $destinatarioCargo = null
+        ?string $destinatarioCargo = null,
+        ?array $camposSeleccionados = null
     ): array {
         $inventario->loadMissing([
             'departamento',
@@ -458,6 +459,7 @@ class SigemPdfGenerator
         ]);
 
         $config = self::datosInstitucionales();
+        $specs = is_array($inventario->especificaciones) ? $inventario->especificaciones : [];
 
         // Si tiene componentes asociados a la misma estación física, incluirlos en la tabla
         $equipos = collect();
@@ -492,19 +494,36 @@ class SigemPdfGenerator
             $origenAreaObj = null;
         }
 
-        $origenDepto = $origenDeptoObj?->nombre ?? ($config['centro_computo']['nombre'] ?? 'Departamento de Centro de Cómputo');
-        $origenArea = $origenAreaObj?->nombre ?? 'Centro de Cómputo';
+        $origenDepto = $specs['cambio_origen_depto']
+            ?? $origenDeptoObj?->nombre
+            ?? ($config['centro_computo']['nombre'] ?? 'Departamento de Centro de Cómputo');
+        $origenArea = $specs['cambio_origen_area']
+            ?? $origenAreaObj?->nombre
+            ?? 'Centro de Cómputo';
+        $jefeOrigen = $specs['cambio_jefe_origen']
+            ?? $origenDeptoObj?->encargado
+            ?? ($config['centro_computo']['jefe'] ?: 'Jefe de Centro de Cómputo');
 
         $deptoNombre = $destinoDeptoObj?->nombre ?? 'Centro de Cómputo';
         $destinoArea = $destinoAreaObj?->nombre ?? $deptoNombre;
 
         $destNombre = $destinatarioNombre
+            ?: ($specs['jefe_destino'] ?? null)
             ?: ($destinoDeptoObj?->encargado
                 ?? $destinoAreaObj?->responsable
                 ?? 'ENCARGADO DEL DEPARTAMENTO');
 
         $destCargo = $destinatarioCargo
             ?: ('JEFE DEL DEPARTAMENTO DE ' . mb_strtoupper($deptoNombre, 'UTF-8'));
+
+        $nuevaAula = $specs['cambio_nueva_aula']
+            ?? $inventario->salon?->nombre
+            ?? ($specs['aula'] ?? null)
+            ?? '—';
+
+        $motivoFinal = $motivo
+            ?: ($solicitudUbicacion['motivo'] ?? null)
+            ?: ($specs['cambio_motivo'] ?? null);
 
         // Entrega: Usuario autenticado o soporte técnico institucional
         $nombreEntrega = '';
@@ -525,6 +544,14 @@ class SigemPdfGenerator
         $ahora = now();
         $fechaTexto = $ahora->day . '/' . ($meses[$ahora->month] ?? $ahora->format('m')) . '/' . $ahora->year;
 
+        $camposActivos = $camposSeleccionados ?? [
+            'num_serie',
+            'origen',
+            'destino',
+            'jefe_destino',
+            'fecha_cambio',
+        ];
+
         return array_merge([
             'config' => $config,
             'inventario' => $inventario,
@@ -533,15 +560,19 @@ class SigemPdfGenerator
             'fechaCorta' => $ahora->format('d/m/Y'),
             'origenDepto' => $origenDepto,
             'origenArea' => $origenArea,
+            'jefeOrigen' => $jefeOrigen,
             'destinoDepto' => $deptoNombre,
             'destinoArea' => $destinoArea,
+            'jefeDestino' => $destNombre,
+            'nuevaAula' => $nuevaAula,
             'destinatarioNombre' => mb_strtoupper($destNombre, 'UTF-8'),
             'destinatarioCargo' => mb_strtoupper($destCargo, 'UTF-8'),
             'destinatarioDepto' => mb_strtoupper($deptoNombre, 'UTF-8'),
             'nombreEntrega' => mb_strtoupper($nombreEntrega, 'UTF-8'),
             'cargoEntrega' => 'SOPORTE TÉCNICO',
             'deptoEntrega' => mb_strtoupper($config['centro_computo']['nombre'] ?? 'DEPARTAMENTO DE CENTRO DE CÓMPUTO', 'UTF-8'),
-            'motivo' => $motivo,
+            'motivo' => $motivoFinal,
+            'camposSeleccionados' => $camposActivos,
         ], self::logosInstitucionales($config));
     }
 
@@ -552,9 +583,13 @@ class SigemPdfGenerator
         \App\Models\Inventario $inventario,
         ?string $motivo = null,
         ?string $destinatarioNombre = null,
-        ?string $destinatarioCargo = null
+        ?string $destinatarioCargo = null,
+        ?array $camposSeleccionados = null
     ): \Barryvdh\DomPDF\PDF {
-        return self::crearPdf('pdf.formato-cambio-area', self::datosCambioArea($inventario, $motivo, $destinatarioNombre, $destinatarioCargo));
+        return self::crearPdf(
+            'pdf.formato-cambio-area',
+            self::datosCambioArea($inventario, $motivo, $destinatarioNombre, $destinatarioCargo, $camposSeleccionados)
+        );
     }
 
     /**
@@ -564,9 +599,10 @@ class SigemPdfGenerator
         \App\Models\Inventario $inventario,
         ?string $motivo = null,
         ?string $destinatarioNombre = null,
-        ?string $destinatarioCargo = null
+        ?string $destinatarioCargo = null,
+        ?array $camposSeleccionados = null
     ): StreamedResponse {
-        $pdf = self::generarCambioArea($inventario, $motivo, $destinatarioNombre, $destinatarioCargo);
+        $pdf = self::generarCambioArea($inventario, $motivo, $destinatarioNombre, $destinatarioCargo, $camposSeleccionados);
         $codigo = preg_replace('/[^A-Za-z0-9_-]+/', '-', (string) ($inventario->codigo ?: $inventario->num_serie ?: $inventario->id_inventario));
 
         return self::descargarPdf($pdf, 'formato-cambio-area-' . trim((string) $codigo, '-') . '.pdf');

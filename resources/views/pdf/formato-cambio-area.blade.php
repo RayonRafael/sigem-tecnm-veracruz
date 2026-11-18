@@ -2,6 +2,18 @@
 
 @section('titulo', 'Formato de Cambio de Área — SIGEM')
 
+@php
+    $camposSeleccionados = $camposSeleccionados ?? [
+        'num_serie',
+        'origen',
+        'destino',
+        'jefe_destino',
+        'fecha_cambio',
+    ];
+    $mostrarSerie = in_array('num_serie', $camposSeleccionados, true);
+    $mostrarDescExtendida = in_array('descripcion_extendida', $camposSeleccionados, true);
+@endphp
+
 @section('estilos')
     @page {
         margin: 12mm 16mm 14mm 16mm;
@@ -93,19 +105,24 @@
     .origen-destino-box {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 12px;
+        margin-bottom: 10px;
         font-size: 8.5pt;
     }
 
     .origen-destino-box td {
         border: 1px solid #d1d5db;
         padding: 5px 8px;
-        width: 50%;
         vertical-align: top;
     }
 
     .od-label {
         font-weight: bold;
+        color: #111827;
+    }
+
+    .dato-opcional {
+        font-size: 8.5pt;
+        margin: 3px 0;
         color: #111827;
     }
 
@@ -150,6 +167,12 @@
 
     .col-serie {
         width: 26%;
+    }
+
+    .desc-ext {
+        font-size: 8pt;
+        color: #374151;
+        margin-top: 3px;
     }
 
     .parrafo-cierre {
@@ -267,9 +290,11 @@
                     <div>{{ $config['almacen']['subdireccion'] ?? 'Subdirección de Servicios Administrativos' }}</div>
                     <div>Departamento de {{ $config['centro_computo']['nombre'] ?? 'Centro de Cómputo' }}</div>
                 </div>
-                <div class="fecha-row">
-                    H. Veracruz, Ver., <span class="fecha-highlight">{{ $fecha }}</span>
-                </div>
+                @if(in_array('fecha_cambio', $camposSeleccionados, true))
+                    <div class="fecha-row">
+                        H. Veracruz, Ver., <span class="fecha-highlight">{{ $fecha }}</span>
+                    </div>
+                @endif
             </td>
         </tr>
     </table>
@@ -278,7 +303,9 @@
 @section('contenido')
     <!-- Destinatario (Jefe del departamento de destino) -->
     <div class="destinatario-block">
-        <div>{{ $destinatarioNombre }}</div>
+        @if(in_array('jefe_destino', $camposSeleccionados, true))
+            <div>{{ $destinatarioNombre }}</div>
+        @endif
         <div>{{ $destinatarioCargo }}</div>
         @if(!empty($destinatarioDepto) && !str_contains($destinatarioCargo, $destinatarioDepto))
             <div>{{ $destinatarioDepto }}</div>
@@ -288,32 +315,46 @@
 
     <!-- Asunto e introducción oficial -->
     <p class="parrafo-intro">
-        @if(!empty($motivo))
-            Por este medio le envío un cordial saludo, el motivo principal del mismo es informarle que se realizará el cambio de área del siguiente equipo ({{ $motivo }}) para el departamento que honra dirigir. El equipo es un equipo de reutilización en buenas condiciones, siendo el siguiente el que se entrega:
-        @else
-            Por este medio le envío un cordial saludo, el motivo principal del mismo es informarle que se realizará el cambio de área del siguiente equipo de cómputo para el departamento que honra dirigir. El equipo es un equipo de reutilización en buenas condiciones, siendo el siguiente el que se entrega:
-        @endif
+        Por este medio le envío un cordial saludo, el motivo principal del mismo es informarle que se realizará el cambio de área del siguiente equipo de cómputo para el departamento que honra dirigir. El equipo es un equipo de reutilización en buenas condiciones, siendo el siguiente el que se entrega:
     </p>
 
-    <!-- Origen y Destino -->
-    <table class="origen-destino-box">
-        <tr>
-            <td>
-                <span class="od-label">Origen:</span> {{ $origenDepto ?? 'Centro de Cómputo' }}
-                @if(!empty($origenArea) && $origenArea !== ($origenDepto ?? ''))
-                    — {{ $origenArea }}
+    <!-- Origen y Destino (condicional según checklist) -->
+    @if(in_array('origen', $camposSeleccionados, true) || in_array('destino', $camposSeleccionados, true))
+        <table class="origen-destino-box">
+            <tr>
+                @if(in_array('origen', $camposSeleccionados, true))
+                    <td>
+                        <span class="od-label">Origen:</span> {{ $origenDepto ?? 'Centro de Cómputo' }}
+                        @if(!empty($origenArea) && $origenArea !== ($origenDepto ?? ''))
+                            — {{ $origenArea }}
+                        @endif
+                    </td>
                 @endif
-            </td>
-            <td>
-                <span class="od-label">Destino:</span> {{ $destinoDepto ?? $destinatarioDepto }}
-                @if(!empty($destinoArea) && $destinoArea !== ($destinoDepto ?? ''))
-                    — {{ $destinoArea }}
+                @if(in_array('destino', $camposSeleccionados, true))
+                    <td>
+                        <span class="od-label">Destino:</span> {{ $destinoDepto ?? $destinatarioDepto }}
+                        @if(!empty($destinoArea) && $destinoArea !== ($destinoDepto ?? ''))
+                            — {{ $destinoArea }}
+                        @endif
+                    </td>
                 @endif
-            </td>
-        </tr>
-    </table>
+            </tr>
+        </table>
+    @endif
 
-    <!-- Tabla de equipos -->
+    @if(in_array('jefe_origen', $camposSeleccionados, true))
+        <p class="dato-opcional"><strong>Jefe de Depto. origen:</strong> {{ $jefeOrigen ?? '—' }}</p>
+    @endif
+
+    @if(in_array('nueva_aula', $camposSeleccionados, true))
+        <p class="dato-opcional"><strong>Nueva aula:</strong> {{ $nuevaAula ?? '—' }}</p>
+    @endif
+
+    @if(in_array('motivo', $camposSeleccionados, true))
+        <p class="dato-opcional"><strong>Motivo del cambio:</strong> {{ $motivo ?: 'Reubicación operativa de equipo' }}</p>
+    @endif
+
+    <!-- Tabla de equipos (SIEMPRE visible; Serie y Descripción extendida condicionales) -->
     <table class="equipos-table">
         <thead>
             <tr>
@@ -321,7 +362,9 @@
                 <th class="col-desc">Descripción</th>
                 <th class="col-marca">Marca</th>
                 <th class="col-modelo">Modelo</th>
-                <th class="col-serie">Serie</th>
+                @if($mostrarSerie)
+                    <th class="col-serie">Serie</th>
+                @endif
             </tr>
         </thead>
         <tbody>
@@ -331,6 +374,13 @@
                     if ($desc === '') {
                         $desc = $item->subtipo ?? 'Equipo de cómputo';
                     }
+                    $detallesExtendidos = array_filter([
+                        $item->procesador ? "CPU: {$item->procesador}" : null,
+                        $item->ram ? "RAM: {$item->ram}" : null,
+                        $item->disco ? "Disco: {$item->disco}" : null,
+                        $item->sistema_operativo ? "SO: {$item->sistema_operativo}" : null,
+                        $item->observaciones_generales ?: null,
+                    ]);
                     $marca = $item->material?->marca?->nombre
                         ?? ($item->especificaciones['marca'] ?? null)
                         ?? ($item->especificaciones['cpu_marca'] ?? null)
@@ -343,10 +393,17 @@
                 @endphp
                 <tr>
                     <td class="col-cant">1</td>
-                    <td class="col-desc">{{ $desc }}</td>
+                    <td class="col-desc">
+                        {{ $desc }}
+                        @if($mostrarDescExtendida && !empty($detallesExtendidos))
+                            <div class="desc-ext">{{ implode(' · ', $detallesExtendidos) }}</div>
+                        @endif
+                    </td>
                     <td class="col-marca">{{ $marca }}</td>
                     <td class="col-modelo">{{ $modelo }}</td>
-                    <td class="col-serie">{{ $serie }}</td>
+                    @if($mostrarSerie)
+                        <td class="col-serie">{{ $serie }}</td>
+                    @endif
                 </tr>
             @empty
                 <tr>
@@ -354,7 +411,9 @@
                     <td class="col-desc">{{ $inventario->material?->nombre ?? 'Equipo' }}</td>
                     <td class="col-marca">{{ $inventario->material?->marca?->nombre ?? '—' }}</td>
                     <td class="col-modelo">{{ $inventario->modelo ?? '—' }}</td>
-                    <td class="col-serie">{{ $inventario->num_serie ?: ($inventario->codigo ?: '—') }}</td>
+                    @if($mostrarSerie)
+                        <td class="col-serie">{{ $inventario->num_serie ?: ($inventario->codigo ?: '—') }}</td>
+                    @endif
                 </tr>
             @endforelse
         </tbody>
@@ -365,7 +424,7 @@
         Sin más por el momento quedo a sus más finas atenciones y al pendiente de cualquier duda o aclaración al respecto
     </p>
 
-    <!-- Firmas: ENTREGA (origen) / RECIBE (destino) -->
+    <!-- Firmas: ENTREGA (origen) / RECIBE (destino) — SIEMPRE visibles -->
     <table class="firmas-table">
         <tr>
             <td>
@@ -378,7 +437,9 @@
             </td>
             <td>
                 <div class="firma-header">RECIBE</div>
-                <div class="firma-nombre">{{ $destinatarioNombre }}</div>
+                <div class="firma-nombre">
+                    {{ in_array('jefe_destino', $camposSeleccionados, true) ? $destinatarioNombre : '_______________________________' }}
+                </div>
                 <div class="firma-cargo">
                     {{ $destinatarioCargo }}<br>
                     @if(!str_contains($destinatarioCargo, $destinatarioDepto))
@@ -418,4 +479,3 @@
         </table>
     </div>
 @endsection
-
