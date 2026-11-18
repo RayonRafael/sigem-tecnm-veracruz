@@ -12,6 +12,7 @@ use App\Models\TipoMaterial;
 use App\Support\SigemBajaFormatHelper;
 use App\Support\SigemExcelExporter;
 use App\Support\SigemPdfGenerator;
+use App\Support\SigemReportExporter;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Carbon;
@@ -51,6 +52,20 @@ class ReportesPage extends Page
     }
 
     public ?string $reporteActivo = null;
+
+    public string $pestanaPrincipal = 'formatos';
+
+    public string $subpestanaReportes = 'inventario';
+
+    public ?string $filtroFechaDesde = null;
+
+    public ?string $filtroFechaHasta = null;
+
+    public ?string $filtroDepartamentoId = '';
+
+    public ?string $nuevoReporteActivo = null;
+
+    public ?string $formatoSeleccionadoCambioArea = '';
 
     public array $visibilidadServicioSocial = [];
 
@@ -217,13 +232,14 @@ class ReportesPage extends Page
     }
 
     /**
-     * Metadata de los 4 Formatos Institucionales en PDF del TecNM Veracruz.
+     * Metadata de los Formatos Institucionales en PDF del TecNM Veracruz.
+     * Retorna 4 formatos por defecto (retrocompatibilidad) o 5 si se incluye Cambio de Área.
      *
      * @return list<array{id: string, emoji: string, titulo: string, subtitulo: string, descripcion: string}>
      */
-    public function getFormatosInstitucionales(): array
+    public function getFormatosInstitucionales(bool $incluirCambioArea = false): array
     {
-        return [
+        $formatos = [
             [
                 'id' => 'entrega',
                 'emoji' => '📄',
@@ -253,6 +269,77 @@ class ReportesPage extends Page
                 'descripcion' => 'Genera trámite de baja de mobiliario y equipo individual o en lote multipágina.',
             ],
         ];
+
+        if ($incluirCambioArea) {
+            $formatos[] = [
+                'id' => 'cambio_area',
+                'emoji' => '🔄',
+                'titulo' => 'Formato de Cambio de Área',
+                'subtitulo' => 'Formato 5',
+                'descripcion' => 'Constancia oficial de reubicación y traslado de bienes entre departamentos y áreas.',
+            ];
+        }
+
+        return $formatos;
+    }
+
+    public function cambiarPestanaPrincipal(string $pestana): void
+    {
+        if (in_array($pestana, ['formatos', 'nuevos_reportes'], true)) {
+            $this->pestanaPrincipal = $pestana;
+            $this->cerrarReporte();
+            $this->cerrarNuevoReporte();
+        }
+    }
+
+    public function cambiarSubpestanaReportes(string $subpestana): void
+    {
+        $validas = array_keys(SigemReportExporter::getSubpestanas());
+        if (in_array($subpestana, $validas, true)) {
+            $this->subpestanaReportes = $subpestana;
+            $this->cerrarNuevoReporte();
+        }
+    }
+
+    public function limpiarFiltrosNuevosReportes(): void
+    {
+        $this->filtroFechaDesde = null;
+        $this->filtroFechaHasta = null;
+        $this->filtroDepartamentoId = '';
+        $this->cerrarNuevoReporte();
+    }
+
+    public function verNuevoReporte(string $reportId): void
+    {
+        $this->nuevoReporteActivo = $reportId;
+        $this->dispatch('scroll-to-report');
+    }
+
+    public function cerrarNuevoReporte(): void
+    {
+        $this->nuevoReporteActivo = null;
+    }
+
+    public function exportarNuevoReporte(string $reportId, string $formato = 'xlsx')
+    {
+        $filtros = [
+            'fecha_desde' => $this->filtroFechaDesde,
+            'fecha_hasta' => $this->filtroFechaHasta,
+            'departamento_id' => $this->filtroDepartamentoId,
+        ];
+
+        return SigemReportExporter::export($reportId, $filtros, $formato);
+    }
+
+    public function getDatosNuevoReporte(string $reportId): ?array
+    {
+        $filtros = [
+            'fecha_desde' => $this->filtroFechaDesde,
+            'fecha_hasta' => $this->filtroFechaHasta,
+            'departamento_id' => $this->filtroDepartamentoId,
+        ];
+
+        return SigemReportExporter::getReportData($reportId, $filtros);
     }
 
     public function updatedFormatoFechaDesde(): void
@@ -275,6 +362,7 @@ class ReportesPage extends Page
         $this->formatoSeleccionadoEntrega = '';
         $this->formatoSeleccionadoOrden = '';
         $this->formatoSeleccionadoVerificacion = '';
+        $this->formatoSeleccionadoCambioArea = '';
         $this->formatosSeleccionadosBaja = [];
     }
 
@@ -423,6 +511,27 @@ class ReportesPage extends Page
             ->get();
     }
 
+    public function getInventariosCambioAreaParaFormato(): \Illuminate\Support\Collection
+    {
+        $query = Inventario::query()
+            ->with(['material.marca', 'departamento', 'area.departamento', 'salon'])
+            ->where(function ($q) {
+                $q->whereNotNull('fecha_cambio_area')
+                    ->orWhere('estado', 'Cambio de área')
+                    ->orWhereNotNull('especificaciones->cambio_origen_depto');
+            });
+
+        $this->aplicarFiltroFechaFormato($query, 'fecha_cambio_area');
+
+        $deptoId = filled($this->formatoDepartamentoId) ? (int) $this->formatoDepartamentoId : null;
+        $this->aplicarFiltroDeptoInventario($query, $deptoId);
+
+        return $query->orderByDesc('fecha_cambio_area')
+            ->orderByDesc('id_inventario')
+            ->limit(100)
+            ->get();
+    }
+
     /**
      * Resuelve un registro de formato verificando propiedad del usuario cuando no es Administrador.
      *
@@ -532,6 +641,24 @@ class ReportesPage extends Page
             }
 
             return SigemPdfGenerator::descargarFormatosBajaLote($bajas);
+        }
+
+        if ($formatoId === 'cambio_area') {
+            $candidatos = $this->getInventariosCambioAreaParaFormato();
+            $inv = null;
+            if (filled($this->formatoSeleccionadoCambioArea)) {
+                $inv = $candidatos->firstWhere('id_inventario', (int) $this->formatoSeleccionadoCambioArea)
+                    ?? Inventario::find($this->formatoSeleccionadoCambioArea);
+            } else {
+                $inv = $candidatos->first();
+            }
+
+            if (! $inv) {
+                $this->notificarSinRegistrosFormato('No hay equipos con cambio de área que coincidan con los filtros.');
+                return null;
+            }
+
+            return SigemPdfGenerator::descargarCambioArea($inv);
         }
 
         return null;

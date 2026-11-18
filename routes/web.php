@@ -1,11 +1,16 @@
 <?php
 
+use App\Http\Controllers\ReportesController;
 use App\Http\Controllers\SigemPdfController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('landing');
 });
+
+Route::get('/reportes/export/{tipo}', [ReportesController::class, 'export'])
+    ->middleware('auth')
+    ->name('reportes.export');
 
 Route::get('/sigem/pdf/baja/{inventario}', [SigemPdfController::class, 'formatoBaja'])
     ->name('sigem.pdf.baja');
