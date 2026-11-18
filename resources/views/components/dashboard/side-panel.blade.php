@@ -55,7 +55,8 @@
                     $areaNom = $parts[1] ?? $parts[0] ?? null;
                 }
                 $areaNom = $areaNom ?: 'Sin área';
-                $aulaNom = $rec->salon?->nombre
+                $aulaNom = $rec->aula
+                    ?? $rec->salon?->nombre
                     ?? ($rec->especificaciones['aula'] ?? null)
                     ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $rec->ubicacion_fisica ?? '', $m) ? $m[1] : null);
                 return $matNom . ' · ' . $areaNom . (!empty($aulaNom) ? ' · Aula ' . $aulaNom : '');

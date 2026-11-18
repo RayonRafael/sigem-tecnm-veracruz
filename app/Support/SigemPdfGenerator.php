@@ -517,6 +517,7 @@ class SigemPdfGenerator
             ?: ('JEFE DEL DEPARTAMENTO DE ' . mb_strtoupper($deptoNombre, 'UTF-8'));
 
         $nuevaAula = $specs['cambio_nueva_aula']
+            ?? $inventario->aula
             ?? $inventario->salon?->nombre
             ?? ($specs['aula'] ?? null)
             ?? '—';

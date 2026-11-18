@@ -196,7 +196,8 @@ class InfolistSchema
                                             ->label('Aula')
                                             ->icon('heroicon-m-academic-cap')
                                             ->getStateUsing(function (Inventario $record): string {
-                                                return $record->salon?->nombre
+                                                return $record->aula
+                                                    ?? $record->salon?->nombre
                                                     ?? ($record->especificaciones['aula'] ?? null)
                                                     ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record->ubicacion_fisica ?? '', $m) ? $m[1] : null)
                                                     ?? '—';

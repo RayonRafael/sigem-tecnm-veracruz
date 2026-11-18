@@ -31,12 +31,20 @@ class InventarioObserver
             $inventario->codigo = $inventario->generarCodigo();
         }
 
-        // 3. Sincronizar ubicación física inicial si no viene asignada
+        // 3. Sincronizar campo físico aula y ubicación física inicial si no vienen asignados
+        if (empty($inventario->aula)) {
+            $aulaFallback = $inventario->especificaciones['aula']
+                ?? ($inventario->salon_id ? Salon::find($inventario->salon_id)?->nombre : null);
+            if (! empty($aulaFallback)) {
+                $inventario->aula = substr(trim((string) $aulaFallback), 0, 50);
+            }
+        }
+
         if (empty($inventario->ubicacion_fisica)) {
             $ubicacion = $this->construirUbicacion(
                 $inventario->departamento_id,
                 $inventario->area_id,
-                $inventario->salon_id,
+                $inventario->aula ?: $inventario->salon_id,
                 $inventario->estacion
             );
             if (! empty($ubicacion)) {
@@ -50,7 +58,7 @@ class InventarioObserver
         $ubicacion = $this->construirUbicacion(
             $inventario->departamento_id,
             $inventario->area_id,
-            $inventario->salon_id,
+            $inventario->aula ?: $inventario->salon_id,
             $inventario->estacion
         );
 
@@ -73,11 +81,17 @@ class InventarioObserver
             $inventario->fecha_baja = now();
         }
 
-        if ($inventario->isDirty(['departamento_id', 'area_id', 'salon_id', 'estacion'])) {
+        if ($inventario->isDirty('salon_id') && ! $inventario->isDirty('aula')) {
+            $inventario->aula = $inventario->salon_id
+                ? Salon::find($inventario->salon_id)?->nombre
+                : null;
+        }
+
+        if ($inventario->isDirty(['departamento_id', 'area_id', 'salon_id', 'aula', 'estacion'])) {
             $ubicacion = $this->construirUbicacion(
                 $inventario->departamento_id,
                 $inventario->area_id,
-                $inventario->salon_id,
+                $inventario->aula ?: $inventario->salon_id,
                 $inventario->estacion
             );
             if (! empty($ubicacion)) {
@@ -92,20 +106,20 @@ class InventarioObserver
             return;
         }
 
-        $cambioUbicacion = $inventario->wasChanged(['departamento_id', 'area_id', 'salon_id', 'estacion']);
+        $cambioUbicacion = $inventario->wasChanged(['departamento_id', 'area_id', 'salon_id', 'aula', 'estacion']);
 
         if ($cambioUbicacion) {
             $ubicacionAnterior = $this->construirUbicacion(
                 $inventario->getOriginal('departamento_id'),
                 $inventario->getOriginal('area_id'),
-                $inventario->getOriginal('salon_id'),
+                $inventario->getOriginal('aula') ?: $inventario->getOriginal('salon_id'),
                 $inventario->getOriginal('estacion')
             );
 
             $ubicacionNueva = $this->construirUbicacion(
                 $inventario->departamento_id,
                 $inventario->area_id,
-                $inventario->salon_id,
+                $inventario->aula ?: $inventario->salon_id,
                 $inventario->estacion
             );
 
@@ -127,7 +141,7 @@ class InventarioObserver
         }
     }
 
-    public function construirUbicacion(?int $departamentoId, ?int $areaId, ?int $salonId, ?string $estacion): string
+    public function construirUbicacion(?int $departamentoId, ?int $areaId, int|string|null $salonId, ?string $estacion): string
     {
         return \App\Support\UbicacionHelper::construir($departamentoId, $areaId, $salonId, $estacion);
     }

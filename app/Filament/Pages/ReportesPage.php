@@ -815,7 +815,7 @@ class ReportesPage extends Page
         foreach ($mantenimientos as $m) {
             $inv = $m->inventario;
             $espec = is_array($inv?->especificaciones) ? $inv->especificaciones : json_decode($inv?->especificaciones ?? '[]', true);
-            $aula = $inv?->salon?->nombre ?? ($espec['aula'] ?? '—');
+            $aula = $inv?->aula ?? $inv?->salon?->nombre ?? ($espec['aula'] ?? '—');
             $codigo = $inv?->codigo ?: ($inv?->num_serie ?: ('#' . $m->id_inventario));
             $equipo = $inv?->material?->nombre ?? $inv?->subtipo ?? 'N/A';
             $categoria = $inv?->material?->tipo?->nombre ?? $inv?->subtipo ?? 'General';

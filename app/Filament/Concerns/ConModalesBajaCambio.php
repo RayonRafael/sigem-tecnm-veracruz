@@ -139,7 +139,12 @@ trait ConModalesBajaCambio
         $specs['jefe_destino'] = filled($data['jefe_departamento'] ?? null)
             ? trim((string) $data['jefe_departamento'])
             : ($deptoDestino?->encargado ?? '');
-        $specs['cambio_nueva_aula'] = $data['aula'] ?? null;
+        $nuevaAula = filled($data['aula'] ?? null) ? trim((string) $data['aula']) : null;
+        $specs['cambio_nueva_aula'] = $nuevaAula;
+        if ($nuevaAula !== null) {
+            $specs['aula'] = $nuevaAula;
+            $record->aula = $nuevaAula;
+        }
         $specs['cambio_motivo'] = $data['motivo'] ?? null;
 
         $record->skipHistorialObserver = true;

@@ -20,7 +20,7 @@ class RegistrarMultiplesEquipos
             $estacion = $data['estacion'] ?? null;
             $departamentoId = $data['departamento_id'] ?? null;
             $areaId = $data['area_id'] ?? null;
-            $aula = $data['especificaciones']['aula'] ?? null;
+            $aula = $data['aula'] ?? ($data['especificaciones']['aula'] ?? null);
             $salonId = $data['salon_id'] ?? null;
 
             if (empty($salonId) && ! empty($aula)) {
@@ -90,6 +90,7 @@ class RegistrarMultiplesEquipos
                 'departamento_id' => $departamentoId,
                 'area_id' => $areaId,
                 'salon_id' => $salonId,
+                'aula' => $aula,
                 'estacion' => $estacion,
                 'estado' => $data['estado'] ?? 'Disponible',
                 'tipo_propiedad' => $data['tipo_propiedad'] ?? 'Propio',

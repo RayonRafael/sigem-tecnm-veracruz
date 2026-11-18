@@ -19,7 +19,18 @@ class UbicacionHelper
 
         $departamento = $departamentoId ? Departamento::find($departamentoId) : null;
         $area = $areaId ? Area::with('departamento')->find($areaId) : null;
-        $salon = $salonId ? Salon::with('area.departamento')->find($salonId) : null;
+
+        $salon = null;
+        $nombreSalon = null;
+
+        if (! empty($salonId)) {
+            if (is_numeric($salonId)) {
+                $salon = Salon::with('area.departamento')->find($salonId);
+                $nombreSalon = $salon?->nombre;
+            } elseif (is_string($salonId)) {
+                $nombreSalon = trim($salonId);
+            }
+        }
 
         if (! $area && $salon?->area) {
             $area = $salon->area;
@@ -37,8 +48,8 @@ class UbicacionHelper
             $partes[] = trim($area->nombre);
         }
 
-        if ($salon?->nombre) {
-            $nombreSalon = trim($salon->nombre);
+        if (! empty($nombreSalon)) {
+            $nombreSalon = trim($nombreSalon);
             $partes[] = str_starts_with(strtolower($nombreSalon), 'aula')
                 ? $nombreSalon
                 : 'Aula ' . $nombreSalon;
@@ -72,7 +83,7 @@ class UbicacionHelper
                 $partes[] = $area->nombre;
             }
         }
-        if ($aula = $get('especificaciones.aula')) {
+        if ($aula = ($get('aula') ?: $get('especificaciones.aula'))) {
             $partes[] = "Aula {$aula}";
         }
         if (! empty($partes)) {

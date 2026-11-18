@@ -22,7 +22,7 @@ class Inventario extends Model
                 'id_usuario', 'estado_registro', 'aprobado', 'aprobado_por', 'fecha_aprobacion', 'fecha_baja',
                 'fecha_asignacion', 'fecha_cambio_area', 'ram', 'disco', 'procesador', 'mac_address', 'ip_address',
                 'codigo', 'estacion', 'tipo_impresora', 'sistema_operativo', 'modelo', 'especificacion_texto',
-                'departamento_id', 'area_id', 'salon_id',
+                'departamento_id', 'area_id', 'salon_id', 'aula',
             ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
@@ -49,7 +49,7 @@ class Inventario extends Model
         'observaciones_generales', 'garantia_fecha_fin', 'garantia_estado',
         'aprobado', 'aprobado_por', 'fecha_aprobacion',
         'ram', 'disco', 'procesador', 'mac_address', 'ip_address',
-        'tipo_equipo', 'edificio_id', 'departamento_id', 'area_id', 'salon_id',
+        'tipo_equipo', 'edificio_id', 'departamento_id', 'area_id', 'salon_id', 'aula',
         'codigo', 'estacion', 'tipo_impresora', 'sistema_operativo', 'modelo', 'especificacion_texto',
         'motivo_baja', 'observaciones_baja', 'id_usuario_baja', 'estado_previo_baja',
         'estado_previo_cambio', 'ubicacion_solicitada',
@@ -453,24 +453,41 @@ class Inventario extends Model
             $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
             $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
-            if (!empty($salonId) && !is_numeric($salonId) && is_string($salonId)) {
-                $salonObj = Salon::firstOrCreate(['nombre' => $salonId, 'area_id' => $areaId]);
-                $salonId = $salonObj->id;
+            $aulaTexto = null;
+            $salonIdFinal = null;
+
+            if (! empty($salonId) && ! is_numeric($salonId) && is_string($salonId)) {
+                $aulaTexto = trim($salonId);
+                $salonObj = Salon::firstOrCreate(['nombre' => $aulaTexto, 'area_id' => $areaId]);
+                $salonIdFinal = $salonObj->id;
+            } elseif (! empty($salonId) && is_numeric($salonId)) {
+                $salonIdFinal = (int) $salonId;
+                $aulaTexto = Salon::find($salonIdFinal)?->nombre;
             }
 
             $ubicacionAnterior = $this->ubicacion_fisica
-                ?: (\App\Support\UbicacionHelper::construir($this->departamento_id, $this->area_id, $this->salon_id, $this->estacion) ?: 'Sin ubicación previa');
+                ?: (\App\Support\UbicacionHelper::construir($this->departamento_id, $this->area_id, $this->aula ?: $this->salon_id, $this->estacion) ?: 'Sin ubicación previa');
 
-            $ubicacionNueva = \App\Support\UbicacionHelper::construir($departamentoId, $areaId, $salonId, $estacion);
+            $ubicacionNueva = \App\Support\UbicacionHelper::construir($departamentoId, $areaId, $aulaTexto ?: $salonIdFinal, $estacion);
 
             $this->skipHistorialObserver = true;
 
             $this->departamento_id = $departamentoId;
             $this->area_id = $areaId;
-            $this->salon_id = $salonId;
+            $this->salon_id = $salonIdFinal;
+            $this->aula = $aulaTexto;
             $this->estacion = $estacion;
             $this->fecha_cambio_area = now();
-            if (!empty($ubicacionNueva)) {
+
+            $specs = is_array($this->especificaciones) ? $this->especificaciones : [];
+            if ($aulaTexto !== null) {
+                $specs['aula'] = $aulaTexto;
+            } else {
+                unset($specs['aula']);
+            }
+            $this->especificaciones = $specs;
+
+            if (! empty($ubicacionNueva)) {
                 $this->ubicacion_fisica = substr($ubicacionNueva, 0, 150);
             }
             $this->save();
@@ -497,15 +514,23 @@ class Inventario extends Model
             $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
             $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
-            if (!empty($salonId) && !is_numeric($salonId) && is_string($salonId)) {
-                $salonObj = Salon::firstOrCreate(['nombre' => $salonId, 'area_id' => $areaId]);
-                $salonId = $salonObj->id;
+            $aulaTexto = null;
+            $salonIdFinal = null;
+
+            if (! empty($salonId) && ! is_numeric($salonId) && is_string($salonId)) {
+                $aulaTexto = trim($salonId);
+                $salonObj = Salon::firstOrCreate(['nombre' => $aulaTexto, 'area_id' => $areaId]);
+                $salonIdFinal = $salonObj->id;
+            } elseif (! empty($salonId) && is_numeric($salonId)) {
+                $salonIdFinal = (int) $salonId;
+                $aulaTexto = Salon::find($salonIdFinal)?->nombre;
             }
 
             $solicitudData = [
                 'departamento_id' => $departamentoId,
                 'area_id' => $areaId,
-                'salon_id' => $salonId,
+                'salon_id' => $salonIdFinal,
+                'aula' => $aulaTexto,
                 'estacion' => $estacion,
                 'motivo' => $motivo,
             ];
@@ -540,6 +565,7 @@ class Inventario extends Model
             $depto = $solicitud['departamento_id'] ?? $this->departamento_id;
             $area = $solicitud['area_id'] ?? $this->area_id;
             $salon = $solicitud['salon_id'] ?? null;
+            $aula = $solicitud['aula'] ?? ($salon ? Salon::find($salon)?->nombre : null);
             $estacion = $solicitud['estacion'] ?? null;
 
             $this->skipHistorialObserver = true;
@@ -547,14 +573,23 @@ class Inventario extends Model
             $this->departamento_id = $depto;
             $this->area_id = $area;
             $this->salon_id = $salon;
+            $this->aula = $aula;
             $this->estacion = $estacion;
             $this->estado = $estadoPrevio;
             $this->fecha_cambio_area = now();
             $this->ubicacion_solicitada = null;
             $this->estado_previo_cambio = null;
 
-            $ubicacionNueva = \App\Support\UbicacionHelper::construir($depto, $area, $salon, $estacion);
-            if (!empty($ubicacionNueva)) {
+            $specs = is_array($this->especificaciones) ? $this->especificaciones : [];
+            if ($aula !== null) {
+                $specs['aula'] = $aula;
+            } else {
+                unset($specs['aula']);
+            }
+            $this->especificaciones = $specs;
+
+            $ubicacionNueva = \App\Support\UbicacionHelper::construir($depto, $area, $aula ?: $salon, $estacion);
+            if (! empty($ubicacionNueva)) {
                 $this->ubicacion_fisica = substr($ubicacionNueva, 0, 150);
             }
             $this->save();

@@ -266,7 +266,8 @@ class InventarioResource extends Resource
             ?? $record->especificaciones['cpu_marca']
             ?? $record->material?->marca?->nombre
             ?? '';
-        $data['aula'] = $record->salon?->nombre
+        $data['aula'] = $record->aula
+            ?? $record->salon?->nombre
             ?? ($record->especificaciones['aula'] ?? null)
             ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record->ubicacion_fisica ?? '', $m) ? $m[1] : null)
             ?? '';
@@ -309,20 +310,28 @@ class InventarioResource extends Resource
                 }
             }
 
-            // 3. Aula
-            if (isset($data['aula'])) {
-                $nuevaAula = trim($data['aula']);
+            // 3. Aula (columna física + especificaciones + sincronización limpia de salon_id)
+            if (array_key_exists('aula', $data)) {
+                $nuevaAula = filled($data['aula']) ? trim((string) $data['aula']) : null;
+                $record->aula = $nuevaAula;
+                $data['aula'] = $nuevaAula;
+
                 $specs = $record->especificaciones ?? [];
-                $specs['aula'] = $nuevaAula;
+                if ($nuevaAula !== null) {
+                    $specs['aula'] = $nuevaAula;
+                } else {
+                    unset($specs['aula']);
+                }
                 $record->especificaciones = $specs;
 
-                if ($record->area_id && filled($nuevaAula)) {
-                    $salon = Salon::where('area_id', $record->area_id)
+                $targetAreaId = $data['area_id'] ?? $record->area_id;
+                if ($targetAreaId && $nuevaAula !== null) {
+                    $salon = Salon::where('area_id', $targetAreaId)
                         ->where('nombre', $nuevaAula)
                         ->first();
-                    if ($salon) {
-                        $record->salon_id = $salon->id;
-                    }
+                    $record->salon_id = $salon?->id;
+                } else {
+                    $record->salon_id = null;
                 }
             }
 
@@ -560,21 +569,24 @@ class InventarioResource extends Resource
                 ->extraHeaderAttributes(['style' => 'min-width: 80px;'])
                 ->extraCellAttributes(['style' => 'min-width: 80px;'])
                 ->getStateUsing(function (Inventario $record): string {
-                    return $record->salon?->nombre
+                    return $record->aula
+                        ?? $record->salon?->nombre
                         ?? ($record->especificaciones['aula'] ?? null)
                         ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record->ubicacion_fisica ?? '', $m) ? $m[1] : null)
                         ?? '—';
                 })
                 ->searchable(query: function (Builder $query, string $search): Builder {
                     return $query->where(function (Builder $q) use ($search) {
-                        $q->whereHas('salon', fn ($sub) => $sub->where('nombre', 'like', "%{$search}%"))
+                        $q->where('inventario.aula', 'like', "%{$search}%")
+                          ->orWhereHas('salon', fn ($sub) => $sub->where('nombre', 'like', "%{$search}%"))
                           ->orWhere('especificaciones->aula', 'like', "%{$search}%")
                           ->orWhere('ubicacion_fisica', 'like', "%{$search}%");
                     });
                 }, isIndividual: true)
                 ->sortable(query: function (Builder $query, string $direction): Builder {
+                    $dir = strtolower($direction) === 'desc' ? 'DESC' : 'ASC';
                     return $query->leftJoin('salones', 'inventario.salon_id', '=', 'salones.id')
-                        ->orderBy('salones.nombre', $direction)
+                        ->orderByRaw("COALESCE(NULLIF(inventario.aula, ''), salones.nombre) {$dir}")
                         ->select('inventario.*');
                 })
                 ->placeholder('—'),
@@ -1018,7 +1030,8 @@ class InventarioResource extends Resource
         if (filled($searches['aula'] ?? null)) {
             $termAula = '%' . trim((string) $searches['aula']) . '%';
             $invQuery->where(function (Builder $q) use ($termAula) {
-                $q->whereHas('salon', fn ($sub) => $sub->where('nombre', 'like', $termAula))
+                $q->where('inventario.aula', 'like', $termAula)
+                  ->orWhereHas('salon', fn ($sub) => $sub->where('nombre', 'like', $termAula))
                   ->orWhere('especificaciones->aula', 'like', $termAula)
                   ->orWhere('ubicacion_fisica', 'like', $termAula);
             });
@@ -1090,7 +1103,7 @@ class InventarioResource extends Resource
             'area' => $invQuery->leftJoin('area', 'inventario.area_id', '=', 'area.id_area')
                 ->orderBy('area.nombre', $direction),
             'aula' => $invQuery->leftJoin('salones', 'inventario.salon_id', '=', 'salones.id')
-                ->orderBy('salones.nombre', $direction),
+                ->orderByRaw("COALESCE(NULLIF(inventario.aula, ''), salones.nombre) " . ($direction === 'asc' ? 'ASC' : 'DESC')),
             'num_serie' => $invQuery->orderBy('num_serie', $direction),
             'ip_address' => $invQuery->orderBy('ip_address', $direction),
             'mac_address' => $invQuery->orderBy('mac_address', $direction),

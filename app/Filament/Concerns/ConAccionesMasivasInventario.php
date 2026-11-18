@@ -318,7 +318,7 @@ trait ConAccionesMasivasInventario
 
                     $record->departamento_id = $deptoId;
                     $record->area_id = $areaId;
-                    $ubicacionNueva = UbicacionHelper::construir($deptoId, $areaId, $record->salon_id, null);
+                    $ubicacionNueva = UbicacionHelper::construir($deptoId, $areaId, $record->aula ?: $record->salon_id, null);
                     if ($ubicacionNueva) {
                         $record->ubicacion_fisica = substr($ubicacionNueva, 0, 150);
                     }
@@ -339,7 +339,7 @@ trait ConAccionesMasivasInventario
                     $depto = Departamento::find($deptoId);
 
                     $record->departamento_id = $deptoId;
-                    $ubicacionNueva = UbicacionHelper::construir($deptoId, $record->area_id, $record->salon_id, null);
+                    $ubicacionNueva = UbicacionHelper::construir($deptoId, $record->area_id, $record->aula ?: $record->salon_id, null);
                     if ($ubicacionNueva) {
                         $record->ubicacion_fisica = substr($ubicacionNueva, 0, 150);
                     }
