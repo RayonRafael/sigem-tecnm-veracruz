@@ -303,21 +303,21 @@
             grid-template-columns: repeat(6, 1fr);
             gap: 24px;
             margin-bottom: 32px;
-            align-items: start;
+            align-items: stretch;
         }
         .sigem-new-rep-grid-charts {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 24px;
             margin-bottom: 24px;
-            align-items: start;
+            align-items: stretch;
         }
         .sigem-new-rep-grid-tables {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 24px;
             margin-bottom: 32px;
-            align-items: start;
+            align-items: stretch;
         }
         /* Tarjetas CON gráfica: ocupan 3 de 6 columnas (medio ancho = 2 por fila) */
         .sigem-new-card.sigem-chart-card {
@@ -365,8 +365,7 @@
             flex-direction: column;
             min-width: 0;
             overflow: hidden;
-            height: auto;
-            align-self: start;
+            height: 100%;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
             transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
         }
@@ -411,6 +410,7 @@
         }
         .sigem-chart-canvas-wrap {
             position: relative;
+            flex: 1;
             min-height: 220px;
             width: 100%;
             margin: 8px 0;
@@ -429,6 +429,12 @@
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             max-width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .sigem-mini-table-box .sigem-mini-table {
+            flex: 1;
         }
         .sigem-mini-table-title {
             font-size: 11.5px;
@@ -1351,7 +1357,7 @@
 
                         {{-- CONTENEDOR CANVAS RESPONSIVE DE CHART.JS O MENSAJE SIN GRÁFICA --}}
                         @if ($numPuntos > 0)
-                            <div class="sigem-chart-canvas-wrap" style="min-height: {{ $numPuntos >= 4 ? '220px' : '180px' }}; height: {{ $numPuntos >= 4 ? '220px' : '180px' }}; position: relative;">
+                            <div class="sigem-chart-canvas-wrap" style="min-height: {{ $numPuntos >= 4 ? '220px' : '180px' }}; position: relative;">
                                 <canvas x-ref="canvas"></canvas>
                             </div>
                         @else
