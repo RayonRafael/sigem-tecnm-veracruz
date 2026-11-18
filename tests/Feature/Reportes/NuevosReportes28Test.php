@@ -338,12 +338,14 @@ class NuevosReportes28Test extends TestCase
 
         $livewire = Livewire::test(ReportesPage::class)
             // Verificar pestaña principal por defecto
+            ->assertSet('pestanaPrincipal', 'principales')
+            ->assertSee('Reportes Principales')
+            ->call('cambiarPestanaPrincipal', 'formatos')
             ->assertSet('pestanaPrincipal', 'formatos')
-            ->assertSee('Formatos Institucionales (PDF)')
-            ->assertSee('Formato de Cambio de Área')
+            ->assertSee('Formatos PDF')
             // Cambiar a pestaña Nuevos Reportes
-            ->call('cambiarPestanaPrincipal', 'nuevos_reportes')
-            ->assertSet('pestanaPrincipal', 'nuevos_reportes')
+            ->call('cambiarPestanaPrincipal', 'nuevos')
+            ->assertSet('pestanaPrincipal', 'nuevos')
             ->assertSee('Inventario General')
             ->assertSee('Por Departamento')
             // Cambiar sub-pestaña a Mantenimiento
@@ -483,6 +485,7 @@ class NuevosReportes28Test extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('admin'));
 
         $component = Livewire::test(ReportesPage::class)
+            ->call('cambiarPestanaPrincipal', 'formatos')
             ->assertSee('📄 Formatos Institucionales (PDF)')
             ->assertSee('📋 Entrega')
             ->assertSee('🔧 Orden')
@@ -491,35 +494,76 @@ class NuevosReportes28Test extends TestCase
             ->assertSee('🔄 Cambio')
             ->assertSee('🔍 Filtrar existentes');
 
-        // Pestaña inicial por defecto: Entrega
+        // Pestaña inicial por defecto: Entrega (formato tabla)
         $component->assertSee('Entrega de Equipo')
-            ->assertSee('Formato 1');
+            ->assertSee('Receptor');
 
-        // Cambiar a Orden de Trabajo
+        // Cambiar a Orden de Trabajo (formato tabla)
         $component->call('cambiarPestanaFormato', 'orden_trabajo')
             ->assertSee('Orden de Trabajo')
-            ->assertSee('Formato 2');
+            ->assertSee('Tipo servicio');
 
-        // Cambiar a Lista Verificación
+        // Cambiar a Lista Verificación (formato tabla)
         $component->call('cambiarPestanaFormato', 'lista_verificacion')
             ->assertSee('Lista Verificación')
-            ->assertSee('Formato 3');
+            ->assertSee('Atendido por');
 
-        // Cambiar a Baja
+        // Cambiar a Baja (formato tabla)
         $component->call('cambiarPestanaFormato', 'baja')
             ->assertSee('Trámite de Baja')
-            ->assertSee('Formato 4');
+            ->assertSee('Motivo');
 
-        // Cambiar a Cambio de Área
+        // Cambiar a Cambio de Área (formato tabla)
         $component->call('cambiarPestanaFormato', 'cambio_area')
-            ->assertSee('Formato de Cambio de Área')
-            ->assertSee('Formato 5');
+            ->assertSee('Cambio de Área')
+            ->assertSee('Origen')
+            ->assertSee('Destino');
 
-        // Cambiar a Filtrar formatos existentes
+        // Cambiar a Filtrar formatos existentes (formato tabla)
         $component->call('cambiarPestanaFormato', 'filtrar')
             ->assertSee('Filtrar formatos existentes')
             ->assertSee('Busca y descarga formatos ya generados')
             ->assertSee('Descargar seleccionados')
             ->assertDontSee('Filtros de regeneración');
+    }
+
+    public function test_ruta_web_abrir_y_descargar_formatos_pdf_funciona(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $receptor = \App\Models\Receptor::create([
+            'nombre' => 'Juan',
+            'apellido_paterno' => 'Pérez',
+            'apellido_materno' => 'Gómez',
+            'id_area' => $this->area->id_area,
+        ]);
+
+        $solicitud = Solicitud::create([
+            'id_usuario' => $this->adminUser->id,
+            'id_receptor' => $receptor->id_receptor,
+            'tipo_movimiento' => 'Asignacion Permanente',
+            'estado' => 'Autorizado',
+            'fecha_solicitud' => now(),
+        ]);
+
+        // Probar apertura (?preview=1 inline)
+        $resPreview = $this->get(route('reportes.pdf', [
+            'tipo' => 'entrega',
+            'id' => $solicitud->id_solicitud,
+            'preview' => 1,
+        ]));
+        $resPreview->assertOk();
+        $this->assertStringContainsString('inline', (string) $resPreview->headers->get('content-disposition'));
+        $this->assertEquals('application/pdf', $resPreview->headers->get('content-type'));
+
+        // Probar descarga (?download=1 attachment)
+        $resDownload = $this->get(route('reportes.pdf', [
+            'tipo' => 'entrega',
+            'id' => $solicitud->id_solicitud,
+            'download' => 1,
+        ]));
+        $resDownload->assertOk();
+        $this->assertStringContainsString('attachment', (string) $resDownload->headers->get('content-disposition'));
+        $this->assertEquals('application/pdf', $resDownload->headers->get('content-type'));
     }
 }

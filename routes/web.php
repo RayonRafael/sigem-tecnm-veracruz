@@ -12,6 +12,10 @@ Route::get('/reportes/export/{tipo}', [ReportesController::class, 'export'])
     ->middleware('auth')
     ->name('reportes.export');
 
+Route::get('/reportes/pdf/{tipo}/{id}', [ReportesController::class, 'pdf'])
+    ->middleware('auth')
+    ->name('reportes.pdf');
+
 Route::get('/sigem/pdf/baja/{inventario}', [SigemPdfController::class, 'formatoBaja'])
     ->name('sigem.pdf.baja');
 

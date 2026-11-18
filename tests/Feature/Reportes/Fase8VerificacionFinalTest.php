@@ -333,6 +333,7 @@ class Fase8VerificacionFinalTest extends TestCase
         ], array_column($formatos, 'id'));
 
         Livewire::test(AdminReportesPage::class)
+            ->call('cambiarPestanaPrincipal', 'formatos')
             ->assertSee('Formatos Institucionales (PDF)')
             ->assertSee('Entrega de Equipo')
             ->assertSee('Orden de Trabajo')

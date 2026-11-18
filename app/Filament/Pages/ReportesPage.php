@@ -53,7 +53,7 @@ class ReportesPage extends Page
 
     public ?string $reporteActivo = null;
 
-    public string $pestanaPrincipal = 'formatos';
+    public string $pestanaPrincipal = 'principales';
 
     public string $subpestanaReportes = 'inventario';
 
@@ -287,7 +287,13 @@ class ReportesPage extends Page
 
     public function cambiarPestanaPrincipal(string $pestana): void
     {
-        if (in_array($pestana, ['formatos', 'reportes', 'nuevos_reportes'], true)) {
+        $map = [
+            'nuevos_reportes' => 'nuevos',
+            'reportes' => 'principales',
+        ];
+        $pestana = $map[$pestana] ?? $pestana;
+
+        if (in_array($pestana, ['principales', 'formatos', 'nuevos'], true)) {
             $this->pestanaPrincipal = $pestana;
             $this->cerrarReporte();
             $this->cerrarNuevoReporte();
@@ -595,12 +601,14 @@ class ReportesPage extends Page
         return $registro;
     }
 
-    public function descargarFormatoInstitucional(string $formatoId)
+    public function descargarFormatoInstitucional(string $formatoId, $registroId = null)
     {
+        $idStr = filled($registroId) ? (string) $registroId : null;
+
         if ($formatoId === 'entrega') {
             $solicitud = $this->resolverRegistroFormatoAutorizado(
                 $this->getSolicitudesParaFormato(),
-                $this->formatoSeleccionadoEntrega,
+                $idStr ?? $this->formatoSeleccionadoEntrega,
                 'id_solicitud',
                 Solicitud::class,
                 'id_usuario',
@@ -613,7 +621,7 @@ class ReportesPage extends Page
         if ($formatoId === 'orden_trabajo') {
             $mant = $this->resolverRegistroFormatoAutorizado(
                 $this->getMantenimientosParaOrdenFormato(),
-                $this->formatoSeleccionadoOrden,
+                $idStr ?? $this->formatoSeleccionadoOrden,
                 'id_mantenimiento',
                 Mantenimiento::class,
                 'id_usuario_solicita',
@@ -626,7 +634,7 @@ class ReportesPage extends Page
         if ($formatoId === 'lista_verificacion') {
             $mant = $this->resolverRegistroFormatoAutorizado(
                 $this->getMantenimientosParaVerificacionFormato(),
-                $this->formatoSeleccionadoVerificacion,
+                $idStr ?? $this->formatoSeleccionadoVerificacion,
                 'id_mantenimiento',
                 Mantenimiento::class,
                 'id_usuario_solicita',
@@ -638,6 +646,13 @@ class ReportesPage extends Page
 
         if ($formatoId === 'baja') {
             $candidatos = $this->getInventariosBajaParaFormato();
+            if ($idStr !== null) {
+                $inv = $candidatos->firstWhere('id_inventario', (int) $idStr) ?? Inventario::find((int) $idStr);
+                if ($inv) {
+                    return SigemPdfGenerator::descargarFormatoBaja($inv);
+                }
+            }
+
             $ids = array_values(array_filter(array_map('intval', $this->formatosSeleccionadosBaja)));
             $bajas = ! empty($ids)
                 ? $candidatos->whereIn('id_inventario', $ids)->values()
@@ -666,20 +681,16 @@ class ReportesPage extends Page
 
         if ($formatoId === 'cambio_area') {
             $candidatos = $this->getInventariosCambioAreaParaFormato();
-            $inv = null;
-            if (filled($this->formatoSeleccionadoCambioArea)) {
-                $inv = $candidatos->firstWhere('id_inventario', (int) $this->formatoSeleccionadoCambioArea)
-                    ?? Inventario::find($this->formatoSeleccionadoCambioArea);
-            } else {
-                $inv = $candidatos->first();
-            }
+            $inv = $this->resolverRegistroFormatoAutorizado(
+                $candidatos,
+                $idStr ?? $this->formatoSeleccionadoCambioArea,
+                'id_inventario',
+                Inventario::class,
+                'id_usuario',
+                'No hay equipos con cambio de área que coincidan con los filtros.'
+            );
 
-            if (! $inv) {
-                $this->notificarSinRegistrosFormato('No hay equipos con cambio de área que coincidan con los filtros.');
-                return null;
-            }
-
-            return SigemPdfGenerator::descargarCambioArea($inv);
+            return $inv ? SigemPdfGenerator::descargarCambioArea($inv) : null;
         }
 
         return null;

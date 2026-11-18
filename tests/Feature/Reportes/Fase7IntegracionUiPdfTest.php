@@ -430,6 +430,7 @@ class Fase7IntegracionUiPdfTest extends TestCase
         ], array_column($formatos, 'id'));
 
         $livewire = Livewire::test(AdminReportesPage::class)
+            ->call('cambiarPestanaPrincipal', 'formatos')
             ->assertSee('Formatos Institucionales (PDF)')
             ->assertSee('Entrega de Equipo')
             ->assertSee('Orden de Trabajo')
@@ -461,6 +462,7 @@ class Fase7IntegracionUiPdfTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('servicio-social'));
 
         Livewire::test(SSReportesPage::class)
+            ->call('cambiarPestanaPrincipal', 'formatos')
             ->assertSee('Formatos Institucionales (PDF)')
             ->assertSee('Trámite de Baja');
     }
