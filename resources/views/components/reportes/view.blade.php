@@ -300,9 +300,34 @@
         }
         .sigem-new-rep-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            grid-template-columns: repeat(6, 1fr);
             gap: 24px;
             margin-bottom: 32px;
+        }
+        /* Tarjetas CON gráfica: ocupan 3 de 6 columnas (medio ancho = 2 por fila) */
+        .sigem-new-card.sigem-chart-card {
+            grid-column: span 3;
+        }
+        /* Tarjetas SOLO tabla: ocupan 2 de 6 columnas (3 por fila) */
+        .sigem-new-card.sigem-table-card {
+            grid-column: span 2;
+        }
+        @media (max-width: 1024px) {
+            .sigem-new-card.sigem-chart-card {
+                grid-column: span 6;
+            }
+            .sigem-new-card.sigem-table-card {
+                grid-column: span 3;
+            }
+        }
+        @media (max-width: 768px) {
+            .sigem-new-rep-grid {
+                grid-template-columns: 1fr;
+            }
+            .sigem-new-card.sigem-chart-card,
+            .sigem-new-card.sigem-table-card {
+                grid-column: span 1;
+            }
         }
         .sigem-new-card {
             background: #ffffff;
@@ -312,6 +337,8 @@
             display: flex;
             flex-direction: column;
             height: 100%;
+            min-width: 0;
+            overflow: hidden;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
             transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
         }
@@ -362,6 +389,8 @@
             background: #fafafa;
             border-radius: 8px;
             padding: 8px;
+            box-sizing: border-box;
+            overflow: hidden;
         }
         .sigem-mini-table-box {
             background: #f8fafc;
@@ -369,6 +398,9 @@
             border-radius: 8px;
             padding: 10px 12px;
             margin-top: 16px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            max-width: 100%;
         }
         .sigem-mini-table-title {
             font-size: 11.5px;
@@ -388,14 +420,19 @@
             text-align: left;
             font-weight: 600;
             color: #64748b;
-            padding: 5px 8px;
+            padding: 6px 8px;
             border-bottom: 1px solid #cbd5e1;
             background: #f1f5f9;
+            white-space: nowrap;
         }
         .sigem-mini-table td {
-            padding: 5px 8px;
+            padding: 6px 8px;
             border-bottom: 1px solid #f1f5f9;
             color: #1e293b;
+            word-break: break-word;
+        }
+        .sigem-mini-table td.sigem-td-nowrap {
+            white-space: nowrap !important;
         }
         .sigem-mini-table tr:last-child td {
             border-bottom: none;
@@ -1305,7 +1342,7 @@
                                     @forelse (($rep['top5_rows'] ?? []) as $tr)
                                         <tr>
                                             @foreach ($tr as $td)
-                                                <td>{{ $td }}</td>
+                                                <td class="{{ preg_match('/^\d{2}\/\d{2}\/\d{4}$/', trim((string)$td)) ? 'sigem-td-nowrap' : '' }}">{{ $td }}</td>
                                             @endforeach
                                         </tr>
                                     @empty
@@ -1371,7 +1408,7 @@
                                     @forelse (($rep['top5_rows'] ?? []) as $tr)
                                         <tr>
                                             @foreach ($tr as $td)
-                                                <td>{{ $td }}</td>
+                                                <td class="{{ preg_match('/^\d{2}\/\d{2}\/\d{4}$/', trim((string)$td)) ? 'sigem-td-nowrap' : '' }}">{{ $td }}</td>
                                             @endforeach
                                         </tr>
                                     @empty
@@ -1489,6 +1526,69 @@
                     if (!chartConfig || !this.$refs.canvas) return;
                     const ctx = this.$refs.canvas.getContext('2d');
 
+                    const truncateLabel = (val, maxLen = 25) => {
+                        if (typeof val === 'string' && val.length > maxLen) {
+                            return val.slice(0, maxLen - 3) + '...';
+                        }
+                        return val;
+                    };
+
+                    const isHorizontal = chartConfig.options?.indexAxis === 'y';
+                    const isPieOrDonut = ['pie', 'doughnut'].includes(chartConfig.type);
+
+                    // Configurar escalas responsivas según orientación
+                    const baseScales = chartConfig.options?.scales ? JSON.parse(JSON.stringify(chartConfig.options.scales)) : {};
+                    let finalScales = {};
+
+                    if (!isPieOrDonut) {
+                        if (isHorizontal) {
+                            // Barras horizontales: Y son categorías (labels de deptos/equipos), X son valores numéricos
+                            finalScales.y = Object.assign({}, baseScales.y || {}, {
+                                grid: { display: false },
+                                ticks: {
+                                    autoSkip: false,
+                                    maxRotation: 0,
+                                    font: { size: 11 },
+                                    callback: function (val, index) {
+                                        const raw = this.getLabelForValue ? this.getLabelForValue(val) : (chartConfig.labels?.[index] ?? val);
+                                        return truncateLabel(raw, 25);
+                                    }
+                                }
+                            });
+                            finalScales.x = Object.assign({}, baseScales.x || {}, {
+                                beginAtZero: true,
+                                grid: { color: '#f1f5f9' },
+                                ticks: {
+                                    font: { size: 11 },
+                                    precision: 0
+                                }
+                            });
+                        } else {
+                            // Barras verticales o líneas: X son categorías, Y son valores numéricos
+                            finalScales.x = Object.assign({}, baseScales.x || {}, {
+                                grid: { display: false },
+                                ticks: {
+                                    autoSkip: true,
+                                    maxRotation: 45,
+                                    minRotation: 0,
+                                    font: { size: 11 },
+                                    callback: function (val, index) {
+                                        const raw = this.getLabelForValue ? this.getLabelForValue(val) : (chartConfig.labels?.[index] ?? val);
+                                        return truncateLabel(raw, 25);
+                                    }
+                                }
+                            });
+                            finalScales.y = Object.assign({}, baseScales.y || {}, {
+                                beginAtZero: true,
+                                grid: { color: '#f1f5f9' },
+                                ticks: {
+                                    font: { size: 11 },
+                                    precision: 0
+                                }
+                            });
+                        }
+                    }
+
                     const render = () => {
                         if (typeof Chart === 'undefined') {
                             setTimeout(render, 150);
@@ -1507,16 +1607,36 @@
                                 options: Object.assign({
                                     responsive: true,
                                     maintainAspectRatio: false,
+                                    layout: {
+                                        padding: {
+                                            left: 4,
+                                            right: 8,
+                                            top: 4,
+                                            bottom: 4
+                                        }
+                                    },
                                     plugins: {
                                         legend: {
-                                            display: ['pie', 'doughnut'].includes(chartConfig.type),
+                                            display: isPieOrDonut,
                                             position: 'bottom',
-                                            labels: { boxWidth: 10, font: { size: 10 } }
+                                            labels: {
+                                                boxWidth: 10,
+                                                font: { size: 11 },
+                                                padding: 12
+                                            }
                                         },
                                         tooltip: {
-                                            enabled: true
+                                            enabled: true,
+                                            callbacks: {
+                                                title: function (items) {
+                                                    if (!items.length) return '';
+                                                    const idx = items[0].dataIndex;
+                                                    return chartConfig.labels?.[idx] ?? items[0].label ?? '';
+                                                }
+                                            }
                                         }
-                                    }
+                                    },
+                                    scales: finalScales
                                 }, chartConfig.options || {})
                             });
                         } catch (err) {
