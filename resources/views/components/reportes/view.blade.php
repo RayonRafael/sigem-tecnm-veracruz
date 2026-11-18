@@ -303,6 +303,7 @@
             grid-template-columns: repeat(6, 1fr);
             gap: 24px;
             margin-bottom: 32px;
+            align-items: start;
         }
         /* Tarjetas CON gráfica: ocupan 3 de 6 columnas (medio ancho = 2 por fila) */
         .sigem-new-card.sigem-chart-card {
@@ -336,7 +337,6 @@
             padding: 20px 24px;
             display: flex;
             flex-direction: column;
-            height: 100%;
             min-width: 0;
             overflow: hidden;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
