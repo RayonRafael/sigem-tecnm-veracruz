@@ -476,4 +476,50 @@ class NuevosReportes28Test extends TestCase
             $this->assertNotEmpty($data['top5_headers']);
         }
     }
+
+    public function test_formatos_institucionales_pdf_tienen_sistema_de_pestanas_con_contadores(): void
+    {
+        $this->actingAs($this->adminUser);
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        $component = Livewire::test(ReportesPage::class)
+            ->assertSee('📄 Formatos Institucionales (PDF)')
+            ->assertSee('📋 Entrega')
+            ->assertSee('🔧 Orden')
+            ->assertSee('✅ Lista')
+            ->assertSee('⚠️ Baja')
+            ->assertSee('🔄 Cambio')
+            ->assertSee('🔍 Filtrar existentes');
+
+        // Pestaña inicial por defecto: Entrega
+        $component->assertSee('Entrega de Equipo')
+            ->assertSee('Formato 1');
+
+        // Cambiar a Orden de Trabajo
+        $component->call('cambiarPestanaFormato', 'orden_trabajo')
+            ->assertSee('Orden de Trabajo')
+            ->assertSee('Formato 2');
+
+        // Cambiar a Lista Verificación
+        $component->call('cambiarPestanaFormato', 'lista_verificacion')
+            ->assertSee('Lista Verificación')
+            ->assertSee('Formato 3');
+
+        // Cambiar a Baja
+        $component->call('cambiarPestanaFormato', 'baja')
+            ->assertSee('Trámite de Baja')
+            ->assertSee('Formato 4');
+
+        // Cambiar a Cambio de Área
+        $component->call('cambiarPestanaFormato', 'cambio_area')
+            ->assertSee('Formato de Cambio de Área')
+            ->assertSee('Formato 5');
+
+        // Cambiar a Filtrar formatos existentes
+        $component->call('cambiarPestanaFormato', 'filtrar')
+            ->assertSee('Filtrar formatos existentes')
+            ->assertSee('Busca y descarga formatos ya generados')
+            ->assertSee('Descargar seleccionados')
+            ->assertDontSee('Filtros de regeneración');
+    }
 }

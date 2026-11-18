@@ -86,6 +86,8 @@ class ReportesPage extends Page
 
     public string $formatoFiltroTipo = 'baja';
 
+    public string $pestanaFormatoActiva = 'entrega';
+
     public function mount(): void
     {
         $defaults = [
@@ -298,6 +300,14 @@ class ReportesPage extends Page
         if (in_array($subpestana, $validas, true)) {
             $this->subpestanaReportes = $subpestana;
             $this->cerrarNuevoReporte();
+        }
+    }
+
+    public function cambiarPestanaFormato(string $pestana): void
+    {
+        $validas = ['entrega', 'orden_trabajo', 'lista_verificacion', 'baja', 'cambio_area', 'filtrar'];
+        if (in_array($pestana, $validas, true)) {
+            $this->pestanaFormatoActiva = $pestana;
         }
     }
 

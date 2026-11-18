@@ -338,7 +338,7 @@ class Fase8VerificacionFinalTest extends TestCase
             ->assertSee('Orden de Trabajo')
             ->assertSee('Lista Verificación')
             ->assertSee('Trámite de Baja')
-            ->assertSee('Filtros de regeneración');
+            ->assertSee('Filtrar formatos existentes');
     }
 
     public function test_reportes_filtros_historicos_funcionan(): void

@@ -435,7 +435,7 @@ class Fase7IntegracionUiPdfTest extends TestCase
             ->assertSee('Orden de Trabajo')
             ->assertSee('Lista Verificación')
             ->assertSee('Trámite de Baja')
-            ->assertSee('Generar seleccionados');
+            ->assertSee('Descargar seleccionados');
 
         $livewire->call('descargarFormatoInstitucional', 'entrega');
         $this->assertLivewirePdfDownloaded($livewire, "acta-entrega-{$solEntrega->id_solicitud}.pdf");

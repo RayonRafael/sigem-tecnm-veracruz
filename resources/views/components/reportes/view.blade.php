@@ -33,6 +33,7 @@
 
     $datosPreviaNuevo = $livewire->nuevoReporteActivo ? $livewire->getDatosNuevoReporte($livewire->nuevoReporteActivo) : null;
     $pestanaActual = $livewire->pestanaPrincipal ?? 'formatos';
+    $pestanaFormatoActiva = $livewire->pestanaFormatoActiva ?? 'entrega';
 @endphp
 
 <div class="sigem-professional">
@@ -121,6 +122,38 @@
             color: #ffffff;
             border-color: #1b396a;
             box-shadow: 0 2px 6px rgba(27, 57, 106, 0.25);
+        }
+        .sigem-subtab-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1px 6px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            line-height: 1.2;
+            background: rgba(15, 23, 42, 0.08);
+            color: inherit;
+        }
+        .sigem-subtab-btn.is-active .sigem-subtab-count {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        .sigem-fmt-tab-card {
+            max-width: 760px;
+            width: 100%;
+            padding: 22px 24px;
         }
         .sigem-filter-toolbar {
             display: flex;
@@ -470,192 +503,322 @@
 
         {{-- SECCIÓN 2: FORMATOS INSTITUCIONALES (PDF) --}}
         <section class="sigem-fmt-section" aria-labelledby="sigem-fmt-heading" style="border-top: 2px solid #e2e8f0; padding-top: 28px;">
-            <div class="sigem-fmt-header">
+            <div class="sigem-fmt-header" style="margin-bottom: 16px;">
                 <h2 id="sigem-fmt-heading">📄 Formatos Institucionales (PDF)</h2>
                 <p>Genera los formatos oficiales del TecNM Veracruz con membrete institucional y firma electrónica</p>
             </div>
 
-            <div class="sigem-fmt-grid">
-                @foreach ($formatosPdf as $fmt)
-                    @php
-                        $fmtId = $fmt['id'];
-                    @endphp
-                    <div class="sigem-fmt-card">
-                        <div class="sigem-fmt-card-top">
-                            <div class="sigem-fmt-ico">{{ $fmt['emoji'] }}</div>
-                            <span class="sigem-fmt-badge">{{ $fmt['subtitulo'] }}</span>
-                        </div>
-                        <div class="sigem-fmt-title">{{ $fmt['titulo'] }}</div>
-                        <div class="sigem-fmt-desc">{{ $fmt['descripcion'] }}</div>
+            {{-- Sistema de Pestañas de Formatos --}}
+            <div class="sigem-subtabs-bar" role="tablist" style="margin-bottom: 20px;">
+                <button type="button"
+                        wire:click="cambiarPestanaFormato('entrega')"
+                        title="Entrega de Equipo"
+                        class="sigem-subtab-btn {{ $pestanaFormatoActiva === 'entrega' ? 'is-active' : '' }}">
+                    <span>📋 Entrega</span>
+                    <span class="sr-only">de Equipo</span>
+                    <span class="sigem-subtab-count">({{ $solicitudesEntrega->count() }})</span>
+                </button>
 
-                        <div class="sigem-fmt-picker">
-                            @if ($fmtId === 'entrega')
-                                <label class="sigem-fmt-label">Solicitud de entrega ({{ $solicitudesEntrega->count() }})</label>
-                                <select wire:model="formatoSeleccionadoEntrega" class="sigem-fmt-control">
-                                    <option value="">
-                                        {{ $solicitudesEntrega->isNotEmpty() ? 'Más reciente (' . $solicitudesEntrega->count() . ' disp.)' : 'Sin solicitudes en el filtro' }}
+                <button type="button"
+                        wire:click="cambiarPestanaFormato('orden_trabajo')"
+                        title="Orden de Trabajo"
+                        class="sigem-subtab-btn {{ $pestanaFormatoActiva === 'orden_trabajo' ? 'is-active' : '' }}">
+                    <span>🔧 Orden</span>
+                    <span class="sr-only">de Trabajo</span>
+                    <span class="sigem-subtab-count">({{ $mantenimientosOrden->count() }})</span>
+                </button>
+
+                <button type="button"
+                        wire:click="cambiarPestanaFormato('lista_verificacion')"
+                        title="Lista Verificación"
+                        class="sigem-subtab-btn {{ $pestanaFormatoActiva === 'lista_verificacion' ? 'is-active' : '' }}">
+                    <span>✅ Lista</span>
+                    <span class="sr-only">Verificación</span>
+                    <span class="sigem-subtab-count">({{ $mantenimientosVerif->count() }})</span>
+                </button>
+
+                <button type="button"
+                        wire:click="cambiarPestanaFormato('baja')"
+                        title="Trámite de Baja"
+                        class="sigem-subtab-btn {{ $pestanaFormatoActiva === 'baja' ? 'is-active' : '' }}">
+                    <span>⚠️ Baja</span>
+                    <span class="sr-only">Trámite de Baja</span>
+                    <span class="sigem-subtab-count">({{ $inventariosBaja->count() }})</span>
+                </button>
+
+                <button type="button"
+                        wire:click="cambiarPestanaFormato('cambio_area')"
+                        title="Formato de Cambio de Área"
+                        class="sigem-subtab-btn {{ $pestanaFormatoActiva === 'cambio_area' ? 'is-active' : '' }}">
+                    <span>🔄 Cambio</span>
+                    <span class="sr-only">de Área</span>
+                    <span class="sigem-subtab-count">({{ $inventariosCambio->count() }})</span>
+                </button>
+
+                <button type="button"
+                        wire:click="cambiarPestanaFormato('filtrar')"
+                        title="Filtrar formatos existentes"
+                        class="sigem-subtab-btn {{ $pestanaFormatoActiva === 'filtrar' ? 'is-active' : '' }}">
+                    <span>🔍 Filtrar existentes</span>
+                    <span class="sr-only">Filtrar formatos existentes — Descargar seleccionados</span>
+                </button>
+            </div>
+
+            {{-- Contenido Dinámico de la Pestaña Activa --}}
+            <div class="sigem-fmt-tab-content">
+                @if ($pestanaFormatoActiva === 'entrega')
+                    <div class="sigem-fmt-card sigem-fmt-tab-card">
+                        <div class="sigem-fmt-card-top">
+                            <div class="sigem-fmt-ico">📋</div>
+                            <span class="sigem-fmt-badge">Formato 1</span>
+                        </div>
+                        <div class="sigem-fmt-title">Entrega de Equipo</div>
+                        <div class="sigem-fmt-desc">Genera acta oficial de entrega de equipo o bien con receptor y unidad orgánica.</div>
+
+                        <div class="sigem-fmt-picker" style="margin: 14px 0;">
+                            <label class="sigem-fmt-label">Solicitud de entrega ({{ $solicitudesEntrega->count() }}):</label>
+                            <select wire:model="formatoSeleccionadoEntrega" class="sigem-fmt-control">
+                                <option value="">
+                                    {{ $solicitudesEntrega->isNotEmpty() ? 'Más reciente (' . $solicitudesEntrega->count() . ' disp.)' : 'Sin solicitudes en el filtro' }}
+                                </option>
+                                @foreach ($solicitudesEntrega as $sol)
+                                    @php
+                                         $folioSol = 'FOLIO-' . str_pad((string) $sol->id_solicitud, 5, '0', STR_PAD_LEFT);
+                                         $receptorSol = $sol->receptor ? trim(($sol->receptor->nombre ?? '') . ' ' . ($sol->receptor->apellido_paterno ?? '')) : 'Sin receptor';
+                                         $fechaSol = $sol->fecha_solicitud ? $sol->fecha_solicitud->format('d/m/Y') : '—';
+                                    @endphp
+                                    <option value="{{ $sol->id_solicitud }}">
+                                        {{ $folioSol }} · {{ $receptorSol }} · {{ $fechaSol }}
                                     </option>
-                                    @foreach ($solicitudesEntrega as $sol)
-                                        @php
-                                             $folioSol = 'FOLIO-' . str_pad((string) $sol->id_solicitud, 5, '0', STR_PAD_LEFT);
-                                             $receptorSol = $sol->receptor ? trim(($sol->receptor->nombre ?? '') . ' ' . ($sol->receptor->apellido_paterno ?? '')) : 'Sin receptor';
-                                             $fechaSol = $sol->fecha_solicitud ? $sol->fecha_solicitud->format('d/m/Y') : '—';
-                                        @endphp
-                                        <option value="{{ $sol->id_solicitud }}">
-                                            {{ $folioSol }} · {{ $receptorSol }} · {{ $fechaSol }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            @elseif ($fmtId === 'orden_trabajo')
-                                <label class="sigem-fmt-label">Mantenimiento ({{ $mantenimientosOrden->count() }})</label>
-                                <select wire:model="formatoSeleccionadoOrden" class="sigem-fmt-control">
-                                    <option value="">
-                                        {{ $mantenimientosOrden->isNotEmpty() ? 'Más reciente (' . $mantenimientosOrden->count() . ' disp.)' : 'Sin órdenes en el filtro' }}
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="sigem-fmt-foot">
+                            <button type="button"
+                                    wire:click="descargarFormatoInstitucional('entrega')"
+                                    class="sigem-pdf-btn"
+                                    title="Descargar Entrega de Equipo en PDF">
+                                ↓ Descargar
+                            </button>
+                        </div>
+                    </div>
+                @elseif ($pestanaFormatoActiva === 'orden_trabajo')
+                    <div class="sigem-fmt-card sigem-fmt-tab-card">
+                        <div class="sigem-fmt-card-top">
+                            <div class="sigem-fmt-ico">🔧</div>
+                            <span class="sigem-fmt-badge">Formato 2</span>
+                        </div>
+                        <div class="sigem-fmt-title">Orden de Trabajo</div>
+                        <div class="sigem-fmt-desc">Genera orden de trabajo de mantenimiento y servicio técnico del Centro de Cómputo.</div>
+
+                        <div class="sigem-fmt-picker" style="margin: 14px 0;">
+                            <label class="sigem-fmt-label">Mantenimiento ({{ $mantenimientosOrden->count() }}):</label>
+                            <select wire:model="formatoSeleccionadoOrden" class="sigem-fmt-control">
+                                <option value="">
+                                    {{ $mantenimientosOrden->isNotEmpty() ? 'Más reciente (' . $mantenimientosOrden->count() . ' disp.)' : 'Sin órdenes en el filtro' }}
+                                </option>
+                                @foreach ($mantenimientosOrden as $mant)
+                                    @php
+                                        $folioMant = '#' . str_pad((string) $mant->id_mantenimiento, 4, '0', STR_PAD_LEFT);
+                                        $eqNom = $mant->inventario?->codigo ?: ($mant->inventario?->material?->nombre ?? 'Equipo');
+                                        $fechaMant = $mant->fecha_solicitud ? $mant->fecha_solicitud->format('d/m/Y') : '—';
+                                    @endphp
+                                    <option value="{{ $mant->id_mantenimiento }}">
+                                        {{ $folioMant }} · {{ $eqNom }} · {{ $fechaMant }}
                                     </option>
-                                    @foreach ($mantenimientosOrden as $mant)
-                                        @php
-                                            $folioMant = '#' . str_pad((string) $mant->id_mantenimiento, 4, '0', STR_PAD_LEFT);
-                                            $eqNom = $mant->inventario?->codigo ?: ($mant->inventario?->material?->nombre ?? 'Equipo');
-                                            $fechaMant = $mant->fecha_solicitud ? $mant->fecha_solicitud->format('d/m/Y') : '—';
-                                        @endphp
-                                        <option value="{{ $mant->id_mantenimiento }}">
-                                            {{ $folioMant }} · {{ $eqNom }} · {{ $fechaMant }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            @elseif ($fmtId === 'lista_verificacion')
-                                <label class="sigem-fmt-label">Mantenimiento atendido ({{ $mantenimientosVerif->count() }})</label>
-                                <select wire:model="formatoSeleccionadoVerificacion" class="sigem-fmt-control">
-                                    <option value="">
-                                        {{ $mantenimientosVerif->isNotEmpty() ? 'Más reciente (' . $mantenimientosVerif->count() . ' disp.)' : 'Sin registros en el filtro' }}
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="sigem-fmt-foot">
+                            <button type="button"
+                                    wire:click="descargarFormatoInstitucional('orden_trabajo')"
+                                    class="sigem-pdf-btn"
+                                    title="Descargar Orden de Trabajo en PDF">
+                                ↓ Descargar
+                            </button>
+                        </div>
+                    </div>
+                @elseif ($pestanaFormatoActiva === 'lista_verificacion')
+                    <div class="sigem-fmt-card sigem-fmt-tab-card">
+                        <div class="sigem-fmt-card-top">
+                            <div class="sigem-fmt-ico">✅</div>
+                            <span class="sigem-fmt-badge">Formato 3</span>
+                        </div>
+                        <div class="sigem-fmt-title">Lista Verificación</div>
+                        <div class="sigem-fmt-desc">Genera lista de verificación con hallazgo, atención y validación técnica.</div>
+
+                        <div class="sigem-fmt-picker" style="margin: 14px 0;">
+                            <label class="sigem-fmt-label">Mantenimiento atendido ({{ $mantenimientosVerif->count() }}):</label>
+                            <select wire:model="formatoSeleccionadoVerificacion" class="sigem-fmt-control">
+                                <option value="">
+                                    {{ $mantenimientosVerif->isNotEmpty() ? 'Más reciente (' . $mantenimientosVerif->count() . ' disp.)' : 'Sin registros en el filtro' }}
+                                </option>
+                                @foreach ($mantenimientosVerif as $mantV)
+                                    @php
+                                        $folioV = '#' . str_pad((string) $mantV->id_mantenimiento, 4, '0', STR_PAD_LEFT);
+                                        $estadoTag = $mantV->estado === 'Completado' ? '✓ Terminado' : $mantV->estado;
+                                        $eqV = $mantV->inventario?->codigo ?: ($mantV->inventario?->material?->nombre ?? 'Equipo');
+                                    @endphp
+                                    <option value="{{ $mantV->id_mantenimiento }}">
+                                        {{ $folioV }} · {{ $eqV }} ({{ $estadoTag }})
                                     </option>
-                                    @foreach ($mantenimientosVerif as $mantV)
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="sigem-fmt-foot">
+                            <button type="button"
+                                    wire:click="descargarFormatoInstitucional('lista_verificacion')"
+                                    class="sigem-pdf-btn"
+                                    title="Descargar Lista Verificación en PDF">
+                                ↓ Descargar
+                            </button>
+                        </div>
+                    </div>
+                @elseif ($pestanaFormatoActiva === 'baja')
+                    <div class="sigem-fmt-card sigem-fmt-tab-card">
+                        <div class="sigem-fmt-card-top">
+                            <div class="sigem-fmt-ico">⚠️</div>
+                            <span class="sigem-fmt-badge">Formato 4</span>
+                        </div>
+                        <div class="sigem-fmt-title">Trámite de Baja</div>
+                        <div class="sigem-fmt-desc">Genera trámite de baja de mobiliario y equipo individual o en lote multipágina.</div>
+
+                        <div class="sigem-fmt-picker" style="margin: 14px 0;">
+                            <label class="sigem-fmt-label">Equipos en baja ({{ $inventariosBaja->count() }}):</label>
+                            @if ($inventariosBaja->isNotEmpty())
+                                <div class="sigem-fmt-checklist" style="max-height: 180px;">
+                                    @foreach ($inventariosBaja as $invBaja)
                                         @php
-                                            $folioV = '#' . str_pad((string) $mantV->id_mantenimiento, 4, '0', STR_PAD_LEFT);
-                                            $estadoTag = $mantV->estado === 'Completado' ? '✓ Terminado' : $mantV->estado;
-                                            $eqV = $mantV->inventario?->codigo ?: ($mantV->inventario?->material?->nombre ?? 'Equipo');
+                                            $codBaja = $invBaja->codigo ?: ($invBaja->num_serie ?: ('#' . $invBaja->id_inventario));
+                                            $nomBaja = $invBaja->material?->nombre ?? $invBaja->subtipo ?? 'Equipo';
                                         @endphp
-                                        <option value="{{ $mantV->id_mantenimiento }}">
-                                            {{ $folioV }} · {{ $eqV }} ({{ $estadoTag }})
-                                        </option>
+                                        <label class="sigem-fmt-check-item">
+                                            <input type="checkbox"
+                                                   wire:model="formatosSeleccionadosBaja"
+                                                   value="{{ $invBaja->id_inventario }}">
+                                            <span><strong>{{ $codBaja }}</strong> · {{ $nomBaja }}</span>
+                                        </label>
                                     @endforeach
-                                </select>
-                            @elseif ($fmtId === 'baja')
-                                <label class="sigem-fmt-label">Equipos en baja ({{ $inventariosBaja->count() }})</label>
-                                @if ($inventariosBaja->isNotEmpty())
-                                    <div class="sigem-fmt-checklist">
-                                        @foreach ($inventariosBaja as $invBaja)
-                                            @php
-                                                $codBaja = $invBaja->codigo ?: ($invBaja->num_serie ?: ('#' . $invBaja->id_inventario));
-                                                $nomBaja = $invBaja->material?->nombre ?? $invBaja->subtipo ?? 'Equipo';
-                                            @endphp
-                                            <label class="sigem-fmt-check-item">
-                                                <input type="checkbox"
-                                                       wire:model="formatosSeleccionadosBaja"
-                                                       value="{{ $invBaja->id_inventario }}">
-                                                <span><strong>{{ $codBaja }}</strong> · {{ $nomBaja }}</span>
-                                            </label>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <div class="sigem-fmt-empty-note">Sin equipos en baja para el filtro actual.</div>
-                                @endif
-                            @elseif ($fmtId === 'cambio_area')
-                                <label class="sigem-fmt-label">Equipos con cambio de área ({{ $inventariosCambio->count() }})</label>
-                                <select wire:model="formatoSeleccionadoCambioArea" class="sigem-fmt-control">
-                                    <option value="">
-                                        {{ $inventariosCambio->isNotEmpty() ? 'Más reciente (' . $inventariosCambio->count() . ' disp.)' : 'Sin cambios de área en el filtro' }}
-                                    </option>
-                                    @foreach ($inventariosCambio as $invC)
-                                        @php
-                                            $codC = $invC->codigo ?: ($invC->num_serie ?: ('#' . $invC->id_inventario));
-                                            $nomC = $invC->material?->nombre ?? $invC->subtipo ?? 'Equipo';
-                                            $deptoC = $invC->departamento?->nombre ?? $invC->area?->departamento?->nombre ?? 'Sin depto';
-                                            $fechaC = $invC->fecha_cambio_area ? Carbon\Carbon::parse($invC->fecha_cambio_area)->format('d/m/Y') : '—';
-                                        @endphp
-                                        <option value="{{ $invC->id_inventario }}">
-                                            {{ $codC }} · {{ $nomC }} · {{ $deptoC }} ({{ $fechaC }})
-                                        </option>
-                                    @endforeach
-                                </select>
+                                </div>
+                            @else
+                                <div class="sigem-fmt-empty-note">Sin equipos en baja para el filtro actual.</div>
                             @endif
                         </div>
 
                         <div class="sigem-fmt-foot">
                             <button type="button"
-                                    wire:click="descargarFormatoInstitucional('{{ $fmtId }}')"
+                                    wire:click="descargarFormatoInstitucional('baja')"
                                     class="sigem-pdf-btn"
-                                    title="Descargar {{ $fmt['titulo'] }} en PDF">
+                                    title="Descargar Trámite de Baja en PDF">
                                 ↓ Descargar
                             </button>
                         </div>
                     </div>
-                @endforeach
-
-                {{-- Tarjeta de Filtros Históricos de Regeneración --}}
-                <div class="sigem-fmt-card sigem-fmt-filters-card">
-                    <div class="sigem-fmt-card-top">
-                        <div class="sigem-fmt-ico sigem-fmt-ico-filter">🔍</div>
-                        <span class="sigem-fmt-badge">Histórico</span>
-                    </div>
-                    <div class="sigem-fmt-title">Filtros de regeneración</div>
-                    <div class="sigem-fmt-desc">Filtra los registros por rango de fechas y departamento para regenerar formatos.</div>
-
-                    <div class="sigem-fmt-filters-form">
-                        <div class="sigem-fmt-filter-row">
-                            <label class="sigem-fmt-label" for="sigem-fmt-desde">Desde:</label>
-                            <input id="sigem-fmt-desde"
-                                   type="date"
-                                   wire:model.live="formatoFechaDesde"
-                                   class="sigem-fmt-control">
+                @elseif ($pestanaFormatoActiva === 'cambio_area')
+                    <div class="sigem-fmt-card sigem-fmt-tab-card">
+                        <div class="sigem-fmt-card-top">
+                            <div class="sigem-fmt-ico">🔄</div>
+                            <span class="sigem-fmt-badge">Formato 5</span>
                         </div>
-                        <div class="sigem-fmt-filter-row">
-                            <label class="sigem-fmt-label" for="sigem-fmt-hasta">Hasta:</label>
-                            <input id="sigem-fmt-hasta"
-                                   type="date"
-                                   wire:model.live="formatoFechaHasta"
-                                   class="sigem-fmt-control">
-                        </div>
-                        <div class="sigem-fmt-filter-row">
-                            <label class="sigem-fmt-label" for="sigem-fmt-depto">Depto:</label>
-                            <select id="sigem-fmt-depto"
-                                    wire:model.live="formatoDepartamentoId"
-                                    class="sigem-fmt-control">
-                                <option value="">Todos</option>
-                                @foreach ($deptosFiltros as $idDepto => $nombreDepto)
-                                    <option value="{{ $idDepto }}">{{ $nombreDepto }}</option>
+                        <div class="sigem-fmt-title">Formato de Cambio de Área</div>
+                        <div class="sigem-fmt-desc">Constancia oficial de reubicación y traslado de bienes entre departamentos y áreas.</div>
+
+                        <div class="sigem-fmt-picker" style="margin: 14px 0;">
+                            <label class="sigem-fmt-label">Equipos con cambio de área ({{ $inventariosCambio->count() }}):</label>
+                            <select wire:model="formatoSeleccionadoCambioArea" class="sigem-fmt-control">
+                                <option value="">
+                                    {{ $inventariosCambio->isNotEmpty() ? 'Más reciente (' . $inventariosCambio->count() . ' disp.)' : 'Sin cambios de área en el filtro' }}
+                                </option>
+                                @foreach ($inventariosCambio as $invC)
+                                    @php
+                                        $codC = $invC->codigo ?: ($invC->num_serie ?: ('#' . $invC->id_inventario));
+                                        $nomC = $invC->material?->nombre ?? $invC->subtipo ?? 'Equipo';
+                                        $deptoC = $invC->departamento?->nombre ?? $invC->area?->departamento?->nombre ?? 'Sin depto';
+                                        $fechaC = $invC->fecha_cambio_area ? Carbon\Carbon::parse($invC->fecha_cambio_area)->format('d/m/Y') : '—';
+                                    @endphp
+                                    <option value="{{ $invC->id_inventario }}">
+                                        {{ $codC }} · {{ $nomC }} · {{ $deptoC }} ({{ $fechaC }})
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="sigem-fmt-filter-row">
-                            <label class="sigem-fmt-label" for="sigem-fmt-tipo-lote">Formato:</label>
-                            <select id="sigem-fmt-tipo-lote"
-                                    wire:model="formatoFiltroTipo"
-                                    class="sigem-fmt-control">
-                                <option value="baja">Trámite de Baja ({{ $inventariosBaja->count() }})</option>
-                                <option value="entrega">Entrega de Equipo ({{ $solicitudesEntrega->count() }})</option>
-                                <option value="orden_trabajo">Orden de Trabajo ({{ $mantenimientosOrden->count() }})</option>
-                                <option value="lista_verificacion">Lista Verificación ({{ $mantenimientosVerif->count() }})</option>
-                                <option value="cambio_area">Cambio de Área ({{ $inventariosCambio->count() }})</option>
-                            </select>
+
+                        <div class="sigem-fmt-foot">
+                            <button type="button"
+                                    wire:click="descargarFormatoInstitucional('cambio_area')"
+                                    class="sigem-pdf-btn"
+                                    title="Descargar Formato de Cambio de Área en PDF">
+                                ↓ Descargar
+                            </button>
                         </div>
                     </div>
+                @elseif ($pestanaFormatoActiva === 'filtrar')
+                    <div class="sigem-fmt-card sigem-fmt-filters-card sigem-fmt-tab-card">
+                        <div class="sigem-fmt-card-top">
+                            <div class="sigem-fmt-ico sigem-fmt-ico-filter">🔍</div>
+                        </div>
+                        <div class="sigem-fmt-title">Filtrar formatos existentes</div>
+                        <div class="sigem-fmt-desc">Busca y descarga formatos ya generados</div>
 
-                    <div class="sigem-fmt-foot" style="justify-content: space-between;">
-                        <button type="button"
-                                wire:click="limpiarFiltrosFormatos"
-                                class="sigem-rep-btn-sec"
-                                title="Limpiar filtros">
-                            Limpiar
-                        </button>
-                        <button type="button"
-                                wire:click="generarFormatosFiltrados"
-                                class="sigem-pdf-btn"
-                                title="Generar PDFs de los registros filtrados">
-                            📄 Generar seleccionados
-                        </button>
+                        <div class="sigem-fmt-filters-form" style="margin: 16px 0;">
+                            <div class="sigem-fmt-filter-row">
+                                <label class="sigem-fmt-label" for="sigem-fmt-desde">Desde:</label>
+                                <input id="sigem-fmt-desde"
+                                       type="date"
+                                       wire:model.live="formatoFechaDesde"
+                                       class="sigem-fmt-control">
+                            </div>
+                            <div class="sigem-fmt-filter-row">
+                                <label class="sigem-fmt-label" for="sigem-fmt-hasta">Hasta:</label>
+                                <input id="sigem-fmt-hasta"
+                                       type="date"
+                                       wire:model.live="formatoFechaHasta"
+                                       class="sigem-fmt-control">
+                            </div>
+                            <div class="sigem-fmt-filter-row">
+                                <label class="sigem-fmt-label" for="sigem-fmt-depto">Depto:</label>
+                                <select id="sigem-fmt-depto"
+                                        wire:model.live="formatoDepartamentoId"
+                                        class="sigem-fmt-control">
+                                    <option value="">Todos</option>
+                                    @foreach ($deptosFiltros as $idDepto => $nombreDepto)
+                                        <option value="{{ $idDepto }}">{{ $nombreDepto }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="sigem-fmt-filter-row">
+                                <label class="sigem-fmt-label" for="sigem-fmt-tipo-lote">Formato:</label>
+                                <select id="sigem-fmt-tipo-lote"
+                                        wire:model="formatoFiltroTipo"
+                                        class="sigem-fmt-control">
+                                    <option value="baja">Trámite de Baja ({{ $inventariosBaja->count() }})</option>
+                                    <option value="entrega">Entrega de Equipo ({{ $solicitudesEntrega->count() }})</option>
+                                    <option value="orden_trabajo">Orden de Trabajo ({{ $mantenimientosOrden->count() }})</option>
+                                    <option value="lista_verificacion">Lista Verificación ({{ $mantenimientosVerif->count() }})</option>
+                                    <option value="cambio_area">Cambio de Área ({{ $inventariosCambio->count() }})</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="sigem-fmt-foot" style="justify-content: space-between;">
+                            <button type="button"
+                                    wire:click="limpiarFiltrosFormatos"
+                                    class="sigem-rep-btn-sec"
+                                    title="Limpiar filtros">
+                                Limpiar
+                            </button>
+                            <button type="button"
+                                    wire:click="generarFormatosFiltrados"
+                                    class="sigem-pdf-btn"
+                                    title="Descargar formatos de los registros filtrados">
+                                📥 Descargar seleccionados
+                            </button>
+                        </div>
                     </div>
-                </div>
+                @endif
             </div>
         </section>
     @endif
