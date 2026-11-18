@@ -86,10 +86,6 @@
                 ? \App\Models\Area::where('id_departamento', $deptoAct)->orderBy('nombre')->pluck('nombre', 'id_area')
                 : $todasLasAreas;
 
-            $salonesDisponibles = !empty($areaAct)
-                ? \App\Models\Salon::where('area_id', $areaAct)->orderBy('nombre')->pluck('nombre', 'id')
-                : collect();
-
             $todosLosReceptores = \App\Models\Receptor::orderBy('nombre')->get()->mapWithKeys(function ($r) {
                 $nom = trim("{$r->nombre} {$r->apellido_paterno} {$r->apellido_materno}");
                 return [$r->id_receptor => ($nom ?: "Receptor #{$r->id_receptor}") . ($r->cargo ? " ({$r->cargo})" : '')];
@@ -97,6 +93,16 @@
 
             $todosLosProveedores = \App\Models\Proveedor::orderBy('nombre_empresa')->pluck('nombre_empresa', 'id_proveedor');
             $motivosBajaOpciones = \App\Support\SigemBajaFormatHelper::motivosBajaOptions();
+
+            // Calcular propiedad actual de los equipos seleccionados
+            $propiedades = $selectedRecords->pluck('tipo_propiedad')->unique()->filter();
+            if ($propiedades->count() === 0) {
+                $propiedadActual = 'Sin definir';
+            } elseif ($propiedades->count() === 1) {
+                $propiedadActual = $propiedades->first();  // "Propio" o "Rentado"
+            } else {
+                $propiedadActual = 'Mixto';  // Equipos con diferente propiedad
+            }
         @endphp
 
         @if($curStep === 'principal')
@@ -357,12 +363,13 @@
                         @foreach($estadosEnum as $optEst)
                             <option value="{{ $optEst->value }}">{{ $optEst->value }}</option>
                         @endforeach
+                        <option value="Cambio de propiedad">Cambio de propiedad</option>
                     </select>
                 </div>
 
                 {{-- ── SECCIÓN 2: CAMPOS CONTEXTUALES ── --}}
                 @if($estadoAct === 'Cambio de área')
-                    {{-- SI ES "Cambio de área": Depto, Área, Aula, Salón --}}
+                    {{-- SI ES "Cambio de área": Depto, Área, Aula --}}
                     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
                         <div style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
                             <span>📍</span>
@@ -389,19 +396,9 @@
                             </select>
                         </div>
 
-                        <div class="sigem-sel-form-group">
+                        <div class="sigem-sel-form-group" style="margin-bottom: 0;">
                             <label class="sigem-sel-form-label">Nueva aula</label>
                             <input type="text" wire:model="cambioAula" class="sigem-sel-form-control" placeholder="ej. E101">
-                        </div>
-
-                        <div class="sigem-sel-form-group" style="margin-bottom: 0;">
-                            <label class="sigem-sel-form-label">Nuevo salón</label>
-                            <select wire:model.live="cambioSalonId" class="sigem-sel-form-control">
-                                <option value="">-- Seleccionar salón --</option>
-                                @foreach($salonesDisponibles as $sId => $sNom)
-                                    <option value="{{ $sId }}">{{ $sNom }}</option>
-                                @endforeach
-                            </select>
                         </div>
                     </div>
 
@@ -536,6 +533,27 @@
                             <input type="text" wire:model="cambioMotivoDevolucion" class="sigem-sel-form-control" placeholder="Motivo de la devolución...">
                         </div>
                     </div>
+                @elseif($estadoAct === 'Cambio de propiedad')
+                    {{-- SI ES "Cambio de propiedad": Propiedad ACTUAL y NUEVA --}}
+                    <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                        {{-- Propiedad ACTUAL (solo lectura) --}}
+                        <div class="sigem-sel-form-group">
+                            <label class="sigem-sel-form-label">Propiedad actual</label>
+                            <div style="background: #e2e8f0; border-radius: 6px; padding: 8px 12px; font-weight: 600; color: #334155;">
+                                {{ $propiedadActual }}
+                            </div>
+                        </div>
+
+                        {{-- Nueva propiedad (seleccionable) --}}
+                        <div class="sigem-sel-form-group" style="margin-bottom: 0;">
+                            <label class="sigem-sel-form-label">Nueva propiedad</label>
+                            <select wire:model="cambioNuevoTipoPropiedad" class="sigem-sel-form-control">
+                                <option value="">-- Seleccionar --</option>
+                                <option value="Propio">Propio</option>
+                                <option value="Rentado">Rentado</option>
+                            </select>
+                        </div>
+                    </div>
                 @elseif(empty($estadoAct))
                     <div class="sigem-sel-form-group">
                         <label class="sigem-sel-form-label">Nueva área</label>
@@ -549,28 +567,6 @@
                 @endif
 
                 {{-- ── SECCIÓN 3: CAMPOS COMUNES ── --}}
-                @php
-                    $mostrarTipoPropiedad = !in_array($estadoAct, [
-                        'En Mantenimiento',
-                        'Dado de baja',
-                        'Solicitud de baja',
-                        'Dañado',
-                        'Daño',
-                        'Devuelto a Proveedor',
-                    ], true);
-                @endphp
-
-                @if($mostrarTipoPropiedad)
-                    <div class="sigem-sel-form-group">
-                        <label class="sigem-sel-form-label">Tipo de propiedad</label>
-                        <select wire:model="cambioNuevoTipoPropiedad" class="sigem-sel-form-control">
-                            <option value="">-- sin cambio --</option>
-                            <option value="Propio">Propio</option>
-                            <option value="Rentado">Rentado</option>
-                        </select>
-                    </div>
-                @endif
-
                 <div class="sigem-sel-form-group">
                     <label class="sigem-sel-form-label">Motivo del cambio</label>
                     <textarea wire:model="cambioMotivo" rows="3" class="sigem-sel-form-control sigem-sel-form-textarea" placeholder="Motivo del cambio (opcional)..."></textarea>

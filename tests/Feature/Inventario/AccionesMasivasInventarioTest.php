@@ -397,11 +397,10 @@ class AccionesMasivasInventarioTest extends TestCase
         $this->actingAs($this->adminUser);
         Filament::setCurrentPanel(Filament::getPanel('admin'));
 
-        $inv1 = $this->crearEquipo();
-        $inv2 = $this->crearEquipo();
+        $inv1 = $this->crearEquipo(['salon_id' => $this->salon1->id]);
+        $inv2 = $this->crearEquipo(['salon_id' => $this->salon1->id]);
 
-        // Creamos un salón que pertenece a area1, pero pasaremos nueva_area_id = area2
-        // Debe limpiar salon_id porque salon1 no pertenece a area2 (FIX 3585873)
+        // Al hacer cambio de área, salon_id se guarda como null y se guarda la nueva aula como texto libre
         Livewire::test(AdminDashboard::class)
             ->set('selectedRows', [(string) $inv1->id_inventario, (string) $inv2->id_inventario])
             ->callAction('cambioMasivo', [
@@ -409,7 +408,6 @@ class AccionesMasivasInventarioTest extends TestCase
                 'nuevo_departamento_id' => $this->depto2->id_departamento,
                 'nueva_area_id' => $this->area2->id_area,
                 'nueva_aula' => 'Aula 202',
-                'nuevo_salon_id' => $this->salon1->id, // Salón inválido para area2
                 'motivo' => 'Reubicación al Lab B',
             ])
             ->assertHasNoActionErrors();
@@ -419,13 +417,91 @@ class AccionesMasivasInventarioTest extends TestCase
 
         $this->assertEquals($this->area2->id_area, $fresh1->area_id);
         $this->assertEquals($this->depto2->id_departamento, $fresh1->departamento_id);
-        $this->assertNull($fresh1->salon_id, 'El salon_id inválido debió ser limpiado a null');
+        $this->assertNull($fresh1->salon_id, 'El salon_id debe guardarse como null al hacer cambio de área');
         $this->assertEquals('Aula 202', $fresh1->aula);
         $this->assertEquals('Reubicación al Lab B', $fresh1->especificaciones['cambio_motivo'] ?? null);
         $this->assertEquals($this->area2->nombre, $fresh1->especificaciones['cambio_destino_area'] ?? null);
 
         $this->assertEquals($this->area2->id_area, $fresh2->area_id);
         $this->assertNull($fresh2->salon_id);
+    }
+
+    public function test_cambio_masivo_estado_cambio_de_propiedad_actualiza_tipo_y_registra_historial(): void
+    {
+        $this->actingAs($this->adminUser);
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        $inv1 = $this->crearEquipo(['tipo_propiedad' => 'Propio']);
+        $inv2 = $this->crearEquipo(['tipo_propiedad' => 'Propio']);
+
+        Livewire::test(AdminDashboard::class)
+            ->set('selectedRows', [(string) $inv1->id_inventario, (string) $inv2->id_inventario])
+            ->callAction('cambioMasivo', [
+                'nuevo_estado' => 'Cambio de propiedad',
+                'nuevo_tipo_propiedad' => 'Rentado',
+                'motivo' => 'Migración a arrendamiento',
+            ])
+            ->assertHasNoActionErrors();
+
+        $this->assertSame('Rentado', $inv1->fresh()->tipo_propiedad);
+        $this->assertSame('Rentado', $inv2->fresh()->tipo_propiedad);
+        $this->assertSame(EstadoInventario::Disponible->value, $inv1->fresh()->estado);
+
+        $this->assertDatabaseHas('historial_estados', [
+            'id_inventario' => $inv1->id_inventario,
+            'motivo_cambio' => 'Cambio de propiedad de Propio a: Rentado. Migración a arrendamiento',
+            'estado_nuevo' => EstadoInventario::Disponible->value,
+        ]);
+    }
+
+    public function test_cambio_masivo_estado_cambio_de_propiedad_con_equipos_mixtos(): void
+    {
+        $this->actingAs($this->adminUser);
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        $inv1 = $this->crearEquipo(['tipo_propiedad' => 'Propio']);
+        $inv2 = $this->crearEquipo(['tipo_propiedad' => 'Rentado']);
+
+        Livewire::test(AdminDashboard::class)
+            ->set('selectedRows', [(string) $inv1->id_inventario, (string) $inv2->id_inventario])
+            ->callAction('cambioMasivo', [
+                'nuevo_estado' => 'Cambio de propiedad',
+                'nuevo_tipo_propiedad' => 'Propio',
+                'motivo' => 'Compra de equipos',
+            ])
+            ->assertHasNoActionErrors();
+
+        $this->assertSame('Propio', $inv1->fresh()->tipo_propiedad);
+        $this->assertSame('Propio', $inv2->fresh()->tipo_propiedad);
+
+        $this->assertDatabaseHas('historial_estados', [
+            'id_inventario' => $inv1->id_inventario,
+            'motivo_cambio' => 'Cambio de propiedad de Mixto a: Propio. Compra de equipos',
+        ]);
+    }
+
+    public function test_slide_over_cambio_de_propiedad_ejecucion_directa(): void
+    {
+        $this->actingAs($this->adminUser);
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        $inv1 = $this->crearEquipo(['tipo_propiedad' => 'Rentado']);
+        $inv2 = $this->crearEquipo(['tipo_propiedad' => 'Rentado']);
+
+        Livewire::test(AdminDashboard::class)
+            ->set('selectedRows', [(string) $inv1->id_inventario, (string) $inv2->id_inventario])
+            ->set('cambioNuevoEstado', 'Cambio de propiedad')
+            ->set('cambioNuevoTipoPropiedad', 'Propio')
+            ->set('cambioMotivo', 'Adquisición patrimonial')
+            ->call('ejecutarCambioSlideOver');
+
+        $this->assertSame('Propio', $inv1->fresh()->tipo_propiedad);
+        $this->assertSame('Propio', $inv2->fresh()->tipo_propiedad);
+
+        $this->assertDatabaseHas('historial_estados', [
+            'id_inventario' => $inv1->id_inventario,
+            'motivo_cambio' => 'Cambio de propiedad de Rentado a: Propio. Adquisición patrimonial',
+        ]);
     }
 
     public function test_cambio_masivo_asignado_con_receptor_guarda_asignacion(): void

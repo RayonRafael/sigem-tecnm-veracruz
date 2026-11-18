@@ -53,7 +53,6 @@ trait ConAccionesMasivasInventario
     public ?string $cambioDepartamentoId = '';
     public ?string $cambioNuevaAreaId = '';
     public ?string $cambioAula = '';
-    public ?string $cambioSalonId = '';
     public ?string $cambioReceptorId = '';
     public ?string $cambioMotivoBaja = '';
     public ?string $cambioDescripcionBaja = '';
@@ -124,7 +123,6 @@ trait ConAccionesMasivasInventario
         $this->cambioDepartamentoId = '';
         $this->cambioNuevaAreaId = '';
         $this->cambioAula = '';
-        $this->cambioSalonId = '';
         $this->cambioReceptorId = '';
         $this->cambioMotivoBaja = '';
         $this->cambioDescripcionBaja = '';
@@ -155,7 +153,6 @@ trait ConAccionesMasivasInventario
             $this->cambioDepartamentoId = '';
             $this->cambioNuevaAreaId = '';
             $this->cambioAula = '';
-            $this->cambioSalonId = '';
             $this->cambioReceptorId = '';
             $this->cambioMotivoBaja = '';
             $this->cambioDescripcionBaja = '';
@@ -179,37 +176,22 @@ trait ConAccionesMasivasInventario
     }
 
     /**
-     * Hook reactivo: Al cambiar departamento destino, limpia el área y el salón.
+     * Hook reactivo: Al cambiar departamento destino, limpia el área.
      */
     public function updatedCambioDepartamentoId($value): void
     {
         $this->cambioNuevaAreaId = '';
-        $this->cambioSalonId = '';
     }
 
     /**
-     * Hook reactivo: Al cambiar área destino, limpia el salón y autocompleta depto si está vacío.
+     * Hook reactivo: Al cambiar área destino, autocompleta depto si está vacío.
      */
     public function updatedCambioNuevaAreaId($value): void
     {
-        $this->cambioSalonId = '';
         if (! empty($value)) {
             $area = Area::find($value);
             if ($area && empty($this->cambioDepartamentoId)) {
                 $this->cambioDepartamentoId = (string) $area->id_departamento;
-            }
-        }
-    }
-
-    /**
-     * Hook reactivo: Al seleccionar salón, autocompleta el nombre del aula.
-     */
-    public function updatedCambioSalonId($value): void
-    {
-        if (! empty($value)) {
-            $salon = Salon::find($value);
-            if ($salon) {
-                $this->cambioAula = $salon->nombre;
             }
         }
     }
@@ -246,7 +228,6 @@ trait ConAccionesMasivasInventario
             'nuevo_departamento_id' => $this->cambioDepartamentoId ?: null,
             'nueva_area_id' => $this->cambioNuevaAreaId ?: null,
             'nueva_aula' => $this->cambioAula ?: null,
-            'nuevo_salon_id' => $this->cambioSalonId ?: null,
             'nuevo_receptor_id' => $this->cambioReceptorId ?: null,
             'motivo_baja' => $this->cambioMotivoBaja ?: null,
             'descripcion_baja' => $this->cambioDescripcionBaja ?: null,
@@ -517,7 +498,10 @@ trait ConAccionesMasivasInventario
                 Select::make('nuevo_estado')
                     ->label('Nuevo estado')
                     ->placeholder('— sin cambio —')
-                    ->options(EstadoInventario::options())
+                    ->options(array_merge(
+                        EstadoInventario::options(),
+                        ['Cambio de propiedad' => 'Cambio de propiedad']
+                    ))
                     ->live(),
 
                 // Contextual: Cambio de área
@@ -538,23 +522,22 @@ trait ConAccionesMasivasInventario
                             : Area::orderBy('nombre')->pluck('nombre', 'id_area');
                     })
                     ->visible(fn (Get $get) => in_array($get('nuevo_estado'), [EstadoInventario::CambioDeArea->value, EstadoInventario::Asignado->value, EstadoInventario::Reasignado->value, null, ''], true))
-                    ->live()
-                    ->afterStateUpdated(fn (callable $set) => $set('nuevo_salon_id', null)),
+                    ->live(),
 
                 TextInput::make('nueva_aula')
                     ->label('Nueva aula')
                     ->placeholder('ej. E101')
                     ->visible(fn (Get $get) => $get('nuevo_estado') === EstadoInventario::CambioDeArea->value),
 
-                Select::make('nuevo_salon_id')
-                    ->label('Nuevo salón')
-                    ->options(function (Get $get) {
-                        $areaId = $get('nueva_area_id');
-                        return $areaId
-                            ? Salon::where('area_id', $areaId)->orderBy('nombre')->pluck('nombre', 'id')
-                            : [];
-                    })
-                    ->visible(fn (Get $get) => $get('nuevo_estado') === EstadoInventario::CambioDeArea->value),
+                // Contextual: Cambio de propiedad
+                Select::make('nuevo_tipo_propiedad')
+                    ->label('Nueva propiedad')
+                    ->placeholder('— Seleccionar —')
+                    ->options([
+                        'Propio' => 'Propio',
+                        'Rentado' => 'Rentado',
+                    ])
+                    ->visible(fn (Get $get) => in_array($get('nuevo_estado'), ['Cambio de propiedad', null, ''], true)),
 
                 // Contextual: Asignado / Reasignado
                 Select::make('nuevo_receptor_id')
@@ -618,23 +601,6 @@ trait ConAccionesMasivasInventario
                     ->placeholder('Motivo de la devolución...')
                     ->visible(fn (Get $get) => $get('nuevo_estado') === EstadoInventario::DevueltoAProveedor->value),
 
-                // Común: Tipo de propiedad (solo si NO es restrictivo)
-                Select::make('nuevo_tipo_propiedad')
-                    ->label('Tipo de propiedad')
-                    ->placeholder('— sin cambio —')
-                    ->options([
-                        'Propio' => 'Propio',
-                        'Rentado' => 'Rentado',
-                    ])
-                    ->visible(fn (Get $get) => ! in_array($get('nuevo_estado'), [
-                        EstadoInventario::DadoDeBaja->value,
-                        EstadoInventario::SolicitudDeBaja->value,
-                        EstadoInventario::EnMantenimiento->value,
-                        EstadoInventario::Danado->value,
-                        'Daño',
-                        EstadoInventario::DevueltoAProveedor->value,
-                    ], true)),
-
                 Textarea::make('motivo')
                     ->label('Motivo del cambio')
                     ->placeholder('Motivo del cambio (opcional)...'),
@@ -665,7 +631,6 @@ trait ConAccionesMasivasInventario
         $nuevoDeptoId = ! empty($data['nuevo_departamento_id']) ? $data['nuevo_departamento_id'] : null;
         $nuevaAreaId = ! empty($data['nueva_area_id']) ? $data['nueva_area_id'] : null;
         $nuevaAula = ! empty($data['nueva_aula']) ? trim($data['nueva_aula']) : null;
-        $nuevoSalonId = ! empty($data['nuevo_salon_id']) ? $data['nuevo_salon_id'] : null;
         $nuevoReceptorId = ! empty($data['nuevo_receptor_id']) ? $data['nuevo_receptor_id'] : null;
         $motivoBaja = ! empty($data['motivo_baja']) ? $data['motivo_baja'] : 'Baja masiva';
         $descBaja = ! empty($data['descripcion_baja']) ? $data['descripcion_baja'] : 'Baja masiva';
@@ -692,14 +657,25 @@ trait ConAccionesMasivasInventario
             $nuevoTipoPropiedad = null;
         }
 
+        // Calcular propiedad actual de los equipos seleccionados
+        $equipos = Inventario::whereIn('id_inventario', $this->selectedRows)->get();
+        $propiedades = $equipos->pluck('tipo_propiedad')->unique()->filter();
+        if ($propiedades->count() === 0) {
+            $propiedadActual = 'Sin definir';
+        } elseif ($propiedades->count() === 1) {
+            $propiedadActual = $propiedades->first();  // "Propio" o "Rentado"
+        } else {
+            $propiedadActual = 'Mixto';  // Equipos con diferente propiedad
+        }
+
         $aplicados = 0;
         $omitidos = 0;
 
         DB::transaction(function () use (
             $esAdmin, $userId, $nuevoEstado, $nuevoDeptoId, $nuevaAreaId, $nuevaAula,
-            $nuevoSalonId, $nuevoReceptorId, $motivoBaja, $descBaja, $descDano, $nivelDano,
+            $nuevoReceptorId, $motivoBaja, $descBaja, $descDano, $nivelDano,
             $tipoServicio, $descFalla, $proveedorId, $motivoDevolucion, $nuevoTipoPropiedad,
-            $motivo, &$aplicados, &$omitidos
+            $motivo, $propiedadActual, &$aplicados, &$omitidos
         ) {
             $records = Inventario::whereIn('id_inventario', $this->selectedRows)->get();
 
@@ -720,7 +696,6 @@ trait ConAccionesMasivasInventario
                 // Destinos para ubicación
                 $areaDestino = $nuevaAreaId;
                 $deptoDestino = $nuevoDeptoId;
-                $salonDestino = $nuevoSalonId;
                 $aulaDestino = $nuevaAula;
 
                 // Resolver departamento a partir del área si no se indicó
@@ -729,45 +704,30 @@ trait ConAccionesMasivasInventario
                     if (! $deptoDestino && $areaModel) {
                         $deptoDestino = $areaModel->id_departamento;
                     }
-
-                    // FIX 3585873: Validar que el salón pertenece a la nueva área
-                    if ($salonDestino) {
-                        $salonValido = Salon::where('id', $salonDestino)
-                            ->where('area_id', $areaDestino)
-                            ->whereNull('deleted_at')
-                            ->exists();
-                        if (! $salonValido) {
-                            $salonDestino = null;
-                        }
-                    }
-                } elseif ($salonDestino) {
-                    $salonValido = Salon::where('id', $salonDestino)
-                        ->where('area_id', $record->area_id)
-                        ->whereNull('deleted_at')
-                        ->exists();
-                    if (! $salonValido) {
-                        $salonDestino = null;
-                    }
-                }
-
-                // Resolver salón final respetando validación (FIX 3585873)
-                if ($nuevoSalonId !== null && $nuevoSalonId !== '') {
-                    $salonFinal = $salonDestino;
-                } elseif ($areaDestino && $record->area_id != $areaDestino) {
-                    $salonFinal = null;
-                } else {
-                    $salonFinal = $record->salon_id;
                 }
 
                 // 1. MANEJO SEGÚN EL NUEVO ESTADO:
-                if ($nuevoEstado === EstadoInventario::CambioDeArea->value) {
+                if ($nuevoEstado === 'Cambio de propiedad') {
+                    if ($nuevoTipoPropiedad) {
+                        $record->update(['tipo_propiedad' => $nuevoTipoPropiedad]);
+                        HistorialEstado::create([
+                            'id_inventario' => $record->id_inventario,
+                            'id_usuario' => $userId,
+                            'estado_anterior' => $record->estado,
+                            'estado_nuevo' => $record->estado,  // Estado NO cambia
+                            'motivo_cambio' => "Cambio de propiedad de {$propiedadActual} a: {$nuevoTipoPropiedad}. {$motivo}",
+                            'ubicacion_fisica' => $record->ubicacion_fisica,
+                            'fecha_cambio' => now(),
+                        ]);
+                    }
+                } elseif ($nuevoEstado === EstadoInventario::CambioDeArea->value) {
                     $deptoFinal = $deptoDestino ?: $record->departamento_id;
                     $areaFinal = $areaDestino ?: $record->area_id;
 
                     if ($esAdmin) {
-                        $record->cambiarAreaDirecto($deptoFinal, $areaFinal, $salonFinal, null, $motivo, $userId);
+                        $record->cambiarAreaDirecto($deptoFinal, $areaFinal, null, null, $motivo, $userId);
                     } else {
-                        $record->solicitarCambioArea($deptoFinal, $areaFinal, $salonFinal, null, $motivo, $userId);
+                        $record->solicitarCambioArea($deptoFinal, $areaFinal, null, null, $motivo, $userId);
                     }
 
                     $specs = is_array($record->especificaciones) ? $record->especificaciones : [];
@@ -782,6 +742,7 @@ trait ConAccionesMasivasInventario
                     }
                     $specs['cambio_motivo'] = $motivo;
                     $specs['fecha_cambio'] = now()->toDateString();
+                    $record->salon_id = null; // salon_id se guarda como null al hacer cambio de área
                     $record->especificaciones = $specs;
                     $record->save();
                 } elseif ($nuevoEstado === EstadoInventario::DadoDeBaja->value) {
@@ -884,10 +845,11 @@ trait ConAccionesMasivasInventario
                     if ($areaDestino) {
                         $deptoFinal = $deptoDestino ?: ($record->departamento_id);
                         if ($esAdmin) {
-                            $record->cambiarAreaDirecto($deptoFinal, $areaDestino, $salonDestino, null, $motivo, $userId);
+                            $record->cambiarAreaDirecto($deptoFinal, $areaDestino, null, null, $motivo, $userId);
                         } else {
-                            $record->solicitarCambioArea($deptoFinal, $areaDestino, $salonDestino, null, $motivo, $userId);
+                            $record->solicitarCambioArea($deptoFinal, $areaDestino, null, null, $motivo, $userId);
                         }
+                        $record->salon_id = null;
                     }
 
                     $record->update([
@@ -912,16 +874,19 @@ trait ConAccionesMasivasInventario
                         $deptoFinal = $deptoDestino ?: $record->departamento_id;
 
                         if ($esAdmin) {
-                            $record->cambiarAreaDirecto($deptoFinal, $areaDestino, $salonFinal, null, $motivo, $userId);
+                            $record->cambiarAreaDirecto($deptoFinal, $areaDestino, null, null, $motivo, $userId);
                         } else {
-                            $record->solicitarCambioArea($deptoFinal, $areaDestino, $salonFinal, null, $motivo, $userId);
+                            $record->solicitarCambioArea($deptoFinal, $areaDestino, null, null, $motivo, $userId);
                         }
 
+                        $record->salon_id = null;
                         if ($aulaDestino) {
                             $specs = is_array($record->especificaciones) ? $record->especificaciones : [];
                             $specs['aula'] = $aulaDestino;
-                            $record->update(['aula' => $aulaDestino, 'especificaciones' => $specs]);
+                            $record->aula = $aulaDestino;
+                            $record->especificaciones = $specs;
                         }
+                        $record->save();
                     }
 
                     if ($nuevoEstado && $record->estado !== EstadoInventario::CambioDeArea->value) {
@@ -939,8 +904,8 @@ trait ConAccionesMasivasInventario
                     }
                 }
 
-                // 2. TIPO DE PROPIEDAD (solo si aplica y no se bloqueó por estado)
-                if ($nuevoTipoPropiedad && in_array($nuevoTipoPropiedad, ['Propio', 'Rentado'], true)) {
+                // 2. TIPO DE PROPIEDAD (para llamadas legacy o sin estado explícito 'Cambio de propiedad')
+                if ($nuevoEstado !== 'Cambio de propiedad' && $nuevoTipoPropiedad && in_array($nuevoTipoPropiedad, ['Propio', 'Rentado'], true)) {
                     $propiedadAnt = $record->tipo_propiedad ?? 'Propio';
                     if ($propiedadAnt !== $nuevoTipoPropiedad) {
                         $record->update(['tipo_propiedad' => $nuevoTipoPropiedad]);
