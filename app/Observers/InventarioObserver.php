@@ -21,17 +21,29 @@ class InventarioObserver
 
     public function creating(Inventario $inventario): void
     {
-        // 1. Auto-match Material: Si no se selecciona material explícitamente
+        // 1. Validar integridad de salon_id para el area_id indicado
+        if ($inventario->salon_id) {
+            $salonValido = Salon::where('id', $inventario->salon_id)
+                ->where('area_id', $inventario->area_id)
+                ->whereNull('deleted_at')
+                ->exists();
+
+            if (! $salonValido) {
+                $inventario->salon_id = null;
+            }
+        }
+
+        // 2. Auto-match Material: Si no se selecciona material explícitamente
         if (empty($inventario->id_producto)) {
             $this->autoMatchMaterial($inventario);
         }
 
-        // 2. Auto-generar código: MARCA-MODELO-### (ej. HP-LJ4103-001)
+        // 3. Auto-generar código: MARCA-MODELO-### (ej. HP-LJ4103-001)
         if (empty($inventario->codigo)) {
             $inventario->codigo = $inventario->generarCodigo();
         }
 
-        // 3. Sincronizar campo físico aula y ubicación física inicial si no vienen asignados
+        // 4. Sincronizar campo físico aula y ubicación física inicial si no vienen asignados
         if (empty($inventario->aula)) {
             $aulaFallback = $inventario->especificaciones['aula']
                 ?? ($inventario->salon_id ? Salon::find($inventario->salon_id)?->nombre : null);
@@ -81,6 +93,17 @@ class InventarioObserver
     {
         if ($inventario->isDirty('estado') && in_array($inventario->estado, ['Baja', EstadoInventario::DadoDeBaja->value], true) && empty($inventario->fecha_baja)) {
             $inventario->fecha_baja = now();
+        }
+
+        if ($inventario->isDirty('area_id') && $inventario->salon_id) {
+            $salonValido = Salon::where('id', $inventario->salon_id)
+                ->where('area_id', $inventario->area_id)
+                ->whereNull('deleted_at')
+                ->exists();
+
+            if (! $salonValido) {
+                $inventario->salon_id = null;
+            }
         }
 
         if ($inventario->isDirty('salon_id') && ! $inventario->isDirty('aula')) {

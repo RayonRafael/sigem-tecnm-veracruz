@@ -327,5 +327,129 @@ class CambioAreaInventarioTest extends TestCase
         $totalRegistros = HistorialEstado::where('id_inventario', $equipo->id_inventario)->count();
         $this->assertEquals(1, $totalRegistros, 'El observer no debe duplicar el historial de cambio de área.');
     }
+
+    public function test_cambiar_area_directo_con_salon_de_otra_area_setea_salon_id_null(): void
+    {
+        $this->actingAs($this->adminUser);
+        $equipo = $this->crearEquipo();
+        $equipo->update(['area_id' => $this->area1->id_area, 'salon_id' => $this->salon1->id]);
+
+        // Intentar cambiar a area2 pasando salon1 (que pertenece a area1, no a area2)
+        $equipo->cambiarAreaDirecto(
+            $this->depto2->id_departamento,
+            $this->area2->id_area,
+            $this->salon1->id,
+            null,
+            'Prueba FK salon_id'
+        );
+
+        $equipo->refresh();
+        $this->assertEquals($this->area2->id_area, $equipo->area_id);
+        $this->assertNull($equipo->salon_id, 'salon_id debe ser null si el salón no pertenece a la nueva área.');
+    }
+
+    public function test_solicitar_y_aprobar_cambio_area_valida_salon_id(): void
+    {
+        $this->actingAs($this->adminUser);
+        $equipo = $this->crearEquipo();
+        $equipo->update(['area_id' => $this->area1->id_area, 'salon_id' => $this->salon1->id]);
+
+        // Solicitar cambio a area2 pasando salon1 (inválido para area2)
+        $equipo->solicitarCambioArea(
+            $this->depto2->id_departamento,
+            $this->area2->id_area,
+            $this->salon1->id,
+            null,
+            'Solicitud con salón no válido'
+        );
+
+        $equipo->refresh();
+        $this->assertNull($equipo->ubicacion_solicitada['salon_id'], 'La solicitud debe ignorar salon_id si no pertenece a la nueva área.');
+
+        // Aprobar cambio
+        $equipo->aprobarCambioArea($this->adminUser->id);
+        $equipo->refresh();
+        $this->assertEquals($this->area2->id_area, $equipo->area_id);
+        $this->assertNull($equipo->salon_id, 'Al aprobar, salon_id debe ser null si no es válido para la nueva área.');
+    }
+
+    public function test_observer_limpia_salon_id_si_cambia_area(): void
+    {
+        $this->actingAs($this->adminUser);
+        $equipo = $this->crearEquipo();
+        $equipo->update(['area_id' => $this->area1->id_area, 'salon_id' => $this->salon1->id]);
+
+        // Actualizar directamente area_id a area2 (sin actualizar salon_id)
+        $equipo->update(['area_id' => $this->area2->id_area]);
+
+        $equipo->refresh();
+        $this->assertEquals($this->area2->id_area, $equipo->area_id);
+        $this->assertNull($equipo->salon_id, 'InventarioObserver debe limpiar salon_id si el área cambia y el salón no pertenece.');
+    }
+
+    public function test_dashboard_acciones_sin_argumentos_no_lanzan_undefined_array_key_record(): void
+    {
+        $this->actingAs($this->adminUser);
+        $equipo = $this->crearEquipo();
+        $dashboard = new \App\Filament\Pages\Dashboard();
+
+        // 1. Sin argumentos (arguments = []) no debe lanzar Undefined array key "record"
+        $actionCambio = $dashboard->cambiarAreaAction();
+        $this->assertNull($actionCambio->getRecord(), 'cambiarArea con arguments vacío debe evaluar a null sin error');
+
+        // Con argumentos con 'id' o 'record' debe resolver el equipo
+        $actionCambio->arguments(['id' => $equipo->id_inventario]);
+        $this->assertEquals($equipo->id_inventario, $actionCambio->getRecord()?->id_inventario);
+
+        $actionCambio->arguments(['record' => $equipo->id_inventario]);
+        $this->assertEquals($equipo->id_inventario, $actionCambio->getRecord()?->id_inventario);
+
+        // 2. checklistCambioAreaAction sin argumentos
+        $actionChecklist = $dashboard->checklistCambioAreaAction();
+        $this->assertNull($actionChecklist->getRecord());
+        $actionChecklist->arguments(['id' => $equipo->id_inventario]);
+        $this->assertEquals($equipo->id_inventario, $actionChecklist->getRecord()?->id_inventario);
+
+        // 3. darBajaAction sin argumentos
+        $actionBaja = $dashboard->darBajaAction();
+        $this->assertNull($actionBaja->getRecord());
+        $actionBaja->arguments(['id' => $equipo->id_inventario]);
+        $this->assertEquals($equipo->id_inventario, $actionBaja->getRecord()?->id_inventario);
+
+        // 4. editarEquipoAction sin argumentos
+        $actionEditar = $dashboard->editarEquipoAction();
+        $this->assertNull($actionEditar->getRecord());
+        $actionEditar->arguments(['id' => $equipo->id_inventario]);
+        $this->assertEquals($equipo->id_inventario, $actionEditar->getRecord()?->id_inventario);
+
+        // 5. eliminarEquipoAction sin argumentos
+        $actionEliminar = $dashboard->eliminarEquipoAction();
+        $this->assertNull($actionEliminar->getRecord());
+        $actionEliminar->arguments(['id' => $equipo->id_inventario]);
+        $this->assertEquals($equipo->id_inventario, $actionEliminar->getRecord()?->id_inventario);
+
+        // 6. Servicio Social Dashboard acciones sin argumentos
+        $ssDashboard = new \App\Filament\ServicioSocial\Pages\Dashboard();
+
+        $actionSSCambio = $ssDashboard->solicitarCambioAreaAction();
+        $this->assertNull($actionSSCambio->getRecord());
+        $actionSSCambio->arguments(['id' => $equipo->id_inventario]);
+        $this->assertEquals($equipo->id_inventario, $actionSSCambio->getRecord()?->id_inventario);
+
+        $actionSSChecklist = $ssDashboard->checklistCambioAreaAction();
+        $this->assertNull($actionSSChecklist->getRecord());
+        $actionSSChecklist->arguments(['id' => $equipo->id_inventario]);
+        $this->assertEquals($equipo->id_inventario, $actionSSChecklist->getRecord()?->id_inventario);
+
+        $actionSSBaja = $ssDashboard->solicitarBajaAction();
+        $this->assertNull($actionSSBaja->getRecord());
+        $actionSSBaja->arguments(['id' => $equipo->id_inventario]);
+        $this->assertEquals($equipo->id_inventario, $actionSSBaja->getRecord()?->id_inventario);
+
+        $actionSSEditar = $ssDashboard->editarEquipoAction();
+        $this->assertNull($actionSSEditar->getRecord());
+        $actionSSEditar->arguments(['id' => $equipo->id_inventario]);
+        $this->assertEquals($equipo->id_inventario, $actionSSEditar->getRecord()?->id_inventario);
+    }
 }
 

@@ -488,6 +488,17 @@ class Inventario extends Model
             $this->estacion = $estacion;
             $this->fecha_cambio_area = now();
 
+            if ($this->salon_id) {
+                $salonValido = Salon::where('id', $this->salon_id)
+                    ->where('area_id', $this->area_id)
+                    ->whereNull('deleted_at')
+                    ->exists();
+
+                if (! $salonValido) {
+                    $this->salon_id = null;
+                }
+            }
+
             $specs = is_array($this->especificaciones) ? $this->especificaciones : [];
             if ($aulaTexto !== null) {
                 $specs['aula'] = $aulaTexto;
@@ -533,6 +544,17 @@ class Inventario extends Model
             } elseif (! empty($salonId) && is_numeric($salonId)) {
                 $salonIdFinal = (int) $salonId;
                 $aulaTexto = Salon::find($salonIdFinal)?->nombre;
+            }
+
+            if ($salonIdFinal) {
+                $salonValido = Salon::where('id', $salonIdFinal)
+                    ->where('area_id', $areaId)
+                    ->whereNull('deleted_at')
+                    ->exists();
+
+                if (! $salonValido) {
+                    $salonIdFinal = null;
+                }
             }
 
             $solicitudData = [
@@ -588,6 +610,17 @@ class Inventario extends Model
             $this->fecha_cambio_area = now();
             $this->ubicacion_solicitada = null;
             $this->estado_previo_cambio = null;
+
+            if ($this->salon_id) {
+                $salonValido = Salon::where('id', $this->salon_id)
+                    ->where('area_id', $this->area_id)
+                    ->whereNull('deleted_at')
+                    ->exists();
+
+                if (! $salonValido) {
+                    $this->salon_id = null;
+                }
+            }
 
             $specs = is_array($this->especificaciones) ? $this->especificaciones : [];
             if ($aula !== null) {

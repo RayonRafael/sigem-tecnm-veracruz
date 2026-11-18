@@ -167,7 +167,10 @@ class Dashboard extends BaseDashboard
             ->modalHeading('Cambiar área de equipo')
             ->modalDescription('Se actualizará la ubicación física del equipo de forma inmediata.')
             ->model(Inventario::class)
-            ->record(fn (array $arguments) => Inventario::find($arguments['id'] ?? $arguments['record']))
+            ->record(function (array $arguments) {
+                $id = $arguments['id'] ?? $arguments['record'] ?? null;
+                return $id ? Inventario::find($id) : null;
+            })
             ->form(ConModalesBajaCambio::getModalCambioAreaFormSchema(true))
             ->modalSubmitActionLabel('Confirmar cambio')
             ->modalCancelActionLabel('Cancelar')
@@ -197,7 +200,10 @@ class Dashboard extends BaseDashboard
             ->modalHeading('Cambio registrado')
             ->modalDescription('Selecciona qué datos mostrar en el formato de Cambio de Área.')
             ->model(Inventario::class)
-            ->record(fn (array $arguments) => Inventario::find($arguments['id'] ?? $arguments['record']))
+            ->record(function (array $arguments) {
+                $id = $arguments['id'] ?? $arguments['record'] ?? null;
+                return $id ? Inventario::find($id) : null;
+            })
             ->form(ConModalesBajaCambio::getChecklistCambioAreaSchema())
             ->modalSubmitActionLabel('Generar Formato PDF')
             ->modalCancelActionLabel('Cerrar')
@@ -227,7 +233,10 @@ class Dashboard extends BaseDashboard
             ->modalHeading('Confirmar baja de equipo')
             ->modalDescription('El equipo pasará a estado Dado de baja de manera inmediata.')
             ->model(Inventario::class)
-            ->record(fn (array $arguments) => Inventario::find($arguments['id'] ?? $arguments['record']))
+            ->record(function (array $arguments) {
+                $id = $arguments['id'] ?? $arguments['record'] ?? null;
+                return $id ? Inventario::find($id) : null;
+            })
             ->form(ConModalesBajaCambio::getModalBajaFormSchema())
             ->modalSubmitActionLabel('Confirmar baja')
             ->modalCancelActionLabel('Cancelar')
@@ -257,8 +266,8 @@ class Dashboard extends BaseDashboard
             ))
             ->model(Inventario::class)
             ->record(function (array $arguments) {
-                return Inventario::with(['material.marca', 'material.tipo', 'area', 'salon'])
-                    ->find($arguments['id'] ?? $arguments['record']);
+                $id = $arguments['id'] ?? $arguments['record'] ?? null;
+                return $id ? Inventario::with(['material.marca', 'material.tipo', 'area', 'salon'])->find($id) : null;
             })
             ->form([
                 Tabs::make('Tabs')
@@ -275,7 +284,7 @@ class Dashboard extends BaseDashboard
 
     public function editarEquipo($id): void
     {
-        $this->mountAction('editarEquipo', ['id' => $id]);
+        $this->mountAction('editarEquipo', ['id' => $id, 'record' => $id]);
     }
 
     public function eliminarEquipoAction(): Action
@@ -288,14 +297,15 @@ class Dashboard extends BaseDashboard
             ))
             ->model(Inventario::class)
             ->record(function (array $arguments) {
-                return Inventario::find($arguments['id'] ?? $arguments['record']);
+                $id = $arguments['id'] ?? $arguments['record'] ?? null;
+                return $id ? Inventario::find($id) : null;
             })
             ->successNotificationTitle('Registro eliminado correctamente');
     }
 
     public function eliminarEquipo($id): void
     {
-        $this->mountAction('eliminarEquipo', ['id' => $id]);
+        $this->mountAction('eliminarEquipo', ['id' => $id, 'record' => $id]);
     }
 
     public function getColumns(): int|string|array
