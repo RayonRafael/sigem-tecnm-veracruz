@@ -240,7 +240,7 @@
             border: 1px solid #e2e8f0;
             border-radius: 10px;
             padding: 12px 16px;
-            margin-bottom: 22px;
+            margin-bottom: 24px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
         }
         .sigem-filter-group {
@@ -267,20 +267,51 @@
             border-color: #1b396a;
             background: #ffffff;
         }
+        /* Selects unificados y sin flechas duplicadas (Problema 2) */
+        select.sigem-filter-input,
+        .sigem-filter-toolbar select,
+        .sigem-filter-group select,
+        .sigem-rep-filter-select,
+        .sigem-rep-filter select,
+        .sigem-fmt-section select {
+            appearance: none !important;
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            background-color: #ffffff !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 12px center !important;
+            background-size: 12px 12px !important;
+            padding-right: 36px !important;
+            cursor: pointer;
+        }
+        select.sigem-filter-input::-ms-expand,
+        .sigem-filter-toolbar select::-ms-expand,
+        .sigem-filter-group select::-ms-expand,
+        .sigem-fmt-section select::-ms-expand {
+            display: none !important;
+        }
+        .sigem-subtabs-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
         .sigem-new-rep-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 18px;
-            margin-bottom: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
         }
         .sigem-new-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 18px;
+            padding: 20px 24px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            height: 100%;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
             transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
         }
@@ -294,43 +325,50 @@
             align-items: center;
             justify-content: space-between;
             gap: 8px;
+            margin-bottom: 6px;
         }
         .sigem-badge-totales {
             font-size: 11px;
             font-weight: 700;
-            padding: 3px 8px;
+            padding: 4px 9px;
             border-radius: 6px;
             background: #f1f5f9;
             color: #1e293b;
             border: 1px solid #e2e8f0;
             white-space: nowrap;
+            margin-left: 12px;
         }
         .sigem-new-card-title {
             font-size: 15px;
             font-weight: 700;
             color: #0f172a;
-            line-height: 1.3;
+            line-height: 1.35;
+            min-height: 48px;
+            display: flex;
+            align-items: center;
+            flex: 1;
         }
         .sigem-new-card-desc {
-            font-size: 12.5px;
+            font-size: 13px;
             color: #64748b;
             line-height: 1.45;
+            margin-bottom: 12px;
         }
         .sigem-chart-canvas-wrap {
             position: relative;
-            height: 180px;
+            min-height: 220px;
             width: 100%;
-            margin: 6px 0;
+            margin: 8px 0;
             background: #fafafa;
             border-radius: 8px;
-            padding: 6px;
+            padding: 8px;
         }
         .sigem-mini-table-box {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
-            padding: 8px 10px;
-            margin-top: 4px;
+            padding: 10px 12px;
+            margin-top: 16px;
         }
         .sigem-mini-table-title {
             font-size: 11.5px;
@@ -350,12 +388,12 @@
             text-align: left;
             font-weight: 600;
             color: #64748b;
-            padding: 4px 6px;
+            padding: 5px 8px;
             border-bottom: 1px solid #cbd5e1;
             background: #f1f5f9;
         }
         .sigem-mini-table td {
-            padding: 4px 6px;
+            padding: 5px 8px;
             border-bottom: 1px solid #f1f5f9;
             color: #1e293b;
         }
@@ -367,7 +405,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 8px;
-            padding-top: 10px;
+            padding-top: 14px;
             border-top: 1px solid #f1f5f9;
             margin-top: auto;
         }
@@ -465,64 +503,6 @@
     {{-- PESTAÑA 1: REPORTES PRINCIPALES (6)                      --}}
     {{-- ======================================================== --}}
     @if (in_array($pestanaActual, ['principales', 'reportes'], true))
-        {{-- Vista previa del reporte legacy cuando se solicita --}}
-        @if ($reporteActual)
-            <div class="sigem-rep-view" id="sigem-reporte-visor-legacy" style="margin-bottom: 24px;">
-                <div class="sigem-rep-vh">
-                    <div>
-                        <h3>{{ $reporteActual['emoji'] ?? '📊' }} {{ $reporteActual['titulo'] }}</h3>
-                        <div class="sigem-rep-meta">
-                            {{ count($reporteActual['rows']) }} registros
-                        </div>
-                    </div>
-                    <div style="display: inline-flex; align-items: center; gap: 8px;">
-                        <button type="button"
-                                wire:click="exportarReporte('{{ $livewire->reporteActivo }}', 'xlsx')"
-                                class="sigem-btn-primary">
-                            ↓ Exportar Excel (.xlsx)
-                        </button>
-                        <button type="button"
-                                wire:click="exportarReporte('{{ $livewire->reporteActivo }}', 'csv')"
-                                class="sigem-rep-btn-sec">
-                            ↓ Exportar CSV
-                        </button>
-                        <button type="button"
-                                wire:click="cerrarReporte"
-                                class="sigem-rep-btn-sec">
-                            ✕ Cerrar
-                        </button>
-                    </div>
-                </div>
-
-                <div class="sigem-rep-table-wrap sigem-scroll-top">
-                    <table class="sigem-rep-table">
-                        <thead>
-                            <tr>
-                                @foreach ($reporteActual['headers'] as $header)
-                                    <th>{{ $header }}</th>
-                                @endforeach
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($reporteActual['rows'] as $row)
-                                <tr>
-                                    @foreach ($row as $celda)
-                                        <td>{!! $celda !!}</td>
-                                    @endforeach
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="{{ count($reporteActual['headers']) }}" style="text-align: center; color: #94a3b8; padding: 20px;">
-                                        Sin registros disponibles para este reporte
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        @endif
-
         {{-- SECCIÓN 1: LOS 6 REPORTES ORIGINALES --}}
         <section class="sigem-rep-original-section" style="margin-bottom: 36px;">
             <div class="sigem-rep-header" style="margin-bottom: 12px;">
@@ -547,7 +527,7 @@
                     @php
                         $esVisible = $livewire->visibilidadServicioSocial[$rep['id']] ?? false;
                     @endphp
-                    <div class="sigem-rep-card">
+                    <div class="sigem-rep-card" wire:key="sigem-rep-card-{{ $rep['id'] }}">
                         <div class="sigem-rep-ico">{{ $rep['emoji'] }}</div>
                         <div class="sigem-rep-t">{{ $rep['titulo'] }}</div>
                         <div class="sigem-rep-d">{{ $rep['descripcion'] }}</div>
@@ -585,6 +565,64 @@
                     </div>
                 @endforelse
             </div>
+
+            {{-- Vista previa del reporte legacy cuando se solicita (ABAJO DE LAS TARJETAS - Problema 1) --}}
+            @if ($reporteActual)
+                <div class="sigem-rep-view" id="sigem-reporte-visor-legacy" style="margin-top: 24px;">
+                    <div class="sigem-rep-vh">
+                        <div>
+                            <h3>{{ $reporteActual['emoji'] ?? '📊' }} {{ $reporteActual['titulo'] }}</h3>
+                            <div class="sigem-rep-meta">
+                                {{ count($reporteActual['rows']) }} registros
+                            </div>
+                        </div>
+                        <div style="display: inline-flex; align-items: center; gap: 8px;">
+                            <button type="button"
+                                    wire:click="exportarReporte('{{ $livewire->reporteActivo }}', 'xlsx')"
+                                    class="sigem-btn-primary">
+                                ↓ Exportar Excel (.xlsx)
+                            </button>
+                            <button type="button"
+                                    wire:click="exportarReporte('{{ $livewire->reporteActivo }}', 'csv')"
+                                    class="sigem-rep-btn-sec">
+                                ↓ Exportar CSV
+                            </button>
+                            <button type="button"
+                                    wire:click="cerrarReporte"
+                                    class="sigem-rep-btn-sec">
+                                ✕ Cerrar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="sigem-rep-table-wrap sigem-scroll-top">
+                        <table class="sigem-rep-table">
+                            <thead>
+                                <tr>
+                                    @foreach ($reporteActual['headers'] as $header)
+                                        <th>{{ $header }}</th>
+                                    @endforeach
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($reporteActual['rows'] as $row)
+                                    <tr>
+                                        @foreach ($row as $celda)
+                                            <td>{!! $celda !!}</td>
+                                        @endforeach
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="{{ count($reporteActual['headers']) }}" style="text-align: center; color: #94a3b8; padding: 20px;">
+                                            Sin registros disponibles para este reporte
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
         </section>
     @endif
 
@@ -1221,7 +1259,17 @@
             @forelse ($reportesSubpestana as $rep)
                 @if (! empty($rep['has_chart']))
                     {{-- 12 REPORTES CON GRÁFICA CHART.JS --}}
+                    @php
+                        $datosFilas = $rep['rows'] ?? [];
+                        $tieneFilas = count($datosFilas) > 0;
+                        $rawChartData = $rep['chart']['datasets'][0]['data'] ?? [];
+                        $esVacio = ! $tieneFilas || (count($rawChartData) === 1 && ($rawChartData[0] === 0 || ($rep['chart']['labels'][0] ?? '') === 'Sin registros'));
+                        $datosGrafica = $esVacio ? [] : $rawChartData;
+                        $numPuntos = count($datosGrafica);
+                    @endphp
+
                     <div class="sigem-new-card sigem-chart-card"
+                         wire:key="sigem-new-chart-{{ $rep['id'] }}"
                          x-data="sigemChartComponent(@js($rep['chart'] ?? null))"
                          x-init="initChart()">
                         <div class="sigem-new-card-top">
@@ -1231,10 +1279,16 @@
                             @endif
                         </div>
 
-                        {{-- CONTENEDOR CANVAS RESPONSIVE DE CHART.JS --}}
-                        <div class="sigem-chart-canvas-wrap">
-                            <canvas x-ref="canvas"></canvas>
-                        </div>
+                        {{-- CONTENEDOR CANVAS RESPONSIVE DE CHART.JS O MENSAJE SIN GRÁFICA (Problema 4) --}}
+                        @if ($numPuntos > 0)
+                            <div class="sigem-chart-canvas-wrap" style="min-height: {{ $numPuntos >= 4 ? '220px' : '180px' }}; height: {{ $numPuntos >= 4 ? '220px' : '180px' }}; position: relative;">
+                                <canvas x-ref="canvas"></canvas>
+                            </div>
+                        @else
+                            <div class="sin-grafica" style="padding: 16px; text-align: center; color: #94a3b8; background: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1; margin: 10px 0; font-size: 13px;">
+                                📊 Datos insuficientes para gráfica
+                            </div>
+                        @endif
 
                         {{-- TABLA TOP 5 REGISTROS --}}
                         <div class="sigem-mini-table-box">
@@ -1292,7 +1346,7 @@
                     </div>
                 @else
                     {{-- 16 REPORTES SOLO TABLA --}}
-                    <div class="sigem-new-card sigem-table-card">
+                    <div class="sigem-new-card sigem-table-card" wire:key="sigem-new-table-{{ $rep['id'] }}">
                         <div class="sigem-new-card-top">
                             <div class="sigem-new-card-title">{{ $rep['emoji'] }} {{ $rep['titulo'] }}</div>
                             @if (! empty($rep['totales_label']))
@@ -1364,9 +1418,9 @@
             @endforelse
         </div>
 
-        {{-- Vista previa del nuevo reporte seleccionado --}}
+        {{-- Vista previa del nuevo reporte seleccionado (ABAJO DEL GRID - Problema 1) --}}
         @if ($datosPreviaNuevo)
-            <div class="sigem-rep-view" id="sigem-reporte-visor" x-on:scroll-to-report.window="$el.scrollIntoView({behavior:'smooth'})" style="margin-top: 24px;">
+            <div class="sigem-rep-view" id="sigem-reporte-visor" wire:key="sigem-reporte-visor-detalle" x-on:scroll-to-report.window="$el.scrollIntoView({behavior:'smooth'})" style="margin-top: 28px;">
                 <div class="sigem-rep-vh">
                     <div>
                         <h3>📊 {{ $datosPreviaNuevo['titulo'] }}</h3>
