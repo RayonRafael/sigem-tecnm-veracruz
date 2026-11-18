@@ -31,8 +31,14 @@
         }
 
         .logo-izq {
-            width: 68%;
+            width: 58%;
             text-align: left;
+        }
+
+        .logo-educacion {
+            height: 46px;
+            width: auto;
+            vertical-align: middle;
         }
 
         .logo-sep {
@@ -56,8 +62,13 @@
         }
 
         .logo-der {
-            width: 32%;
+            width: 42%;
             text-align: right;
+        }
+
+        .logo-bandera {
+            height: 42px;
+            width: auto;
         }
 
         .logo-itv {
@@ -186,23 +197,33 @@
             vertical-align: middle;
         }
 
-        .footer-info {
-            width: 62%;
+        .footer-left {
+            width: 26%;
             text-align: left;
-            font-size: 8.5px;
+        }
+
+        .footer-left img {
+            height: 36px;
+            max-width: 100%;
+        }
+
+        .footer-info {
+            width: 46%;
+            text-align: center;
+            font-size: 7.5pt;
             color: #374151;
             line-height: 1.35;
         }
 
         .footer-seals {
-            width: 38%;
+            width: 28%;
             text-align: right;
         }
 
         .footer-seals img {
-            height: 30px;
+            height: 26px;
             width: auto;
-            margin-left: 6px;
+            margin-left: 4px;
             vertical-align: middle;
         }
 @endsection
@@ -212,18 +233,24 @@
     <table class="header-logos">
         <tr>
             <td class="logo-izq">
-                @if(!empty($logoSep))
-                    <img class="logo-sep" src="{{ $logoSep }}" alt="SEP">
-                @endif
-                @if(!empty($logoSep) && !empty($logoTecnm))
-                    <span class="logo-divider"></span>
-                @endif
-                @if(!empty($logoTecnm))
-                    <img class="logo-tecnm" src="{{ $logoTecnm }}" alt="TecNM">
+                @if(!empty($logoEducacion))
+                    <img class="logo-educacion" src="{{ $logoEducacion }}" alt="Educación · TecNM">
+                @else
+                    @if(!empty($logoSep))
+                        <img class="logo-sep" src="{{ $logoSep }}" alt="SEP">
+                    @endif
+                    @if(!empty($logoSep) && !empty($logoTecnm))
+                        <span class="logo-divider"></span>
+                    @endif
+                    @if(!empty($logoTecnm))
+                        <img class="logo-tecnm" src="{{ $logoTecnm }}" alt="TecNM">
+                    @endif
                 @endif
             </td>
             <td class="logo-der">
-                @if(!empty($logoItv))
+                @if(!empty($logoBandera))
+                    <img class="logo-bandera" src="{{ $logoBandera }}" alt="Bandera">
+                @elseif(!empty($logoItv))
                     <img class="logo-itv" src="{{ $logoItv }}" alt="ITV">
                 @endif
             </td>
@@ -233,13 +260,13 @@
     <!-- Institución y área emisora alineadas a la derecha -->
     <div class="header-inst-block">
         <div class="header-institucion">{{ $config['institucion']['nombre'] ?? 'Instituto Tecnológico de Veracruz' }}</div>
-        <div class="header-subdireccion">Subdirección Administrativo</div>
+        <div class="header-subdireccion">Subdirección de Servicios Administrativos</div>
         <div class="header-centro">{{ $config['centro_computo']['nombre'] ?? 'Centro de Cómputo' }}</div>
     </div>
 
     <!-- Lugar y fecha -->
     <div class="lugar-fecha">
-        {{ $config['institucion']['ciudad'] ?? 'H. Veracruz, Veracruz' }}, {{ $fecha }}
+        {{ $config['institucion']['ciudad'] ?? 'H. Veracruz, Ver.' }}, {{ $fecha }}
     </div>
 @endsection
 
@@ -327,6 +354,11 @@
     <!-- Footer institucional -->
     <table class="footer-table">
         <tr>
+            <td class="footer-left">
+                @if(!empty($logoMargaritaMaza))
+                    <img src="{{ $logoMargaritaMaza }}" alt="2026 Margarita Maza">
+                @endif
+            </td>
             <td class="footer-info">
                 {{ $config['institucion']['direccion'] ?? '' }}<br>
                 Tel. {{ $config['institucion']['telefono'] ?? '' }} &middot;
@@ -334,14 +366,18 @@
                 {{ $config['institucion']['web'] ?? '' }}
             </td>
             <td class="footer-seals">
-                @if(!empty($logoItv))
-                    <img src="{{ $logoItv }}" alt="ITV">
-                @endif
-                @if(!empty($logoIso14001))
-                    <img src="{{ $logoIso14001 }}" alt="ISO 14001">
-                @endif
-                @if(!empty($logoIso9001))
-                    <img src="{{ $logoIso9001 }}" alt="ISO 9001">
+                @if(!empty($logoCertificaciones))
+                    <img src="{{ $logoCertificaciones }}" alt="Certificaciones">
+                @else
+                    @if(!empty($logoItv))
+                        <img src="{{ $logoItv }}" alt="ITV">
+                    @endif
+                    @if(!empty($logoIso14001))
+                        <img src="{{ $logoIso14001 }}" alt="ISO 14001">
+                    @endif
+                    @if(!empty($logoIso9001))
+                        <img src="{{ $logoIso9001 }}" alt="ISO 9001">
+                    @endif
                 @endif
             </td>
         </tr>

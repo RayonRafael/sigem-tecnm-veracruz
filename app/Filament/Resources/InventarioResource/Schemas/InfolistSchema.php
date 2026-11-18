@@ -198,6 +198,16 @@ class InfolistSchema
                                             ->date('d/m/Y')
                                             ->icon('heroicon-m-calendar-days')
                                             ->placeholder('Por capturar'),
+                                        Infolists\Components\Actions::make([
+                                            Infolists\Components\Actions\Action::make('Cambio de Área')
+                                                ->label('📄 Formato de Cambio de Área')
+                                                ->color('info')
+                                                ->icon('heroicon-o-arrow-path')
+                                                ->extraAttributes(['class' => 'sigem-pdf-btn'])
+                                                ->url(fn (Inventario $record): string => route('pdf.cambio.area', $record))
+                                                ->openUrlInNewTab()
+                                                ->visible(fn (Inventario $record): bool => (bool) $record->aprobado),
+                                        ])->columnSpanFull(),
                                     ])->columns(2),
 
                                 Infolists\Components\Section::make('Red y Conectividad')

@@ -758,6 +758,13 @@ class InventarioResource extends Resource
                                 $record->rechazarCambioArea($data['motivo_rechazo'] ?? null, auth()->id());
                                 Notification::make()->title('Solicitud de cambio de área rechazada')->warning()->send();
                             }),
+                        Tables\Actions\Action::make('Cambio de Área')
+                            ->label('📄 Formato Cambio de Área')
+                            ->color('info')
+                            ->icon('heroicon-o-arrow-path')
+                            ->url(fn (Inventario $record) => route('pdf.cambio.area', $record))
+                            ->openUrlInNewTab()
+                            ->visible(fn (Inventario $record) => (bool) $record->aprobado),
                         Tables\Actions\Action::make('desde_detalle_baja')
                             ->label('Baja')
                             ->color('danger')

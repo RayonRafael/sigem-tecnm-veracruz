@@ -21,4 +21,22 @@ class SigemPdfController
 
         return SigemPdfGenerator::descargarFormatoBaja($inventario);
     }
+
+    /**
+     * Descarga el Formato de Cambio de Área para un equipo de inventario.
+     */
+    public function cambioArea(Inventario $inventario): StreamedResponse
+    {
+        $user = auth()->user();
+        if (! $user) {
+            abort(403);
+        }
+
+        $tieneRoles = method_exists($user, 'roles') && $user->roles()->exists();
+        if ($tieneRoles && ! $user->can('view', $inventario)) {
+            abort(403);
+        }
+
+        return SigemPdfGenerator::descargarCambioArea($inventario);
+    }
 }
