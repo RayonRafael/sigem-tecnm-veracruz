@@ -30,3 +30,4 @@ class ReportesController
         return SigemReportExporter::export($tipo, $filtros, $formato);
     }
 }
+

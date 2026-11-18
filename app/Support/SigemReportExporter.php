@@ -19,6 +19,44 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class SigemReportExporter
 {
     /**
+     * Mapeo de alias cortos hacia IDs canónicos.
+     */
+    public static array $aliasMap = [
+        'inv_general' => 'inventario_general',
+        'inv_depto' => 'inventario_por_departamento',
+        'inv_area' => 'inventario_por_area',
+        'inv_tipo' => 'inventario_por_tipo',
+        'inv_estado' => 'inventario_por_estado',
+        'inv_aula' => 'inventario_por_aula',
+
+        'est_antiguos' => 'estadisticas_antiguos',
+        'est_sin_asignar' => 'estadisticas_sin_asignar',
+        'est_top_deptos' => 'estadisticas_depto_mas_equipos',
+        'est_movidos' => 'estadisticas_mas_movidos',
+        'est_propiedad' => 'estadisticas_propio_vs_rentado',
+        'est_resumen' => 'estadisticas_resumen_general',
+
+        'mant_top_deptos' => 'mantenimiento_depto_pide_mas',
+        'mant_top_tipos' => 'mantenimiento_tipo_mas_frecuente',
+        'mant_por_mes' => 'mantenimiento_por_mes',
+        'mant_activos' => 'mantenimiento_en_curso',
+        'mant_tiempos' => 'mantenimiento_tiempo_promedio',
+        'mant_historial' => 'mantenimiento_historial',
+
+        'rent_activas' => 'rentas_equipos',
+        'rent_por_vencer' => 'rentas_proximas_vencer',
+        'rent_vencidas' => 'rentas_vencidas',
+        'rent_gasto_mensual' => 'rentas_gasto_mensual',
+        'rent_proveedores' => 'rentas_por_proveedor',
+
+        'hist_cambios_area' => 'historico_cambios_area',
+        'hist_bajas' => 'historico_bajas',
+        'hist_entregas' => 'historico_entregas',
+        'hist_actividad_usuario' => 'historico_actividad_usuario',
+        'hist_general' => 'historico_general',
+    ];
+
+    /**
      * Retorna el catálogo completo de los 28 reportes organizados en 5 sub-pestañas.
      */
     public static function getCatalogo(): array
@@ -28,55 +66,74 @@ class SigemReportExporter
                 'inventario_general' => [
                     'num' => 1,
                     'id' => 'inventario_general',
+                    'alias' => 'inv_general',
                     'categoria' => 'inventario',
                     'titulo' => 'Inventario General',
                     'descripcion' => 'Listado completo de todos los equipos registrados en el inventario con sus datos técnicos y de ubicación.',
                     'icono' => '📋',
+                    'has_chart' => false,
                     'columnas' => ['Código', 'Equipo', 'Tipo', 'Marca', 'Modelo', 'Estado', 'Depto', 'Área', 'Aula', 'Serie'],
                 ],
                 'inventario_por_departamento' => [
                     'num' => 2,
                     'id' => 'inventario_por_departamento',
+                    'alias' => 'inv_depto',
                     'categoria' => 'inventario',
                     'titulo' => 'Por Departamento',
                     'descripcion' => 'Concentrado cuantitativo de equipos agrupados por departamento, desglosando bienes propios y rentados.',
                     'icono' => '🏢',
+                    'has_chart' => true,
+                    'chart_type' => 'bar',
+                    'chart_color' => '#1b65d4',
+                    'chart_horizontal' => true,
                     'columnas' => ['Depto', 'Cantidad equipos', 'Propios', 'Rentados'],
                 ],
                 'inventario_por_area' => [
                     'num' => 3,
                     'id' => 'inventario_por_area',
+                    'alias' => 'inv_area',
                     'categoria' => 'inventario',
                     'titulo' => 'Por Área',
                     'descripcion' => 'Distribución detallada de equipos en cada área académica y administrativa con su departamento.',
                     'icono' => '🗂️',
+                    'has_chart' => false,
                     'columnas' => ['Área', 'Depto', 'Cantidad equipos'],
                 ],
                 'inventario_por_tipo' => [
                     'num' => 4,
                     'id' => 'inventario_por_tipo',
+                    'alias' => 'inv_tipo',
                     'categoria' => 'inventario',
                     'titulo' => 'Por Tipo',
                     'descripcion' => 'Clasificación de equipos según su tipo de material y régimen de propiedad patrimonial o rentado.',
                     'icono' => '💻',
+                    'has_chart' => true,
+                    'chart_type' => 'doughnut',
+                    'chart_colors' => ['#1b65d4', '#0891b2', '#059669', '#d97706', '#8b5cf6', '#dc2626', '#64748b'],
                     'columnas' => ['Tipo', 'Cantidad', 'Propios', 'Rentados'],
                 ],
                 'inventario_por_estado' => [
                     'num' => 5,
                     'id' => 'inventario_por_estado',
+                    'alias' => 'inv_estado',
                     'categoria' => 'inventario',
                     'titulo' => 'Por Estado',
                     'descripcion' => 'Volumen y porcentaje de equipos según su estado operativo (Disponible, Asignado, En mantenimiento, etc.).',
                     'icono' => '🔄',
+                    'has_chart' => true,
+                    'chart_type' => 'doughnut',
+                    'chart_colors' => ['#059669', '#1b65d4', '#d97706', '#dc2626', '#8b5cf6'],
                     'columnas' => ['Estado', 'Cantidad', 'Porcentaje'],
                 ],
                 'inventario_por_aula' => [
                     'num' => 6,
                     'id' => 'inventario_por_aula',
+                    'alias' => 'inv_aula',
                     'categoria' => 'inventario',
                     'titulo' => 'Por Aula',
                     'descripcion' => 'Concentrado de equipos localizados físicamente por aula, área y departamento institucional.',
                     'icono' => '🏫',
+                    'has_chart' => false,
                     'columnas' => ['Aula', 'Área', 'Depto', 'Cantidad'],
                 ],
             ],
@@ -85,55 +142,74 @@ class SigemReportExporter
                 'estadisticas_antiguos' => [
                     'num' => 7,
                     'id' => 'estadisticas_antiguos',
+                    'alias' => 'est_antiguos',
                     'categoria' => 'estadisticas',
                     'titulo' => 'Más antiguos (Top 20)',
                     'descripcion' => 'Los 20 equipos con mayor tiempo registrados en la institución según fecha de factura o registro.',
                     'icono' => '⏳',
+                    'has_chart' => false,
                     'columnas' => ['Código', 'Equipo', 'Fecha compra', 'Depto', 'Estado'],
                 ],
                 'estadisticas_sin_asignar' => [
                     'num' => 8,
                     'id' => 'estadisticas_sin_asignar',
+                    'alias' => 'est_sin_asignar',
                     'categoria' => 'estadisticas',
                     'titulo' => 'Sin asignar',
                     'descripcion' => 'Equipos disponibles en almacén o bodega sin departamento o área específica asignada.',
                     'icono' => '📦',
+                    'has_chart' => false,
                     'columnas' => ['Código', 'Equipo', 'Tipo', 'Fecha registro'],
                 ],
                 'estadisticas_depto_mas_equipos' => [
                     'num' => 9,
                     'id' => 'estadisticas_depto_mas_equipos',
+                    'alias' => 'est_top_deptos',
                     'categoria' => 'estadisticas',
                     'titulo' => 'Depto con más equipos',
                     'descripcion' => 'Ranking departamental ordenado por volumen de inventario y porcentaje respecto al total institucional.',
                     'icono' => '🏆',
+                    'has_chart' => true,
+                    'chart_type' => 'bar',
+                    'chart_color' => '#1b65d4',
+                    'chart_horizontal' => true,
                     'columnas' => ['Depto', 'Cantidad', '% del total'],
                 ],
                 'estadisticas_mas_movidos' => [
                     'num' => 10,
                     'id' => 'estadisticas_mas_movidos',
+                    'alias' => 'est_movidos',
                     'categoria' => 'estadisticas',
                     'titulo' => 'Más movidos',
                     'descripcion' => 'Equipos con mayor número de reubicaciones y traslados registrados en el historial de estados.',
                     'icono' => '🚚',
+                    'has_chart' => true,
+                    'chart_type' => 'bar',
+                    'chart_color' => '#1b65d4',
                     'columnas' => ['Código', 'Equipo', 'Cantidad cambios', 'Último cambio'],
                 ],
                 'estadisticas_propio_vs_rentado' => [
                     'num' => 11,
                     'id' => 'estadisticas_propio_vs_rentado',
+                    'alias' => 'est_propiedad',
                     'categoria' => 'estadisticas',
                     'titulo' => 'Propio vs Rentado',
                     'descripcion' => 'Comparativo cuantitativo y porcentual entre bienes patrimoniales y equipo en arrendamiento.',
                     'icono' => '⚖️',
+                    'has_chart' => true,
+                    'chart_type' => 'pie',
+                    'chart_colors' => ['#1b65d4', '#059669'],
                     'columnas' => ['Tipo', 'Cantidad', 'Porcentaje'],
                 ],
                 'estadisticas_resumen_general' => [
                     'num' => 12,
                     'id' => 'estadisticas_resumen_general',
+                    'alias' => 'est_resumen',
                     'categoria' => 'estadisticas',
                     'titulo' => 'Resumen general',
                     'descripcion' => 'Indicadores consolidados con los totales globales de equipos, departamentos, áreas y usuarios.',
                     'icono' => '📈',
+                    'has_chart' => false,
                     'columnas' => ['Equipos', 'Deptos', 'Áreas', 'Usuarios', 'Propios', 'Rentados'],
                 ],
             ],
@@ -142,55 +218,72 @@ class SigemReportExporter
                 'mantenimiento_depto_pide_mas' => [
                     'num' => 13,
                     'id' => 'mantenimiento_depto_pide_mas',
+                    'alias' => 'mant_top_deptos',
                     'categoria' => 'mantenimiento',
                     'titulo' => 'Depto que pide más',
                     'descripcion' => 'Departamentos con mayor volumen de solicitudes de mantenimiento, clasificadas por estado.',
                     'icono' => '🛠️',
+                    'has_chart' => true,
+                    'chart_type' => 'bar',
+                    'chart_color' => '#dc2626',
+                    'chart_horizontal' => true,
                     'columnas' => ['Depto', 'Solicitudes', 'Completadas', 'Pendientes'],
                 ],
                 'mantenimiento_tipo_mas_frecuente' => [
                     'num' => 14,
                     'id' => 'mantenimiento_tipo_mas_frecuente',
+                    'alias' => 'mant_top_tipos',
                     'categoria' => 'mantenimiento',
                     'titulo' => 'Tipo con más mantenimiento',
                     'descripcion' => 'Tipos de equipo que demandan mayor frecuencia de atención y reparación técnica.',
                     'icono' => '⚠️',
+                    'has_chart' => false,
                     'columnas' => ['Tipo', 'Solicitudes', 'Frecuencia'],
                 ],
                 'mantenimiento_por_mes' => [
                     'num' => 15,
                     'id' => 'mantenimiento_por_mes',
+                    'alias' => 'mant_por_mes',
                     'categoria' => 'mantenimiento',
                     'titulo' => 'Por mes',
                     'descripcion' => 'Comportamiento cronológico mensual del número de órdenes de servicio registradas.',
                     'icono' => '📅',
+                    'has_chart' => true,
+                    'chart_type' => 'line',
+                    'chart_color' => '#ea580c',
                     'columnas' => ['Mes', 'Año', 'Cantidad'],
                 ],
                 'mantenimiento_en_curso' => [
                     'num' => 16,
                     'id' => 'mantenimiento_en_curso',
+                    'alias' => 'mant_activos',
                     'categoria' => 'mantenimiento',
                     'titulo' => 'En mantenimiento',
                     'descripcion' => 'Equipos que se encuentran actualmente bajo intervención técnica o pendientes de atención.',
                     'icono' => '🔧',
+                    'has_chart' => false,
                     'columnas' => ['Código', 'Equipo', 'Depto', 'Fecha entrada'],
                 ],
                 'mantenimiento_tiempo_promedio' => [
                     'num' => 17,
                     'id' => 'mantenimiento_tiempo_promedio',
+                    'alias' => 'mant_tiempos',
                     'categoria' => 'mantenimiento',
                     'titulo' => 'Tiempo promedio',
                     'descripcion' => 'Duración media, mínima y máxima en días para concluir los servicios de mantenimiento completados.',
                     'icono' => '⏱️',
+                    'has_chart' => false,
                     'columnas' => ['Tipo', 'Días promedio', 'Mín', 'Máx'],
                 ],
                 'mantenimiento_historial_equipo' => [
                     'num' => 18,
                     'id' => 'mantenimiento_historial_equipo',
+                    'alias' => 'mant_historial',
                     'categoria' => 'mantenimiento',
                     'titulo' => 'Historial por equipo',
                     'descripcion' => 'Relación cronológica de todas las intervenciones técnicas realizadas a cada equipo registrado.',
                     'icono' => '📑',
+                    'has_chart' => false,
                     'columnas' => ['Código', 'Equipo', 'Fecha', 'Tipo servicio', 'Estado'],
                 ],
             ],
@@ -199,46 +292,60 @@ class SigemReportExporter
                 'rentas_equipos' => [
                     'num' => 19,
                     'id' => 'rentas_equipos',
+                    'alias' => 'rent_activas',
                     'categoria' => 'rentas',
                     'titulo' => 'Equipos en renta',
                     'descripcion' => 'Catálogo completo de equipos en esquema de arrendamiento con proveedor y vigencia contractual.',
                     'icono' => '💳',
+                    'has_chart' => false,
                     'columnas' => ['Código', 'Equipo', 'Proveedor', 'Fecha inicio', 'Fecha fin'],
                 ],
                 'rentas_proximas_vencer' => [
                     'num' => 20,
                     'id' => 'rentas_proximas_vencer',
+                    'alias' => 'rent_por_vencer',
                     'categoria' => 'rentas',
                     'titulo' => 'Próximas a vencer',
                     'descripcion' => 'Arrendamientos con fecha de término en los próximos 90 días naturales para planeación de renovación.',
                     'icono' => '🔔',
+                    'has_chart' => true,
+                    'chart_type' => 'pie',
+                    'chart_colors' => ['#059669', '#d97706', '#dc2626'],
                     'columnas' => ['Código', 'Equipo', 'Proveedor', 'Fecha fin', 'Días restantes'],
                 ],
                 'rentas_vencidas' => [
                     'num' => 21,
                     'id' => 'rentas_vencidas',
+                    'alias' => 'rent_vencidas',
                     'categoria' => 'rentas',
                     'titulo' => 'Vencidas',
                     'descripcion' => 'Contratos de arrendamiento cuya fecha límite ha expirado y requieren devolución o regularización.',
                     'icono' => '🚨',
+                    'has_chart' => false,
                     'columnas' => ['Código', 'Equipo', 'Proveedor', 'Fecha fin', 'Días vencida'],
                 ],
                 'rentas_gasto_mensual' => [
                     'num' => 22,
                     'id' => 'rentas_gasto_mensual',
+                    'alias' => 'rent_gasto_mensual',
                     'categoria' => 'rentas',
                     'titulo' => 'Gasto mensual',
                     'descripcion' => 'Concentrado mensual del parque vehicular de cómputo arrendado y estimación de gasto.',
                     'icono' => '💰',
+                    'has_chart' => true,
+                    'chart_type' => 'line',
+                    'chart_color' => '#8b5cf6',
                     'columnas' => ['Mes', 'Cantidad equipos', 'Costo estimado'],
                 ],
                 'rentas_por_proveedor' => [
                     'num' => 23,
                     'id' => 'rentas_por_proveedor',
+                    'alias' => 'rent_proveedores',
                     'categoria' => 'rentas',
                     'titulo' => 'Por proveedor',
                     'descripcion' => 'Distribución de equipos en renta agrupados por empresa proveedora con fechas extremas.',
                     'icono' => '🤝',
+                    'has_chart' => false,
                     'columnas' => ['Proveedor', 'Equipos', 'Fecha más antigua', 'Fecha más reciente'],
                 ],
             ],
@@ -247,46 +354,61 @@ class SigemReportExporter
                 'historico_cambios_area' => [
                     'num' => 24,
                     'id' => 'historico_cambios_area',
+                    'alias' => 'hist_cambios_area',
                     'categoria' => 'historico',
                     'titulo' => 'Cambios de área',
                     'descripcion' => 'Bitácora de movimientos y traslados de equipo entre diferentes áreas y departamentos.',
                     'icono' => '🔄',
+                    'has_chart' => true,
+                    'chart_type' => 'line',
+                    'chart_color' => '#0891b2',
                     'columnas' => ['Fecha', 'Equipo', 'Origen', 'Destino', 'Usuario'],
                 ],
                 'historico_bajas' => [
                     'num' => 25,
                     'id' => 'historico_bajas',
+                    'alias' => 'hist_bajas',
                     'categoria' => 'historico',
                     'titulo' => 'Bajas',
                     'descripcion' => 'Relación de equipos dados de baja institucionalmente con su motivo y usuario dictaminador.',
                     'icono' => '🗑️',
+                    'has_chart' => false,
                     'columnas' => ['Código', 'Equipo', 'Fecha baja', 'Motivo', 'Usuario'],
                 ],
                 'historico_entregas' => [
                     'num' => 26,
                     'id' => 'historico_entregas',
+                    'alias' => 'hist_entregas',
                     'categoria' => 'historico',
                     'titulo' => 'Entregas',
                     'descripcion' => 'Historial de solicitudes de asignación y entrega autorizadas formalmente a personal receptor.',
                     'icono' => '🤝',
+                    'has_chart' => false,
                     'columnas' => ['Fecha', 'Equipo', 'Receptor', 'Depto'],
                 ],
                 'historico_actividad_usuario' => [
                     'num' => 27,
                     'id' => 'historico_actividad_usuario',
+                    'alias' => 'hist_actividad_usuario',
                     'categoria' => 'historico',
                     'titulo' => 'Actividad por usuario',
                     'descripcion' => 'Conteo de acciones operativas, cambios y registros efectuados por cada cuenta de usuario.',
                     'icono' => '👥',
+                    'has_chart' => true,
+                    'chart_type' => 'bar',
+                    'chart_color' => '#059669',
+                    'chart_horizontal' => true,
                     'columnas' => ['Usuario', 'Acciones', 'Última actividad'],
                 ],
                 'historico_general' => [
                     'num' => 28,
                     'id' => 'historico_general',
+                    'alias' => 'hist_general',
                     'categoria' => 'historico',
                     'titulo' => 'Historial general',
                     'descripcion' => 'Línea de tiempo cronológica completa de todas las transacciones de estado y ubicación del inventario.',
                     'icono' => '📜',
+                    'has_chart' => false,
                     'columnas' => ['Fecha', 'Equipo', 'Estado anterior', 'Estado nuevo', 'Motivo', 'Usuario'],
                 ],
             ],
@@ -308,11 +430,16 @@ class SigemReportExporter
     }
 
     /**
-     * Busca los metadatos de un reporte específico por su ID.
+     * Busca los metadatos de un reporte específico por su ID o alias.
      */
     public static function findReporte(string $tipo): ?array
     {
+        $canonical = self::$aliasMap[$tipo] ?? $tipo;
+
         foreach (self::getCatalogo() as $subpestana => $reportes) {
+            if (isset($reportes[$canonical])) {
+                return $reportes[$canonical];
+            }
             if (isset($reportes[$tipo])) {
                 return $reportes[$tipo];
             }
@@ -322,19 +449,38 @@ class SigemReportExporter
     }
 
     /**
+     * Retorna los reportes listos para visualizar de una sub-pestaña dada.
+     */
+    public static function getReportesSubpestana(string $subpestana, array $filtros = []): array
+    {
+        $catalogo = self::getCatalogo();
+        $lista = $catalogo[$subpestana] ?? [];
+        $resultado = [];
+
+        foreach ($lista as $key => $meta) {
+            $resultado[] = self::getReportData($key, $filtros);
+        }
+
+        return $resultado;
+    }
+
+    /**
      * Ejecuta el query correspondiente al tipo de reporte y retorna su estructura con headers y rows.
      */
     public static function getReportData(string $tipo, array $filtros = []): array
     {
-        $meta = self::findReporte($tipo) ?? [
+        $canonical = self::$aliasMap[$tipo] ?? $tipo;
+        $meta = self::findReporte($canonical) ?? [
+            'id' => $canonical,
             'titulo' => 'Reporte',
             'columnas' => [],
+            'has_chart' => false,
         ];
 
-        $headers = $meta['columnas'];
+        $headers = $meta['columnas'] ?? [];
         $rows = [];
 
-        switch ($tipo) {
+        switch ($canonical) {
             // ==========================================
             // SUB-PESTAÑA 1: INVENTARIO (6 reportes)
             // ==========================================
@@ -991,13 +1137,276 @@ class SigemReportExporter
                 break;
         }
 
+        $hasChart = ! empty($meta['has_chart']);
+        $chartConfig = $hasChart ? self::buildChartConfig($meta, $headers, $rows) : null;
+        $totalesLabel = self::computeTotalesLabel($meta['id'] ?? $canonical, $rows);
+
+        // Preview de columnas (primeras 3) y primeras 5 filas
+        $top5Headers = array_slice($headers, 0, min(3, count($headers)));
+        $top5Rows = [];
+        foreach (array_slice($rows, 0, 5) as $r) {
+            $top5Rows[] = array_slice((array) $r, 0, min(3, count($headers)));
+        }
+
         return [
-            'id' => $tipo,
-            'titulo' => $meta['titulo'],
+            'id' => $meta['id'] ?? $canonical,
+            'alias' => $meta['alias'] ?? ($meta['id'] ?? $canonical),
+            'subpestana' => $meta['categoria'] ?? 'inventario',
+            'titulo' => $meta['titulo'] ?? 'Reporte',
+            'emoji' => $meta['icono'] ?? '📊',
+            'descripcion' => $meta['descripcion'] ?? '',
             'headers' => $headers,
             'rows' => $rows,
             'total' => count($rows),
+            'total_registros' => count($rows),
+            'totales_label' => $totalesLabel,
+            'has_chart' => $hasChart,
+            'chart' => $chartConfig,
+            'top5_headers' => $top5Headers,
+            'top5_rows' => $top5Rows,
         ];
+    }
+
+    /**
+     * Construye la estructura de datos compatible con Chart.js para los 12 reportes visuales.
+     */
+    public static function buildChartConfig(array $meta, array $headers, array $rows): ?array
+    {
+        if (empty($meta['has_chart'])) {
+            return null;
+        }
+
+        $type = $meta['chart_type'] ?? 'bar';
+        $labels = [];
+        $data = [];
+        $id = $meta['id'] ?? '';
+
+        switch ($id) {
+            case 'estadisticas_propio_vs_rentado':
+                foreach ($rows as $r) {
+                    $labels[] = (string) ($r[0] ?? '');
+                    $data[] = (int) ($r[1] ?? 0);
+                }
+                break;
+
+            case 'inventario_por_estado':
+                foreach (array_slice($rows, 0, 7) as $r) {
+                    $labels[] = (string) ($r[0] ?? '');
+                    $data[] = (int) ($r[1] ?? 0);
+                }
+                break;
+
+            case 'inventario_por_departamento':
+            case 'estadisticas_depto_mas_equipos':
+                foreach (array_slice($rows, 0, 8) as $r) {
+                    $labels[] = (string) ($r[0] ?? '');
+                    $data[] = (int) ($r[1] ?? 0);
+                }
+                break;
+
+            case 'inventario_por_tipo':
+                foreach (array_slice($rows, 0, 7) as $r) {
+                    $labels[] = (string) ($r[0] ?? '');
+                    $data[] = (int) ($r[1] ?? 0);
+                }
+                break;
+
+            case 'mantenimiento_por_mes':
+                foreach (array_slice($rows, 0, 12) as $r) {
+                    $labels[] = trim(($r[0] ?? '') . ' ' . ($r[1] ?? ''));
+                    $data[] = (int) ($r[2] ?? 0);
+                }
+                break;
+
+            case 'mantenimiento_depto_pide_mas':
+                foreach (array_slice($rows, 0, 8) as $r) {
+                    $labels[] = (string) ($r[0] ?? '');
+                    $data[] = (int) ($r[1] ?? 0);
+                }
+                break;
+
+            case 'rentas_proximas_vencer':
+                $r15 = 0; $r30 = 0; $r60 = 0;
+                foreach ($rows as $r) {
+                    $dias = (int) preg_replace('/[^0-9]/', '', (string) ($r[4] ?? '0'));
+                    if ($dias <= 15) {
+                        $r15++;
+                    } elseif ($dias <= 30) {
+                        $r30++;
+                    } else {
+                        $r60++;
+                    }
+                }
+                $labels = ['1 a 15 días', '16 a 30 días', '31 a 90 días'];
+                $data = [$r15, $r30, $r60];
+                break;
+
+            case 'rentas_gasto_mensual':
+                foreach (array_slice($rows, 0, 12) as $r) {
+                    $labels[] = (string) ($r[0] ?? '');
+                    $val = preg_replace('/[^0-9.]/', '', (string) ($r[2] ?? ($r[1] ?? 0)));
+                    $data[] = (float) $val;
+                }
+                break;
+
+            case 'estadisticas_mas_movidos':
+                foreach (array_slice($rows, 0, 8) as $r) {
+                    $labels[] = (string) ($r[0] ?? '');
+                    $data[] = (int) ($r[2] ?? 0);
+                }
+                break;
+
+            case 'historico_cambios_area':
+                $porMes = [];
+                foreach ($rows as $r) {
+                    $f = (string) ($r[0] ?? '');
+                    $mesKey = strlen($f) >= 10 ? substr($f, 3, 7) : 'General';
+                    $porMes[$mesKey] = ($porMes[$mesKey] ?? 0) + 1;
+                }
+                if (empty($porMes)) {
+                    $labels = ['Sin datos'];
+                    $data = [0];
+                } else {
+                    $labels = array_keys($porMes);
+                    $data = array_values($porMes);
+                }
+                break;
+
+            case 'historico_actividad_usuario':
+                foreach (array_slice($rows, 0, 6) as $r) {
+                    $labels[] = (string) ($r[0] ?? '');
+                    $data[] = (int) ($r[1] ?? 0);
+                }
+                break;
+
+            default:
+                foreach (array_slice($rows, 0, 6) as $r) {
+                    $labels[] = (string) ($r[0] ?? '');
+                    $data[] = isset($r[1]) && is_numeric($r[1]) ? (int) $r[1] : 1;
+                }
+                break;
+        }
+
+        if (empty($labels)) {
+            $labels = ['Sin registros'];
+            $data = [0];
+        }
+
+        $isPieOrDonut = in_array($type, ['pie', 'doughnut'], true);
+        if ($isPieOrDonut) {
+            $palette = $meta['chart_colors'] ?? ['#1b65d4', '#059669', '#d97706', '#dc2626', '#8b5cf6', '#0891b2', '#64748b'];
+            $bgColors = [];
+            foreach ($labels as $idx => $lbl) {
+                $bgColors[] = $palette[$idx % count($palette)];
+            }
+        } else {
+            $bgColors = $meta['chart_color'] ?? '#1b65d4';
+        }
+
+        return [
+            'type' => $type,
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => $meta['titulo'] ?? 'Reporte',
+                    'data' => $data,
+                    'backgroundColor' => $bgColors,
+                    'borderColor' => $isPieOrDonut ? '#ffffff' : ($meta['chart_color'] ?? '#1b65d4'),
+                    'borderWidth' => $isPieOrDonut ? 2 : 1.5,
+                    'fill' => $type === 'line' ? false : true,
+                    'tension' => 0.35,
+                ],
+            ],
+            'options' => [
+                'indexAxis' => ! empty($meta['chart_horizontal']) ? 'y' : 'x',
+                'responsive' => true,
+                'maintainAspectRatio' => false,
+                'plugins' => [
+                    'legend' => [
+                        'display' => $isPieOrDonut,
+                        'position' => 'bottom',
+                        'labels' => ['boxWidth' => 10, 'font' => ['size' => 11]],
+                    ],
+                    'tooltip' => [
+                        'enabled' => true,
+                    ],
+                ],
+                'scales' => $isPieOrDonut ? (object) [] : [
+                    'y' => ['beginAtZero' => true, 'grid' => ['color' => '#f1f5f9']],
+                    'x' => ['grid' => ['display' => false]],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Calcula la etiqueta resumen de totales para encabezado de tarjeta.
+     */
+    public static function computeTotalesLabel(string $id, array $rows): string
+    {
+        $count = count($rows);
+        switch ($id) {
+            case 'estadisticas_propio_vs_rentado':
+            case 'est_propiedad':
+                $propios = 0; $rentados = 0;
+                foreach ($rows as $r) {
+                    if (stripos((string) ($r[0] ?? ''), 'propio') !== false) $propios = (int) ($r[1] ?? 0);
+                    if (stripos((string) ($r[0] ?? ''), 'rent') !== false) $rentados = (int) ($r[1] ?? 0);
+                }
+                $total = $propios + $rentados;
+                return "Totales: {$total} equipos | Propios: {$propios} · Rentados: {$rentados}";
+
+            case 'inventario_por_departamento':
+            case 'inv_depto':
+            case 'estadisticas_depto_mas_equipos':
+            case 'est_top_deptos':
+                $total = array_sum(array_map('intval', array_column($rows, 1)));
+                return "Totales: {$total} equipos | {$count} departamentos";
+
+            case 'inventario_por_estado':
+            case 'inv_estado':
+                $total = array_sum(array_map('intval', array_column($rows, 1)));
+                return "Totales: {$total} equipos | {$count} estados";
+
+            case 'inventario_por_tipo':
+            case 'inv_tipo':
+                $total = array_sum(array_map('intval', array_column($rows, 1)));
+                return "Totales: {$total} equipos | {$count} tipos";
+
+            case 'mantenimiento_por_mes':
+            case 'mant_por_mes':
+                $total = array_sum(array_map('intval', array_column($rows, 2)));
+                return "Totales: {$total} servicios en {$count} meses";
+
+            case 'mantenimiento_depto_pide_mas':
+            case 'mant_top_deptos':
+                $total = array_sum(array_map('intval', array_column($rows, 1)));
+                return "Totales: {$total} solicitudes | {$count} departamentos";
+
+            case 'rentas_proximas_vencer':
+            case 'rent_por_vencer':
+                return "Totales: {$count} equipos con renta próxima a vencer";
+
+            case 'rentas_gasto_mensual':
+            case 'rent_gasto_mensual':
+                return "Totales: {$count} periodos proyectados";
+
+            case 'estadisticas_mas_movidos':
+            case 'est_movidos':
+                return "Top {$count} equipos con más movimientos";
+
+            case 'historico_cambios_area':
+            case 'hist_cambios_area':
+                return "Totales: {$count} traslados y reubicaciones";
+
+            case 'historico_actividad_usuario':
+            case 'hist_actividad_usuario':
+                $total = array_sum(array_map('intval', array_column($rows, 1)));
+                return "Totales: {$total} acciones registradas";
+
+            default:
+                return "Total: {$count} registros";
+        }
     }
 
     /**
@@ -1081,3 +1490,4 @@ class SigemReportExporter
         }
     }
 }
+

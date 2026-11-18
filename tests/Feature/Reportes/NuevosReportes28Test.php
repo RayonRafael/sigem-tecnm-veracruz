@@ -373,4 +373,107 @@ class NuevosReportes28Test extends TestCase
         $livewire->call('cambiarPestanaPrincipal', 'formatos')
             ->call('descargarFormatoInstitucional', 'cambio_area');
     }
+
+    public function test_los_6_reportes_originales_estan_restaurados_en_la_pagina(): void
+    {
+        $this->actingAs($this->adminUser);
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        $livewire = Livewire::test(ReportesPage::class)
+            ->assertSee('Reportes Principales del Inventario')
+            ->assertSee('Inventario por categoría')
+            ->assertSee('Equipos por área')
+            ->assertSee('Equipos en mantenimiento')
+            ->assertSee('Equipos con solicitud de baja')
+            ->assertSee('Solicitudes de material')
+            ->assertSee('Movimientos SS')
+            ->assertSee('Visible para Servicio Social')
+            ->call('verReporte', 'inventario_categoria')
+            ->assertSet('reporteActivo', 'inventario_categoria')
+            ->assertSee('Categoría')
+            ->assertSee('Cerrar')
+            ->call('cerrarReporte')
+            ->assertSet('reporteActivo', null);
+
+        // Toggle visibilidad SS funciona
+        $estadoInicial = $livewire->get('visibilidadServicioSocial')['inventario_categoria'] ?? true;
+        $livewire->call('toggleVisibilidad', 'inventario_categoria');
+        $this->assertEquals(! $estadoInicial, $livewire->get('visibilidadServicioSocial')['inventario_categoria']);
+    }
+
+    public function test_exactamente_12_reportes_tienen_grafica_y_16_son_solo_tabla(): void
+    {
+        $catalogo = SigemReportExporter::getCatalogo();
+        $conGrafica = [];
+        $soloTabla = [];
+
+        foreach ($catalogo as $sub => $reportes) {
+            foreach ($reportes as $id => $meta) {
+                if (! empty($meta['has_chart'])) {
+                    $conGrafica[$id] = $meta;
+                } else {
+                    $soloTabla[$id] = $meta;
+                }
+            }
+        }
+
+        $this->assertCount(12, $conGrafica, 'Debe haber exactamente 12 reportes con gráfica');
+        $this->assertCount(16, $soloTabla, 'Debe haber exactamente 16 reportes solo tabla');
+
+        $esperadosConGrafica = [
+            'inventario_por_departamento',   // inv_depto
+            'inventario_por_tipo',           // inv_tipo
+            'inventario_por_estado',         // inv_estado
+            'estadisticas_depto_mas_equipos',// est_top_deptos
+            'estadisticas_mas_movidos',      // est_movidos
+            'estadisticas_propio_vs_rentado',// est_propiedad
+            'mantenimiento_depto_pide_mas',  // mant_top_deptos
+            'mantenimiento_por_mes',         // mant_por_mes
+            'rentas_proximas_vencer',        // rent_por_vencer
+            'rentas_gasto_mensual',          // rent_gasto_mensual
+            'historico_cambios_area',        // hist_cambios_area
+            'historico_actividad_usuario',   // hist_actividad_usuario
+        ];
+
+        foreach ($esperadosConGrafica as $idEsperado) {
+            $this->assertArrayHasKey($idEsperado, $conGrafica, "El reporte {$idEsperado} debe tener gráfica");
+            $data = SigemReportExporter::getReportData($idEsperado);
+            $this->assertTrue($data['has_chart'], "Data de {$idEsperado} debe marcar has_chart=true");
+            $this->assertNotNull($data['chart'], "Data de {$idEsperado} debe contener chart");
+            $this->assertArrayHasKey('type', $data['chart']);
+            $this->assertArrayHasKey('labels', $data['chart']);
+            $this->assertArrayHasKey('datasets', $data['chart']);
+            $this->assertArrayHasKey('options', $data['chart']);
+            $this->assertNotEmpty($data['totales_label']);
+            $this->assertNotEmpty($data['top5_headers']);
+        }
+
+        $esperadosSoloTabla = [
+            'inventario_general',
+            'inventario_por_area',
+            'inventario_por_aula',
+            'estadisticas_antiguos',
+            'estadisticas_sin_asignar',
+            'estadisticas_resumen_general',
+            'mantenimiento_tipo_mas_frecuente',
+            'mantenimiento_en_curso',
+            'mantenimiento_tiempo_promedio',
+            'mantenimiento_historial_equipo',
+            'rentas_equipos',
+            'rentas_vencidas',
+            'rentas_por_proveedor',
+            'historico_bajas',
+            'historico_entregas',
+            'historico_general',
+        ];
+
+        foreach ($esperadosSoloTabla as $idEsperado) {
+            $this->assertArrayHasKey($idEsperado, $soloTabla, "El reporte {$idEsperado} debe ser solo tabla");
+            $data = SigemReportExporter::getReportData($idEsperado);
+            $this->assertFalse($data['has_chart'], "Data de {$idEsperado} debe marcar has_chart=false");
+            $this->assertNull($data['chart']);
+            $this->assertNotEmpty($data['totales_label']);
+            $this->assertNotEmpty($data['top5_headers']);
+        }
+    }
 }

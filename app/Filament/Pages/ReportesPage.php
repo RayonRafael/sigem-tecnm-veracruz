@@ -285,7 +285,7 @@ class ReportesPage extends Page
 
     public function cambiarPestanaPrincipal(string $pestana): void
     {
-        if (in_array($pestana, ['formatos', 'nuevos_reportes'], true)) {
+        if (in_array($pestana, ['formatos', 'reportes', 'nuevos_reportes'], true)) {
             $this->pestanaPrincipal = $pestana;
             $this->cerrarReporte();
             $this->cerrarNuevoReporte();
@@ -340,6 +340,17 @@ class ReportesPage extends Page
         ];
 
         return SigemReportExporter::getReportData($reportId, $filtros);
+    }
+
+    public function getReportesSubpestanaActual(): array
+    {
+        $filtros = [
+            'fecha_desde' => $this->filtroFechaDesde,
+            'fecha_hasta' => $this->filtroFechaHasta,
+            'departamento_id' => $this->filtroDepartamentoId,
+        ];
+
+        return SigemReportExporter::getReportesSubpestana($this->subpestanaReportes, $filtros);
     }
 
     public function updatedFormatoFechaDesde(): void
