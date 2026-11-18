@@ -791,6 +791,7 @@ class InventarioResource extends Resource
                             ->label('Baja')
                             ->color('danger')
                             ->icon('heroicon-m-arrow-down-circle')
+                            ->slideOver()
                             ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Solicitud de baja', 'Cambio de área'], true))
                             ->modalHeading(fn () => static::esAdmin() ? 'Confirmar baja de equipo' : 'Solicitar baja de equipo')
                             ->modalDescription(fn () => static::esAdmin() ? 'El equipo pasará a estado Dado de baja de manera inmediata.' : 'La solicitud quedará registrada en espera de revisión y aprobación por el Administrador.')

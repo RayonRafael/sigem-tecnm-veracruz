@@ -350,6 +350,15 @@
                 </div>
 
                 <div class="sigem-sel-form-group">
+                    <label class="sigem-sel-form-label">Tipo de propiedad</label>
+                    <select wire:model="cambioNuevoTipoPropiedad" class="sigem-sel-form-control">
+                        <option value="">-- sin cambio --</option>
+                        <option value="Propio">Propio</option>
+                        <option value="Rentado">Rentado</option>
+                    </select>
+                </div>
+
+                <div class="sigem-sel-form-group">
                     <label class="sigem-sel-form-label">Motivo del cambio</label>
                     <textarea wire:model="cambioMotivo" rows="3" class="sigem-sel-form-control sigem-sel-form-textarea" placeholder="Motivo del cambio (opcional)..."></textarea>
                 </div>
@@ -482,6 +491,7 @@
                         <option value="area">Área</option>
                         <option value="departamento">Departamento</option>
                         <option value="ubicacion_fisica">Ubicación física</option>
+                        <option value="tipo_propiedad">Tipo de propiedad (Propio / Rentado)</option>
                     </select>
                 </div>
 
@@ -510,6 +520,12 @@
                         </select>
                     @elseif(($campoMod ?? '') === 'ubicacion_fisica')
                         <input type="text" wire:model="modificarNuevoValor" class="sigem-sel-form-control" placeholder="ej. Depto. de Sistemas > Oficina > Aula 101" />
+                    @elseif(($campoMod ?? '') === 'tipo_propiedad')
+                        <select wire:model="modificarNuevoValor" class="sigem-sel-form-control">
+                            <option value="">-- seleccione --</option>
+                            <option value="Propio">Propio</option>
+                            <option value="Rentado">Rentado</option>
+                        </select>
                     @else
                         <input type="text" disabled class="sigem-sel-form-control" placeholder="Seleccione primero un campo a modificar..." style="opacity: 0.6; cursor: not-allowed; background: #f3f4f6;" />
                     @endif

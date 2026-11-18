@@ -223,6 +223,7 @@ class Dashboard extends BaseDashboard
     {
         return Action::make('darBaja')
             ->label('Dar de baja')
+            ->slideOver()
             ->modalHeading('Confirmar baja de equipo')
             ->modalDescription('El equipo pasará a estado Dado de baja de manera inmediata.')
             ->model(Inventario::class)

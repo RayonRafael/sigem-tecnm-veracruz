@@ -47,6 +47,7 @@ trait ConAccionesMasivasInventario
      */
     public ?string $cambioNuevoEstado = '';
     public ?string $cambioNuevaAreaId = '';
+    public ?string $cambioNuevoTipoPropiedad = '';
     public ?string $cambioMotivo = '';
 
     /**
@@ -105,6 +106,7 @@ trait ConAccionesMasivasInventario
         $this->slideOverStep = 'principal';
         $this->cambioNuevoEstado = '';
         $this->cambioNuevaAreaId = '';
+        $this->cambioNuevoTipoPropiedad = '';
         $this->cambioMotivo = '';
         $this->bajaMotivo = '';
         $this->bajaObservaciones = '';
@@ -123,6 +125,7 @@ trait ConAccionesMasivasInventario
         if ($step === 'cambio') {
             $this->cambioNuevoEstado = '';
             $this->cambioNuevaAreaId = '';
+            $this->cambioNuevoTipoPropiedad = '';
             $this->cambioMotivo = '';
         } elseif ($step === 'baja') {
             $this->bajaMotivo = '';
@@ -165,6 +168,7 @@ trait ConAccionesMasivasInventario
         $data = [
             'nuevo_estado' => $this->cambioNuevoEstado ?: null,
             'nueva_area_id' => $this->cambioNuevaAreaId ?: null,
+            'nuevo_tipo_propiedad' => $this->cambioNuevoTipoPropiedad ?: null,
             'motivo' => $this->cambioMotivo ?: 'Cambio masivo',
         ];
 
@@ -207,6 +211,7 @@ trait ConAccionesMasivasInventario
             'nueva_area_id' => $this->modificarCampo === 'area' ? $this->modificarNuevoValor : null,
             'nuevo_departamento_id' => $this->modificarCampo === 'departamento' ? $this->modificarNuevoValor : null,
             'nueva_ubicacion_fisica' => $this->modificarCampo === 'ubicacion_fisica' ? $this->modificarNuevoValor : null,
+            'nuevo_tipo_propiedad' => $this->modificarCampo === 'tipo_propiedad' ? $this->modificarNuevoValor : null,
         ];
 
         $this->procesarModificarTodos($data);
@@ -214,7 +219,7 @@ trait ConAccionesMasivasInventario
 
     /**
      * Modal: Modificar todos
-     * Permite modificar masivamente Estado, Área, Departamento o Ubicación física.
+     * Permite modificar masivamente Estado, Área, Departamento, Ubicación física o Tipo de propiedad.
      */
     public function modificarTodosAction(): Action
     {
@@ -232,6 +237,7 @@ trait ConAccionesMasivasInventario
                         'area' => 'Área',
                         'departamento' => 'Departamento',
                         'ubicacion_fisica' => 'Ubicación física',
+                        'tipo_propiedad' => 'Tipo de propiedad (Propio / Rentado)',
                     ])
                     ->required()
                     ->live(),
@@ -260,6 +266,15 @@ trait ConAccionesMasivasInventario
                     ->maxLength(150)
                     ->visible(fn (Get $get) => $get('campo_a_modificar') === 'ubicacion_fisica')
                     ->required(fn (Get $get) => $get('campo_a_modificar') === 'ubicacion_fisica'),
+
+                Select::make('nuevo_tipo_propiedad')
+                    ->label('Nuevo tipo de propiedad')
+                    ->options([
+                        'Propio' => 'Propio',
+                        'Rentado' => 'Rentado',
+                    ])
+                    ->visible(fn (Get $get) => $get('campo_a_modificar') === 'tipo_propiedad')
+                    ->required(fn (Get $get) => $get('campo_a_modificar') === 'tipo_propiedad'),
             ])
             ->action(function (array $data) {
                 $this->procesarModificarTodos($data);
@@ -369,6 +384,23 @@ trait ConAccionesMasivasInventario
                         'fecha_cambio' => now(),
                     ]);
                     $aplicados++;
+                } elseif ($campo === 'tipo_propiedad') {
+                    $nuevoTipo = $data['nuevo_tipo_propiedad'] ?? $this->modificarNuevoValor;
+                    if (in_array($nuevoTipo, ['Propio', 'Rentado'], true)) {
+                        $propiedadAnt = $record->tipo_propiedad ?? 'Propio';
+                        $record->update(['tipo_propiedad' => $nuevoTipo]);
+
+                        HistorialEstado::create([
+                            'id_inventario' => $record->id_inventario,
+                            'id_usuario' => $userId,
+                            'estado_anterior' => $estadoAnterior,
+                            'estado_nuevo' => $record->estado,
+                            'motivo_cambio' => "Modificación masiva de propiedad: {$propiedadAnt} → {$nuevoTipo}",
+                            'ubicacion_fisica' => $record->ubicacion_fisica,
+                            'fecha_cambio' => now(),
+                        ]);
+                        $aplicados++;
+                    }
                 }
             }
         });
@@ -383,7 +415,7 @@ trait ConAccionesMasivasInventario
 
     /**
      * Modal: Cambio (masivo)
-     * Aplica o solicita cambio de área / estado para equipos seleccionados.
+     * Aplica o solicita cambio de área / estado / tipo de propiedad para equipos seleccionados.
      */
     public function cambioMasivoAction(): Action
     {
@@ -404,6 +436,14 @@ trait ConAccionesMasivasInventario
                     ->placeholder('— sin cambio —')
                     ->options(fn () => Area::orderBy('nombre')->pluck('nombre', 'id_area')),
 
+                Select::make('nuevo_tipo_propiedad')
+                    ->label('Tipo de propiedad')
+                    ->placeholder('— sin cambio —')
+                    ->options([
+                        'Propio' => 'Propio',
+                        'Rentado' => 'Rentado',
+                    ]),
+
                 Textarea::make('motivo')
                     ->label('Motivo del cambio')
                     ->placeholder('Motivo del cambio (opcional)...'),
@@ -414,7 +454,7 @@ trait ConAccionesMasivasInventario
     }
 
     /**
-     * Procesa la lógica de cambio masivo de área o estado.
+     * Procesa la lógica de cambio masivo de área, estado o tipo de propiedad.
      */
     public function procesarCambioMasivo(array $data): void
     {
@@ -427,11 +467,12 @@ trait ConAccionesMasivasInventario
         $userId = auth()->id() ?? 1;
         $nuevoEstado = ! empty($data['nuevo_estado']) ? $data['nuevo_estado'] : null;
         $nuevaAreaId = ! empty($data['nueva_area_id']) ? $data['nueva_area_id'] : null;
+        $nuevoTipoPropiedad = ! empty($data['nuevo_tipo_propiedad']) ? $data['nuevo_tipo_propiedad'] : null;
         $motivo = ! empty($data['motivo']) ? $data['motivo'] : 'Cambio masivo';
         $aplicados = 0;
         $omitidos = 0;
 
-        DB::transaction(function () use ($esAdmin, $userId, $nuevoEstado, $nuevaAreaId, $motivo, &$aplicados, &$omitidos) {
+        DB::transaction(function () use ($esAdmin, $userId, $nuevoEstado, $nuevaAreaId, $nuevoTipoPropiedad, $motivo, &$aplicados, &$omitidos) {
             $records = Inventario::whereIn('id_inventario', $this->selectedRows)->get();
 
             foreach ($records as $record) {
@@ -467,6 +508,21 @@ trait ConAccionesMasivasInventario
                         'estado_anterior' => $estadoAnt,
                         'estado_nuevo' => $nuevoEstado,
                         'motivo_cambio' => "Cambio masivo de estado a {$nuevoEstado}: {$motivo}",
+                        'ubicacion_fisica' => $record->ubicacion_fisica,
+                        'fecha_cambio' => now(),
+                    ]);
+                }
+
+                if ($nuevoTipoPropiedad && in_array($nuevoTipoPropiedad, ['Propio', 'Rentado'], true)) {
+                    $propiedadAnt = $record->tipo_propiedad ?? 'Propio';
+                    $record->update(['tipo_propiedad' => $nuevoTipoPropiedad]);
+
+                    HistorialEstado::create([
+                        'id_inventario' => $record->id_inventario,
+                        'id_usuario' => $userId,
+                        'estado_anterior' => $record->estado,
+                        'estado_nuevo' => $record->estado,
+                        'motivo_cambio' => "Cambio masivo de propiedad: {$propiedadAnt} → {$nuevoTipoPropiedad}: {$motivo}",
                         'ubicacion_fisica' => $record->ubicacion_fisica,
                         'fecha_cambio' => now(),
                     ]);

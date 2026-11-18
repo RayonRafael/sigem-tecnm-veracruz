@@ -301,4 +301,91 @@ class AccionesMasivasInventarioTest extends TestCase
         $this->assertEmpty($component->get('selectedRows'));
         $this->assertFalse($component->get('selectAll'));
     }
+
+    public function test_cambio_masivo_permite_cambiar_tipo_propiedad(): void
+    {
+        $this->actingAs($this->adminUser);
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        $inv1 = $this->crearEquipo(['tipo_propiedad' => 'Propio']);
+        $inv2 = $this->crearEquipo(['tipo_propiedad' => 'Propio']);
+
+        Livewire::test(AdminDashboard::class)
+            ->set('selectedRows', [(string) $inv1->id_inventario, (string) $inv2->id_inventario])
+            ->set('cambioNuevoTipoPropiedad', 'Rentado')
+            ->set('cambioMotivo', 'Actualización a contrato de arrendamiento')
+            ->call('ejecutarCambioSlideOver');
+
+        $this->assertSame('Rentado', $inv1->fresh()->tipo_propiedad);
+        $this->assertSame('Rentado', $inv2->fresh()->tipo_propiedad);
+
+        $this->assertDatabaseHas('historial_estados', [
+            'id_inventario' => $inv1->id_inventario,
+            'motivo_cambio' => 'Cambio masivo de propiedad: Propio → Rentado: Actualización a contrato de arrendamiento',
+        ]);
+    }
+
+    public function test_modificar_todos_permite_cambiar_tipo_propiedad(): void
+    {
+        $this->actingAs($this->adminUser);
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        $inv1 = $this->crearEquipo(['tipo_propiedad' => 'Propio']);
+        $inv2 = $this->crearEquipo(['tipo_propiedad' => 'Rentado']);
+
+        Livewire::test(AdminDashboard::class)
+            ->set('selectedRows', [(string) $inv1->id_inventario, (string) $inv2->id_inventario])
+            ->set('modificarCampo', 'tipo_propiedad')
+            ->set('modificarNuevoValor', 'Rentado')
+            ->call('ejecutarModificarSlideOver');
+
+        $this->assertSame('Rentado', $inv1->fresh()->tipo_propiedad);
+        $this->assertSame('Rentado', $inv2->fresh()->tipo_propiedad);
+
+        $this->assertDatabaseHas('historial_estados', [
+            'id_inventario' => $inv1->id_inventario,
+            'motivo_cambio' => 'Modificación masiva de propiedad: Propio → Rentado',
+        ]);
+    }
+
+    public function test_slide_over_cambiar_area_tiene_diseno_sigem(): void
+    {
+        $schema = \App\Filament\Concerns\ConModalesBajaCambio::getModalCambioAreaFormSchema(true);
+
+        $nombresTopLevel = collect($schema)
+            ->map(fn ($c) => method_exists($c, 'getName') ? $c->getName() : null)
+            ->filter()
+            ->values()
+            ->all();
+
+        $this->assertContains('equipo_resumen', $nombresTopLevel);
+        $this->assertContains('tip', $nombresTopLevel);
+
+        $nombresCampos = collect($schema)
+            ->flatMap(fn ($component) => method_exists($component, 'getChildComponents') && ! empty($component->getChildComponents())
+                ? $component->getChildComponents()
+                : [$component])
+            ->map(fn ($c) => method_exists($c, 'getName') ? $c->getName() : null)
+            ->filter()
+            ->values()
+            ->all();
+
+        $this->assertContains('departamento_actual', $nombresCampos);
+        $this->assertContains('area_actual', $nombresCampos);
+        $this->assertContains('departamento_id', $nombresCampos);
+        $this->assertContains('area_id', $nombresCampos);
+        $this->assertContains('aula', $nombresCampos);
+        $this->assertContains('jefe_departamento', $nombresCampos);
+        $this->assertContains('motivo', $nombresCampos);
+
+        $checklistSchema = \App\Filament\Concerns\ConModalesBajaCambio::getChecklistCambioAreaSchema();
+        $nombresChecklist = collect($checklistSchema)
+            ->map(fn ($c) => method_exists($c, 'getName') ? $c->getName() : null)
+            ->filter()
+            ->values()
+            ->all();
+
+        $this->assertContains('exito', $nombresChecklist);
+        $this->assertContains('campos_pdf', $nombresChecklist);
+    }
 }

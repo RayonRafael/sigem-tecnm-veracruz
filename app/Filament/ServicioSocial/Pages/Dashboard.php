@@ -229,6 +229,7 @@ class Dashboard extends BaseDashboard
     {
         return Action::make('solicitarBaja')
             ->label('Solicitar baja')
+            ->slideOver()
             ->modalHeading('Solicitar baja de equipo')
             ->modalDescription('La solicitud quedará registrada en espera de revisión y aprobación por el Administrador.')
             ->model(Inventario::class)
