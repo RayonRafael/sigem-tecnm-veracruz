@@ -339,7 +339,8 @@
                                         }
                                         $areaUbicacion = $areaUbicacion ?: '—';
 
-                                        $aula = $inv->salon?->nombre
+                                        $aula = $inv->aula
+                                            ?? $inv->salon?->nombre
                                             ?? ($inv->especificaciones['aula'] ?? null)
                                             ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $inv->ubicacion_fisica ?? '', $m) ? $m[1] : null)
                                             ?? '—';

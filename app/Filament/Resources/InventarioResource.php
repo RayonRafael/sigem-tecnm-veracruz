@@ -266,7 +266,8 @@ class InventarioResource extends Resource
             ?? $record->especificaciones['cpu_marca']
             ?? $record->material?->marca?->nombre
             ?? '';
-        $data['aula'] = $record->salon?->nombre
+        $data['aula'] = $record->aula
+            ?? $record->salon?->nombre
             ?? ($record->especificaciones['aula'] ?? null)
             ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record->ubicacion_fisica ?? '', $m) ? $m[1] : null)
             ?? '';
@@ -280,6 +281,7 @@ class InventarioResource extends Resource
         $data['num_puertos'] = $record->especificaciones['num_puertos'] ?? '—';
         $data['ip_address'] = $record->ip_address ?? ($record->especificaciones['ip_address'] ?? '');
         $data['mac_address'] = $record->mac_address ?? ($record->especificaciones['mac_address'] ?? '');
+        $data['observaciones_adicionales'] = $record->observaciones_generales ?? '';
 
         return $data;
     }
@@ -287,42 +289,105 @@ class InventarioResource extends Resource
     public static function guardarCambiosEquipo(Inventario $record, array $data): Inventario
     {
         return DB::transaction(function () use ($record, $data) {
-            // 1. Nombre (Material/Equipo)
+            // 1. Nombre y Marca en el registro de inventario
+            $nuevoNombre = null;
             if (isset($data['nombre_equipo']) && filled($data['nombre_equipo'])) {
-                $nuevoNombre = trim($data['nombre_equipo']);
-                $record->subtipo = $nuevoNombre;
-                if ($record->material) {
-                    $record->material->update(['nombre' => $nuevoNombre]);
-                }
+                $nuevoNombre = trim((string) $data['nombre_equipo']);
+                $record->subtipo = substr($nuevoNombre, 0, 100);
             }
 
-            // 2. Marca
+            $marcaModel = null;
             if (isset($data['marca']) && filled($data['marca'])) {
-                $nuevaMarca = trim($data['marca']);
+                $nuevaMarca = trim((string) $data['marca']);
                 $specs = $record->especificaciones ?? [];
                 $specs['marca'] = $nuevaMarca;
                 $record->especificaciones = $specs;
 
-                $marcaModel = MarcaMaterial::firstOrCreate(['nombre' => $nuevaMarca]);
-                if ($record->material) {
-                    $record->material->update(['id_marca' => $marcaModel->id_marca]);
+                $marcaModel = MarcaMaterial::withTrashed()->where('nombre', $nuevaMarca)->first();
+                if ($marcaModel && $marcaModel->trashed()) {
+                    $marcaModel->restore();
+                } elseif (! $marcaModel) {
+                    $marcaModel = MarcaMaterial::create(['nombre' => $nuevaMarca]);
                 }
             }
 
-            // 3. Aula
-            if (isset($data['aula'])) {
-                $nuevaAula = trim($data['aula']);
+            // 2. Actualizar Material sin afectar otros equipos que compartan id_producto (FIX INT-01)
+            $cambioMaterial = $nuevoNombre !== null
+                || $marcaModel !== null
+                || (isset($data['modelo']) && filled($data['modelo']));
+
+            if ($record->material && $cambioMaterial) {
+                $targetNombre = $nuevoNombre ?? $record->material->nombre;
+                $targetMarcaId = $marcaModel ? $marcaModel->id_marca : $record->material->id_marca;
+                $targetModelo = (isset($data['modelo']) && filled($data['modelo']))
+                    ? trim((string) $data['modelo'])
+                    : ($record->modelo ?? $record->material->modelo);
+
+                $compartido = Inventario::withTrashed()
+                    ->where('id_producto', $record->id_producto)
+                    ->where('id_inventario', '!=', $record->id_inventario)
+                    ->exists();
+
+                if ($compartido) {
+                    $queryMat = \App\Models\Material::withTrashed()
+                        ->where('nombre', substr($targetNombre, 0, 150))
+                        ->where('id_marca', $targetMarcaId);
+
+                    if ($targetModelo !== null && $targetModelo !== '') {
+                        $queryMat->where('modelo', substr($targetModelo, 0, 100));
+                    } else {
+                        $queryMat->whereNull('modelo');
+                    }
+
+                    $nuevoMaterial = $queryMat->first();
+                    if ($nuevoMaterial && $nuevoMaterial->trashed()) {
+                        $nuevoMaterial->restore();
+                    } elseif (! $nuevoMaterial) {
+                        $nuevoMaterial = \App\Models\Material::create([
+                            'nombre' => substr($targetNombre, 0, 150),
+                            'id_marca' => $targetMarcaId,
+                            'modelo' => $targetModelo ? substr($targetModelo, 0, 100) : null,
+                            'id_tipodematerial' => $record->material->id_tipodematerial,
+                            'id_unidad' => $record->material->id_unidad,
+                            'requiere_control_individual' => $record->material->requiere_control_individual ?? true,
+                            'stock_minimo' => $record->material->stock_minimo ?? 0,
+                        ]);
+                    }
+
+                    $record->id_producto = $nuevoMaterial->id_producto;
+                    $record->setRelation('material', $nuevoMaterial);
+                    $data['id_producto'] = $nuevoMaterial->id_producto;
+                } else {
+                    $record->material->update([
+                        'nombre' => substr($targetNombre, 0, 150),
+                        'id_marca' => $targetMarcaId,
+                        'modelo' => $targetModelo ? substr($targetModelo, 0, 100) : null,
+                    ]);
+                }
+            }
+
+            // 3. Aula (columna física + especificaciones + sincronización limpia de salon_id)
+            if (array_key_exists('aula', $data)) {
+                $nuevaAula = filled($data['aula']) ? trim((string) $data['aula']) : null;
+                $record->aula = $nuevaAula;
+                $data['aula'] = $nuevaAula;
+
                 $specs = $record->especificaciones ?? [];
-                $specs['aula'] = $nuevaAula;
+                if ($nuevaAula !== null) {
+                    $specs['aula'] = $nuevaAula;
+                } else {
+                    unset($specs['aula']);
+                }
                 $record->especificaciones = $specs;
 
-                if ($record->area_id && filled($nuevaAula)) {
-                    $salon = Salon::where('area_id', $record->area_id)
+                $targetAreaId = $data['area_id'] ?? $record->area_id;
+                if ($targetAreaId && $nuevaAula !== null) {
+                    $salon = Salon::where('area_id', $targetAreaId)
                         ->where('nombre', $nuevaAula)
                         ->first();
-                    if ($salon) {
-                        $record->salon_id = $salon->id;
-                    }
+                    $record->salon_id = $salon?->id;
+                } else {
+                    $record->salon_id = null;
                 }
             }
 
@@ -362,12 +427,15 @@ class InventarioResource extends Resource
                     }
                 }
             }
-            if (isset($data['modelo']) && filled($data['modelo']) && $record->material) {
-                $record->material->update(['modelo' => trim((string) $data['modelo'])]);
-            }
             $record->especificaciones = $specs;
 
-            // 7. Fill other allowable fields
+            // 7. Observaciones adicionales (FIX INT-11)
+            if (array_key_exists('observaciones_adicionales', $data)) {
+                $record->observaciones_generales = $data['observaciones_adicionales'] ?? null;
+                unset($data['observaciones_adicionales']);
+            }
+
+            // 8. Fill other allowable fields
             $record->fill($data);
             $record->save();
 
@@ -560,21 +628,24 @@ class InventarioResource extends Resource
                 ->extraHeaderAttributes(['style' => 'min-width: 80px;'])
                 ->extraCellAttributes(['style' => 'min-width: 80px;'])
                 ->getStateUsing(function (Inventario $record): string {
-                    return $record->salon?->nombre
+                    return $record->aula
+                        ?? $record->salon?->nombre
                         ?? ($record->especificaciones['aula'] ?? null)
                         ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record->ubicacion_fisica ?? '', $m) ? $m[1] : null)
                         ?? '—';
                 })
                 ->searchable(query: function (Builder $query, string $search): Builder {
                     return $query->where(function (Builder $q) use ($search) {
-                        $q->whereHas('salon', fn ($sub) => $sub->where('nombre', 'like', "%{$search}%"))
+                        $q->where('inventario.aula', 'like', "%{$search}%")
+                          ->orWhereHas('salon', fn ($sub) => $sub->where('nombre', 'like', "%{$search}%"))
                           ->orWhere('especificaciones->aula', 'like', "%{$search}%")
                           ->orWhere('ubicacion_fisica', 'like', "%{$search}%");
                     });
                 }, isIndividual: true)
                 ->sortable(query: function (Builder $query, string $direction): Builder {
+                    $dir = strtolower($direction) === 'desc' ? 'DESC' : 'ASC';
                     return $query->leftJoin('salones', 'inventario.salon_id', '=', 'salones.id')
-                        ->orderBy('salones.nombre', $direction)
+                        ->orderByRaw("COALESCE(NULLIF(inventario.aula, ''), salones.nombre) {$dir}")
                         ->select('inventario.*');
                 })
                 ->placeholder('—'),
@@ -698,13 +769,17 @@ class InventarioResource extends Resource
                             ->label('Cambio')
                             ->color('info')
                             ->icon('heroicon-m-arrows-right-left')
+                            ->slideOver()
                             ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Cambio de área', 'Solicitud de baja'], true))
                             ->modalHeading(fn () => static::esAdmin() ? 'Cambiar área de equipo' : 'Solicitar cambio de área')
                             ->modalDescription(fn () => static::esAdmin() ? 'Se actualizará la ubicación física del equipo de forma inmediata.' : 'La solicitud quedará registrada en espera de revisión y aprobación por el Administrador.')
                             ->form(static::getModalCambioAreaFormSchema(static::esAdmin()))
                             ->modalSubmitActionLabel(fn () => static::esAdmin() ? 'Confirmar cambio' : 'Solicitar cambio')
                             ->modalCancelActionLabel('Cancelar')
-                            ->action(function (Inventario $record, array $data) {
+                            ->action(function (Inventario $record, array $data, $livewire = null) {
+                                $origenDeptoObj = $record->departamento ?? $record->area?->departamento;
+                                $origenAreaObj = $record->area;
+
                                 if (static::esAdmin()) {
                                     $record->cambiarAreaDirecto(
                                         $data['departamento_id'],
@@ -714,7 +789,8 @@ class InventarioResource extends Resource
                                         $data['motivo'] ?? null,
                                         auth()->id()
                                     );
-                                    Notification::make()->title('Área del equipo actualizada correctamente')->success()->send();
+                                    static::guardarMetadatosCambioArea($record, $data, $origenDeptoObj, $origenAreaObj);
+                                    Notification::make()->title('Cambio registrado')->body('Área del equipo actualizada correctamente')->success()->send();
                                 } else {
                                     $record->solicitarCambioArea(
                                         $data['departamento_id'],
@@ -724,7 +800,12 @@ class InventarioResource extends Resource
                                         $data['motivo'] ?? null,
                                         auth()->id()
                                     );
-                                    Notification::make()->title('Solicitud de cambio de área enviada a revisión')->warning()->send();
+                                    static::guardarMetadatosCambioArea($record, $data, $origenDeptoObj, $origenAreaObj);
+                                    Notification::make()->title('Cambio registrado')->body('Solicitud de cambio de área enviada a revisión')->warning()->send();
+                                }
+
+                                if ($livewire && method_exists($livewire, 'replaceMountedTableAction')) {
+                                    $livewire->replaceMountedTableAction('checklist_cambio_area', (string) $record->getKey());
                                 }
                             }),
                         Tables\Actions\Action::make('aprobar_cambio')
@@ -758,10 +839,18 @@ class InventarioResource extends Resource
                                 $record->rechazarCambioArea($data['motivo_rechazo'] ?? null, auth()->id());
                                 Notification::make()->title('Solicitud de cambio de área rechazada')->warning()->send();
                             }),
+                        Tables\Actions\Action::make('Cambio de Área')
+                            ->label('📄 Formato Cambio de Área')
+                            ->color('info')
+                            ->icon('heroicon-o-arrow-path')
+                            ->url(fn (Inventario $record) => route('pdf.cambio.area', $record))
+                            ->openUrlInNewTab()
+                            ->visible(fn (Inventario $record) => (bool) $record->aprobado),
                         Tables\Actions\Action::make('desde_detalle_baja')
                             ->label('Baja')
                             ->color('danger')
                             ->icon('heroicon-m-arrow-down-circle')
+                            ->slideOver()
                             ->visible(fn (?Inventario $record) => $record && !in_array($record->estado, ['Dado de baja', 'Solicitud de baja', 'Cambio de área'], true))
                             ->modalHeading(fn () => static::esAdmin() ? 'Confirmar baja de equipo' : 'Solicitar baja de equipo')
                             ->modalDescription(fn () => static::esAdmin() ? 'El equipo pasará a estado Dado de baja de manera inmediata.' : 'La solicitud quedará registrada en espera de revisión y aprobación por el Administrador.')
@@ -838,6 +927,28 @@ class InventarioResource extends Resource
                     ->mutateRecordDataUsing(fn (array $data, Inventario $record): array => static::hidratarDatosEdicion($data, $record))
                     ->using(fn (Inventario $record, array $data): Inventario => static::guardarCambiosEquipo($record, $data))
                     ->successNotificationTitle('Registro actualizado correctamente'),
+                Tables\Actions\Action::make('checklist_cambio_area')
+                    ->label('Generar Formato PDF')
+                    ->color('info')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->extraAttributes(['style' => 'display: none;'])
+                    ->slideOver()
+                    ->modalHeading('Cambio registrado')
+                    ->modalDescription('Selecciona qué datos mostrar en el formato de Cambio de Área.')
+                    ->form(static::getChecklistCambioAreaSchema())
+                    ->modalSubmitActionLabel('Generar Formato PDF')
+                    ->modalCancelActionLabel('Cerrar')
+                    ->action(function (Inventario $record, array $data) {
+                        $campos = $data['campos_pdf'] ?? [];
+
+                        return \App\Support\SigemPdfGenerator::descargarCambioArea(
+                            $record,
+                            $record->especificaciones['cambio_motivo'] ?? null,
+                            $record->especificaciones['jefe_destino'] ?? null,
+                            null,
+                            $campos
+                        );
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -979,7 +1090,8 @@ class InventarioResource extends Resource
         if (filled($searches['aula'] ?? null)) {
             $termAula = '%' . trim((string) $searches['aula']) . '%';
             $invQuery->where(function (Builder $q) use ($termAula) {
-                $q->whereHas('salon', fn ($sub) => $sub->where('nombre', 'like', $termAula))
+                $q->where('inventario.aula', 'like', $termAula)
+                  ->orWhereHas('salon', fn ($sub) => $sub->where('nombre', 'like', $termAula))
                   ->orWhere('especificaciones->aula', 'like', $termAula)
                   ->orWhere('ubicacion_fisica', 'like', $termAula);
             });
@@ -1051,7 +1163,7 @@ class InventarioResource extends Resource
             'area' => $invQuery->leftJoin('area', 'inventario.area_id', '=', 'area.id_area')
                 ->orderBy('area.nombre', $direction),
             'aula' => $invQuery->leftJoin('salones', 'inventario.salon_id', '=', 'salones.id')
-                ->orderBy('salones.nombre', $direction),
+                ->orderByRaw("COALESCE(NULLIF(inventario.aula, ''), salones.nombre) " . ($direction === 'asc' ? 'ASC' : 'DESC')),
             'num_serie' => $invQuery->orderBy('num_serie', $direction),
             'ip_address' => $invQuery->orderBy('ip_address', $direction),
             'mac_address' => $invQuery->orderBy('mac_address', $direction),

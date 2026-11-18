@@ -333,12 +333,13 @@ class Fase8VerificacionFinalTest extends TestCase
         ], array_column($formatos, 'id'));
 
         Livewire::test(AdminReportesPage::class)
+            ->call('cambiarPestanaPrincipal', 'formatos')
             ->assertSee('Formatos Institucionales (PDF)')
             ->assertSee('Entrega de Equipo')
             ->assertSee('Orden de Trabajo')
             ->assertSee('Lista Verificación')
             ->assertSee('Trámite de Baja')
-            ->assertSee('Filtros de regeneración');
+            ->assertSee('Filtrar formatos existentes');
     }
 
     public function test_reportes_filtros_historicos_funcionan(): void

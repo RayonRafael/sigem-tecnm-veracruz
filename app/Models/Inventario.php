@@ -22,7 +22,7 @@ class Inventario extends Model
                 'id_usuario', 'estado_registro', 'aprobado', 'aprobado_por', 'fecha_aprobacion', 'fecha_baja',
                 'fecha_asignacion', 'fecha_cambio_area', 'ram', 'disco', 'procesador', 'mac_address', 'ip_address',
                 'codigo', 'estacion', 'tipo_impresora', 'sistema_operativo', 'modelo', 'especificacion_texto',
-                'departamento_id', 'area_id', 'salon_id',
+                'departamento_id', 'area_id', 'salon_id', 'aula',
             ])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
@@ -49,7 +49,7 @@ class Inventario extends Model
         'observaciones_generales', 'garantia_fecha_fin', 'garantia_estado',
         'aprobado', 'aprobado_por', 'fecha_aprobacion',
         'ram', 'disco', 'procesador', 'mac_address', 'ip_address',
-        'tipo_equipo', 'edificio_id', 'departamento_id', 'area_id', 'salon_id',
+        'tipo_equipo', 'edificio_id', 'departamento_id', 'area_id', 'salon_id', 'aula',
         'codigo', 'estacion', 'tipo_impresora', 'sistema_operativo', 'modelo', 'especificacion_texto',
         'motivo_baja', 'observaciones_baja', 'id_usuario_baja', 'estado_previo_baja',
         'estado_previo_cambio', 'ubicacion_solicitada',
@@ -295,10 +295,19 @@ class Inventario extends Model
         return $specs;
     }
 
+    protected function resolverUsuarioId(?int $usuarioId = null): ?int
+    {
+        return $usuarioId
+            ?? auth()->id()
+            ?? $this->id_usuario
+            ?? User::where('email', 'admin@tecnm.edu.mx')->value('id')
+            ?? User::first()?->id;
+    }
+
     public function darBajaDirecta(string $motivo, string $observaciones, ?int $usuarioId = null, array $datosAdicionales = []): void
     {
         DB::transaction(function () use ($motivo, $observaciones, $usuarioId, $datosAdicionales) {
-            $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
             $payload = [
@@ -330,7 +339,7 @@ class Inventario extends Model
     public function solicitarBaja(string $motivo, string $observaciones, ?int $usuarioId = null, array $datosAdicionales = []): void
     {
         DB::transaction(function () use ($motivo, $observaciones, $usuarioId, $datosAdicionales) {
-            $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
             $payload = [
@@ -362,7 +371,7 @@ class Inventario extends Model
     public function aprobarBaja(?int $usuarioId = null): void
     {
         DB::transaction(function () use ($usuarioId) {
-    $userId = $usuarioId ?? auth()->id() ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $motivo = $this->motivo_baja ?? 'Sin motivo especificado';
 
             $this->update([
@@ -394,7 +403,7 @@ class Inventario extends Model
     public function rechazarBaja(?string $observaciones = null, ?int $usuarioId = null): void
     {
         DB::transaction(function () use ($observaciones, $usuarioId) {
-            $userId = $usuarioId ?? auth()->id() ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $estadoRestaurar = $this->estado_previo_baja ?? EstadoInventario::Disponible->value;
             $obsTexto = !empty($observaciones) ? $observaciones : ($this->observaciones_baja ?? 'Sin observaciones');
 
@@ -423,7 +432,7 @@ class Inventario extends Model
     public function reactivar(?int $usuarioId = null): void
     {
         DB::transaction(function () use ($usuarioId) {
-            $userId = $usuarioId ?? auth()->id() ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
 
             $this->update([
                 'estado' => EstadoInventario::Disponible->value,
@@ -450,27 +459,55 @@ class Inventario extends Model
     public function cambiarAreaDirecto($departamentoId, $areaId, $salonId = null, $estacion = null, ?string $motivo = null, ?int $usuarioId = null): void
     {
         DB::transaction(function () use ($departamentoId, $areaId, $salonId, $estacion, $motivo, $usuarioId) {
-            $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
-            if (!empty($salonId) && !is_numeric($salonId) && is_string($salonId)) {
-                $salonObj = Salon::firstOrCreate(['nombre' => $salonId, 'area_id' => $areaId]);
-                $salonId = $salonObj->id;
+            $aulaTexto = null;
+            $salonIdFinal = null;
+
+            if (! empty($salonId) && ! is_numeric($salonId) && is_string($salonId)) {
+                $aulaTexto = trim($salonId);
+                $salonObj = Salon::firstOrCreate(['nombre' => $aulaTexto, 'area_id' => $areaId]);
+                $salonIdFinal = $salonObj->id;
+            } elseif (! empty($salonId) && is_numeric($salonId)) {
+                $salonIdFinal = (int) $salonId;
+                $aulaTexto = Salon::find($salonIdFinal)?->nombre;
             }
 
             $ubicacionAnterior = $this->ubicacion_fisica
-                ?: (\App\Support\UbicacionHelper::construir($this->departamento_id, $this->area_id, $this->salon_id, $this->estacion) ?: 'Sin ubicación previa');
+                ?: (\App\Support\UbicacionHelper::construir($this->departamento_id, $this->area_id, $this->aula ?: $this->salon_id, $this->estacion) ?: 'Sin ubicación previa');
 
-            $ubicacionNueva = \App\Support\UbicacionHelper::construir($departamentoId, $areaId, $salonId, $estacion);
+            $ubicacionNueva = \App\Support\UbicacionHelper::construir($departamentoId, $areaId, $aulaTexto ?: $salonIdFinal, $estacion);
 
             $this->skipHistorialObserver = true;
 
             $this->departamento_id = $departamentoId;
             $this->area_id = $areaId;
-            $this->salon_id = $salonId;
+            $this->salon_id = $salonIdFinal;
+            $this->aula = $aulaTexto;
             $this->estacion = $estacion;
             $this->fecha_cambio_area = now();
-            if (!empty($ubicacionNueva)) {
+
+            if ($this->salon_id) {
+                $salonValido = Salon::where('id', $this->salon_id)
+                    ->where('area_id', $this->area_id)
+                    ->whereNull('deleted_at')
+                    ->exists();
+
+                if (! $salonValido) {
+                    $this->salon_id = null;
+                }
+            }
+
+            $specs = is_array($this->especificaciones) ? $this->especificaciones : [];
+            if ($aulaTexto !== null) {
+                $specs['aula'] = $aulaTexto;
+            } else {
+                unset($specs['aula']);
+            }
+            $this->especificaciones = $specs;
+
+            if (! empty($ubicacionNueva)) {
                 $this->ubicacion_fisica = substr($ubicacionNueva, 0, 150);
             }
             $this->save();
@@ -494,18 +531,37 @@ class Inventario extends Model
     public function solicitarCambioArea($departamentoId, $areaId, $salonId = null, $estacion = null, ?string $motivo = null, ?int $usuarioId = null): void
     {
         DB::transaction(function () use ($departamentoId, $areaId, $salonId, $estacion, $motivo, $usuarioId) {
-            $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
-            if (!empty($salonId) && !is_numeric($salonId) && is_string($salonId)) {
-                $salonObj = Salon::firstOrCreate(['nombre' => $salonId, 'area_id' => $areaId]);
-                $salonId = $salonObj->id;
+            $aulaTexto = null;
+            $salonIdFinal = null;
+
+            if (! empty($salonId) && ! is_numeric($salonId) && is_string($salonId)) {
+                $aulaTexto = trim($salonId);
+                $salonObj = Salon::firstOrCreate(['nombre' => $aulaTexto, 'area_id' => $areaId]);
+                $salonIdFinal = $salonObj->id;
+            } elseif (! empty($salonId) && is_numeric($salonId)) {
+                $salonIdFinal = (int) $salonId;
+                $aulaTexto = Salon::find($salonIdFinal)?->nombre;
+            }
+
+            if ($salonIdFinal) {
+                $salonValido = Salon::where('id', $salonIdFinal)
+                    ->where('area_id', $areaId)
+                    ->whereNull('deleted_at')
+                    ->exists();
+
+                if (! $salonValido) {
+                    $salonIdFinal = null;
+                }
             }
 
             $solicitudData = [
                 'departamento_id' => $departamentoId,
                 'area_id' => $areaId,
-                'salon_id' => $salonId,
+                'salon_id' => $salonIdFinal,
+                'aula' => $aulaTexto,
                 'estacion' => $estacion,
                 'motivo' => $motivo,
             ];
@@ -533,13 +589,14 @@ class Inventario extends Model
     public function aprobarCambioArea(?int $usuarioId = null): void
     {
         DB::transaction(function () use ($usuarioId) {
-            $userId = $usuarioId ?? auth()->id() ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $solicitud = $this->ubicacion_solicitada ?? [];
             $estadoPrevio = $this->estado_previo_cambio ?? EstadoInventario::Disponible->value;
 
             $depto = $solicitud['departamento_id'] ?? $this->departamento_id;
             $area = $solicitud['area_id'] ?? $this->area_id;
             $salon = $solicitud['salon_id'] ?? null;
+            $aula = $solicitud['aula'] ?? ($salon ? Salon::find($salon)?->nombre : null);
             $estacion = $solicitud['estacion'] ?? null;
 
             $this->skipHistorialObserver = true;
@@ -547,14 +604,34 @@ class Inventario extends Model
             $this->departamento_id = $depto;
             $this->area_id = $area;
             $this->salon_id = $salon;
+            $this->aula = $aula;
             $this->estacion = $estacion;
             $this->estado = $estadoPrevio;
             $this->fecha_cambio_area = now();
             $this->ubicacion_solicitada = null;
             $this->estado_previo_cambio = null;
 
-            $ubicacionNueva = \App\Support\UbicacionHelper::construir($depto, $area, $salon, $estacion);
-            if (!empty($ubicacionNueva)) {
+            if ($this->salon_id) {
+                $salonValido = Salon::where('id', $this->salon_id)
+                    ->where('area_id', $this->area_id)
+                    ->whereNull('deleted_at')
+                    ->exists();
+
+                if (! $salonValido) {
+                    $this->salon_id = null;
+                }
+            }
+
+            $specs = is_array($this->especificaciones) ? $this->especificaciones : [];
+            if ($aula !== null) {
+                $specs['aula'] = $aula;
+            } else {
+                unset($specs['aula']);
+            }
+            $this->especificaciones = $specs;
+
+            $ubicacionNueva = \App\Support\UbicacionHelper::construir($depto, $area, $aula ?: $salon, $estacion);
+            if (! empty($ubicacionNueva)) {
                 $this->ubicacion_fisica = substr($ubicacionNueva, 0, 150);
             }
             $this->save();
@@ -576,7 +653,7 @@ class Inventario extends Model
     public function rechazarCambioArea(?string $motivoRechazo = null, ?int $usuarioId = null): void
     {
         DB::transaction(function () use ($motivoRechazo, $usuarioId) {
-    $userId = $usuarioId ?? auth()->id() ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $estadoPrevio = $this->estado_previo_cambio ?? EstadoInventario::Disponible->value;
 
             $this->update([

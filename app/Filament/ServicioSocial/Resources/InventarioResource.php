@@ -116,6 +116,13 @@ class InventarioResource extends Resource
                             ->icon('heroicon-m-pencil-square')
                             ->visible(true)
                             ->alpineClickHandler(fn (?Inventario $record) => "\$wire.replaceMountedTableAction('edit', '{$record?->getKey()}')"),
+                        Tables\Actions\Action::make('Cambio de Área')
+                            ->label('📄 Formato Cambio de Área')
+                            ->color('info')
+                            ->icon('heroicon-o-arrow-path')
+                            ->url(fn (Inventario $record) => route('pdf.cambio.area', $record))
+                            ->openUrlInNewTab()
+                            ->visible(fn (Inventario $record) => (bool) $record->aprobado),
                     ]),
                 Tables\Actions\EditAction::make()
                     ->authorize(true)

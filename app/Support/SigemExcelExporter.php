@@ -168,7 +168,8 @@ class SigemExcelExporter
             }
             $area = $area ?: '—';
 
-            $aula = $record->salon?->nombre
+            $aula = $record->aula
+                ?? $record->salon?->nombre
                 ?? ($record->especificaciones['aula'] ?? null)
                 ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record->ubicacion_fisica ?? '', $m) ? $m[1] : null)
                 ?? '—';

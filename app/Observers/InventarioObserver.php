@@ -21,22 +21,42 @@ class InventarioObserver
 
     public function creating(Inventario $inventario): void
     {
-        // 1. Auto-match Material: Si no se selecciona material explícitamente
+        // 1. Validar integridad de salon_id para el area_id indicado
+        if ($inventario->salon_id) {
+            $salonValido = Salon::where('id', $inventario->salon_id)
+                ->where('area_id', $inventario->area_id)
+                ->whereNull('deleted_at')
+                ->exists();
+
+            if (! $salonValido) {
+                $inventario->salon_id = null;
+            }
+        }
+
+        // 2. Auto-match Material: Si no se selecciona material explícitamente
         if (empty($inventario->id_producto)) {
             $this->autoMatchMaterial($inventario);
         }
 
-        // 2. Auto-generar código: MARCA-MODELO-### (ej. HP-LJ4103-001)
+        // 3. Auto-generar código: MARCA-MODELO-### (ej. HP-LJ4103-001)
         if (empty($inventario->codigo)) {
             $inventario->codigo = $inventario->generarCodigo();
         }
 
-        // 3. Sincronizar ubicación física inicial si no viene asignada
+        // 4. Sincronizar campo físico aula y ubicación física inicial si no vienen asignados
+        if (empty($inventario->aula)) {
+            $aulaFallback = $inventario->especificaciones['aula']
+                ?? ($inventario->salon_id ? Salon::find($inventario->salon_id)?->nombre : null);
+            if (! empty($aulaFallback)) {
+                $inventario->aula = substr(trim((string) $aulaFallback), 0, 50);
+            }
+        }
+
         if (empty($inventario->ubicacion_fisica)) {
             $ubicacion = $this->construirUbicacion(
                 $inventario->departamento_id,
                 $inventario->area_id,
-                $inventario->salon_id,
+                $inventario->aula ?: $inventario->salon_id,
                 $inventario->estacion
             );
             if (! empty($ubicacion)) {
@@ -50,21 +70,23 @@ class InventarioObserver
         $ubicacion = $this->construirUbicacion(
             $inventario->departamento_id,
             $inventario->area_id,
-            $inventario->salon_id,
+            $inventario->aula ?: $inventario->salon_id,
             $inventario->estacion
         );
 
-        $usuarioId = auth()->id() ?? $inventario->id_usuario ?? User::where('email', 'admin@tecnm.edu.mx')->value('id') ?? User::first()?->id ?? 1;
+        $usuarioId = auth()->id() ?? $inventario->id_usuario ?? User::where('email', 'admin@tecnm.edu.mx')->value('id') ?? User::first()?->id;
 
-        HistorialEstado::create([
-            'id_inventario' => $inventario->id_inventario,
-            'id_usuario' => $usuarioId,
-            'estado_anterior' => null,
-            'estado_nuevo' => $inventario->estado ?? EstadoInventario::Disponible->value,
-            'motivo_cambio' => 'Alta inicial en el inventario',
-            'ubicacion_fisica' => $ubicacion ?: ($inventario->ubicacion_fisica ?: 'Sin ubicación asignada'),
-            'fecha_cambio' => now(),
-        ]);
+        if ($usuarioId) {
+            HistorialEstado::create([
+                'id_inventario' => $inventario->id_inventario,
+                'id_usuario' => $usuarioId,
+                'estado_anterior' => null,
+                'estado_nuevo' => $inventario->estado ?? EstadoInventario::Disponible->value,
+                'motivo_cambio' => 'Alta inicial en el inventario',
+                'ubicacion_fisica' => $ubicacion ?: ($inventario->ubicacion_fisica ?: 'Sin ubicación asignada'),
+                'fecha_cambio' => now(),
+            ]);
+        }
     }
 
     public function updating(Inventario $inventario): void
@@ -73,11 +95,28 @@ class InventarioObserver
             $inventario->fecha_baja = now();
         }
 
-        if ($inventario->isDirty(['departamento_id', 'area_id', 'salon_id', 'estacion'])) {
+        if ($inventario->isDirty('area_id') && $inventario->salon_id) {
+            $salonValido = Salon::where('id', $inventario->salon_id)
+                ->where('area_id', $inventario->area_id)
+                ->whereNull('deleted_at')
+                ->exists();
+
+            if (! $salonValido) {
+                $inventario->salon_id = null;
+            }
+        }
+
+        if ($inventario->isDirty('salon_id') && ! $inventario->isDirty('aula')) {
+            $inventario->aula = $inventario->salon_id
+                ? Salon::find($inventario->salon_id)?->nombre
+                : null;
+        }
+
+        if ($inventario->isDirty(['departamento_id', 'area_id', 'salon_id', 'aula', 'estacion'])) {
             $ubicacion = $this->construirUbicacion(
                 $inventario->departamento_id,
                 $inventario->area_id,
-                $inventario->salon_id,
+                $inventario->aula ?: $inventario->salon_id,
                 $inventario->estacion
             );
             if (! empty($ubicacion)) {
@@ -92,42 +131,44 @@ class InventarioObserver
             return;
         }
 
-        $cambioUbicacion = $inventario->wasChanged(['departamento_id', 'area_id', 'salon_id', 'estacion']);
+        $cambioUbicacion = $inventario->wasChanged(['departamento_id', 'area_id', 'salon_id', 'aula', 'estacion']);
 
         if ($cambioUbicacion) {
             $ubicacionAnterior = $this->construirUbicacion(
                 $inventario->getOriginal('departamento_id'),
                 $inventario->getOriginal('area_id'),
-                $inventario->getOriginal('salon_id'),
+                $inventario->getOriginal('aula') ?: $inventario->getOriginal('salon_id'),
                 $inventario->getOriginal('estacion')
             );
 
             $ubicacionNueva = $this->construirUbicacion(
                 $inventario->departamento_id,
                 $inventario->area_id,
-                $inventario->salon_id,
+                $inventario->aula ?: $inventario->salon_id,
                 $inventario->estacion
             );
 
             if ($ubicacionAnterior !== $ubicacionNueva) {
                 $textoAnterior = $ubicacionAnterior ?: 'Sin ubicación previa';
                 $textoNuevo = $ubicacionNueva ?: 'Sin ubicación asignada';
-                $usuarioId = auth()->id() ?? $inventario->id_usuario ?? User::where('email', 'admin@tecnm.edu.mx')->value('id') ?? User::first()?->id ?? 1;
+                $usuarioId = auth()->id() ?? $inventario->id_usuario ?? User::where('email', 'admin@tecnm.edu.mx')->value('id') ?? User::first()?->id;
 
-                HistorialEstado::create([
-                    'id_inventario' => $inventario->id_inventario,
-                    'id_usuario' => $usuarioId,
-                    'estado_anterior' => $inventario->getOriginal('estado') ?? $inventario->estado ?? EstadoInventario::Disponible->value,
-                    'estado_nuevo' => $inventario->estado ?? EstadoInventario::Disponible->value,
-                    'motivo_cambio' => "Cambio de ubicación: {$textoAnterior} → {$textoNuevo}",
-                    'ubicacion_fisica' => $ubicacionNueva ?: null,
-                    'fecha_cambio' => now(),
-                ]);
+                if ($usuarioId) {
+                    HistorialEstado::create([
+                        'id_inventario' => $inventario->id_inventario,
+                        'id_usuario' => $usuarioId,
+                        'estado_anterior' => $inventario->getOriginal('estado') ?? $inventario->estado ?? EstadoInventario::Disponible->value,
+                        'estado_nuevo' => $inventario->estado ?? EstadoInventario::Disponible->value,
+                        'motivo_cambio' => "Cambio de ubicación: {$textoAnterior} → {$textoNuevo}",
+                        'ubicacion_fisica' => $ubicacionNueva ?: null,
+                        'fecha_cambio' => now(),
+                    ]);
+                }
             }
         }
     }
 
-    public function construirUbicacion(?int $departamentoId, ?int $areaId, ?int $salonId, ?string $estacion): string
+    public function construirUbicacion(?int $departamentoId, ?int $areaId, int|string|null $salonId, ?string $estacion): string
     {
         return \App\Support\UbicacionHelper::construir($departamentoId, $areaId, $salonId, $estacion);
     }
@@ -146,7 +187,7 @@ class InventarioObserver
 
         $tipoMaterial = null;
         if ($tipoId) {
-            $tipoMaterial = TipoMaterial::find($tipoId);
+            $tipoMaterial = TipoMaterial::withTrashed()->find($tipoId);
         } elseif ($tipoNombre) {
             $tipoBusqueda = match (strtolower(trim($tipoNombre))) {
                 'mouse', 'raton', 'ratón' => 'Muse',
@@ -154,15 +195,22 @@ class InventarioObserver
                 default => $tipoNombre,
             };
 
-            $tipoMaterial = TipoMaterial::where('nombre', $tipoBusqueda)->first()
-                ?? TipoMaterial::where('nombre', 'LIKE', "%{$tipoBusqueda}%")->first()
-                ?? TipoMaterial::where('nombre', $tipoNombre)->first()
-                ?? TipoMaterial::where('nombre', 'LIKE', "%{$tipoNombre}%")->first()
-                ?? TipoMaterial::firstOrCreate(['nombre' => $tipoNombre]);
+            $tipoMaterial = TipoMaterial::withTrashed()->where('nombre', $tipoBusqueda)->first()
+                ?? TipoMaterial::withTrashed()->where('nombre', 'LIKE', "%{$tipoBusqueda}%")->first()
+                ?? TipoMaterial::withTrashed()->where('nombre', $tipoNombre)->first()
+                ?? TipoMaterial::withTrashed()->where('nombre', 'LIKE', "%{$tipoNombre}%")->first();
+
+            if (! $tipoMaterial) {
+                $tipoMaterial = TipoMaterial::create(['nombre' => $tipoNombre]);
+            }
         }
 
         if (! $tipoMaterial) {
-            $tipoMaterial = TipoMaterial::firstOrCreate(['nombre' => 'Equipo de Cómputo']);
+            $tipoMaterial = TipoMaterial::withTrashed()->where('nombre', 'Equipo de Cómputo')->first()
+                ?? TipoMaterial::create(['nombre' => 'Equipo de Cómputo']);
+        }
+        if ($tipoMaterial->trashed()) {
+            $tipoMaterial->restore();
         }
 
         // Resolver Marca
@@ -176,15 +224,22 @@ class InventarioObserver
 
         $marca = null;
         if ($marcaId) {
-            $marca = MarcaMaterial::find($marcaId);
+            $marca = MarcaMaterial::withTrashed()->find($marcaId);
         } elseif ($marcaNombre) {
-            $marca = MarcaMaterial::where('nombre', $marcaNombre)->first()
-                ?? MarcaMaterial::where('nombre', 'LIKE', "%{$marcaNombre}%")->first()
-                ?? MarcaMaterial::firstOrCreate(['nombre' => $marcaNombre]);
+            $marca = MarcaMaterial::withTrashed()->where('nombre', $marcaNombre)->first()
+                ?? MarcaMaterial::withTrashed()->where('nombre', 'LIKE', "%{$marcaNombre}%")->first();
+
+            if (! $marca) {
+                $marca = MarcaMaterial::create(['nombre' => $marcaNombre]);
+            }
         }
 
         if (! $marca) {
-            $marca = MarcaMaterial::firstOrCreate(['nombre' => 'Genérico']);
+            $marca = MarcaMaterial::withTrashed()->where('nombre', 'Genérico')->first()
+                ?? MarcaMaterial::create(['nombre' => 'Genérico']);
+        }
+        if ($marca->trashed()) {
+            $marca->restore();
         }
 
         // Resolver Modelo
@@ -193,7 +248,8 @@ class InventarioObserver
             ?? null;
 
         // Buscar material existente por tipo_material + marca + modelo
-        $materialQuery = Material::where('id_tipodematerial', $tipoMaterial->id_tipodematerial)
+        $materialQuery = Material::withTrashed()
+            ->where('id_tipodematerial', $tipoMaterial->id_tipodematerial)
             ->where('id_marca', $marca->id_marca);
 
         if (! empty($modelo)) {
@@ -203,14 +259,22 @@ class InventarioObserver
         }
 
         $material = $materialQuery->first();
+        if ($material && $material->trashed()) {
+            $material->restore();
+        }
 
         // Si no existe → crear automáticamente
         if (! $material) {
-            $unidad = UnidadMedida::where('nombre', 'like', 'Pieza%')
-                ->orWhere('nombre', 'like', 'Pza%')
+            $unidad = UnidadMedida::withTrashed()
+                ->where(fn ($q) => $q->where('nombre', 'like', 'Pieza%')->orWhere('nombre', 'like', 'Pza%'))
                 ->first()
-                ?? UnidadMedida::first()
-                ?? UnidadMedida::firstOrCreate(['nombre' => 'Pieza']);
+                ?? UnidadMedida::withTrashed()->first();
+
+            if ($unidad && $unidad->trashed()) {
+                $unidad->restore();
+            } elseif (! $unidad) {
+                $unidad = UnidadMedida::create(['nombre' => 'Pieza']);
+            }
 
             $nombreCompuesto = trim($marca->nombre . ' ' . $tipoMaterial->nombre . ($modelo ? ' ' . $modelo : ''));
 

@@ -430,12 +430,13 @@ class Fase7IntegracionUiPdfTest extends TestCase
         ], array_column($formatos, 'id'));
 
         $livewire = Livewire::test(AdminReportesPage::class)
+            ->call('cambiarPestanaPrincipal', 'formatos')
             ->assertSee('Formatos Institucionales (PDF)')
             ->assertSee('Entrega de Equipo')
             ->assertSee('Orden de Trabajo')
             ->assertSee('Lista Verificación')
             ->assertSee('Trámite de Baja')
-            ->assertSee('Generar seleccionados');
+            ->assertSee('Descargar seleccionados');
 
         $livewire->call('descargarFormatoInstitucional', 'entrega');
         $this->assertLivewirePdfDownloaded($livewire, "acta-entrega-{$solEntrega->id_solicitud}.pdf");
@@ -461,6 +462,7 @@ class Fase7IntegracionUiPdfTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('servicio-social'));
 
         Livewire::test(SSReportesPage::class)
+            ->call('cambiarPestanaPrincipal', 'formatos')
             ->assertSee('Formatos Institucionales (PDF)')
             ->assertSee('Trámite de Baja');
     }

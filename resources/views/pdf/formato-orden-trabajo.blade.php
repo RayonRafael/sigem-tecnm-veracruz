@@ -144,6 +144,20 @@
 @endsection
 
 @section('encabezado')
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 6px;">
+        <tr>
+            <td style="width: 60%; text-align: left; vertical-align: middle; border: none; padding: 0;">
+                @if(!empty($logoEducacion))
+                    <img src="{{ $logoEducacion }}" alt="Educación · TecNM" style="height: 40px;">
+                @endif
+            </td>
+            <td style="width: 40%; text-align: right; vertical-align: middle; border: none; padding: 0;">
+                @if(!empty($logoBandera))
+                    <img src="{{ $logoBandera }}" alt="Bandera" style="height: 36px;">
+                @endif
+            </td>
+        </tr>
+    </table>
     <!-- Encabezado oficial con referencia ISO 9001 / ISO 14001 + Logo ITV -->
     <table class="iso-header-table">
         <tr>
@@ -227,5 +241,30 @@
     <div class="footer-note">
         C.c.p. Área Solicitante.
     </div>
+@endsection
+
+@section('footer')
+    <table class="footer-table" style="width: 100%; border-collapse: collapse; border-top: 1px solid #d1d5db; margin-top: 15px; padding-top: 6px;">
+        <tr>
+            <td style="width: 26%; text-align: left; vertical-align: middle;">
+                @if(!empty($logoMargaritaMaza))
+                    <img src="{{ $logoMargaritaMaza }}" alt="2026 Margarita Maza" style="height: 32px;">
+                @endif
+            </td>
+            <td style="width: 48%; text-align: center; vertical-align: middle; font-size: 7.5pt; color: #4b5563; line-height: 1.3;">
+                {{ $config['institucion']['direccion'] ?? '' }}<br>
+                Tel. {{ $config['institucion']['telefono'] ?? '' }} &middot;
+                e-mail: {{ $config['institucion']['email'] ?? '' }} &middot;
+                {{ $config['institucion']['web'] ?? '' }}
+            </td>
+            <td style="width: 26%; text-align: right; vertical-align: middle;">
+                @if(!empty($logoCertificaciones))
+                    <img src="{{ $logoCertificaciones }}" alt="Certificaciones" style="height: 24px;">
+                @elseif(!empty($logoItv))
+                    <img src="{{ $logoItv }}" alt="ITV" style="height: 24px;">
+                @endif
+            </td>
+        </tr>
+    </table>
 @endsection
 

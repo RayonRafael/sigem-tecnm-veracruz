@@ -338,7 +338,9 @@
         <table class="header-logos">
             <tr>
                 <td class="logo-col-izq">
-                    @if(!empty($logoSep))
+                    @if(!empty($logoEducacion))
+                        <img class="logo-sep-hdr" src="{{ $logoEducacion }}" alt="Educación · TecNM" style="height: 38px; width: auto;">
+                    @elseif(!empty($logoSep))
                         <img class="logo-sep-hdr" src="{{ $logoSep }}" alt="SEP">
                     @endif
                 </td>
@@ -351,6 +353,9 @@
                     </div>
                 </td>
                 <td class="logo-col-der">
+                    @if(!empty($logoBandera))
+                        <img src="{{ $logoBandera }}" alt="Bandera" style="height: 34px; margin-right: 4px; vertical-align: middle;">
+                    @endif
                     @if(!empty($logoItv))
                         <img class="logo-itv-hdr" src="{{ $logoItv }}" alt="ITV">
                     @endif
@@ -487,17 +492,24 @@
 
         <!-- FOOTER -->
         <div class="footer-institucional">
-            @if(!empty($logoItv))
-                <img src="{{ $logoItv }}" alt="ITV">
+            @if(!empty($logoMargaritaMaza))
+                <img src="{{ $logoMargaritaMaza }}" alt="2026 Margarita Maza" style="height: 28px; float: left; margin-top: 4px;">
             @endif
-            @if(!empty($logoSep))
-                <img src="{{ $logoSep }}" alt="SEP">
-            @endif
-            @if(!empty($logoIso14001))
-                <img src="{{ $logoIso14001 }}" alt="ISO 14001">
-            @endif
-            @if(!empty($logoIso9001))
-                <img src="{{ $logoIso9001 }}" alt="ISO 9001">
+            @if(!empty($logoCertificaciones))
+                <img src="{{ $logoCertificaciones }}" alt="Certificaciones" style="height: 22px; float: right; margin-top: 6px;">
+            @else
+                @if(!empty($logoItv))
+                    <img src="{{ $logoItv }}" alt="ITV">
+                @endif
+                @if(!empty($logoSep))
+                    <img src="{{ $logoSep }}" alt="SEP">
+                @endif
+                @if(!empty($logoIso14001))
+                    <img src="{{ $logoIso14001 }}" alt="ISO 14001">
+                @endif
+                @if(!empty($logoIso9001))
+                    <img src="{{ $logoIso9001 }}" alt="ISO 9001">
+                @endif
             @endif
         </div>
     </div>

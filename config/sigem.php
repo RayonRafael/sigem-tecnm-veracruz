@@ -7,11 +7,11 @@ return [
         'nombre' => 'Instituto Tecnológico de Veracruz',
         'tecnm' => 'Tecnológico Nacional de México',
         'sep' => 'Secretaría de Educación Pública',
-        'direccion' => 'Calz. Miguel Ángel de Quevedo 2779 Col. Formando Hogar, Veracruz, Ver. C.P. 91800',
-        'telefono' => '(229) 934 15 00',
-        'email' => 'veracruz@veracruz.tecnm.mx',
-        'web' => 'web.veracruz.tecnm.mx',
-        'ciudad' => 'H. Veracruz, Veracruz',
+        'direccion' => 'Calz. Miguel Ángel de Quevedo 2779, Col. Formando Hogar. C.P. 91897 Veracruz, Ver.',
+        'telefono' => '(229)934 1500',
+        'email' => 'web_veracruz@tecnm.mx',
+        'web' => 'www.veracruz.tecnm.mx',
+        'ciudad' => 'H. Veracruz, Ver.',
     ],
 
     // Centro de Cómputo
@@ -54,6 +54,10 @@ return [
         'sigem' => 'images/sigem-logo.svg',
         'iso_9001' => 'images/iso-9001.png',
         'iso_14001' => 'images/iso-14001.png',
+        'educacion' => 'images/logo-educacion-sep.png',
+        'bandera' => 'images/bandera-mexico.png',
+        'margarita_maza' => 'images/margarita-maza-2026.png',
+        'certificaciones' => 'images/logos-certificaciones.png',
     ],
 
     // PDF defaults

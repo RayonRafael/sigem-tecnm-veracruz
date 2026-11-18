@@ -20,7 +20,7 @@ class RegistrarMultiplesEquipos
             $estacion = $data['estacion'] ?? null;
             $departamentoId = $data['departamento_id'] ?? null;
             $areaId = $data['area_id'] ?? null;
-            $aula = $data['especificaciones']['aula'] ?? null;
+            $aula = $data['aula'] ?? ($data['especificaciones']['aula'] ?? null);
             $salonId = $data['salon_id'] ?? null;
 
             if (empty($salonId) && ! empty($aula)) {
@@ -72,7 +72,12 @@ class RegistrarMultiplesEquipos
                 if (str_starts_with($clean, '__NEW__:')) {
                     $clean = trim(substr($clean, 8));
                 }
-                MarcaMaterial::firstOrCreate(['nombre' => $clean]);
+                $marcaObj = MarcaMaterial::withTrashed()->where('nombre', $clean)->first();
+                if ($marcaObj && $marcaObj->trashed()) {
+                    $marcaObj->restore();
+                } elseif (! $marcaObj) {
+                    MarcaMaterial::create(['nombre' => $clean]);
+                }
                 return $clean;
             };
 
@@ -86,15 +91,21 @@ class RegistrarMultiplesEquipos
                 return $clean;
             };
 
+            $usuarioId = $data['id_usuario']
+                ?? auth()->id()
+                ?? \App\Models\User::where('email', 'admin@tecnm.edu.mx')->value('id')
+                ?? \App\Models\User::first()?->id;
+
             $baseData = [
                 'departamento_id' => $departamentoId,
                 'area_id' => $areaId,
                 'salon_id' => $salonId,
+                'aula' => $aula,
                 'estacion' => $estacion,
                 'estado' => $data['estado'] ?? 'Disponible',
                 'tipo_propiedad' => $data['tipo_propiedad'] ?? 'Propio',
                 'fecha_registro' => $data['fecha_registro'] ?? now(),
-                'id_usuario' => $data['id_usuario'] ?? auth()->id() ?? 1,
+                'id_usuario' => $usuarioId,
                 'ubicacion_fisica' => $ubicacionFisica,
                 'aprobado' => $aprobado,
                 'estado_registro' => $estadoRegistro,
