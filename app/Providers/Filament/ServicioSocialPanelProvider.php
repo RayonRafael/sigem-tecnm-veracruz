@@ -53,7 +53,7 @@ class ServicioSocialPanelProvider extends PanelProvider
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="{{ asset(\'css/sigem-theme.css\') }}">
+<link rel="stylesheet" href="{{ asset(\'css/sigem-theme.css\') }}?v={{ file_exists(public_path(\'css/sigem-theme.css\')) ? filemtime(public_path(\'css/sigem-theme.css\')) : 1 }}">
 <script src="{{ asset(\'js/sigem-network.js\') }}" defer></script>
 <script src="{{ asset(\'js/sigem-titles.js\') }}" defer></script>
 ')

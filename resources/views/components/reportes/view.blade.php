@@ -305,6 +305,20 @@
             margin-bottom: 32px;
             align-items: start;
         }
+        .sigem-new-rep-grid-charts {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+            align-items: start;
+        }
+        .sigem-new-rep-grid-tables {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+            align-items: start;
+        }
         /* Tarjetas CON gráfica: ocupan 3 de 6 columnas (medio ancho = 2 por fila) */
         .sigem-new-card.sigem-chart-card {
             grid-column: span 3;
@@ -313,7 +327,17 @@
         .sigem-new-card.sigem-table-card {
             grid-column: span 2;
         }
+        .sigem-new-rep-grid-charts .sigem-new-card.sigem-chart-card,
+        .sigem-new-rep-grid-tables .sigem-new-card.sigem-table-card {
+            grid-column: auto;
+        }
         @media (max-width: 1024px) {
+            .sigem-new-rep-grid-charts {
+                grid-template-columns: 1fr;
+            }
+            .sigem-new-rep-grid-tables {
+                grid-template-columns: repeat(2, 1fr);
+            }
             .sigem-new-card.sigem-chart-card {
                 grid-column: span 6;
             }
@@ -322,7 +346,9 @@
             }
         }
         @media (max-width: 768px) {
-            .sigem-new-rep-grid {
+            .sigem-new-rep-grid,
+            .sigem-new-rep-grid-charts,
+            .sigem-new-rep-grid-tables {
                 grid-template-columns: 1fr;
             }
             .sigem-new-card.sigem-chart-card,
@@ -339,6 +365,8 @@
             flex-direction: column;
             min-width: 0;
             overflow: hidden;
+            height: auto;
+            align-self: start;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
             transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
         }
@@ -1273,7 +1301,7 @@
 
             <div class="sigem-filter-group">
                 <span class="sigem-filter-label">🏢 Depto:</span>
-                <select wire:model.live="filtroDepartamentoId" class="sigem-filter-input" style="min-width: 180px;">
+                <select wire:model.live="filtroDepartamentoId" class="sigem-filter-input" style="min-width: 180px; appearance: none; -webkit-appearance: none; -moz-appearance: none;">
                     <option value="">Todos los departamentos</option>
                     @foreach ($deptosFiltros as $idDepto => $nombreDepto)
                         <option value="{{ $idDepto }}">{{ $nombreDepto }}</option>
@@ -1291,11 +1319,16 @@
             @endif
         </div>
 
-        {{-- Grid de Tarjetas: 12 CON GRÁFICA + 16 SOLO TABLA --}}
-        <div class="sigem-new-rep-grid">
-            @forelse ($reportesSubpestana as $rep)
-                @if (! empty($rep['has_chart']))
-                    {{-- 12 REPORTES CON GRÁFICA CHART.JS --}}
+        {{-- Grid de Tarjetas: 12 CON GRÁFICA (2 por fila) + 16 SOLO TABLA (3 por fila) --}}
+        @php
+            $repsConGrafica = collect($reportesSubpestana)->filter(fn ($r) => ! empty($r['has_chart']))->values();
+            $repsSoloTabla = collect($reportesSubpestana)->filter(fn ($r) => empty($r['has_chart']))->values();
+        @endphp
+
+        {{-- SECCIÓN 1: Tarjetas CON Gráfica (2 por fila, 50% cada una) --}}
+        @if ($repsConGrafica->isNotEmpty())
+            <div class="sigem-new-rep-grid-charts sigem-new-rep-grid">
+                @foreach ($repsConGrafica as $rep)
                     @php
                         $datosFilas = $rep['rows'] ?? [];
                         $tieneFilas = count($datosFilas) > 0;
@@ -1316,7 +1349,7 @@
                             @endif
                         </div>
 
-                        {{-- CONTENEDOR CANVAS RESPONSIVE DE CHART.JS O MENSAJE SIN GRÁFICA (Problema 4) --}}
+                        {{-- CONTENEDOR CANVAS RESPONSIVE DE CHART.JS O MENSAJE SIN GRÁFICA --}}
                         @if ($numPuntos > 0)
                             <div class="sigem-chart-canvas-wrap" style="min-height: {{ $numPuntos >= 4 ? '220px' : '180px' }}; height: {{ $numPuntos >= 4 ? '220px' : '180px' }}; position: relative;">
                                 <canvas x-ref="canvas"></canvas>
@@ -1381,8 +1414,14 @@
                             </div>
                         </div>
                     </div>
-                @else
-                    {{-- 16 REPORTES SOLO TABLA --}}
+                @endforeach
+            </div>
+        @endif
+
+        {{-- SECCIÓN 2: Tarjetas SOLO Tabla (3 por fila, 33% cada una) --}}
+        @if ($repsSoloTabla->isNotEmpty())
+            <div class="sigem-new-rep-grid-tables sigem-new-rep-grid">
+                @foreach ($repsSoloTabla as $rep)
                     <div class="sigem-new-card sigem-table-card" wire:key="sigem-new-table-{{ $rep['id'] }}">
                         <div class="sigem-new-card-top">
                             <div class="sigem-new-card-title">{{ $rep['emoji'] }} {{ $rep['titulo'] }}</div>
@@ -1447,13 +1486,15 @@
                             </div>
                         </div>
                     </div>
-                @endif
-            @empty
-                <div style="grid-column: 1 / -1; padding: 24px; text-align: center; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; color: #64748b;">
-                    No hay reportes configurados para esta sección.
-                </div>
-            @endforelse
-        </div>
+                @endforeach
+            </div>
+        @endif
+
+        @if ($repsConGrafica->isEmpty() && $repsSoloTabla->isEmpty())
+            <div style="padding: 24px; text-align: center; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; color: #64748b; margin-bottom: 32px;">
+                No hay reportes configurados para esta sección.
+            </div>
+        @endif
 
         {{-- Vista previa del nuevo reporte seleccionado (ABAJO DEL GRID - Problema 1) --}}
         @if ($datosPreviaNuevo)
