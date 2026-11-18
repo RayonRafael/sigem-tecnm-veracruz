@@ -61,16 +61,17 @@ class UserResource extends Resource
                                 ->label('Apellido paterno')
                                 ->placeholder('Ej. Pérez')
                                 ->prefixIcon('heroicon-m-user')
-                                ->maxLength(255),
+                                ->maxLength(100),
                             Forms\Components\TextInput::make('apellido_materno')
                                 ->label('Apellido materno')
                                 ->placeholder('Ej. López')
                                 ->prefixIcon('heroicon-m-user')
-                                ->maxLength(255),
+                                ->maxLength(100),
                             Forms\Components\TextInput::make('email')
                                 ->label('Correo electrónico')
                                 ->placeholder('Ej. usuario@tecnm.edu.mx')
                                 ->email()
+                                ->unique(ignoreRecord: true)
                                 ->required()
                                 ->prefixIcon('heroicon-m-envelope')
                                 ->maxLength(255),
@@ -94,17 +95,21 @@ class UserResource extends Resource
                                 ->label('Número de control')
                                 ->placeholder('Ej. 21020123')
                                 ->prefixIcon('heroicon-m-identification')
-                                ->maxLength(255),
+                                ->maxLength(10)
+                                ->unique(ignoreRecord: true)
+                                ->nullable(),
                             Forms\Components\TextInput::make('carrera')
                                 ->label('Carrera / área')
                                 ->placeholder('Ej. Ingeniería en Sistemas Computacionales')
                                 ->prefixIcon('heroicon-m-academic-cap')
-                                ->maxLength(255),
+                                ->maxLength(100),
                             Forms\Components\TextInput::make('RFC')
                                 ->label('Rfc (opcional)')
                                 ->placeholder('Ej. PELJ900101XXX')
                                 ->prefixIcon('heroicon-m-identification')
-                                ->maxLength(13),
+                                ->maxLength(13)
+                                ->unique(ignoreRecord: true)
+                                ->nullable(),
                             Forms\Components\Select::make('roles')
                                 ->placeholder('Selecciona...')
                                 ->label('Rol (Spatie)')

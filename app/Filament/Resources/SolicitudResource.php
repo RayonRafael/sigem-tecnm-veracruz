@@ -93,14 +93,29 @@ class SolicitudResource extends Resource
                                         SubformSlideOverHelper::catalogTip('El material estará disponible inmediatamente en el catálogo.'),
                                     ])
                                     ->createOptionUsing(function (array $data): int {
-                                        $tipoDefault = \App\Models\TipoMaterial::first()->id_tipodematerial ?? 1;
-                                        $unidadDefault = \App\Models\UnidadMedida::first()->id_unidad ?? 1;
-                                        $marcaDefault = \App\Models\MarcaMaterial::first()->id_marca ?? 1;
+                                        $tipoModel = \App\Models\TipoMaterial::withTrashed()->first()
+                                            ?? \App\Models\TipoMaterial::create(['nombre' => 'Equipo de Cómputo']);
+                                        if ($tipoModel->trashed()) {
+                                            $tipoModel->restore();
+                                        }
+
+                                        $unidadModel = \App\Models\UnidadMedida::withTrashed()->first()
+                                            ?? \App\Models\UnidadMedida::create(['nombre' => 'Pieza']);
+                                        if ($unidadModel->trashed()) {
+                                            $unidadModel->restore();
+                                        }
+
+                                        $marcaModel = \App\Models\MarcaMaterial::withTrashed()->first()
+                                            ?? \App\Models\MarcaMaterial::create(['nombre' => 'Genérico']);
+                                        if ($marcaModel->trashed()) {
+                                            $marcaModel->restore();
+                                        }
+
                                         $mat = \App\Models\Material::create([
                                             'nombre' => trim($data['nombre']),
-                                            'id_marca' => $marcaDefault,
-                                            'id_tipodematerial' => $tipoDefault,
-                                            'id_unidad' => $unidadDefault,
+                                            'id_marca' => $marcaModel->id_marca,
+                                            'id_tipodematerial' => $tipoModel->id_tipodematerial,
+                                            'id_unidad' => $unidadModel->id_unidad,
                                             'stock_minimo' => 0,
                                             'stock_maximo' => 100,
                                         ]);
@@ -139,7 +154,7 @@ class SolicitudResource extends Resource
                             ->default('Pendiente'),
 
                         Forms\Components\Hidden::make('id_receptor')
-                            ->default(fn () => Receptor::value('id_receptor') ?? 1),
+                            ->default(fn () => Receptor::first()?->id_receptor),
                     ])
                     ->columnSpanFull(),
             ]);

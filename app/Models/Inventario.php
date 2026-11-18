@@ -295,10 +295,19 @@ class Inventario extends Model
         return $specs;
     }
 
+    protected function resolverUsuarioId(?int $usuarioId = null): ?int
+    {
+        return $usuarioId
+            ?? auth()->id()
+            ?? $this->id_usuario
+            ?? User::where('email', 'admin@tecnm.edu.mx')->value('id')
+            ?? User::first()?->id;
+    }
+
     public function darBajaDirecta(string $motivo, string $observaciones, ?int $usuarioId = null, array $datosAdicionales = []): void
     {
         DB::transaction(function () use ($motivo, $observaciones, $usuarioId, $datosAdicionales) {
-            $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
             $payload = [
@@ -330,7 +339,7 @@ class Inventario extends Model
     public function solicitarBaja(string $motivo, string $observaciones, ?int $usuarioId = null, array $datosAdicionales = []): void
     {
         DB::transaction(function () use ($motivo, $observaciones, $usuarioId, $datosAdicionales) {
-            $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
             $payload = [
@@ -362,7 +371,7 @@ class Inventario extends Model
     public function aprobarBaja(?int $usuarioId = null): void
     {
         DB::transaction(function () use ($usuarioId) {
-    $userId = $usuarioId ?? auth()->id() ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $motivo = $this->motivo_baja ?? 'Sin motivo especificado';
 
             $this->update([
@@ -394,7 +403,7 @@ class Inventario extends Model
     public function rechazarBaja(?string $observaciones = null, ?int $usuarioId = null): void
     {
         DB::transaction(function () use ($observaciones, $usuarioId) {
-            $userId = $usuarioId ?? auth()->id() ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $estadoRestaurar = $this->estado_previo_baja ?? EstadoInventario::Disponible->value;
             $obsTexto = !empty($observaciones) ? $observaciones : ($this->observaciones_baja ?? 'Sin observaciones');
 
@@ -423,7 +432,7 @@ class Inventario extends Model
     public function reactivar(?int $usuarioId = null): void
     {
         DB::transaction(function () use ($usuarioId) {
-            $userId = $usuarioId ?? auth()->id() ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
 
             $this->update([
                 'estado' => EstadoInventario::Disponible->value,
@@ -450,7 +459,7 @@ class Inventario extends Model
     public function cambiarAreaDirecto($departamentoId, $areaId, $salonId = null, $estacion = null, ?string $motivo = null, ?int $usuarioId = null): void
     {
         DB::transaction(function () use ($departamentoId, $areaId, $salonId, $estacion, $motivo, $usuarioId) {
-            $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
             $aulaTexto = null;
@@ -511,7 +520,7 @@ class Inventario extends Model
     public function solicitarCambioArea($departamentoId, $areaId, $salonId = null, $estacion = null, ?string $motivo = null, ?int $usuarioId = null): void
     {
         DB::transaction(function () use ($departamentoId, $areaId, $salonId, $estacion, $motivo, $usuarioId) {
-            $userId = $usuarioId ?? auth()->id() ?? $this->id_usuario ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $estadoAnterior = $this->estado ?? EstadoInventario::Disponible->value;
 
             $aulaTexto = null;
@@ -558,7 +567,7 @@ class Inventario extends Model
     public function aprobarCambioArea(?int $usuarioId = null): void
     {
         DB::transaction(function () use ($usuarioId) {
-            $userId = $usuarioId ?? auth()->id() ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $solicitud = $this->ubicacion_solicitada ?? [];
             $estadoPrevio = $this->estado_previo_cambio ?? EstadoInventario::Disponible->value;
 
@@ -611,7 +620,7 @@ class Inventario extends Model
     public function rechazarCambioArea(?string $motivoRechazo = null, ?int $usuarioId = null): void
     {
         DB::transaction(function () use ($motivoRechazo, $usuarioId) {
-    $userId = $usuarioId ?? auth()->id() ?? 1;
+            $userId = $this->resolverUsuarioId($usuarioId);
             $estadoPrevio = $this->estado_previo_cambio ?? EstadoInventario::Disponible->value;
 
             $this->update([

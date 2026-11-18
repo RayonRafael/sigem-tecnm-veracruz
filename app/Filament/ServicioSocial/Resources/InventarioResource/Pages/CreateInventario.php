@@ -22,6 +22,11 @@ class CreateInventario extends CreateRecord
         return $data;
     }
 
+    protected function handleRecordCreation(array $data): \Illuminate\Database\Eloquent\Model
+    {
+        return \App\Filament\Resources\InventarioResource::registrarMultiplesEquipos($data);
+    }
+
     protected function getCreatedNotification(): ?Notification
     {
         return Notification::make()

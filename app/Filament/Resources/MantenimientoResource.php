@@ -87,12 +87,14 @@ class MantenimientoResource extends Resource
                                     ->label('Nombre del técnico')
                                     ->placeholder('Ej. Juan Pérez')
                                     ->default(fn () => auth()->user() ? trim(auth()->user()->name . ' ' . (auth()->user()->apellido_paterno ?? '')) : '')
+                                    ->maxLength(150)
                                     ->required(),
 
                                 Forms\Components\TextInput::make('num_control_tecnico')
                                     ->label('No. de control del técnico')
                                     ->placeholder('Ej. 20240001')
                                     ->default(fn () => auth()->user()?->num_control ?? '')
+                                    ->maxLength(10)
                                     ->required(),
                             ]),
 
@@ -262,7 +264,7 @@ class MantenimientoResource extends Resource
                             ->modalSubmitActionLabel('Sí, autorizar')
                             ->action(function (Mantenimiento $record) {
                                 $record->update(['estado' => 'En proceso', 'fecha_inicio' => now()]);
-                                $record->inventario?->update(['estado' => 'En Mantenimiento']);
+                                $record->inventario?->update(['estado' => \App\Enums\EstadoInventario::EnMantenimiento->value]);
                                 Notification::make()->title('Mantenimiento autorizado correctamente')->success()->send();
                             }),
                         Tables\Actions\Action::make('rechazar_slideover')
@@ -275,7 +277,29 @@ class MantenimientoResource extends Resource
                             ->modalSubmitActionLabel('Sí, rechazar')
                             ->action(function (Mantenimiento $record) {
                                 $record->update(['estado' => 'Cancelado']);
-                                // Al rechazar, el estado del Inventario NO cambia
+                                $inventario = $record->inventario?->fresh();
+                                if ($inventario && in_array($inventario->estado, [\App\Enums\EstadoInventario::EnMantenimiento->value, 'En Mantenimiento'], true)) {
+                                    $estadoAnt = $inventario->estado;
+                                    $inventario->update(['estado' => \App\Enums\EstadoInventario::Disponible->value]);
+
+                                    $userId = auth()->id()
+                                        ?? $record->id_usuario_solicita
+                                        ?? $inventario->id_usuario
+                                        ?? \App\Models\User::where('email', 'admin@tecnm.edu.mx')->value('id')
+                                        ?? \App\Models\User::first()?->id;
+
+                                    if ($userId) {
+                                        \App\Models\HistorialEstado::create([
+                                            'id_inventario' => $inventario->id_inventario,
+                                            'id_usuario' => $userId,
+                                            'estado_anterior' => $estadoAnt,
+                                            'estado_nuevo' => \App\Enums\EstadoInventario::Disponible->value,
+                                            'motivo_cambio' => 'Mantenimiento rechazado: equipo restaurado a Disponible',
+                                            'ubicacion_fisica' => $inventario->ubicacion_fisica,
+                                            'fecha_cambio' => now(),
+                                        ]);
+                                    }
+                                }
                                 Notification::make()->title('Mantenimiento rechazado')->danger()->send();
                             }),
                         Tables\Actions\Action::make('completar_slideover')
@@ -312,7 +336,7 @@ class MantenimientoResource extends Resource
                     ->modalSubmitActionLabel('Sí, autorizar')
                     ->action(function (Mantenimiento $record) {
                         $record->update(['estado' => 'En proceso', 'fecha_inicio' => now()]);
-                        $record->inventario?->update(['estado' => 'En Mantenimiento']);
+                        $record->inventario?->update(['estado' => \App\Enums\EstadoInventario::EnMantenimiento->value]);
                         Notification::make()->title('Mantenimiento autorizado correctamente')->success()->send();
                     }),
 

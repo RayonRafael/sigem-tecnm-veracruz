@@ -292,7 +292,7 @@ trait ConAccionesMasivasInventario
         }
 
         $esAdmin = ! ($this instanceof \App\Filament\ServicioSocial\Pages\Dashboard);
-        $userId = auth()->id() ?? 1;
+        $userId = auth()->id() ?? \App\Models\User::where('email', 'admin@tecnm.edu.mx')->value('id') ?? \App\Models\User::first()?->id;
         $campo = $data['campo_a_modificar'];
         $aplicados = 0;
         $omitidos = 0;
@@ -464,7 +464,7 @@ trait ConAccionesMasivasInventario
         }
 
         $esAdmin = ! ($this instanceof \App\Filament\ServicioSocial\Pages\Dashboard);
-        $userId = auth()->id() ?? 1;
+        $userId = auth()->id() ?? \App\Models\User::where('email', 'admin@tecnm.edu.mx')->value('id') ?? \App\Models\User::first()?->id;
         $nuevoEstado = ! empty($data['nuevo_estado']) ? $data['nuevo_estado'] : null;
         $nuevaAreaId = ! empty($data['nueva_area_id']) ? $data['nueva_area_id'] : null;
         $nuevoTipoPropiedad = ! empty($data['nuevo_tipo_propiedad']) ? $data['nuevo_tipo_propiedad'] : null;
@@ -571,7 +571,7 @@ trait ConAccionesMasivasInventario
         }
 
         $esAdmin = ! ($this instanceof \App\Filament\ServicioSocial\Pages\Dashboard);
-        $userId = auth()->id() ?? 1;
+        $userId = auth()->id() ?? \App\Models\User::where('email', 'admin@tecnm.edu.mx')->value('id') ?? \App\Models\User::first()?->id;
         $motivo = $data['motivo_baja'];
         $obs = ! empty($data['observaciones_baja']) ? $data['observaciones_baja'] : 'Baja masiva';
         $datosAdicionales = ConModalesBajaCambio::extraerDatosAdicionalesBaja($data);

@@ -19,6 +19,16 @@ class EditInventario extends EditRecord
         return [];
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        return \App\Filament\Resources\InventarioResource::hidratarDatosEdicion($data, $this->record);
+    }
+
+    protected function handleRecordUpdate(\Illuminate\Database\Eloquent\Model $record, array $data): \Illuminate\Database\Eloquent\Model
+    {
+        return \App\Filament\Resources\InventarioResource::guardarCambiosEquipo($record, $data);
+    }
+
     protected function getRedirectUrl(): string
     {
         return url('/servicio-social');

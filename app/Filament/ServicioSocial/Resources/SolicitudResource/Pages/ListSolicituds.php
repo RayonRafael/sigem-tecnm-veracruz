@@ -57,7 +57,7 @@ class ListSolicituds extends ListRecords
 
         $data['id_usuario'] = auth()->id();
         $data['estado'] = 'Pendiente';
-        $data['id_receptor'] = $data['id_receptor'] ?? (Receptor::value('id_receptor') ?? 1);
+        $data['id_receptor'] = $data['id_receptor'] ?? Receptor::first()?->id_receptor;
 
         return $data;
     }

@@ -122,7 +122,7 @@ class CreateFormSchema
                             Forms\Components\TextInput::make('aula')
                                 ->label('Aula')
                                 ->placeholder('ej. E101')
-                                ->maxLength(5)
+                                ->maxLength(50)
                                 ->helperText('Letra del edificio + planta + número. Déjalo vacío si el equipo no está en un aula.')
                                 ->prefixIcon('heroicon-m-academic-cap')
                                 ->lazy()

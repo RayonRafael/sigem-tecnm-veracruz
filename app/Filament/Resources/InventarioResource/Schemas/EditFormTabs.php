@@ -25,6 +25,7 @@ class EditFormTabs
                                     Forms\Components\TextInput::make('nombre_equipo')
                                         ->label('Nombre (Material/Equipo)')
                                         ->placeholder('Ej. Impresora HP LaserJet Pro')
+                                        ->maxLength(100)
                                         ->required()
                                         ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->material?->nombre ?? $record?->subtipo ?? ''))
                                         ->columnSpan(2),
@@ -156,7 +157,7 @@ class EditFormTabs
                                     Forms\Components\TextInput::make('aula')
                                         ->label('Aula')
                                         ->placeholder('Ej. E101')
-                                        ->maxLength(5)
+                                        ->maxLength(50)
                                         ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->aula ?? $record?->salon?->nombre ?? ($record?->especificaciones['aula'] ?? null) ?? (preg_match('/Aula\s+([A-Za-z0-9_-]+)/i', $record?->ubicacion_fisica ?? '', $m) ? $m[1] : null) ?? '')),
 
                                     Forms\Components\TextInput::make('jefe_departamento')
@@ -299,7 +300,6 @@ class EditFormTabs
                                 ->label('Observaciones adicionales')
                                 ->placeholder('Notas u observaciones sobre el estado...')
                                 ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->observaciones_generales))
-                                ->dehydrated(false)
                                 ->rows(2),
                         ]),
                 ]),
