@@ -68,6 +68,7 @@ class SigemReportExporter
         'rent_vencidas' => 'rentas_vencidas',
         'rent_gasto_mensual' => 'rentas_gasto_mensual',
         'rent_proveedores' => 'rentas_por_proveedor',
+        'rent_seguimiento' => 'rent_seguimiento',
 
         'hist_cambios_area' => 'historico_cambios_area',
         'hist_bajas' => 'historico_bajas',
@@ -734,6 +735,52 @@ class SigemReportExporter
                 }
                 break;
 
+            case 'rent_seguimiento':
+                $q = Inventario::where('tipo_propiedad', 'Rentado')->with(['material', 'proveedor']);
+                self::aplicarFiltrosInventario($q, $filtros);
+
+                $items = [];
+                foreach ($q->get() as $inv) {
+                    $estado = $inv->renta_estado ?? 'Vigente';
+                    $dias = $inv->renta_dias_restantes;
+                    $prioridad = match ($estado) {
+                        'Vencida' => 0,
+                        'Por vencer' => 1,
+                        default => 2,
+                    };
+                    $badgeTexto = match ($estado) {
+                        'Vencida' => '🔴 Vencida',
+                        'Por vencer' => '🟡 Por vencer',
+                        default => '🟢 Vigente',
+                    };
+
+                    $items[] = [
+                        'prioridad' => $prioridad,
+                        'dias_sort' => $dias ?? PHP_INT_MAX,
+                        'row' => [
+                            $inv->codigo ?: ('#' . $inv->id_inventario),
+                            $inv->material?->nombre ?? $inv->subtipo ?? 'Equipo',
+                            $inv->proveedor?->nombre_empresa ?? 'Sin proveedor',
+                            $inv->fecha_registro ? $inv->fecha_registro->format('d/m/Y') : '—',
+                            $inv->renta_fecha_fin ? $inv->renta_fecha_fin->format('d/m/Y') : '—',
+                            $dias !== null ? ($dias . ' días') : '—',
+                            $badgeTexto,
+                        ],
+                    ];
+                }
+
+                // Orden estricto: 1. 🔴 Vencidas -> 2. 🟡 Por vencer -> 3. 🟢 Vigentes (y por días restantes asc)
+                usort($items, function (array $a, array $b): int {
+                    if ($a['prioridad'] !== $b['prioridad']) {
+                        return $a['prioridad'] <=> $b['prioridad'];
+                    }
+
+                    return $a['dias_sort'] <=> $b['dias_sort'];
+                });
+
+                $rows = array_column($items, 'row');
+                break;
+
             // ==========================================
             // SUB-PESTAÑA 5: HISTÓRICO (5 reportes)
             // ==========================================
@@ -1117,6 +1164,23 @@ class SigemReportExporter
             case 'rentas_gasto_mensual':
             case 'rent_gasto_mensual':
                 return "Totales: {$count} periodos proyectados";
+
+            case 'rent_seguimiento':
+                $vencidas = 0;
+                $porVencer = 0;
+                $vigentes = 0;
+                foreach ($rows as $r) {
+                    $est = (string) ($r[6] ?? '');
+                    if (str_contains($est, 'Vencida')) {
+                        $vencidas++;
+                    } elseif (str_contains($est, 'Por vencer')) {
+                        $porVencer++;
+                    } else {
+                        $vigentes++;
+                    }
+                }
+
+                return "Totales: {$count} rentados | 🔴 {$vencidas} · 🟡 {$porVencer} · 🟢 {$vigentes}";
 
             case 'estadisticas_mas_movidos':
             case 'est_movidos':

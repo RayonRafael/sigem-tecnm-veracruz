@@ -294,6 +294,7 @@ class EditFormTabs
                             Forms\Components\DatePicker::make('fecha_registro')
                                 ->label('Fecha de registro')
                                 ->default(now())
+                                ->live()
                                 ->prefixIcon('heroicon-m-clock'),
 
                             Forms\Components\DatePicker::make('garantia_fecha_fin')
@@ -317,9 +318,7 @@ class EditFormTabs
                                 ->label('Inicio de renta')
                                 ->prefixIcon('heroicon-m-calendar-days'),
 
-                            Forms\Components\DatePicker::make('fecha_fin_renta')
-                                ->label('Fin de renta')
-                                ->prefixIcon('heroicon-m-calendar-days'),
+                            static::getRentaFechaFinField(),
 
                             Forms\Components\Textarea::make('observaciones_renta')
                                 ->label('Observaciones de renta')

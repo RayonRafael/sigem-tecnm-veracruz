@@ -94,14 +94,14 @@ class NuevosReportes28Test extends TestCase
         $this->assertCount(6, $catalogo['inventario'], 'Inventario debe tener 6 reportes');
         $this->assertCount(6, $catalogo['estadisticas'], 'Estadísticas debe tener 6 reportes');
         $this->assertCount(6, $catalogo['mantenimiento'], 'Mantenimiento debe tener 6 reportes');
-        $this->assertCount(5, $catalogo['rentas'], 'Rentas debe tener 5 reportes');
+        $this->assertCount(6, $catalogo['rentas'], 'Rentas debe tener 6 reportes (incluye Seguimiento de Rentas)');
         $this->assertCount(5, $catalogo['historico'], 'Histórico debe tener 5 reportes');
 
         $totalReportes = 0;
         foreach ($catalogo as $grupo) {
             $totalReportes += count($grupo);
         }
-        $this->assertEquals(28, $totalReportes, 'El catálogo total debe contener exactamente 28 reportes');
+        $this->assertEquals(29, $totalReportes, 'El catálogo total debe contener 29 reportes');
     }
 
     public function test_subpestana_inventario_genera_los_6_reportes_correctamente(): void
@@ -420,7 +420,7 @@ class NuevosReportes28Test extends TestCase
         }
 
         $this->assertCount(12, $conGrafica, 'Debe haber exactamente 12 reportes con gráfica');
-        $this->assertCount(16, $soloTabla, 'Debe haber exactamente 16 reportes solo tabla');
+        $this->assertCount(17, $soloTabla, 'Debe haber exactamente 17 reportes solo tabla (incluye rent_seguimiento)');
 
         $esperadosConGrafica = [
             'inventario_por_departamento',   // inv_depto
@@ -464,6 +464,7 @@ class NuevosReportes28Test extends TestCase
             'rentas_equipos',
             'rentas_vencidas',
             'rentas_por_proveedor',
+            'rent_seguimiento',
             'historico_bajas',
             'historico_entregas',
             'historico_general',

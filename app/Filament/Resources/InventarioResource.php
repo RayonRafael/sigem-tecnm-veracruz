@@ -97,6 +97,10 @@ class InventarioResource extends Resource
             return 'Equipo registrado exitosamente';
         }
 
+        if ($record->tipo_propiedad === 'Rentado' && $record->renta_fecha_fin) {
+            return 'Equipo registrado como rentado. Vence el ' . $record->renta_fecha_fin->format('d/m/Y');
+        }
+
         $total = $record->especificaciones['_total_registrados'] ?? 1;
         $estacion = $record->estacion;
 
@@ -283,6 +287,9 @@ class InventarioResource extends Resource
         $data['ip_address'] = $record->ip_address ?? ($record->especificaciones['ip_address'] ?? '');
         $data['mac_address'] = $record->mac_address ?? ($record->especificaciones['mac_address'] ?? '');
         $data['observaciones_adicionales'] = $record->observaciones_generales ?? '';
+        $data['renta_fecha_fin'] = $record->tipo_propiedad === 'Rentado'
+            ? ($record->especificaciones['renta_fecha_fin'] ?? $record->fecha_fin_renta?->format('Y-m-d'))
+            : null;
 
         return $data;
     }
@@ -452,6 +459,27 @@ class InventarioResource extends Resource
                 $record->observaciones_generales = $data['observaciones_adicionales'] ?? null;
                 unset($data['observaciones_adicionales']);
             }
+
+            // 7b. Seguimiento de renta (3 años máximo, guardado en especificaciones sin migración)
+            $tipoPropFinal = $data['tipo_propiedad'] ?? $record->tipo_propiedad;
+            $specs = $record->especificaciones ?? [];
+            if ($tipoPropFinal === 'Propio') {
+                unset($specs['renta_fecha_fin']);
+                $record->fecha_fin_renta = null;
+            } elseif ($tipoPropFinal === 'Rentado') {
+                if (array_key_exists('renta_fecha_fin', $data) && filled($data['renta_fecha_fin'])) {
+                    $finStr = \Illuminate\Support\Carbon::parse($data['renta_fecha_fin'])->format('Y-m-d');
+                    $specs['renta_fecha_fin'] = $finStr;
+                    $record->fecha_fin_renta = $finStr;
+                } elseif (empty($specs['renta_fecha_fin']) && ! $record->fecha_fin_renta) {
+                    $fechaRegRef = $data['fecha_registro'] ?? $record->fecha_registro ?? now();
+                    $finStr = \Illuminate\Support\Carbon::parse($fechaRegRef)->addYears(3)->format('Y-m-d');
+                    $specs['renta_fecha_fin'] = $finStr;
+                    $record->fecha_fin_renta = $finStr;
+                }
+            }
+            $record->especificaciones = $specs;
+            unset($data['renta_fecha_fin']);
 
             // 8. Fill other allowable fields
             $record->fill($data);

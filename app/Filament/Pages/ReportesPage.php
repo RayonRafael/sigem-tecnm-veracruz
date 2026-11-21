@@ -100,6 +100,22 @@ class ReportesPage extends Page
 
         $cached = Cache::get('sigem_reportes_visibilidad_ss', []);
         $this->visibilidadServicioSocial = array_merge($defaults, is_array($cached) ? $cached : []);
+
+        // Deep-link opcional desde Dashboard (ej. ?pestana=nuevos&subpestana=rentas&reporte=rent_seguimiento)
+        $pestana = request()->query('pestana');
+        if (is_string($pestana) && in_array($pestana, ['principales', 'formatos', 'nuevos'], true)) {
+            $this->pestanaPrincipal = $pestana;
+        }
+
+        $subpestana = request()->query('subpestana');
+        if (is_string($subpestana) && array_key_exists($subpestana, SigemReportExporter::getSubpestanas())) {
+            $this->subpestanaReportes = $subpestana;
+        }
+
+        $reporte = request()->query('reporte');
+        if (is_string($reporte) && SigemReportExporter::findReporte($reporte) !== null) {
+            $this->nuevoReporteActivo = $reporte;
+        }
     }
 
     public function toggleVisibilidad(string $reportId): void

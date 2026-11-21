@@ -383,6 +383,7 @@ class Dashboard extends BaseDashboard
             'sortDirection' => $this->sortDirection,
             'perPage' => $this->perPage,
             'categoriasTop' => AdminInventarioResource::obtenerCategoriasTop(),
+            'resumenRentas' => Inventario::resumenRentas(),
             'selectedRows' => $this->selectedRows,
             'selectAll' => $this->selectAll,
             'showSidePanel' => $this->showSidePanel,

@@ -8,9 +8,53 @@ use App\Models\Receptor;
 use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
+use Illuminate\Support\Carbon;
 
 trait InventarioFormFields
 {
+    public static function getRentaFechaFinField(): Forms\Components\DatePicker
+    {
+        return Forms\Components\DatePicker::make('renta_fecha_fin')
+            ->label('Fecha fin de renta')
+            ->prefixIcon('heroicon-m-calendar-days')
+            ->visible(fn (Forms\Get $get): bool => $get('tipo_propiedad') === 'Rentado')
+            ->helperText(function (Forms\Get $get, ?Inventario $record = null): string {
+                $inicioRaw = $get('fecha_registro') ?: $record?->fecha_registro;
+                $inicio = $inicioRaw ? Carbon::parse($inicioRaw) : now();
+                $max = $inicio->copy()->addYears(3)->format('d/m/Y');
+
+                return "⚠️ Máximo permitido: {$max} (3 años desde registro). Si se deja vacío se calcula automáticamente.";
+            })
+            ->rule(function (Forms\Get $get, ?Inventario $record = null): \Closure {
+                return function (string $attribute, $value, \Closure $fail) use ($get, $record): void {
+                    if (blank($value) || $get('tipo_propiedad') !== 'Rentado') {
+                        return;
+                    }
+
+                    $inicioRaw = $get('fecha_registro') ?: $record?->fecha_registro;
+                    $inicio = $inicioRaw ? Carbon::parse($inicioRaw)->startOfDay() : now()->startOfDay();
+                    $fin = Carbon::parse($value)->startOfDay();
+                    $maxPermitido = $inicio->copy()->addYears(3);
+
+                    if ($fin->lt($inicio)) {
+                        $fail("La fecha fin de renta no puede ser anterior a la fecha de registro ({$inicio->format('d/m/Y')}).");
+                    }
+
+                    if ($fin->gt($maxPermitido)) {
+                        $fail("La fecha fin de renta no puede exceder el máximo de 3 años ({$maxPermitido->format('d/m/Y')}).");
+                    }
+                };
+            })
+            ->afterStateHydrated(function (Forms\Components\DatePicker $component, ?Inventario $record): void {
+                if ($record && $record->tipo_propiedad === 'Rentado' && blank($component->getState())) {
+                    $fin = $record->especificaciones['renta_fecha_fin'] ?? $record->fecha_fin_renta?->format('Y-m-d');
+                    if ($fin) {
+                        $component->state($fin);
+                    }
+                }
+            });
+    }
+
     public static function getReceptorSelectField(): Forms\Components\Select
     {
         return Forms\Components\Select::make('id_receptor')

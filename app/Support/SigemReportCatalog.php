@@ -299,6 +299,17 @@ class SigemReportCatalog
                     'has_chart' => false,
                     'columnas' => ['Proveedor', 'Equipos', 'Fecha más antigua', 'Fecha más reciente'],
                 ],
+                'rent_seguimiento' => [
+                    'num' => 24,
+                    'id' => 'rent_seguimiento',
+                    'alias' => 'rent_seguimiento',
+                    'categoria' => 'rentas',
+                    'titulo' => 'Seguimiento de Rentas',
+                    'descripcion' => 'Seguimiento semafórico de todos los equipos rentados (periodo máximo 3 años) ordenados por urgencia de vencimiento.',
+                    'icono' => '🚦',
+                    'has_chart' => false,
+                    'columnas' => ['Código', 'Equipo', 'Proveedor', 'Inicio renta', 'Fin renta', 'Días restantes', 'Estado'],
+                ],
             ],
 
             'historico' => [

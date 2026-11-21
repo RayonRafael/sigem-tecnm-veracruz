@@ -43,6 +43,7 @@
                     :is-skeleton-preview="$isSkeletonPreview"
                     :mantenimientos-pendientes="$mantenimientosPendientes ?? 0"
                     :solicitudes-pendientes="$solicitudesPendientes ?? 0"
+                    :resumen-rentas="$resumenRentas ?? ['total' => 0, 'vigentes' => 0, 'por_vencer' => 0, 'vencidas' => 0]"
                 />
 
                 <div class="sigem-quick-desc-none"></div>
@@ -65,6 +66,7 @@
                     :inventario-asignados="$inventarioAsignados ?? 0"
                     :inventario-danados="$inventarioDanados ?? 0"
                     :categorias-top="$categoriasTop ?? []"
+                    :resumen-rentas="$resumenRentas ?? ['total' => 0, 'vigentes' => 0, 'por_vencer' => 0, 'vencidas' => 0]"
                     :selected-rows="$selectedRows ?? []"
                     :select-all="$selectAll ?? false"
                     :show-side-panel="$showSidePanel ?? false"

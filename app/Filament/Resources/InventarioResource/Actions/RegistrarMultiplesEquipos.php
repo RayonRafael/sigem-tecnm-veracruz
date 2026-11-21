@@ -10,6 +10,7 @@ use App\Models\Inventario;
 use App\Models\MarcaMaterial;
 use App\Models\Receptor;
 use App\Models\Salon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class RegistrarMultiplesEquipos
@@ -110,6 +111,23 @@ class RegistrarMultiplesEquipos
                 }
             }
 
+            // Regla de negocio: Equipos rentados tienen vigencia máxima de 3 años desde fecha_registro
+            $tipoPropiedad = $data['tipo_propiedad'] ?? 'Propio';
+            $fechaRegistro = $data['fecha_registro'] ?? now();
+            $rentaFechaFinStr = null;
+
+            if ($tipoPropiedad === 'Rentado') {
+                $fechaRegCarbon = Carbon::parse($fechaRegistro)->startOfDay();
+                $manualFin = $data['renta_fecha_fin']
+                    ?? ($data['especificaciones']['renta_fecha_fin'] ?? ($data['fecha_fin_renta'] ?? null));
+                $rentaFinCarbon = filled($manualFin)
+                    ? Carbon::parse($manualFin)->startOfDay()
+                    : $fechaRegCarbon->copy()->addYears(3);
+
+                $rentaFechaFinStr = $rentaFinCarbon->format('Y-m-d');
+                $receptorSpecs['renta_fecha_fin'] = $rentaFechaFinStr;
+            }
+
             $baseData = [
                 'departamento_id' => $departamentoId,
                 'area_id' => $areaId,
@@ -117,16 +135,16 @@ class RegistrarMultiplesEquipos
                 'aula' => $aula,
                 'estacion' => $estacion,
                 'estado' => $data['estado'] ?? 'Disponible',
-                'tipo_propiedad' => $data['tipo_propiedad'] ?? 'Propio',
-                'fecha_registro' => $data['fecha_registro'] ?? now(),
+                'tipo_propiedad' => $tipoPropiedad,
+                'fecha_registro' => $fechaRegistro,
                 'id_proveedor' => $data['id_proveedor'] ?? null,
                 'num_factura' => $data['num_factura'] ?? null,
                 'fecha_factura' => $data['fecha_factura'] ?? null,
                 'garantia_fecha_fin' => $data['garantia_fecha_fin'] ?? null,
                 'garantia_estado' => ! empty($data['garantia_estado']) ? $data['garantia_estado'] : 'sin_garantia',
-                'fecha_inicio_renta' => $data['fecha_inicio_renta'] ?? null,
-                'fecha_fin_renta' => $data['fecha_fin_renta'] ?? null,
-                'observaciones_renta' => $data['observaciones_renta'] ?? null,
+                'fecha_inicio_renta' => $tipoPropiedad === 'Rentado' ? ($data['fecha_inicio_renta'] ?? $fechaRegistro) : null,
+                'fecha_fin_renta' => $rentaFechaFinStr,
+                'observaciones_renta' => $tipoPropiedad === 'Rentado' ? ($data['observaciones_renta'] ?? null) : null,
                 'id_usuario' => $usuarioId,
                 'ubicacion_fisica' => $ubicacionFisica,
                 'aprobado' => $aprobado,
