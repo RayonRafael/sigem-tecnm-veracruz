@@ -138,6 +138,8 @@ class SigemReportExporter
             'fecha_desde' => ! empty($filtros['fecha_desde']) ? (string) $filtros['fecha_desde'] : '',
             'fecha_hasta' => ! empty($filtros['fecha_hasta']) ? (string) $filtros['fecha_hasta'] : '',
             'departamento_id' => ! empty($filtros['departamento_id']) ? (string) $filtros['departamento_id'] : '',
+            'area_id' => ! empty($filtros['area_id']) ? (string) $filtros['area_id'] : '',
+            'aula' => ! empty($filtros['aula']) ? (string) $filtros['aula'] : '',
         ];
 
         $ver = self::cacheVersion();
@@ -1248,11 +1250,23 @@ class SigemReportExporter
      */
     protected static function aplicarFiltrosInventario($query, array $filtros): void
     {
-        if (! empty($filtros['departamento_id'])) {
+        if (! empty($filtros['departamento_id']) && strtoupper((string) $filtros['departamento_id']) !== 'TODOS') {
             $deptoId = (int) $filtros['departamento_id'];
             $query->where(function ($q) use ($deptoId) {
                 $q->where('inventario.departamento_id', $deptoId)
                     ->orWhereHas('area', fn ($aq) => $aq->where('id_departamento', $deptoId));
+            });
+        }
+
+        if (! empty($filtros['area_id']) && strtoupper((string) $filtros['area_id']) !== 'TODAS') {
+            $query->where('inventario.area_id', (int) $filtros['area_id']);
+        }
+
+        if (! empty($filtros['aula']) && strtoupper((string) $filtros['aula']) !== 'TODAS') {
+            $aulaVal = trim((string) $filtros['aula']);
+            $query->where(function ($q) use ($aulaVal) {
+                $q->where('inventario.aula', $aulaVal)
+                    ->orWhereHas('salon', fn ($sq) => $sq->where('nombre', $aulaVal));
             });
         }
 

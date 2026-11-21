@@ -4,8 +4,10 @@
     'departamentosFiltro' => [],
     'categoriasFiltro' => [],
     'areasFiltro' => [],
+    'aulasFiltro' => [],
     'inventariosPaginados' => null,
     'inventariosCompletos' => [],
+    'paginaActualIds' => [],
     'sortColumn' => 'created_at',
     'sortDirection' => 'desc',
     'perPage' => 10,
@@ -135,12 +137,19 @@
                     <table class="fi-ta-table">
                         <thead>
                             <tr>
+                                @php
+                                    $idsPagStr = array_map('strval', $paginaActualIds ?? []);
+                                    $selStr = array_map('strval', $selectedRows ?? []);
+                                    $todosEnPaginaSeleccionados = count($idsPagStr) > 0
+                                        && count(array_intersect($idsPagStr, $selStr)) === count($idsPagStr);
+                                @endphp
                                 <th style="width: 44px; min-width: 44px; text-align: center; padding: 6px;">
                                     <input
                                         type="checkbox"
-                                        wire:model.live="selectAll"
+                                        wire:click="toggleSeleccionarPagina"
+                                        @checked($todosEnPaginaSeleccionados)
                                         class="sigem-checkbox"
-                                        title="Seleccionar todos los registros visibles"
+                                        title="Seleccionar solo esta página"
                                     />
                                 </th>
                                 <th style="min-width: 170px; cursor: pointer; user-select: none;" wire:click="sortBy('departamento')" title="Ordenar por departamento">
@@ -249,13 +258,14 @@
                                     </select>
                                 </th>
                                 <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
-                                    <input
-                                        type="search"
-                                        wire:model.live.debounce.500ms="tableColumnSearches.aula"
-                                        placeholder="Filtrar..."
-                                        class="sigem-dash-filter-input"
-                                        title="Filtrar por aula"
-                                    />
+                                    <select wire:model.live="tableColumnSearches.aula" class="fi-table-individual-search-select" title="Filtrar por aula">
+                                        <option value="">Todas</option>
+                                        @foreach (($aulasFiltro ?? []) as $optVal => $optLbl)
+                                            @if($optVal !== '')
+                                                <option value="{{ $optVal }}">{{ $optLbl }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
                                 </th>
                                 <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
                                     <input

@@ -31,19 +31,29 @@ class Dashboard extends BaseDashboard
     public string $sortColumn = 'created_at';
     public string $sortDirection = 'desc';
 
-    public function updatedTableColumnSearches(): void
+    public function updatedTableColumnSearches($value = null, $key = null): void
     {
+        if ($key === 'departamento') {
+            $this->tableColumnSearches['area'] = '';
+            $this->tableColumnSearches['aula'] = '';
+        } elseif ($key === 'area') {
+            $this->tableColumnSearches['aula'] = '';
+        }
+
+        $this->limpiarSeleccionActiva();
         $this->resetPage();
     }
 
     public function updatedPerPage(): void
     {
+        $this->limpiarSeleccionActiva();
         $this->resetPage();
     }
 
     public function resetTableColumnSearches(): void
     {
         $this->tableColumnSearches = [];
+        $this->limpiarSeleccionActiva();
         $this->resetPage();
     }
 
@@ -353,9 +363,21 @@ class Dashboard extends BaseDashboard
         $inventarioEnMantenimiento = (int) ($inventarioStats->en_mantenimiento ?? 0);
         $inventarioDanados = (int) ($inventarioStats->danados ?? 0);
 
-        // 4. Opciones de filtros y registros filtrados paginados
-        [$categoriasFiltro, $areasFiltro, $departamentosFiltro] = AdminInventarioResource::obtenerOpcionesFiltrosDashboard();
+        // 4. Opciones de filtros (encadenados Depto -> Área -> Aula) y registros paginados
+        [$categoriasFiltro, $areasFiltroBase, $departamentosFiltro] = AdminInventarioResource::obtenerOpcionesFiltrosDashboard();
+        $deptoActivo = trim((string) ($this->tableColumnSearches['departamento'] ?? ''));
+        $areasFiltro = ($deptoActivo !== '' && strtoupper($deptoActivo) !== 'TODOS')
+            ? $this->areasFiltradas
+            : $areasFiltroBase;
+        $aulasFiltro = $this->aulasFiltradas;
+
         $inventariosPaginados = $this->getFilteredTableQuery()->paginate($this->perPage);
+        $this->paginaActualIds = $inventariosPaginados
+            ->getCollection()
+            ->pluck('id_inventario')
+            ->map(fn ($id) => (string) $id)
+            ->values()
+            ->toArray();
 
         return [
             'misSolicitudes' => $misSolicitudes,
@@ -376,9 +398,11 @@ class Dashboard extends BaseDashboard
 
             'categoriasFiltro' => $categoriasFiltro,
             'areasFiltro' => $areasFiltro,
+            'aulasFiltro' => $aulasFiltro,
             'departamentosFiltro' => $departamentosFiltro,
             'inventariosPaginados' => $inventariosPaginados,
             'inventariosCompletos' => $inventariosPaginados,
+            'paginaActualIds' => $this->paginaActualIds,
             'sortColumn' => $this->sortColumn,
             'sortDirection' => $this->sortDirection,
             'perPage' => $this->perPage,

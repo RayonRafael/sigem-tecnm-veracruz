@@ -170,7 +170,10 @@ class EditFormTabs
                                         $component->state($record->departamento_id ?? $record->area?->id_departamento);
                                     }
                                 })
-                                ->afterStateUpdated(fn (Forms\Set $set) => $set('area_id', null)),
+                                ->afterStateUpdated(function (Forms\Set $set): void {
+                                    $set('area_id', null);
+                                    $set('aula', null);
+                                }),
 
                             Forms\Components\Select::make('area_id')
                                 ->label('Área')
@@ -184,7 +187,9 @@ class EditFormTabs
                                 })
                                 ->searchable()
                                 ->preload()
+                                ->live()
                                 ->required()
+                                ->afterStateUpdated(fn (Forms\Set $set) => $set('aula', null))
                                 ->prefixIcon('heroicon-m-rectangle-group'),
 
                             Forms\Components\TextInput::make('aula')

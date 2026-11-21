@@ -115,6 +115,8 @@ class CreateFormSchema
                                 ->required()
                                 ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
                                     $set('area_id', null);
+                                    $set('aula', null);
+                                    $set('especificaciones.aula', null);
                                     UbicacionHelper::actualizarDescriptiva($set, $get);
                                 })
                                 ->prefixIcon('heroicon-m-building-office'),
@@ -138,6 +140,8 @@ class CreateFormSchema
                                 ->disabled(fn (Forms\Get $get) => blank($get('departamento_id')))
                                 ->required()
                                 ->afterStateUpdated(function (Forms\Set $set, Forms\Get $get) {
+                                    $set('aula', null);
+                                    $set('especificaciones.aula', null);
                                     UbicacionHelper::actualizarDescriptiva($set, $get);
                                 })
                                 ->prefixIcon('heroicon-m-rectangle-group'),

@@ -1089,7 +1089,7 @@ class InventarioResource extends Resource
 
         // Filtro Departamento
         $deptoSearch = $searches['departamento'] ?? $searches['departamento_nombre'] ?? null;
-        if (filled($deptoSearch)) {
+        if (filled($deptoSearch) && strtoupper(trim((string) $deptoSearch)) !== 'TODOS') {
             $termDepto = '%' . trim((string) $deptoSearch) . '%';
             $invQuery->where(function (Builder $q) use ($termDepto) {
                 $q->whereHas('departamento', fn ($sub) => $sub->where('nombre', 'like', $termDepto))

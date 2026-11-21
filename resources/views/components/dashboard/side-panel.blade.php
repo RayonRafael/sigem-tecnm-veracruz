@@ -226,7 +226,10 @@
                 {{-- HEADER (MÚLTIPLES EQUIPOS) --}}
                 <div class="sigem-sel-header">
                     <div style="min-width: 0; flex: 1;">
-                        <div class="sigem-sel-header-title">{{ $cantSel }} equipos seleccionados</div>
+                        <div class="sigem-sel-header-title">
+                            {{ $cantSel }} equipos seleccionados
+                            <small style="font-weight: 400; font-size: 11.5px; color: var(--sig-muted);">(solo esta página)</small>
+                        </div>
                         <div class="sigem-sel-header-sub">Elige una acción para aplicarla a todos</div>
                     </div>
                     <button type="button" wire:click="deseleccionarTodos" class="sigem-sel-close-btn" title="Cerrar">✕</button>
