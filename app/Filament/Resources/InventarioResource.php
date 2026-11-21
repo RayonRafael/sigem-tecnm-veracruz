@@ -68,11 +68,7 @@ class InventarioResource extends Resource
         }
 
         return $form
-            ->schema([
-                Forms\Components\Tabs::make('Tabs')
-                    ->tabs(static::getEditFormTabs())
-                    ->columnSpanFull(),
-            ]);
+            ->schema(static::getEditFormTabs());
     }
 
     public static function getMockupFormSchema(): array
@@ -263,11 +259,14 @@ class InventarioResource extends Resource
             return $data;
         }
 
+        $data['codigo'] = $record->codigo ?: ('#' . $record->id_inventario);
         $data['nombre_equipo'] = $record->material?->nombre ?? $record->subtipo ?? '';
         $data['marca'] = $record->especificaciones['marca']
             ?? $record->especificaciones['cpu_marca']
             ?? $record->material?->marca?->nombre
             ?? '';
+        $data['departamento_id'] = $record->departamento_id ?? $record->area?->id_departamento;
+        $data['id_receptor'] = $record->id_receptor;
         $data['aula'] = $record->aula
             ?? $record->salon?->nombre
             ?? ($record->especificaciones['aula'] ?? null)
@@ -275,10 +274,10 @@ class InventarioResource extends Resource
             ?? '';
         $data['categoria_display'] = $record->material?->tipo?->nombre ?? $record->subtipo ?? 'General';
         $data['especificacion_texto'] = $record->especificacion_texto ?? ($record->especificaciones['especificaciones'] ?? '');
-        $data['procesador'] = $record->procesador ?? ($record->especificaciones['procesador'] ?? '—');
-        $data['ram'] = $record->ram ?? ($record->especificaciones['ram'] ?? '—');
-        $data['disco'] = $record->disco ?? ($record->especificaciones['disco'] ?? '—');
-        $data['sistema_operativo'] = $record->sistema_operativo ?? ($record->especificaciones['sistema_operativo'] ?? '—');
+        $data['procesador'] = $record->procesador ?? ($record->especificaciones['procesador'] ?? '');
+        $data['ram'] = $record->ram ?? ($record->especificaciones['ram'] ?? '');
+        $data['disco'] = $record->disco ?? ($record->especificaciones['disco'] ?? '');
+        $data['sistema_operativo'] = $record->sistema_operativo ?? ($record->especificaciones['sistema_operativo'] ?? '');
         $data['tipo_impresora'] = $record->tipo_impresora ?? ($record->especificaciones['tipo_impresora'] ?? '—');
         $data['num_puertos'] = $record->especificaciones['num_puertos'] ?? '—';
         $data['ip_address'] = $record->ip_address ?? ($record->especificaciones['ip_address'] ?? '');
@@ -407,13 +406,30 @@ class InventarioResource extends Resource
                 $record->especificaciones = $specs;
             }
 
-            // 5. Área
+            // 5. Departamento, Área y Receptor
+            if (isset($data['departamento_id']) && filled($data['departamento_id'])) {
+                $record->departamento_id = (int) $data['departamento_id'];
+            }
             if (isset($data['area_id']) && filled($data['area_id'])) {
                 $record->area_id = $data['area_id'];
                 $area = Area::find($data['area_id']);
                 if ($area && $area->id_departamento) {
                     $record->departamento_id = $area->id_departamento;
                 }
+            }
+            if (array_key_exists('id_receptor', $data)) {
+                $specs = $record->especificaciones ?? [];
+                if (filled($data['id_receptor'])) {
+                    $receptor = \App\Models\Receptor::find((int) $data['id_receptor']);
+                    if ($receptor) {
+                        $specs['id_receptor'] = $receptor->id_receptor;
+                        $specs['receptor_nombre'] = $receptor->nombre_completo;
+                    }
+                } else {
+                    unset($specs['id_receptor'], $specs['receptor_nombre']);
+                }
+                $record->especificaciones = $specs;
+                unset($data['id_receptor']);
             }
 
             // 6. Datos técnicos, modelo y número de serie

@@ -43,8 +43,6 @@ class ComponentCardsSchema
                                 ->dehydrated(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'pc')
                                 ->columnSpanFull(),
                         ]),
-
-                    static::getDatosTecnicosSection(dehydratedCondition: fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'pc'),
                 ])
                 ->columnSpanFull(),
 
@@ -136,8 +134,6 @@ class ComponentCardsSchema
                                 ->dehydrated(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'aio')
                                 ->columnSpanFull(),
                         ]),
-
-                    static::getDatosTecnicosSection(dehydratedCondition: fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'aio'),
                 ])
                 ->columnSpanFull(),
 
@@ -357,14 +353,6 @@ class ComponentCardsSchema
                                 ->dehydrated(fn (Forms\Get $get) => ! in_array($get('tipo_equipo') ?? 'pc', ['pc', 'aio']))
                                 ->columnSpanFull(),
                         ]),
-
-                    // Datos técnicos expandibles para Laptop o CPU individual
-                    static::getDatosTecnicosSection(dehydratedCondition: fn (Forms\Get $get) => in_array($get('tipo_equipo'), ['lap', 'cpu']))
-                        ->visible(fn (Forms\Get $get) => in_array($get('tipo_equipo'), ['lap', 'cpu'])),
-
-                    // Datos de red expandibles para Impresora o Switch de red
-                    static::getDatosRedSection(dehydratedCondition: fn (Forms\Get $get) => in_array($get('tipo_equipo'), ['imp', 'swi']))
-                        ->visible(fn (Forms\Get $get) => in_array($get('tipo_equipo'), ['imp', 'swi'])),
                 ])
                 ->columnSpanFull(),
         ];

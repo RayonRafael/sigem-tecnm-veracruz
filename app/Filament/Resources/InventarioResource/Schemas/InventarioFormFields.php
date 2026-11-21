@@ -4,39 +4,49 @@ namespace App\Filament\Resources\InventarioResource\Schemas;
 
 use App\Models\Inventario;
 use App\Models\MarcaMaterial;
+use App\Models\Receptor;
 use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 
 trait InventarioFormFields
 {
+    public static function getReceptorSelectField(): Forms\Components\Select
+    {
+        return Forms\Components\Select::make('id_receptor')
+            ->label('Receptor')
+            ->placeholder('Sin receptor asignado...')
+            ->options(fn (): array => Receptor::orderBy('nombre')
+                ->orderBy('apellido_paterno')
+                ->get()
+                ->mapWithKeys(fn (Receptor $r): array => [$r->id_receptor => $r->nombre_completo])
+                ->toArray())
+            ->searchable()
+            ->preload()
+            ->nullable()
+            ->prefixIcon('heroicon-m-user')
+            ->afterStateHydrated(function (Forms\Components\Select $component, ?Inventario $record): void {
+                if ($record && blank($component->getState())) {
+                    $component->state($record->id_receptor);
+                }
+            });
+    }
+
     protected static function getDatosTecnicosSection(
-        string $heading = '⚙️ Datos técnicos (opcional, se pueden capturar después)',
+        string $heading = '🔧 Especificaciones técnicas',
         ?\Closure $dehydratedCondition = null
     ): Forms\Components\Section {
         $fields = [
-            Forms\Components\TextInput::make('ip_address')
-                ->label('Dirección IP')
-                ->placeholder('192.168.1.__')
-                ->prefixIcon('heroicon-m-globe-alt')
-                ->maxLength(50),
-
-            Forms\Components\TextInput::make('mac_address')
-                ->label('Dirección MAC')
-                ->placeholder('AA:BB:CC:DD:EE:FF')
-                ->prefixIcon('heroicon-m-signal')
-                ->maxLength(50),
+            Forms\Components\TextInput::make('ram')
+                ->label('Memoria RAM')
+                ->placeholder('ej. 8 GB DDR4')
+                ->prefixIcon('heroicon-m-circle-stack')
+                ->maxLength(100),
 
             Forms\Components\TextInput::make('procesador')
                 ->label('Procesador')
                 ->placeholder('ej. Intel Core i5-8500')
                 ->prefixIcon('heroicon-m-cpu-chip')
-                ->maxLength(100),
-
-            Forms\Components\TextInput::make('ram')
-                ->label('Memoria RAM')
-                ->placeholder('ej. 8 GB DDR4')
-                ->prefixIcon('heroicon-m-circle-stack')
                 ->maxLength(100),
 
             Forms\Components\TextInput::make('disco')
@@ -50,6 +60,18 @@ trait InventarioFormFields
                 ->placeholder('ej. Windows 11 Pro')
                 ->prefixIcon('heroicon-m-computer-desktop')
                 ->maxLength(100),
+
+            Forms\Components\TextInput::make('ip_address')
+                ->label('Dirección IP')
+                ->placeholder('192.168.1.__')
+                ->prefixIcon('heroicon-m-globe-alt')
+                ->maxLength(50),
+
+            Forms\Components\TextInput::make('mac_address')
+                ->label('Dirección MAC')
+                ->placeholder('AA:BB:CC:DD:EE:FF')
+                ->prefixIcon('heroicon-m-signal')
+                ->maxLength(50),
         ];
 
         if ($dehydratedCondition) {
@@ -59,8 +81,7 @@ trait InventarioFormFields
         }
 
         return Forms\Components\Section::make($heading)
-            ->collapsible()
-            ->collapsed()
+            ->description('Detalles técnicos y de conectividad del equipo')
             ->schema([
                 Forms\Components\Grid::make(['default' => 1, 'sm' => 2])
                     ->schema($fields),
@@ -68,7 +89,7 @@ trait InventarioFormFields
     }
 
     protected static function getDatosRedSection(
-        string $heading = '🌐 Datos de red (opcional)',
+        string $heading = '🔧 Especificaciones técnicas (Red)',
         ?\Closure $dehydratedCondition = null
     ): Forms\Components\Section {
         $fields = [
@@ -92,8 +113,7 @@ trait InventarioFormFields
         }
 
         return Forms\Components\Section::make($heading)
-            ->collapsible()
-            ->collapsed()
+            ->description('Parámetros de conexión a la red institucional')
             ->schema([
                 Forms\Components\Grid::make(['default' => 1, 'sm' => 2])
                     ->schema($fields),

@@ -16,6 +16,15 @@ class Receptor extends Model
 
     protected $fillable = ['nombre', 'apellido_paterno', 'apellido_materno', 'tipo', 'num_control', 'cargo', 'email', 'telefono', 'id_area'];
 
+    public function getNombreCompletoAttribute(): string
+    {
+        return trim(implode(' ', array_filter([
+            $this->nombre,
+            $this->apellido_paterno,
+            $this->apellido_materno,
+        ])));
+    }
+
     public function area()
     {
         return $this->belongsTo(Area::class, 'id_area', 'id_area');

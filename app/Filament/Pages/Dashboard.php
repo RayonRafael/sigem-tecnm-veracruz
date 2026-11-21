@@ -269,11 +269,7 @@ class Dashboard extends BaseDashboard
                 $id = $arguments['id'] ?? $arguments['record'] ?? null;
                 return $id ? Inventario::with(['material.marca', 'material.tipo', 'area', 'salon'])->find($id) : null;
             })
-            ->form([
-                Tabs::make('Tabs')
-                    ->tabs(InventarioResource::getEditFormTabs())
-                    ->columnSpanFull(),
-            ])
+            ->form(InventarioResource::getEditFormTabs())
             ->slideOver()
             ->modalSubmitActionLabel('Guardar cambios')
             ->modalCancelActionLabel('Cancelar')

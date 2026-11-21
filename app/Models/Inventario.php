@@ -49,7 +49,7 @@ class Inventario extends Model
         'observaciones_generales', 'garantia_fecha_fin', 'garantia_estado',
         'aprobado', 'aprobado_por', 'fecha_aprobacion',
         'ram', 'disco', 'procesador', 'mac_address', 'ip_address',
-        'tipo_equipo', 'edificio_id', 'departamento_id', 'area_id', 'salon_id', 'aula',
+        'tipo_equipo', 'edificio_id', 'departamento_id', 'area_id', 'salon_id', 'aula', 'id_receptor',
         'codigo', 'estacion', 'tipo_impresora', 'sistema_operativo', 'modelo', 'especificacion_texto',
         'motivo_baja', 'observaciones_baja', 'id_usuario_baja', 'estado_previo_baja',
         'estado_previo_cambio', 'ubicacion_solicitada',
@@ -106,6 +106,11 @@ class Inventario extends Model
     public function proveedor()
     {
         return $this->belongsTo(Proveedor::class, 'id_proveedor', 'id_proveedor');
+    }
+
+    public function receptor()
+    {
+        return $this->belongsTo(Receptor::class, 'id_receptor', 'id_receptor');
     }
 
     public function aprobadoPor()
@@ -200,6 +205,34 @@ class Inventario extends Model
             unset($specs['edificio_id']);
         }
         $this->especificaciones = $specs;
+    }
+
+    public function getIdReceptorAttribute(): ?int
+    {
+        return isset($this->especificaciones['id_receptor']) && $this->especificaciones['id_receptor'] !== ''
+            ? (int) $this->especificaciones['id_receptor']
+            : null;
+    }
+
+    public function setIdReceptorAttribute($value): void
+    {
+        $specs = $this->especificaciones ?? [];
+        if ($value !== null && $value !== '') {
+            $receptorId = (int) $value;
+            $specs['id_receptor'] = $receptorId;
+            if ($receptor = Receptor::find($receptorId)) {
+                $specs['receptor_nombre'] = $receptor->nombre_completo;
+            }
+        } else {
+            unset($specs['id_receptor'], $specs['receptor_nombre']);
+        }
+        $this->especificaciones = $specs;
+    }
+
+    public function getReceptorNombreAttribute(): ?string
+    {
+        return $this->especificaciones['receptor_nombre']
+            ?? $this->receptor?->nombre_completo;
     }
 
     public function getDepartamentoIdAttribute(): ?int
