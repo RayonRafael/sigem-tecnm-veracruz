@@ -13,11 +13,31 @@ use App\Models\TipoMaterial;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class SigemReportExporter
 {
+    public const CACHE_VERSION_KEY = 'sigem_reportes_cache_ver';
+    public const CACHE_TTL_SECONDS = 300; // 5 minutos
+
+    /**
+     * Versión actual del caché de reportes para invalidación O(1).
+     */
+    public static function cacheVersion(): int
+    {
+        return (int) Cache::get(self::CACHE_VERSION_KEY, 1);
+    }
+
+    /**
+     * Invalida inmediatamente el caché de reportes incrementando la versión.
+     */
+    public static function clearCache(): void
+    {
+        $next = self::cacheVersion() + 1;
+        Cache::forever(self::CACHE_VERSION_KEY, $next);
+    }
     /**
      * Mapeo de alias cortos hacia IDs canónicos.
      */
@@ -61,358 +81,7 @@ class SigemReportExporter
      */
     public static function getCatalogo(): array
     {
-        return [
-            'inventario' => [
-                'inventario_general' => [
-                    'num' => 1,
-                    'id' => 'inventario_general',
-                    'alias' => 'inv_general',
-                    'categoria' => 'inventario',
-                    'titulo' => 'Inventario General',
-                    'descripcion' => 'Listado completo de todos los equipos registrados en el inventario con sus datos técnicos y de ubicación.',
-                    'icono' => '📋',
-                    'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Tipo', 'Marca', 'Modelo', 'Estado', 'Depto', 'Área', 'Aula', 'Serie'],
-                ],
-                'inventario_por_departamento' => [
-                    'num' => 2,
-                    'id' => 'inventario_por_departamento',
-                    'alias' => 'inv_depto',
-                    'categoria' => 'inventario',
-                    'titulo' => 'Por Departamento',
-                    'descripcion' => 'Concentrado cuantitativo de equipos agrupados por departamento, desglosando bienes propios y rentados.',
-                    'icono' => '🏢',
-                    'has_chart' => true,
-                    'chart_type' => 'bar',
-                    'chart_color' => '#1b65d4',
-                    'chart_horizontal' => true,
-                    'columnas' => ['Depto', 'Cantidad equipos', 'Propios', 'Rentados'],
-                ],
-                'inventario_por_area' => [
-                    'num' => 3,
-                    'id' => 'inventario_por_area',
-                    'alias' => 'inv_area',
-                    'categoria' => 'inventario',
-                    'titulo' => 'Por Área',
-                    'descripcion' => 'Distribución detallada de equipos en cada área académica y administrativa con su departamento.',
-                    'icono' => '🗂️',
-                    'has_chart' => false,
-                    'columnas' => ['Área', 'Depto', 'Cantidad equipos'],
-                ],
-                'inventario_por_tipo' => [
-                    'num' => 4,
-                    'id' => 'inventario_por_tipo',
-                    'alias' => 'inv_tipo',
-                    'categoria' => 'inventario',
-                    'titulo' => 'Por Tipo',
-                    'descripcion' => 'Clasificación de equipos según su tipo de material y régimen de propiedad patrimonial o rentado.',
-                    'icono' => '💻',
-                    'has_chart' => true,
-                    'chart_type' => 'doughnut',
-                    'chart_colors' => ['#1b65d4', '#0891b2', '#059669', '#d97706', '#8b5cf6', '#dc2626', '#64748b'],
-                    'columnas' => ['Tipo', 'Cantidad', 'Propios', 'Rentados'],
-                ],
-                'inventario_por_estado' => [
-                    'num' => 5,
-                    'id' => 'inventario_por_estado',
-                    'alias' => 'inv_estado',
-                    'categoria' => 'inventario',
-                    'titulo' => 'Por Estado',
-                    'descripcion' => 'Volumen y porcentaje de equipos según su estado operativo (Disponible, Asignado, En mantenimiento, etc.).',
-                    'icono' => '🔄',
-                    'has_chart' => true,
-                    'chart_type' => 'doughnut',
-                    'chart_colors' => ['#059669', '#1b65d4', '#d97706', '#dc2626', '#8b5cf6'],
-                    'columnas' => ['Estado', 'Cantidad', 'Porcentaje'],
-                ],
-                'inventario_por_aula' => [
-                    'num' => 6,
-                    'id' => 'inventario_por_aula',
-                    'alias' => 'inv_aula',
-                    'categoria' => 'inventario',
-                    'titulo' => 'Por Aula',
-                    'descripcion' => 'Concentrado de equipos localizados físicamente por aula, área y departamento institucional.',
-                    'icono' => '🏫',
-                    'has_chart' => false,
-                    'columnas' => ['Aula', 'Área', 'Depto', 'Cantidad'],
-                ],
-            ],
-
-            'estadisticas' => [
-                'estadisticas_antiguos' => [
-                    'num' => 7,
-                    'id' => 'estadisticas_antiguos',
-                    'alias' => 'est_antiguos',
-                    'categoria' => 'estadisticas',
-                    'titulo' => 'Más antiguos (Top 20)',
-                    'descripcion' => 'Los 20 equipos con mayor tiempo registrados en la institución según fecha de factura o registro.',
-                    'icono' => '⏳',
-                    'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Fecha compra', 'Depto', 'Estado'],
-                ],
-                'estadisticas_sin_asignar' => [
-                    'num' => 8,
-                    'id' => 'estadisticas_sin_asignar',
-                    'alias' => 'est_sin_asignar',
-                    'categoria' => 'estadisticas',
-                    'titulo' => 'Sin asignar',
-                    'descripcion' => 'Equipos disponibles en almacén o bodega sin departamento o área específica asignada.',
-                    'icono' => '📦',
-                    'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Tipo', 'Fecha registro'],
-                ],
-                'estadisticas_depto_mas_equipos' => [
-                    'num' => 9,
-                    'id' => 'estadisticas_depto_mas_equipos',
-                    'alias' => 'est_top_deptos',
-                    'categoria' => 'estadisticas',
-                    'titulo' => 'Depto con más equipos',
-                    'descripcion' => 'Ranking departamental ordenado por volumen de inventario y porcentaje respecto al total institucional.',
-                    'icono' => '🏆',
-                    'has_chart' => true,
-                    'chart_type' => 'bar',
-                    'chart_color' => '#1b65d4',
-                    'chart_horizontal' => true,
-                    'columnas' => ['Depto', 'Cantidad', '% del total'],
-                ],
-                'estadisticas_mas_movidos' => [
-                    'num' => 10,
-                    'id' => 'estadisticas_mas_movidos',
-                    'alias' => 'est_movidos',
-                    'categoria' => 'estadisticas',
-                    'titulo' => 'Más movidos',
-                    'descripcion' => 'Equipos con mayor número de reubicaciones y traslados registrados en el historial de estados.',
-                    'icono' => '🚚',
-                    'has_chart' => true,
-                    'chart_type' => 'bar',
-                    'chart_color' => '#1b65d4',
-                    'columnas' => ['Código', 'Equipo', 'Cantidad cambios', 'Último cambio'],
-                ],
-                'estadisticas_propio_vs_rentado' => [
-                    'num' => 11,
-                    'id' => 'estadisticas_propio_vs_rentado',
-                    'alias' => 'est_propiedad',
-                    'categoria' => 'estadisticas',
-                    'titulo' => 'Propio vs Rentado',
-                    'descripcion' => 'Comparativo cuantitativo y porcentual entre bienes patrimoniales y equipo en arrendamiento.',
-                    'icono' => '⚖️',
-                    'has_chart' => true,
-                    'chart_type' => 'pie',
-                    'chart_colors' => ['#1b65d4', '#059669'],
-                    'columnas' => ['Tipo', 'Cantidad', 'Porcentaje'],
-                ],
-                'estadisticas_resumen_general' => [
-                    'num' => 12,
-                    'id' => 'estadisticas_resumen_general',
-                    'alias' => 'est_resumen',
-                    'categoria' => 'estadisticas',
-                    'titulo' => 'Resumen general',
-                    'descripcion' => 'Indicadores consolidados con los totales globales de equipos, departamentos, áreas y usuarios.',
-                    'icono' => '📈',
-                    'has_chart' => false,
-                    'columnas' => ['Equipos', 'Deptos', 'Áreas', 'Usuarios', 'Propios', 'Rentados'],
-                ],
-            ],
-
-            'mantenimiento' => [
-                'mantenimiento_depto_pide_mas' => [
-                    'num' => 13,
-                    'id' => 'mantenimiento_depto_pide_mas',
-                    'alias' => 'mant_top_deptos',
-                    'categoria' => 'mantenimiento',
-                    'titulo' => 'Depto que pide más',
-                    'descripcion' => 'Departamentos con mayor volumen de solicitudes de mantenimiento, clasificadas por estado.',
-                    'icono' => '🛠️',
-                    'has_chart' => true,
-                    'chart_type' => 'bar',
-                    'chart_color' => '#dc2626',
-                    'chart_horizontal' => true,
-                    'columnas' => ['Depto', 'Solicitudes', 'Completadas', 'Pendientes'],
-                ],
-                'mantenimiento_tipo_mas_frecuente' => [
-                    'num' => 14,
-                    'id' => 'mantenimiento_tipo_mas_frecuente',
-                    'alias' => 'mant_top_tipos',
-                    'categoria' => 'mantenimiento',
-                    'titulo' => 'Tipo con más mantenimiento',
-                    'descripcion' => 'Tipos de equipo que demandan mayor frecuencia de atención y reparación técnica.',
-                    'icono' => '⚠️',
-                    'has_chart' => false,
-                    'columnas' => ['Tipo', 'Solicitudes', 'Frecuencia'],
-                ],
-                'mantenimiento_por_mes' => [
-                    'num' => 15,
-                    'id' => 'mantenimiento_por_mes',
-                    'alias' => 'mant_por_mes',
-                    'categoria' => 'mantenimiento',
-                    'titulo' => 'Por mes',
-                    'descripcion' => 'Comportamiento cronológico mensual del número de órdenes de servicio registradas.',
-                    'icono' => '📅',
-                    'has_chart' => true,
-                    'chart_type' => 'line',
-                    'chart_color' => '#ea580c',
-                    'columnas' => ['Mes', 'Año', 'Cantidad'],
-                ],
-                'mantenimiento_en_curso' => [
-                    'num' => 16,
-                    'id' => 'mantenimiento_en_curso',
-                    'alias' => 'mant_activos',
-                    'categoria' => 'mantenimiento',
-                    'titulo' => 'En mantenimiento',
-                    'descripcion' => 'Equipos que se encuentran actualmente bajo intervención técnica o pendientes de atención.',
-                    'icono' => '🔧',
-                    'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Depto', 'Fecha entrada'],
-                ],
-                'mantenimiento_tiempo_promedio' => [
-                    'num' => 17,
-                    'id' => 'mantenimiento_tiempo_promedio',
-                    'alias' => 'mant_tiempos',
-                    'categoria' => 'mantenimiento',
-                    'titulo' => 'Tiempo promedio',
-                    'descripcion' => 'Duración media, mínima y máxima en días para concluir los servicios de mantenimiento completados.',
-                    'icono' => '⏱️',
-                    'has_chart' => false,
-                    'columnas' => ['Tipo', 'Días promedio', 'Mín', 'Máx'],
-                ],
-                'mantenimiento_historial_equipo' => [
-                    'num' => 18,
-                    'id' => 'mantenimiento_historial_equipo',
-                    'alias' => 'mant_historial',
-                    'categoria' => 'mantenimiento',
-                    'titulo' => 'Historial por equipo',
-                    'descripcion' => 'Relación cronológica de todas las intervenciones técnicas realizadas a cada equipo registrado.',
-                    'icono' => '📑',
-                    'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Fecha', 'Tipo servicio', 'Estado'],
-                ],
-            ],
-
-            'rentas' => [
-                'rentas_equipos' => [
-                    'num' => 19,
-                    'id' => 'rentas_equipos',
-                    'alias' => 'rent_activas',
-                    'categoria' => 'rentas',
-                    'titulo' => 'Equipos en renta',
-                    'descripcion' => 'Catálogo completo de equipos en esquema de arrendamiento con proveedor y vigencia contractual.',
-                    'icono' => '💳',
-                    'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Proveedor', 'Fecha inicio', 'Fecha fin'],
-                ],
-                'rentas_proximas_vencer' => [
-                    'num' => 20,
-                    'id' => 'rentas_proximas_vencer',
-                    'alias' => 'rent_por_vencer',
-                    'categoria' => 'rentas',
-                    'titulo' => 'Próximas a vencer',
-                    'descripcion' => 'Arrendamientos con fecha de término en los próximos 90 días naturales para planeación de renovación.',
-                    'icono' => '🔔',
-                    'has_chart' => true,
-                    'chart_type' => 'pie',
-                    'chart_colors' => ['#059669', '#d97706', '#dc2626'],
-                    'columnas' => ['Código', 'Equipo', 'Proveedor', 'Fecha fin', 'Días restantes'],
-                ],
-                'rentas_vencidas' => [
-                    'num' => 21,
-                    'id' => 'rentas_vencidas',
-                    'alias' => 'rent_vencidas',
-                    'categoria' => 'rentas',
-                    'titulo' => 'Vencidas',
-                    'descripcion' => 'Contratos de arrendamiento cuya fecha límite ha expirado y requieren devolución o regularización.',
-                    'icono' => '🚨',
-                    'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Proveedor', 'Fecha fin', 'Días vencida'],
-                ],
-                'rentas_gasto_mensual' => [
-                    'num' => 22,
-                    'id' => 'rentas_gasto_mensual',
-                    'alias' => 'rent_gasto_mensual',
-                    'categoria' => 'rentas',
-                    'titulo' => 'Gasto mensual',
-                    'descripcion' => 'Concentrado mensual del parque vehicular de cómputo arrendado y estimación de gasto.',
-                    'icono' => '💰',
-                    'has_chart' => true,
-                    'chart_type' => 'line',
-                    'chart_color' => '#8b5cf6',
-                    'columnas' => ['Mes', 'Cantidad equipos', 'Costo estimado'],
-                ],
-                'rentas_por_proveedor' => [
-                    'num' => 23,
-                    'id' => 'rentas_por_proveedor',
-                    'alias' => 'rent_proveedores',
-                    'categoria' => 'rentas',
-                    'titulo' => 'Por proveedor',
-                    'descripcion' => 'Distribución de equipos en renta agrupados por empresa proveedora con fechas extremas.',
-                    'icono' => '🤝',
-                    'has_chart' => false,
-                    'columnas' => ['Proveedor', 'Equipos', 'Fecha más antigua', 'Fecha más reciente'],
-                ],
-            ],
-
-            'historico' => [
-                'historico_cambios_area' => [
-                    'num' => 24,
-                    'id' => 'historico_cambios_area',
-                    'alias' => 'hist_cambios_area',
-                    'categoria' => 'historico',
-                    'titulo' => 'Cambios de área',
-                    'descripcion' => 'Bitácora de movimientos y traslados de equipo entre diferentes áreas y departamentos.',
-                    'icono' => '🔄',
-                    'has_chart' => true,
-                    'chart_type' => 'line',
-                    'chart_color' => '#0891b2',
-                    'columnas' => ['Fecha', 'Equipo', 'Origen', 'Destino', 'Usuario'],
-                ],
-                'historico_bajas' => [
-                    'num' => 25,
-                    'id' => 'historico_bajas',
-                    'alias' => 'hist_bajas',
-                    'categoria' => 'historico',
-                    'titulo' => 'Bajas',
-                    'descripcion' => 'Relación de equipos dados de baja institucionalmente con su motivo y usuario dictaminador.',
-                    'icono' => '🗑️',
-                    'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Fecha baja', 'Motivo', 'Usuario'],
-                ],
-                'historico_entregas' => [
-                    'num' => 26,
-                    'id' => 'historico_entregas',
-                    'alias' => 'hist_entregas',
-                    'categoria' => 'historico',
-                    'titulo' => 'Entregas',
-                    'descripcion' => 'Historial de solicitudes de asignación y entrega autorizadas formalmente a personal receptor.',
-                    'icono' => '🤝',
-                    'has_chart' => false,
-                    'columnas' => ['Fecha', 'Equipo', 'Receptor', 'Depto'],
-                ],
-                'historico_actividad_usuario' => [
-                    'num' => 27,
-                    'id' => 'historico_actividad_usuario',
-                    'alias' => 'hist_actividad_usuario',
-                    'categoria' => 'historico',
-                    'titulo' => 'Actividad por usuario',
-                    'descripcion' => 'Conteo de acciones operativas, cambios y registros efectuados por cada cuenta de usuario.',
-                    'icono' => '👥',
-                    'has_chart' => true,
-                    'chart_type' => 'bar',
-                    'chart_color' => '#059669',
-                    'chart_horizontal' => true,
-                    'columnas' => ['Usuario', 'Acciones', 'Última actividad'],
-                ],
-                'historico_general' => [
-                    'num' => 28,
-                    'id' => 'historico_general',
-                    'alias' => 'hist_general',
-                    'categoria' => 'historico',
-                    'titulo' => 'Historial general',
-                    'descripcion' => 'Línea de tiempo cronológica completa de todas las transacciones de estado y ubicación del inventario.',
-                    'icono' => '📜',
-                    'has_chart' => false,
-                    'columnas' => ['Fecha', 'Equipo', 'Estado anterior', 'Estado nuevo', 'Motivo', 'Usuario'],
-                ],
-            ],
-        ];
+        return SigemReportCatalog::getCatalogo();
     }
 
     /**
@@ -420,13 +89,7 @@ class SigemReportExporter
      */
     public static function getSubpestanas(): array
     {
-        return [
-            'inventario' => '🏢 Inventario',
-            'estadisticas' => '📊 Estadísticas',
-            'mantenimiento' => '🔧 Mantenimiento',
-            'rentas' => '💰 Rentas',
-            'historico' => '📉 Histórico',
-        ];
+        return SigemReportCatalog::getSubpestanas();
     }
 
     /**
@@ -465,11 +128,44 @@ class SigemReportExporter
     }
 
     /**
-     * Ejecuta el query correspondiente al tipo de reporte y retorna su estructura con headers y rows.
+     * Ejecuta el query correspondiente al tipo de reporte (con caché de 5 min) y retorna su estructura.
      */
     public static function getReportData(string $tipo, array $filtros = []): array
     {
         $canonical = self::$aliasMap[$tipo] ?? $tipo;
+        $filtrosNorm = [
+            'fecha_desde' => ! empty($filtros['fecha_desde']) ? (string) $filtros['fecha_desde'] : '',
+            'fecha_hasta' => ! empty($filtros['fecha_hasta']) ? (string) $filtros['fecha_hasta'] : '',
+            'departamento_id' => ! empty($filtros['departamento_id']) ? (string) $filtros['departamento_id'] : '',
+        ];
+
+        $ver = self::cacheVersion();
+        $cacheKey = 'sigem_rep_v' . $ver . '_' . $canonical . '_' . md5(json_encode($filtrosNorm));
+
+        return Cache::remember($cacheKey, self::CACHE_TTL_SECONDS, function () use ($canonical, $filtrosNorm) {
+            return self::computeReportData($canonical, $filtrosNorm);
+        });
+    }
+
+    /**
+     * Catálogo de departamentos ordenado por nombre (cacheado con versión de reportes).
+     *
+     * @return array<int, string>
+     */
+    public static function getDepartamentosMap(): array
+    {
+        $ver = self::cacheVersion();
+
+        return Cache::remember("sigem_rep_deptos_v{$ver}", self::CACHE_TTL_SECONDS, function () {
+            return Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento')->toArray();
+        });
+    }
+
+    /**
+     * Construye el dataset de un reporte consultando la BD de forma optimizada (agregaciones SQL y eager loading).
+     */
+    protected static function computeReportData(string $canonical, array $filtros = []): array
+    {
         $meta = self::findReporte($canonical) ?? [
             'id' => $canonical,
             'titulo' => 'Reporte',
@@ -485,10 +181,12 @@ class SigemReportExporter
             // SUB-PESTAÑA 1: INVENTARIO (6 reportes)
             // ==========================================
             case 'inventario_general':
-                $q = Inventario::with(['material.marca', 'material.tipo', 'departamento', 'area', 'salon'])->orderBy('codigo');
+                $deptosMap = self::getDepartamentosMap();
+                $q = Inventario::with(['material.marca', 'material.tipo', 'area', 'salon'])->orderBy('codigo');
                 self::aplicarFiltrosInventario($q, $filtros);
 
                 foreach ($q->get() as $inv) {
+                    $deptoId = $inv->departamento_id ?? $inv->area?->id_departamento;
                     $rows[] = [
                         $inv->codigo ?: ('#' . $inv->id_inventario),
                         $inv->material?->nombre ?? $inv->subtipo ?? 'Equipo',
@@ -496,7 +194,7 @@ class SigemReportExporter
                         $inv->material?->marca?->nombre ?? ($inv->especificaciones['marca'] ?? '—'),
                         $inv->modelo ?? $inv->material?->modelo ?? '—',
                         $inv->estado ?? 'Disponible',
-                        $inv->departamento?->nombre ?? $inv->area?->departamento?->nombre ?? 'Sin depto',
+                        ($deptoId && isset($deptosMap[$deptoId])) ? $deptosMap[$deptoId] : 'Sin depto',
                         $inv->area?->nombre ?? 'Sin área',
                         $inv->aula_efectiva ?? ($inv->aula ?: ($inv->salon?->nombre ?? '—')),
                         $inv->num_serie ?: 'S/N',
@@ -505,86 +203,91 @@ class SigemReportExporter
                 break;
 
             case 'inventario_por_departamento':
-                $deptos = Departamento::with(['areas'])->orderBy('nombre')->get();
                 $deptoFiltro = ! empty($filtros['departamento_id']) ? (int) $filtros['departamento_id'] : null;
-
+                $deptosMap = self::getDepartamentosMap();
                 if ($deptoFiltro) {
-                    $deptos = $deptos->where('id_departamento', $deptoFiltro);
+                    $deptosMap = isset($deptosMap[$deptoFiltro]) ? [$deptoFiltro => $deptosMap[$deptoFiltro]] : [];
                 }
 
-                foreach ($deptos as $depto) {
-                    $baseQ = Inventario::where(function ($sub) use ($depto) {
-                        $sub->where('departamento_id', $depto->id_departamento)
-                            ->orWhereHas('area', fn ($aq) => $aq->where('id_departamento', $depto->id_departamento));
-                    });
-                    self::aplicarFiltroFechas($baseQ, $filtros);
-
-                    $total = (clone $baseQ)->count();
-                    $rentados = (clone $baseQ)->where('tipo_propiedad', 'Rentado')->count();
-                    $propios = $total - $rentados;
-
-                    $rows[] = [
-                        $depto->nombre,
-                        $total,
-                        $propios,
-                        $rentados,
-                    ];
+                // 1 sola consulta agregada en lugar de 2N queries en bucle
+                $statsQ = Inventario::query()
+                    ->leftJoin('area', 'inventario.area_id', '=', 'area.id_area')
+                    ->selectRaw("
+                        COALESCE(inventario.departamento_id, area.id_departamento) as depto_id,
+                        COUNT(*) as total,
+                        SUM(CASE WHEN inventario.tipo_propiedad = 'Rentado' THEN 1 ELSE 0 END) as rentados
+                    ")
+                    ->groupByRaw('COALESCE(inventario.departamento_id, area.id_departamento)');
+                self::aplicarFiltroFechas($statsQ, $filtros);
+                if ($deptoFiltro) {
+                    $statsQ->whereRaw('COALESCE(inventario.departamento_id, area.id_departamento) = ?', [$deptoFiltro]);
                 }
 
-                // Sin departamento
-                if (! $deptoFiltro) {
-                    $sinDeptoQ = Inventario::whereNull('departamento_id')->whereNull('area_id');
-                    self::aplicarFiltroFechas($sinDeptoQ, $filtros);
-                    $totalSin = (clone $sinDeptoQ)->count();
+                $statsByDepto = $statsQ->get()->keyBy(fn ($r) => $r->depto_id === null ? '__null__' : (int) $r->depto_id);
+
+                foreach ($deptosMap as $idDepto => $nombreDepto) {
+                    $stat = $statsByDepto->get((int) $idDepto);
+                    $total = (int) ($stat->total ?? 0);
+                    $rentados = (int) ($stat->rentados ?? 0);
+                    $rows[] = [$nombreDepto, $total, $total - $rentados, $rentados];
+                }
+
+                if (! $deptoFiltro && $statsByDepto->has('__null__')) {
+                    $statSin = $statsByDepto->get('__null__');
+                    $totalSin = (int) ($statSin->total ?? 0);
                     if ($totalSin > 0) {
-                        $rentadosSin = (clone $sinDeptoQ)->where('tipo_propiedad', 'Rentado')->count();
+                        $rentadosSin = (int) ($statSin->rentados ?? 0);
                         $rows[] = ['Sin departamento asignado', $totalSin, $totalSin - $rentadosSin, $rentadosSin];
                     }
                 }
                 break;
 
             case 'inventario_por_area':
-                $areasQ = Area::with('departamento')->orderBy('nombre');
+                $deptosMap = self::getDepartamentosMap();
+                $areasQ = Area::orderBy('nombre');
                 if (! empty($filtros['departamento_id'])) {
                     $areasQ->where('id_departamento', $filtros['departamento_id']);
                 }
+                $areas = $areasQ->get();
 
-                foreach ($areasQ->get() as $area) {
-                    $baseQ = Inventario::where('area_id', $area->id_area);
-                    self::aplicarFiltroFechas($baseQ, $filtros);
-                    $total = $baseQ->count();
+                // 1 sola consulta GROUP BY en lugar de N queries por área
+                $countsQ = Inventario::query()
+                    ->whereNotNull('area_id')
+                    ->selectRaw('area_id, COUNT(*) as total')
+                    ->groupBy('area_id');
+                self::aplicarFiltroFechas($countsQ, $filtros);
+                $countsByArea = $countsQ->pluck('total', 'area_id');
 
+                foreach ($areas as $area) {
                     $rows[] = [
                         $area->nombre,
-                        $area->departamento?->nombre ?? 'Sin depto',
-                        $total,
+                        ($area->id_departamento && isset($deptosMap[$area->id_departamento])) ? $deptosMap[$area->id_departamento] : 'Sin depto',
+                        (int) ($countsByArea[$area->id_area] ?? 0),
                     ];
                 }
                 break;
 
             case 'inventario_por_tipo':
                 $tipos = TipoMaterial::orderBy('nombre')->get();
-                $deptoFiltro = ! empty($filtros['departamento_id']) ? (int) $filtros['departamento_id'] : null;
+
+                // 1 sola consulta agregada con JOIN material en lugar de 2N queries whereHas
+                $statsQ = Inventario::query()
+                    ->join('material', 'inventario.id_producto', '=', 'material.id_producto')
+                    ->selectRaw("
+                        material.id_tipodematerial as tipo_id,
+                        COUNT(*) as total,
+                        SUM(CASE WHEN inventario.tipo_propiedad = 'Rentado' THEN 1 ELSE 0 END) as rentados
+                    ")
+                    ->groupBy('material.id_tipodematerial');
+                self::aplicarFiltrosInventario($statsQ, $filtros);
+                $statsByTipo = $statsQ->get()->keyBy('tipo_id');
 
                 foreach ($tipos as $tipoObj) {
-                    $baseQ = Inventario::whereHas('material', fn ($mq) => $mq->where('id_tipodematerial', $tipoObj->id_tipodematerial));
-                    if ($deptoFiltro) {
-                        $baseQ->where(function ($sub) use ($deptoFiltro) {
-                            $sub->where('departamento_id', $deptoFiltro)
-                                ->orWhereHas('area', fn ($aq) => $aq->where('id_departamento', $deptoFiltro));
-                        });
-                    }
-                    self::aplicarFiltroFechas($baseQ, $filtros);
-
-                    $total = (clone $baseQ)->count();
+                    $stat = $statsByTipo->get($tipoObj->id_tipodematerial);
+                    $total = (int) ($stat->total ?? 0);
                     if ($total > 0) {
-                        $rentados = (clone $baseQ)->where('tipo_propiedad', 'Rentado')->count();
-                        $rows[] = [
-                            $tipoObj->nombre,
-                            $total,
-                            $total - $rentados,
-                            $rentados,
-                        ];
+                        $rentados = (int) ($stat->rentados ?? 0);
+                        $rows[] = [$tipoObj->nombre, $total, $total - $rentados, $rentados];
                     }
                 }
                 break;
@@ -592,22 +295,22 @@ class SigemReportExporter
             case 'inventario_por_estado':
                 $baseQ = Inventario::query();
                 self::aplicarFiltrosInventario($baseQ, $filtros);
-                $totalGeneral = (clone $baseQ)->count();
 
-                $estados = ['Disponible', 'Asignado', 'En mantenimiento', 'En Mantenimiento', 'Cambio de área', 'Solicitud de baja', 'Dado de baja'];
-                $estadosDb = (clone $baseQ)->selectRaw('COALESCE(estado, "Disponible") as est, count(*) as cant')
-                    ->groupBy('est')
+                $estadosDb = $baseQ->selectRaw("COALESCE(estado, 'Disponible') as est, COUNT(*) as cant")
+                    ->groupByRaw("COALESCE(estado, 'Disponible')")
                     ->pluck('cant', 'est')
                     ->toArray();
+                $totalGeneral = array_sum($estadosDb);
 
                 foreach ($estadosDb as $estadoNom => $cant) {
                     $porcentaje = $totalGeneral > 0 ? round(($cant / $totalGeneral) * 100, 1) . '%' : '0%';
-                    $rows[] = [$estadoNom, $cant, $porcentaje];
+                    $rows[] = [$estadoNom, (int) $cant, $porcentaje];
                 }
                 break;
 
             case 'inventario_por_aula':
-                $baseQ = Inventario::with(['area.departamento', 'salon']);
+                $deptosMap = self::getDepartamentosMap();
+                $baseQ = Inventario::with(['area', 'salon']);
                 self::aplicarFiltrosInventario($baseQ, $filtros);
 
                 $equipos = $baseQ->get();
@@ -617,11 +320,12 @@ class SigemReportExporter
                     return "{$aula}|{$areaId}";
                 });
 
-                foreach ($agrupados as $clave => $grupo) {
+                foreach ($agrupados as $grupo) {
                     $primer = $grupo->first();
                     $aulaNom = $primer->aula_efectiva ?? ($primer->aula ?: ($primer->salon?->nombre ?? 'Sin aula'));
                     $areaNom = $primer->area?->nombre ?? 'Sin área';
-                    $deptoNom = $primer->departamento?->nombre ?? $primer->area?->departamento?->nombre ?? 'Sin depto';
+                    $deptoId = $primer->departamento_id ?? $primer->area?->id_departamento;
+                    $deptoNom = ($deptoId && isset($deptosMap[$deptoId])) ? $deptosMap[$deptoId] : 'Sin depto';
 
                     $rows[] = [
                         $aulaNom,
@@ -636,7 +340,7 @@ class SigemReportExporter
             // SUB-PESTAÑA 2: ESTADÍSTICAS (6 reportes)
             // ==========================================
             case 'estadisticas_antiguos':
-                $q = Inventario::with(['material', 'departamento', 'area']);
+                $q = Inventario::with(['material', 'departamento', 'area.departamento']);
                 self::aplicarFiltrosInventario($q, $filtros);
                 $q->orderByRaw('COALESCE(fecha_factura, fecha_registro, created_at) ASC')->limit(20);
 
@@ -673,21 +377,23 @@ class SigemReportExporter
                 break;
 
             case 'estadisticas_depto_mas_equipos':
-                $baseQ = Inventario::query();
-                self::aplicarFiltroFechas($baseQ, $filtros);
-                $totalGeneral = (clone $baseQ)->count();
+                // 1 sola consulta agregada en lugar de N queries por departamento
+                $statsQ = Inventario::query()
+                    ->leftJoin('area', 'inventario.area_id', '=', 'area.id_area')
+                    ->selectRaw('COALESCE(inventario.departamento_id, area.id_departamento) as depto_id, COUNT(*) as cant')
+                    ->groupByRaw('COALESCE(inventario.departamento_id, area.id_departamento)');
+                self::aplicarFiltroFechas($statsQ, $filtros);
 
-                $deptos = Departamento::all();
+                $countsByDepto = $statsQ->get();
+                $totalGeneral = (int) $countsByDepto->sum('cant');
+                $deptosMap = Departamento::pluck('nombre', 'id_departamento');
+
                 $ranking = [];
-                foreach ($deptos as $depto) {
-                    $cant = (clone $baseQ)->where(function ($sub) use ($depto) {
-                        $sub->where('departamento_id', $depto->id_departamento)
-                            ->orWhereHas('area', fn ($aq) => $aq->where('id_departamento', $depto->id_departamento));
-                    })->count();
-
-                    if ($cant > 0) {
+                foreach ($countsByDepto as $row) {
+                    if ($row->depto_id !== null && isset($deptosMap[$row->depto_id]) && (int) $row->cant > 0) {
+                        $cant = (int) $row->cant;
                         $pct = $totalGeneral > 0 ? round(($cant / $totalGeneral) * 100, 1) . '%' : '0%';
-                        $ranking[] = [$depto->nombre, $cant, $pct];
+                        $ranking[] = [$deptosMap[$row->depto_id], $cant, $pct];
                     }
                 }
 
@@ -696,40 +402,49 @@ class SigemReportExporter
                 break;
 
             case 'estadisticas_mas_movidos':
-                $historial = HistorialEstado::where(function ($q) {
-                    $q->where('motivo_cambio', 'like', '%área%')
-                        ->orWhere('motivo_cambio', 'like', '%ubicación%')
-                        ->orWhere('motivo_cambio', 'like', '%Cambio de área%')
-                        ->orWhere('motivo_cambio', 'like', '%Cambio%');
-                })->get();
+                // Agregación SQL + carga en bloque whereIn (elimina N+1 de find() en bucle)
+                $agg = HistorialEstado::query()
+                    ->where(function ($q) {
+                        $q->where('motivo_cambio', 'like', '%área%')
+                            ->orWhere('motivo_cambio', 'like', '%ubicación%')
+                            ->orWhere('motivo_cambio', 'like', '%Cambio de área%')
+                            ->orWhere('motivo_cambio', 'like', '%Cambio%');
+                    })
+                    ->selectRaw('id_inventario, COUNT(*) as cant, MAX(fecha_cambio) as ultimo_cambio')
+                    ->groupBy('id_inventario')
+                    ->orderByDesc('cant')
+                    ->limit(50)
+                    ->get();
 
-                $conteoPorEquipo = $historial->groupBy('id_inventario');
-                $items = [];
+                $ids = $agg->pluck('id_inventario')->filter()->all();
+                $inventariosMap = ! empty($ids)
+                    ? Inventario::with('material')->whereIn('id_inventario', $ids)->get()->keyBy('id_inventario')
+                    : collect();
 
-                foreach ($conteoPorEquipo as $idInv => $cambios) {
-                    $inv = Inventario::with('material')->find($idInv);
+                foreach ($agg as $row) {
+                    $inv = $inventariosMap->get($row->id_inventario);
                     if ($inv) {
-                        $ultimo = $cambios->sortByDesc('fecha_cambio')->first();
-                        $fechaUltimo = $ultimo?->fecha_cambio ? Carbon::parse($ultimo->fecha_cambio)->format('d/m/Y') : '—';
-                        $items[] = [
+                        $fechaUltimo = $row->ultimo_cambio ? Carbon::parse($row->ultimo_cambio)->format('d/m/Y') : '—';
+                        $rows[] = [
                             $inv->codigo ?: ('#' . $inv->id_inventario),
                             $inv->material?->nombre ?? $inv->subtipo ?? 'Equipo',
-                            $cambios->count(),
+                            (int) $row->cant,
                             $fechaUltimo,
                         ];
                     }
                 }
-
-                usort($items, fn ($a, $b) => $b[2] <=> $a[2]);
-                $rows = array_slice($items, 0, 50);
                 break;
 
             case 'estadisticas_propio_vs_rentado':
                 $baseQ = Inventario::query();
                 self::aplicarFiltrosInventario($baseQ, $filtros);
-                $totalGeneral = (clone $baseQ)->count();
+                $agg = $baseQ->selectRaw("
+                    COUNT(*) as total,
+                    SUM(CASE WHEN tipo_propiedad = 'Rentado' THEN 1 ELSE 0 END) as rentados
+                ")->first();
 
-                $rentados = (clone $baseQ)->where('tipo_propiedad', 'Rentado')->count();
+                $totalGeneral = (int) ($agg->total ?? 0);
+                $rentados = (int) ($agg->rentados ?? 0);
                 $propios = $totalGeneral - $rentados;
 
                 $pctPropios = $totalGeneral > 0 ? round(($propios / $totalGeneral) * 100, 1) . '%' : '0%';
@@ -744,8 +459,13 @@ class SigemReportExporter
             case 'estadisticas_resumen_general':
                 $baseQ = Inventario::query();
                 self::aplicarFiltrosInventario($baseQ, $filtros);
-                $totalEquipos = (clone $baseQ)->count();
-                $rentados = (clone $baseQ)->where('tipo_propiedad', 'Rentado')->count();
+                $agg = $baseQ->selectRaw("
+                    COUNT(*) as total,
+                    SUM(CASE WHEN tipo_propiedad = 'Rentado' THEN 1 ELSE 0 END) as rentados
+                ")->first();
+
+                $totalEquipos = (int) ($agg->total ?? 0);
+                $rentados = (int) ($agg->rentados ?? 0);
                 $propios = $totalEquipos - $rentados;
 
                 $totalDeptos = Departamento::count();
@@ -761,13 +481,14 @@ class SigemReportExporter
             // SUB-PESTAÑA 3: MANTENIMIENTO (6 reportes)
             // ==========================================
             case 'mantenimiento_depto_pide_mas':
-                $mants = Mantenimiento::with(['inventario.departamento', 'inventario.area.departamento'])->get();
+                $mantQ = Mantenimiento::with(['inventario.departamento', 'inventario.area.departamento']);
                 if (! empty($filtros['fecha_desde'])) {
-                    $mants = $mants->where('fecha_solicitud', '>=', Carbon::parse($filtros['fecha_desde'])->startOfDay());
+                    $mantQ->where('fecha_solicitud', '>=', Carbon::parse($filtros['fecha_desde'])->startOfDay());
                 }
                 if (! empty($filtros['fecha_hasta'])) {
-                    $mants = $mants->where('fecha_solicitud', '<=', Carbon::parse($filtros['fecha_hasta'])->endOfDay());
+                    $mantQ->where('fecha_solicitud', '<=', Carbon::parse($filtros['fecha_hasta'])->endOfDay());
                 }
+                $mants = $mantQ->get();
 
                 $agrupados = $mants->groupBy(function ($m) {
                     return $m->inventario?->departamento?->nombre
@@ -808,13 +529,14 @@ class SigemReportExporter
                 break;
 
             case 'mantenimiento_por_mes':
-                $mants = Mantenimiento::whereNotNull('fecha_solicitud')->get();
+                $mantQ = Mantenimiento::query()->select(['id_mantenimiento', 'fecha_solicitud'])->whereNotNull('fecha_solicitud');
                 if (! empty($filtros['fecha_desde'])) {
-                    $mants = $mants->where('fecha_solicitud', '>=', Carbon::parse($filtros['fecha_desde'])->startOfDay());
+                    $mantQ->where('fecha_solicitud', '>=', Carbon::parse($filtros['fecha_desde'])->startOfDay());
                 }
                 if (! empty($filtros['fecha_hasta'])) {
-                    $mants = $mants->where('fecha_solicitud', '<=', Carbon::parse($filtros['fecha_hasta'])->endOfDay());
+                    $mantQ->where('fecha_solicitud', '<=', Carbon::parse($filtros['fecha_hasta'])->endOfDay());
                 }
+                $mants = $mantQ->get();
 
                 $agrupados = $mants->groupBy(function ($m) {
                     $dt = Carbon::parse($m->fecha_solicitud);
@@ -1093,21 +815,26 @@ class SigemReportExporter
                 break;
 
             case 'historico_actividad_usuario':
-                $actividades = HistorialEstado::with('usuario')->get()->groupBy('id_usuario');
-                $datos = [];
+                // Agregación SQL directa: evita cargar todos los registros HistorialEstado en memoria
+                $agg = HistorialEstado::query()
+                    ->selectRaw('id_usuario, COUNT(*) as cant, MAX(fecha_cambio) as ultima_fecha')
+                    ->groupBy('id_usuario')
+                    ->orderByDesc('cant')
+                    ->get();
 
-                foreach ($actividades as $idUser => $grupo) {
-                    $user = $grupo->first()?->usuario;
-                    $nombre = $user?->name ?? ($idUser ? "Usuario #{$idUser}" : 'Sistema');
-                    $cant = $grupo->count();
-                    $ultimo = $grupo->sortByDesc('fecha_cambio')->first();
-                    $fechaUlt = $ultimo?->fecha_cambio ? Carbon::parse($ultimo->fecha_cambio)->format('d/m/Y H:i') : '—';
+                $userIds = $agg->pluck('id_usuario')->filter()->unique()->all();
+                $usersMap = ! empty($userIds)
+                    ? User::whereIn('id', $userIds)->pluck('name', 'id')
+                    : collect();
 
-                    $datos[] = [$nombre, $cant, $fechaUlt];
+                foreach ($agg as $row) {
+                    $idUser = $row->id_usuario;
+                    $nombre = ($idUser && isset($usersMap[$idUser]))
+                        ? $usersMap[$idUser]
+                        : ($idUser ? "Usuario #{$idUser}" : 'Sistema');
+                    $fechaUlt = $row->ultima_fecha ? Carbon::parse($row->ultima_fecha)->format('d/m/Y H:i') : '—';
+                    $rows[] = [$nombre, (int) $row->cant, $fechaUlt];
                 }
-
-                usort($datos, fn ($a, $b) => $b[1] <=> $a[1]);
-                $rows = $datos;
                 break;
 
             case 'historico_general':
@@ -1460,7 +1187,7 @@ class SigemReportExporter
         if (! empty($filtros['departamento_id'])) {
             $deptoId = (int) $filtros['departamento_id'];
             $query->where(function ($q) use ($deptoId) {
-                $q->where('departamento_id', $deptoId)
+                $q->where('inventario.departamento_id', $deptoId)
                     ->orWhereHas('area', fn ($aq) => $aq->where('id_departamento', $deptoId));
             });
         }
@@ -1469,23 +1196,23 @@ class SigemReportExporter
     }
 
     /**
-     * Aplica filtro de fechas por rango.
+     * Aplica filtro de fechas por rango (calificado con prefijo de tabla para compatibilidad con JOINs).
      */
-    protected static function aplicarFiltroFechas($query, array $filtros): void
+    protected static function aplicarFiltroFechas($query, array $filtros, string $tablePrefix = 'inventario'): void
     {
         if (! empty($filtros['fecha_desde'])) {
             $desde = Carbon::parse($filtros['fecha_desde'])->startOfDay();
-            $query->where(function ($q) use ($desde) {
-                $q->where('fecha_registro', '>=', $desde)
-                    ->orWhere('created_at', '>=', $desde);
+            $query->where(function ($q) use ($desde, $tablePrefix) {
+                $q->where("{$tablePrefix}.fecha_registro", '>=', $desde)
+                    ->orWhere("{$tablePrefix}.created_at", '>=', $desde);
             });
         }
 
         if (! empty($filtros['fecha_hasta'])) {
             $hasta = Carbon::parse($filtros['fecha_hasta'])->endOfDay();
-            $query->where(function ($q) use ($hasta) {
-                $q->where('fecha_registro', '<=', $hasta)
-                    ->orWhere('created_at', '<=', $hasta);
+            $query->where(function ($q) use ($hasta, $tablePrefix) {
+                $q->where("{$tablePrefix}.fecha_registro", '<=', $hasta)
+                    ->orWhere("{$tablePrefix}.created_at", '<=', $hasta);
             });
         }
     }

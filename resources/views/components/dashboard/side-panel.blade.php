@@ -72,9 +72,6 @@
                 $resumenEstados[$lbl]['count']++;
             }
 
-            $todasLasAreas = \App\Models\Area::orderBy('nombre')->pluck('nombre', 'id_area');
-            $todosLosDeptos = \App\Models\Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento');
-            $estadosEnum = \App\Enums\EstadoInventario::cases();
             $bajasSeleccionadas = \App\Support\SigemBajaFormatHelper::filtrarInventariosEnBaja($selectedRecords);
             $cantBajas = $bajasSeleccionadas->count();
 
@@ -82,17 +79,34 @@
             $deptoAct = $this->cambioDepartamentoId ?? '';
             $areaAct = $this->cambioNuevaAreaId ?? '';
 
-            $areasDisponibles = !empty($deptoAct)
+            // Carga perezosa de catálogos: solo consultar BD cuando se abre el formulario correspondiente
+            $necesitaCatalogos = in_array($curStep, ['cambiar', 'modificar'], true);
+            $todasLasAreas = $necesitaCatalogos
+                ? \App\Models\Area::orderBy('nombre')->pluck('nombre', 'id_area')
+                : collect();
+            $todosLosDeptos = $necesitaCatalogos
+                ? \App\Models\Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento')
+                : collect();
+            $estadosEnum = $necesitaCatalogos ? \App\Enums\EstadoInventario::cases() : [];
+
+            $areasDisponibles = ($necesitaCatalogos && !empty($deptoAct))
                 ? \App\Models\Area::where('id_departamento', $deptoAct)->orderBy('nombre')->pluck('nombre', 'id_area')
                 : $todasLasAreas;
 
-            $todosLosReceptores = \App\Models\Receptor::orderBy('nombre')->get()->mapWithKeys(function ($r) {
-                $nom = trim("{$r->nombre} {$r->apellido_paterno} {$r->apellido_materno}");
-                return [$r->id_receptor => ($nom ?: "Receptor #{$r->id_receptor}") . ($r->cargo ? " ({$r->cargo})" : '')];
-            });
+            $todosLosReceptores = ($curStep === 'cambiar' && in_array($estadoAct, ['Asignado', 'Reasignado'], true))
+                ? \App\Models\Receptor::orderBy('nombre')->get()->mapWithKeys(function ($r) {
+                    $nom = trim("{$r->nombre} {$r->apellido_paterno} {$r->apellido_materno}");
+                    return [$r->id_receptor => ($nom ?: "Receptor #{$r->id_receptor}") . ($r->cargo ? " ({$r->cargo})" : '')];
+                })
+                : collect();
 
-            $todosLosProveedores = \App\Models\Proveedor::orderBy('nombre_empresa')->pluck('nombre_empresa', 'id_proveedor');
-            $motivosBajaOpciones = \App\Support\SigemBajaFormatHelper::motivosBajaOptions();
+            $todosLosProveedores = ($curStep === 'cambiar' && $estadoAct === 'Devuelto a Proveedor')
+                ? \App\Models\Proveedor::orderBy('nombre_empresa')->pluck('nombre_empresa', 'id_proveedor')
+                : collect();
+
+            $motivosBajaOpciones = in_array($curStep, ['cambiar', 'baja'], true)
+                ? \App\Support\SigemBajaFormatHelper::motivosBajaOptions()
+                : [];
 
             // Calcular propiedad actual de los equipos seleccionados
             $propiedades = $selectedRecords->pluck('tipo_propiedad')->unique()->filter();

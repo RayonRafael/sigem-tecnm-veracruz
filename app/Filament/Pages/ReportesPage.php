@@ -3,21 +3,20 @@
 namespace App\Filament\Pages;
 
 use App\Enums\RoleEnum;
-use App\Models\Area;
 use App\Models\Departamento;
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
 use App\Models\Solicitud;
-use App\Models\TipoMaterial;
 use App\Support\SigemBajaFormatHelper;
 use App\Support\SigemExcelExporter;
+use App\Support\SigemLegacyReportBuilder;
 use App\Support\SigemPdfGenerator;
 use App\Support\SigemReportExporter;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use Spatie\Activitylog\Models\Activity;
+use Livewire\Attributes\Computed;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ReportesPage extends Page
@@ -444,15 +443,24 @@ class ReportesPage extends Page
         });
     }
 
-    public function getDepartamentosParaFiltros(): array
+    #[Computed]
+    public function departamentosParaFiltros(): array
     {
-        return Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento')->toArray();
+        return $this->getDepartamentosParaFiltros();
     }
 
-    public function getSolicitudesParaFormato(): \Illuminate\Support\Collection
+    public function getDepartamentosParaFiltros(): array
+    {
+        $ver = SigemReportExporter::cacheVersion();
+
+        return Cache::remember("sigem_rep_deptos_v{$ver}", SigemReportExporter::CACHE_TTL_SECONDS, function () {
+            return Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento')->toArray();
+        });
+    }
+
+    protected function baseQuerySolicitudesParaFormato()
     {
         $query = Solicitud::query()
-            ->with(['receptor.area.departamento', 'detalles.material'])
             ->where('estado', '!=', 'Rechazado')
             ->whereIn('tipo_movimiento', [
                 'Asignacion Permanente',
@@ -475,17 +483,27 @@ class ReportesPage extends Page
             $query->whereHas('receptor.area', fn ($a) => $a->where('id_departamento', $deptoId));
         }
 
-        return $query->orderByDesc('fecha_solicitud')
+        return $query;
+    }
+
+    public function getSolicitudesParaFormato(): \Illuminate\Support\Collection
+    {
+        return $this->baseQuerySolicitudesParaFormato()
+            ->with(['receptor.area.departamento', 'detalles.material'])
+            ->orderByDesc('fecha_solicitud')
             ->orderByDesc('id_solicitud')
             ->limit(100)
             ->get();
     }
 
-    protected function baseQueryMantenimientosParaFormato()
+    protected function baseQueryMantenimientosParaFormato(bool $withRelations = true)
     {
         $query = Mantenimiento::query()
-            ->with(['inventario.material', 'inventario.departamento', 'inventario.area.departamento'])
             ->where('estado', '!=', 'Cancelado');
+
+        if ($withRelations) {
+            $query->with(['inventario.material', 'inventario.departamento', 'inventario.area.departamento', 'usuarioSolicita']);
+        }
 
         if (! $this->esUsuarioAdminReportes()) {
             $query->where('id_usuario_solicita', auth()->id() ?? 0);
@@ -521,10 +539,9 @@ class ReportesPage extends Page
             ->get();
     }
 
-    public function getInventariosBajaParaFormato(): \Illuminate\Support\Collection
+    protected function baseQueryInventariosBajaParaFormato()
     {
         $query = Inventario::query()
-            ->with(['material.marca', 'departamento', 'area.departamento'])
             ->whereIn('estado', SigemBajaFormatHelper::ESTADOS_BAJA);
 
         $this->aplicarFiltroFechaFormato($query, 'fecha_baja');
@@ -532,16 +549,22 @@ class ReportesPage extends Page
         $deptoId = filled($this->formatoDepartamentoId) ? (int) $this->formatoDepartamentoId : null;
         $this->aplicarFiltroDeptoInventario($query, $deptoId);
 
-        return $query->orderByDesc('fecha_baja')
+        return $query;
+    }
+
+    public function getInventariosBajaParaFormato(): \Illuminate\Support\Collection
+    {
+        return $this->baseQueryInventariosBajaParaFormato()
+            ->with(['material.marca', 'departamento', 'area.departamento'])
+            ->orderByDesc('fecha_baja')
             ->orderByDesc('id_inventario')
             ->limit(SigemBajaFormatHelper::MAX_LOTE_BAJAS)
             ->get();
     }
 
-    public function getInventariosCambioAreaParaFormato(): \Illuminate\Support\Collection
+    protected function baseQueryInventariosCambioAreaParaFormato()
     {
         $query = Inventario::query()
-            ->with(['material.marca', 'departamento', 'area.departamento', 'salon'])
             ->where(function ($q) {
                 $q->whereNotNull('fecha_cambio_area')
                     ->orWhere('estado', 'Cambio de área')
@@ -553,10 +576,99 @@ class ReportesPage extends Page
         $deptoId = filled($this->formatoDepartamentoId) ? (int) $this->formatoDepartamentoId : null;
         $this->aplicarFiltroDeptoInventario($query, $deptoId);
 
-        return $query->orderByDesc('fecha_cambio_area')
+        return $query;
+    }
+
+    public function getInventariosCambioAreaParaFormato(): \Illuminate\Support\Collection
+    {
+        return $this->baseQueryInventariosCambioAreaParaFormato()
+            ->with(['material.marca', 'departamento', 'area.departamento', 'salon'])
+            ->orderByDesc('fecha_cambio_area')
             ->orderByDesc('id_inventario')
             ->limit(100)
             ->get();
+    }
+
+    /**
+     * Contadores ligeros para las pestañas de Formatos PDF (4 COUNT(*) cacheados en lugar de hidratar 5 colecciones completas).
+     *
+     * @return array{entrega: int, orden_trabajo: int, lista_verificacion: int, baja: int, cambio_area: int}
+     */
+    #[Computed]
+    public function conteosFormatos(): array
+    {
+        $ver = SigemReportExporter::cacheVersion();
+        $scope = $this->esUsuarioAdminReportes() ? 'admin' : ('u' . (auth()->id() ?? 0));
+        $hash = md5(json_encode([
+            $scope,
+            (string) $this->formatoFechaDesde,
+            (string) $this->formatoFechaHasta,
+            (string) $this->formatoDepartamentoId,
+        ]));
+
+        return Cache::remember("sigem_fmt_cnt_v{$ver}_{$hash}", SigemReportExporter::CACHE_TTL_SECONDS, function () {
+            $cntEntrega = min(100, (int) $this->baseQuerySolicitudesParaFormato()->count());
+            $cntMant = min(100, (int) $this->baseQueryMantenimientosParaFormato(false)->count());
+            $cntBaja = min(SigemBajaFormatHelper::MAX_LOTE_BAJAS, (int) $this->baseQueryInventariosBajaParaFormato()->count());
+            $cntCambio = min(100, (int) $this->baseQueryInventariosCambioAreaParaFormato()->count());
+
+            return [
+                'entrega' => $cntEntrega,
+                'orden_trabajo' => $cntMant,
+                'lista_verificacion' => $cntMant,
+                'baja' => $cntBaja,
+                'cambio_area' => $cntCambio,
+            ];
+        });
+    }
+
+    /**
+     * Filas normalizadas para la sub-pestaña "Filtrar formatos existentes" (carga solo el tipo seleccionado).
+     */
+    public function getFilasFiltradasFormatos(): \Illuminate\Support\Collection
+    {
+        return match ($this->formatoFiltroTipo) {
+            'entrega' => $this->getSolicitudesParaFormato()->map(fn ($s) => [
+                'tipo_nombre' => 'Entrega',
+                'tipo_clave' => 'entrega',
+                'id' => $s->id_solicitud,
+                'codigo' => 'FOLIO-' . str_pad((string) $s->id_solicitud, 5, '0', STR_PAD_LEFT),
+                'depto' => $s->receptor?->area?->departamento?->nombre ?? ($s->receptor?->area?->nombre ?? '—'),
+                'fecha' => $s->fecha_solicitud ? $s->fecha_solicitud->format('d/m/Y') : '—',
+            ]),
+            'orden_trabajo' => $this->getMantenimientosParaOrdenFormato()->map(fn ($m) => [
+                'tipo_nombre' => 'Orden de Trabajo',
+                'tipo_clave' => 'orden_trabajo',
+                'id' => $m->id_mantenimiento,
+                'codigo' => 'MANT-' . str_pad((string) $m->id_mantenimiento, 4, '0', STR_PAD_LEFT),
+                'depto' => $m->inventario?->departamento?->nombre ?? ($m->inventario?->area?->departamento?->nombre ?? '—'),
+                'fecha' => $m->fecha_solicitud ? $m->fecha_solicitud->format('d/m/Y') : '—',
+            ]),
+            'lista_verificacion' => $this->getMantenimientosParaVerificacionFormato()->map(fn ($m) => [
+                'tipo_nombre' => 'Lista Verificación',
+                'tipo_clave' => 'lista_verificacion',
+                'id' => $m->id_mantenimiento,
+                'codigo' => 'MANT-' . str_pad((string) $m->id_mantenimiento, 4, '0', STR_PAD_LEFT),
+                'depto' => $m->inventario?->departamento?->nombre ?? ($m->inventario?->area?->departamento?->nombre ?? '—'),
+                'fecha' => $m->fecha_fin ? $m->fecha_fin->format('d/m/Y') : ($m->fecha_solicitud ? $m->fecha_solicitud->format('d/m/Y') : '—'),
+            ]),
+            'cambio_area' => $this->getInventariosCambioAreaParaFormato()->map(fn ($c) => [
+                'tipo_nombre' => 'Cambio de Área',
+                'tipo_clave' => 'cambio_area',
+                'id' => $c->id_inventario,
+                'codigo' => $c->codigo ?: ($c->num_serie ?: ('#' . $c->id_inventario)),
+                'depto' => $c->departamento?->nombre ?? ($c->area?->departamento?->nombre ?? '—'),
+                'fecha' => $c->fecha_cambio_area ? Carbon::parse($c->fecha_cambio_area)->format('d/m/Y') : '—',
+            ]),
+            default => $this->getInventariosBajaParaFormato()->map(fn ($b) => [
+                'tipo_nombre' => 'Baja',
+                'tipo_clave' => 'baja',
+                'id' => $b->id_inventario,
+                'codigo' => $b->codigo ?: ($b->num_serie ?: ('#' . $b->id_inventario)),
+                'depto' => $b->departamento?->nombre ?? ($b->area?->departamento?->nombre ?? '—'),
+                'fecha' => $b->fecha_baja ? Carbon::parse($b->fecha_baja)->format('d/m/Y') : '—',
+            ]),
+        };
     }
 
     /**
@@ -711,529 +823,6 @@ class ReportesPage extends Page
 
     public function getDatosReporte(string $reportId, string $formato = 'pantalla'): ?array
     {
-        $fecha = Carbon::now()->format('d/m/Y H:i');
-
-        return match ($reportId) {
-            'inventario_categoria' => $this->generarReporteInventarioCategoria($fecha, $formato),
-            'equipos_area' => $this->generarReporteEquiposArea($fecha, $formato),
-            'equipos_mantenimiento' => $this->generarReporteEquiposMantenimiento($fecha, $formato),
-            'equipos_baja_danados' => $this->generarReporteEquiposBajaDanados($fecha, $formato),
-            'solicitudes_tipo_estado' => $this->generarReporteSolicitudes($fecha, $formato),
-            'movimientos_recientes' => $this->generarReporteMovimientos($fecha, $formato),
-            default => null,
-        };
-    }
-
-    protected function generarReporteInventarioCategoria(string $fecha, string $formato): array
-    {
-        $tipos = TipoMaterial::orderBy('nombre')->get();
-        $inventariosPorTipo = Inventario::join('material', 'inventario.id_producto', '=', 'material.id_producto')
-            ->select([
-                'inventario.id_inventario',
-                'inventario.tipo_propiedad',
-                'inventario.estado',
-                'inventario.estado_registro',
-                'material.id_tipodematerial',
-            ])
-            ->get()
-            ->groupBy('id_tipodematerial');
-        $rows = [];
-
-        if ($formato === 'csv') {
-            foreach ($tipos as $tipo) {
-                $inventarios = $inventariosPorTipo->get($tipo->id_tipodematerial, collect());
-
-                $total = $inventarios->count();
-                if ($total === 0) {
-                    continue;
-                }
-
-                $propios = $inventarios->where('tipo_propiedad', 'Propio')->count();
-                $rentados = $inventarios->where('tipo_propiedad', 'Rentado')->count();
-
-                $rows[] = [
-                    'categoria' => e($tipo->nombre),
-                    'total' => (string) $total,
-                    'propio' => (string) $propios,
-                    'renta' => (string) $rentados,
-                    'disponibles' => (string) $inventarios->where('estado', 'Disponible')->count(),
-                    'asignados' => (string) $inventarios->where('estado', 'Asignado')->count(),
-                    'mantenimiento' => (string) $inventarios->where('estado', 'En Mantenimiento')->count(),
-                    'danados' => (string) $inventarios->whereIn('estado', ['Dañado', 'Baja'])->count(),
-                ];
-            }
-
-            return [
-                'id' => 'inventario_categoria',
-                'emoji' => '📦',
-                'titulo' => 'Inventario por categoría',
-                'fecha' => $fecha,
-                'headers' => ['Categoría / Tipo', 'Total', 'Propio', 'Renta', 'Disponibles', 'Asignados', 'En Mantenimiento', 'Dañados / Baja'],
-                'rows' => $rows,
-            ];
-        }
-
-        // Formato Mockup (Pantalla / Excel): Categoría, Total, Disponible, En mantto, Asignado, Cambio área, Solicitud baja
-        foreach ($tipos as $tipo) {
-            $inventarios = $inventariosPorTipo->get($tipo->id_tipodematerial, collect());
-
-            $total = $inventarios->count();
-            if ($total === 0) {
-                continue;
-            }
-
-            $disp = $inventarios->where('estado', 'Disponible')->count();
-            $mantto = $inventarios->where('estado', 'En Mantenimiento')->count();
-            $asig = $inventarios->where('estado', 'Asignado')->count();
-            $cambio = $inventarios->where('estado', 'Reasignado')->count();
-            $baja = $inventarios->where(function ($i) {
-                return in_array($i->estado, ['Dañado', 'Baja']) || $i->estado_registro === 'Rechazado';
-            })->count();
-
-            if ($formato === 'xlsx') {
-                $rows[] = [
-                    'categoria' => $tipo->nombre,
-                    'total' => $total,
-                    'disponible' => $disp,
-                    'en_mantto' => $mantto,
-                    'asignado' => $asig,
-                    'cambio_area' => $cambio,
-                    'solicitud_baja' => $baja,
-                ];
-            } else {
-                $rows[] = [
-                    'categoria' => '<strong>' . e($tipo->nombre) . '</strong>',
-                    'total' => '<span class="sigem-td-folio">' . $total . '</span>',
-                    'disponible' => $this->renderBadgeConteo($disp, 'ok'),
-                    'en_mantto' => $this->renderBadgeConteo($mantto, 'warn'),
-                    'asignado' => $this->renderBadgeConteo($asig, 'info'),
-                    'cambio_area' => $this->renderBadgeConteo($cambio, 'neutral'),
-                    'solicitud_baja' => $this->renderBadgeConteo($baja, 'danger'),
-                ];
-            }
-        }
-
-        return [
-            'id' => 'inventario_categoria',
-            'emoji' => '📦',
-            'titulo' => 'Inventario por categoría',
-            'fecha' => $fecha,
-            'headers' => ['Categoría', 'Total', 'Disponible', 'En mantto', 'Asignado', 'Cambio área', 'Solicitud baja'],
-            'rows' => $rows,
-        ];
-    }
-
-    protected function generarReporteEquiposArea(string $fecha, string $formato): array
-    {
-        $areas = Area::with('departamento')->orderBy('nombre')->get();
-        $inventarios = Inventario::select(['id_inventario', 'area_id', 'ubicacion_fisica', 'especificaciones', 'tipo_propiedad', 'estado', 'estado_registro'])->get();
-        $rows = [];
-
-        if ($formato === 'csv') {
-            foreach ($areas as $area) {
-                $areaNombre = $area->nombre;
-                $areaIdStr = (string) $area->id_area;
-
-                $areaInventarios = $inventarios->filter(function ($inv) use ($areaNombre, $areaIdStr) {
-                    if ((string) ($inv->area_id ?? '') === $areaIdStr) {
-                        return true;
-                    }
-                    if ($inv->ubicacion_fisica && stripos($inv->ubicacion_fisica, $areaNombre) !== false) {
-                        return true;
-                    }
-                    $espec = is_array($inv->especificaciones) ? $inv->especificaciones : json_decode($inv->especificaciones ?? '[]', true);
-
-                    return isset($espec['area_id']) && (string) $espec['area_id'] === $areaIdStr;
-                });
-
-                $total = $areaInventarios->count();
-                if ($total === 0) {
-                    continue;
-                }
-
-                $propios = $areaInventarios->where('tipo_propiedad', 'Propio')->count();
-                $rentados = $areaInventarios->where('tipo_propiedad', 'Rentado')->count();
-
-                $rows[] = [
-                    'depto' => $area->departamento?->nombre ?? 'N/A',
-                    'area' => $area->nombre,
-                    'total' => (string) $total,
-                    'propio' => (string) $propios,
-                    'renta' => (string) $rentados,
-                    'disponibles' => (string) $areaInventarios->where('estado', 'Disponible')->count(),
-                    'asignados' => (string) $areaInventarios->where('estado', 'Asignado')->count(),
-                ];
-            }
-
-            return [
-                'id' => 'equipos_area',
-                'emoji' => '🏢',
-                'titulo' => 'Equipos por área',
-                'fecha' => $fecha,
-                'headers' => ['Departamento', 'Área', 'Total Activos', 'Propio', 'Renta', 'Disponibles', 'Asignados'],
-                'rows' => $rows,
-            ];
-        }
-
-        // Formato Mockup (Pantalla / Excel): Área, Total, Disponible, En mantto, Asignado, Cambio área, Solicitud baja
-        foreach ($areas as $area) {
-            $areaNombre = $area->nombre;
-            $areaIdStr = (string) $area->id_area;
-
-            $areaInventarios = $inventarios->filter(function ($inv) use ($areaNombre, $areaIdStr) {
-                if ((string) ($inv->area_id ?? '') === $areaIdStr) {
-                    return true;
-                }
-                if ($inv->ubicacion_fisica && stripos($inv->ubicacion_fisica, $areaNombre) !== false) {
-                    return true;
-                }
-                $espec = is_array($inv->especificaciones) ? $inv->especificaciones : json_decode($inv->especificaciones ?? '[]', true);
-
-                return isset($espec['area_id']) && (string) $espec['area_id'] === $areaIdStr;
-            });
-
-            $total = $areaInventarios->count();
-            if ($total === 0) {
-                continue;
-            }
-
-            $disp = $areaInventarios->where('estado', 'Disponible')->count();
-            $mantto = $areaInventarios->where('estado', 'En Mantenimiento')->count();
-            $asig = $areaInventarios->where('estado', 'Asignado')->count();
-            $cambio = $areaInventarios->where('estado', 'Reasignado')->count();
-            $baja = $areaInventarios->where(function ($i) {
-                return in_array($i->estado, ['Dañado', 'Baja']) || $i->estado_registro === 'Rechazado';
-            })->count();
-
-            if ($formato === 'xlsx') {
-                $rows[] = [
-                    'area' => $area->nombre . ($area->departamento ? ' (' . $area->departamento->nombre . ')' : ''),
-                    'total' => $total,
-                    'disponible' => $disp,
-                    'en_mantto' => $mantto,
-                    'asignado' => $asig,
-                    'cambio_area' => $cambio,
-                    'solicitud_baja' => $baja,
-                ];
-            } else {
-                $rows[] = [
-                    'area' => '<strong>' . e($area->nombre) . '</strong>' . ($area->departamento ? '<div style="font-size:12px;color:var(--sig-muted);">' . e($area->departamento->nombre) . '</div>' : ''),
-                    'total' => '<span class="sigem-td-folio">' . $total . '</span>',
-                    'disponible' => $this->renderBadgeConteo($disp, 'ok'),
-                    'en_mantto' => $this->renderBadgeConteo($mantto, 'warn'),
-                    'asignado' => $this->renderBadgeConteo($asig, 'info'),
-                    'cambio_area' => $this->renderBadgeConteo($cambio, 'neutral'),
-                    'solicitud_baja' => $this->renderBadgeConteo($baja, 'danger'),
-                ];
-            }
-        }
-
-        return [
-            'id' => 'equipos_area',
-            'emoji' => '🏢',
-            'titulo' => 'Equipos por área',
-            'fecha' => $fecha,
-            'headers' => ['Área', 'Total', 'Disponible', 'En mantto', 'Asignado', 'Cambio área', 'Solicitud baja'],
-            'rows' => $rows,
-        ];
-    }
-
-    protected function generarReporteEquiposMantenimiento(string $fecha, string $formato): array
-    {
-        $mantenimientos = Mantenimiento::with(['inventario.material.tipo', 'inventario.area', 'inventario.salon'])->latest('fecha_solicitud')->get();
-        $rows = [];
-
-        if ($formato === 'csv') {
-            foreach ($mantenimientos as $m) {
-                $esPropio = ($m->inventario?->tipo_propiedad ?? 'Propio') === 'Propio';
-                $badgePropiedad = $esPropio ? 'Propio' : 'Rentado';
-
-                $rows[] = [
-                    'serie' => $m->inventario?->num_serie ?? 'S/N',
-                    'equipo' => $m->inventario?->material?->nombre ?? 'N/A',
-                    'propiedad' => $badgePropiedad,
-                    'servicio' => $m->tipo_servicio,
-                    'mantenimiento' => $m->tipo_mantenimiento,
-                    'tecnico' => $m->nombre_tecnico,
-                    'fecha' => $m->fecha_solicitud ? $m->fecha_solicitud->format('d/m/Y') : 'N/A',
-                    'estado' => $m->estado,
-                ];
-            }
-
-            return [
-                'id' => 'equipos_mantenimiento',
-                'emoji' => '🔧',
-                'titulo' => 'Equipos en mantenimiento',
-                'fecha' => $fecha,
-                'headers' => ['No. Serie', 'Equipo / Material', 'Propiedad', 'Servicio', 'Tipo', 'Técnico', 'Fecha', 'Estado'],
-                'rows' => $rows,
-            ];
-        }
-
-        // Formato Mockup (Pantalla / Excel): Código, Equipo, Categoría, Área, Aula
-        foreach ($mantenimientos as $m) {
-            $inv = $m->inventario;
-            $espec = is_array($inv?->especificaciones) ? $inv->especificaciones : json_decode($inv?->especificaciones ?? '[]', true);
-            $aula = $inv?->aula ?? $inv?->salon?->nombre ?? ($espec['aula'] ?? '—');
-            $codigo = $inv?->codigo ?: ($inv?->num_serie ?: ('#' . $m->id_inventario));
-            $equipo = $inv?->material?->nombre ?? $inv?->subtipo ?? 'N/A';
-            $categoria = $inv?->material?->tipo?->nombre ?? $inv?->subtipo ?? 'General';
-            $area = $inv?->area?->nombre ?? ($inv?->ubicacion_fisica ?: 'Centro de Cómputo');
-
-            if ($formato === 'xlsx') {
-                $rows[] = [
-                    'codigo' => $codigo,
-                    'equipo' => $equipo,
-                    'categoria' => $categoria,
-                    'area' => $area,
-                    'aula' => $aula,
-                ];
-            } else {
-                $rows[] = [
-                    'codigo' => '<span class="sigem-td-folio">' . e($codigo) . '</span>',
-                    'equipo' => '<strong>' . e($equipo) . '</strong>',
-                    'categoria' => '<span class="sigem-pill neutral">' . e($categoria) . '</span>',
-                    'area' => e($area),
-                    'aula' => '<span class="sigem-td-folio">' . e($aula) . '</span>',
-                ];
-            }
-        }
-
-        return [
-            'id' => 'equipos_mantenimiento',
-            'emoji' => '🔧',
-            'titulo' => 'Equipos en mantenimiento',
-            'fecha' => $fecha,
-            'headers' => ['Código', 'Equipo', 'Categoría', 'Área', 'Aula'],
-            'rows' => $rows,
-        ];
-    }
-
-    protected function generarReporteEquiposBajaDanados(string $fecha, string $formato): array
-    {
-        $inventarios = Inventario::with(['material.tipo', 'area'])
-            ->where(function ($q) {
-                $q->whereIn('estado', ['Dañado', 'Baja'])
-                    ->orWhere('estado_registro', 'Rechazado');
-            })
-            ->latest('updated_at')
-            ->get();
-
-        $rows = [];
-
-        if ($formato === 'csv') {
-            foreach ($inventarios as $i) {
-                $fFecha = $i->fecha_baja ? $i->fecha_baja->format('d/m/Y') : ($i->fecha_registro ? $i->fecha_registro->format('d/m/Y') : 'N/A');
-                $rows[] = [
-                    'serie' => $i->num_serie ?? 'S/N',
-                    'material' => $i->material?->nombre ?? 'N/A',
-                    'propiedad' => $i->tipo_propiedad ?? 'Propio',
-                    'ubicacion' => $i->ubicacion_fisica ?? 'No especificada',
-                    'estado' => $i->estado,
-                    'registro' => $i->estado_registro ?? 'Pendiente',
-                    'fecha' => $fFecha,
-                ];
-            }
-
-            return [
-                'id' => 'equipos_baja_danados',
-                'emoji' => '⚠️',
-                'titulo' => 'Equipos con solicitud de baja',
-                'fecha' => $fecha,
-                'headers' => ['No. Serie', 'Material', 'Propiedad', 'Ubicación', 'Estado', 'Registro', 'Fecha'],
-                'rows' => $rows,
-            ];
-        }
-
-        // Formato Mockup (Pantalla / Excel): Código, Equipo, Categoría, Área, Último movimiento
-        foreach ($inventarios as $i) {
-            $fFecha = $i->fecha_baja ? $i->fecha_baja->format('d/m/Y') : ($i->updated_at ? $i->updated_at->format('d/m/Y') : 'N/A');
-            $codigo = $i->codigo ?: ($i->num_serie ?: ('#' . $i->id_inventario));
-            $equipo = $i->material?->nombre ?? $i->subtipo ?? 'N/A';
-            $categoria = $i->material?->tipo?->nombre ?? $i->subtipo ?? 'General';
-            $area = $i->area?->nombre ?? ($i->ubicacion_fisica ?: 'Centro de Cómputo');
-
-            if ($formato === 'xlsx') {
-                $rows[] = [
-                    'codigo' => $codigo,
-                    'equipo' => $equipo,
-                    'categoria' => $categoria,
-                    'area' => $area,
-                    'ultimo_movimiento' => $fFecha,
-                ];
-            } else {
-                $rows[] = [
-                    'codigo' => '<span class="sigem-td-folio">' . e($codigo) . '</span>',
-                    'equipo' => '<strong>' . e($equipo) . '</strong>',
-                    'categoria' => '<span class="sigem-pill neutral">' . e($categoria) . '</span>',
-                    'area' => e($area),
-                    'ultimo_movimiento' => '<span class="sigem-td-folio">' . e($fFecha) . '</span>',
-                ];
-            }
-        }
-
-        return [
-            'id' => 'equipos_baja_danados',
-            'emoji' => '⚠️',
-            'titulo' => 'Equipos con solicitud de baja',
-            'fecha' => $fecha,
-            'headers' => ['Código', 'Equipo', 'Categoría', 'Área', 'Último movimiento'],
-            'rows' => $rows,
-        ];
-    }
-
-    protected function generarReporteSolicitudes(string $fecha, string $formato): array
-    {
-        $solicitudes = Solicitud::with(['usuario', 'receptor.area.departamento'])->latest('fecha_solicitud')->get();
-        $rows = [];
-
-        if ($formato === 'csv') {
-            foreach ($solicitudes as $s) {
-                $rows[] = [
-                    'folio' => 'FOLIO-' . str_pad($s->id_solicitud, 5, '0', STR_PAD_LEFT),
-                    'tipo' => (string) $s->tipo_movimiento,
-                    'solicitante' => $s->usuario?->name ?? 'N/A',
-                    'receptor' => $s->receptor?->nombre ?? 'N/A',
-                    'departamento' => $s->receptor?->area?->departamento?->nombre ?? 'N/A',
-                    'fecha' => $s->fecha_solicitud ? $s->fecha_solicitud->format('d/m/Y') : 'N/A',
-                    'estado' => (string) $s->estado,
-                ];
-            }
-
-            return [
-                'id' => 'solicitudes_tipo_estado',
-                'emoji' => '📋',
-                'titulo' => 'Solicitudes de material',
-                'fecha' => $fecha,
-                'headers' => ['Folio', 'Tipo Movimiento', 'Solicitante', 'Receptor', 'Departamento', 'Fecha', 'Estado'],
-                'rows' => $rows,
-            ];
-        }
-
-        // Formato Mockup (Pantalla / Excel): Tipo, Pendiente, Autorizado, Entregado, Rechazado, Total
-        $tiposMov = [
-            'Salida' => ['Salida', 'Asignacion Permanente'],
-            'Entrada' => ['Entrada', 'Asignacion Temporal'],
-            'Traslado' => ['Traslado', 'Renta Externa'],
-        ];
-
-        foreach ($tiposMov as $tipoVisual => $matchingKeys) {
-            $grupo = $solicitudes->filter(fn ($s) => in_array($s->tipo_movimiento, $matchingKeys));
-            $pend = $grupo->where('estado', 'Pendiente')->count();
-            $aut = $grupo->where('estado', 'Autorizado')->count();
-            $ent = $grupo->where('estado', 'Entregado')->count();
-            $rech = $grupo->whereIn('estado', ['Rechazado', 'Cancelado'])->count();
-            $tot = $grupo->count();
-
-            if ($formato === 'xlsx') {
-                $rows[] = [
-                    'tipo' => $tipoVisual,
-                    'pendiente' => $pend,
-                    'autorizado' => $aut,
-                    'entregado' => $ent,
-                    'rechazado' => $rech,
-                    'total' => $tot,
-                ];
-            } else {
-                $rows[] = [
-                    'tipo' => '<strong>' . e($tipoVisual) . '</strong>',
-                    'pendiente' => $this->renderBadgeConteo($pend, 'warn'),
-                    'autorizado' => $this->renderBadgeConteo($aut, 'ok'),
-                    'entregado' => $this->renderBadgeConteo($ent, 'info'),
-                    'rechazado' => $this->renderBadgeConteo($rech, 'danger'),
-                    'total' => '<span class="sigem-td-folio">' . $tot . '</span>',
-                ];
-            }
-        }
-
-        return [
-            'id' => 'solicitudes_tipo_estado',
-            'emoji' => '📋',
-            'titulo' => 'Solicitudes de material',
-            'fecha' => $fecha,
-            'headers' => ['Tipo', 'Pendiente', 'Autorizado', 'Entregado', 'Rechazado', 'Total'],
-            'rows' => $rows,
-        ];
-    }
-
-    protected function generarReporteMovimientos(string $fecha, string $formato): array
-    {
-        $activities = Activity::with('causer')->latest()->limit(50)->get();
-        $rows = [];
-
-        if ($formato === 'csv') {
-            foreach ($activities as $a) {
-                $rows[] = [
-                    'fecha' => $a->created_at ? $a->created_at->format('d/m/Y H:i') : 'N/A',
-                    'usuario' => $a->causer?->name ?? 'Sistema',
-                    'accion' => $a->event ?? $a->description ?? 'evento',
-                    'modulo' => class_basename($a->subject_type ?? 'Sistema'),
-                    'descripcion' => $a->description ?? 'Sin detalles',
-                ];
-            }
-
-            return [
-                'id' => 'movimientos_recientes',
-                'emoji' => '📝',
-                'titulo' => 'Movimientos SS',
-                'fecha' => $fecha,
-                'headers' => ['Fecha y Hora', 'Usuario', 'Acción', 'Módulo', 'Descripción'],
-                'rows' => $rows,
-            ];
-        }
-
-        // Formato Mockup (Pantalla / Excel): Fecha, Usuario, Acción, Detalle
-        foreach ($activities as $a) {
-            $fFecha = $a->created_at ? $a->created_at->format('d/m/Y H:i') : 'N/A';
-            $usuario = $a->causer?->name ?? 'Sistema';
-            $accion = ucfirst($a->event ?? $a->description ?? 'Actividad');
-            $detalle = $a->description ?? 'Sin detalle adicional';
-
-            if ($formato === 'xlsx') {
-                $rows[] = [
-                    'fecha' => $fFecha,
-                    'usuario' => $usuario,
-                    'accion' => $accion,
-                    'detalle' => $detalle,
-                ];
-            } else {
-                $rows[] = [
-                    'fecha' => '<span class="sigem-td-folio">' . e($fFecha) . '</span>',
-                    'usuario' => '<strong>' . e($usuario) . '</strong>',
-                    'accion' => $this->renderBadgeAccion($accion),
-                    'detalle' => e($detalle),
-                ];
-            }
-        }
-
-        return [
-            'id' => 'movimientos_recientes',
-            'emoji' => '📝',
-            'titulo' => 'Movimientos SS',
-            'fecha' => $fecha,
-            'headers' => ['Fecha', 'Usuario', 'Acción', 'Detalle'],
-            'rows' => $rows,
-        ];
-    }
-
-    protected function renderBadgeConteo(int $conteo, string $tipo): string
-    {
-        if ($conteo === 0) {
-            return '<span style="color:var(--sig-muted)">0</span>';
-        }
-
-        return '<span class="sigem-pill ' . $tipo . '">' . $conteo . '</span>';
-    }
-
-    protected function renderBadgeAccion(string $evento): string
-    {
-        $tipo = match (strtolower($evento)) {
-            'created', 'creado', 'alta' => 'ok',
-            'updated', 'actualizado', 'modificado' => 'info',
-            'deleted', 'eliminado', 'baja' => 'danger',
-            default => 'neutral',
-        };
-
-        return '<span class="sigem-pill ' . $tipo . '">' . e(ucfirst($evento)) . '</span>';
+        return SigemLegacyReportBuilder::generar($reportId, $formato);
     }
 }

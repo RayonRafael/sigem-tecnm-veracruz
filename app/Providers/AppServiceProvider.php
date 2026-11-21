@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Area;
 use App\Models\Departamento;
+use App\Models\HistorialEstado;
 use App\Models\Inventario;
 use App\Models\Mantenimiento;
 use App\Models\MarcaMaterial;
@@ -17,6 +18,7 @@ use App\Models\User;
 use App\Observers\InventarioObserver;
 use App\Observers\MantenimientoObserver;
 use App\Observers\SolicitudObserver;
+use App\Support\SigemReportExporter;
 use App\Policies\AreaPolicy;
 use App\Policies\DepartamentoPolicy;
 use App\Policies\InventarioPolicy;
@@ -82,6 +84,25 @@ class AppServiceProvider extends ServiceProvider
         Inventario::observe(InventarioObserver::class);
         Mantenimiento::observe(MantenimientoObserver::class);
         Solicitud::observe(SolicitudObserver::class);
+
+        // Invalidación automática O(1) del caché de reportes ante cambios en modelos fuente
+        $invalidateReportsCache = static function (): void {
+            SigemReportExporter::clearCache();
+        };
+        foreach ([
+            Inventario::class,
+            Mantenimiento::class,
+            Solicitud::class,
+            HistorialEstado::class,
+            Departamento::class,
+            Area::class,
+            TipoMaterial::class,
+            Proveedor::class,
+            Material::class,
+        ] as $modelClass) {
+            $modelClass::saved($invalidateReportsCache);
+            $modelClass::deleted($invalidateReportsCache);
+        }
 
         Event::listen(function (Attempting $event) {
             $panel = Filament::getCurrentPanel();

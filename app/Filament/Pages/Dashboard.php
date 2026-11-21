@@ -349,15 +349,14 @@ class Dashboard extends BaseDashboard
         $inventarioDadosDeBaja = (int) ($inventarioStats->dados_de_baja ?? 0);
         $creadosEsteMes = (int) ($inventarioStats->creados_este_mes ?? 0);
 
-        // 2. Estadísticas de Mantenimiento
-        $mantenimientosPendientes = Mantenimiento::toBase()
-            ->whereIn('estado', ['Pendiente Revision Admin', 'Solicitado'])
-            ->count();
-
-        // 3. Estadísticas de Solicitudes
-        $solicitudesPendientes = Solicitud::toBase()
-            ->where('estado', 'Pendiente')
-            ->count();
+        // 2 & 3. Estadísticas de Mantenimiento y Solicitudes en 1 sola consulta escalar
+        $pendientesStats = \Illuminate\Support\Facades\DB::selectOne("
+            SELECT
+                (SELECT COUNT(*) FROM mantenimiento WHERE estado IN ('Pendiente Revision Admin', 'Solicitado')) as mant_pendientes,
+                (SELECT COUNT(*) FROM solicitud WHERE estado = 'Pendiente') as sol_pendientes
+        ");
+        $mantenimientosPendientes = (int) ($pendientesStats->mant_pendientes ?? 0);
+        $solicitudesPendientes = (int) ($pendientesStats->sol_pendientes ?? 0);
 
         // 4. Materiales con Stock Bajo (Usa el scope derivado)
         $materialesStockBajoCount = Material::stockBajo()->count();

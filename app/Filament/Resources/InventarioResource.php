@@ -11,6 +11,7 @@ use App\Models\Inventario;
 use App\Models\MarcaMaterial;
 use App\Models\Salon;
 use App\Models\TipoMaterial;
+use App\Support\SigemReportExporter;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
@@ -22,6 +23,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 
@@ -1010,22 +1012,26 @@ class InventarioResource extends Resource
 
     public static function obtenerOpcionesFiltrosDashboard(): array
     {
-        $categoriasFiltro = ['' => 'Todas'];
-        try {
-            $categoriasFiltro += TipoMaterial::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
-        } catch (\Throwable $e) {}
+        $ver = SigemReportExporter::cacheVersion();
 
-        $areasFiltro = ['' => 'Todas'];
-        try {
-            $areasFiltro += Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
-        } catch (\Throwable $e) {}
+        return Cache::remember("sigem_dash_filtros_v{$ver}", SigemReportExporter::CACHE_TTL_SECONDS, function () {
+            $categoriasFiltro = ['' => 'Todas'];
+            try {
+                $categoriasFiltro += TipoMaterial::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+            } catch (\Throwable $e) {}
 
-        $departamentosFiltro = ['' => 'Todos'];
-        try {
-            $departamentosFiltro += Departamento::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
-        } catch (\Throwable $e) {}
+            $areasFiltro = ['' => 'Todas'];
+            try {
+                $areasFiltro += Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+            } catch (\Throwable $e) {}
 
-        return [$categoriasFiltro, $areasFiltro, $departamentosFiltro];
+            $departamentosFiltro = ['' => 'Todos'];
+            try {
+                $departamentosFiltro += Departamento::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+            } catch (\Throwable $e) {}
+
+            return [$categoriasFiltro, $areasFiltro, $departamentosFiltro];
+        });
     }
 
     public static function obtenerInventariosDashboardQuery(
@@ -1034,7 +1040,7 @@ class InventarioResource extends Resource
         string $sortDirection = 'desc'
     ): Builder {
         $invQuery = Inventario::query()
-            ->with(['material.marca', 'material.tipo', 'proveedor', 'usuario', 'area', 'departamento', 'salon'])
+            ->with(['material.tipo', 'area.departamento', 'departamento', 'salon'])
             ->select('inventario.*');
 
         // Filtro Departamento
@@ -1178,31 +1184,35 @@ class InventarioResource extends Resource
 
     public static function obtenerCategoriasTop(): array
     {
-        $todasCategorias = Inventario::query()
-            ->join('material', 'inventario.id_producto', '=', 'material.id_producto')
-            ->leftJoin('tipo_material', 'material.id_tipodematerial', '=', 'tipo_material.id_tipodematerial')
-            ->selectRaw("COALESCE(tipo_material.nombre, 'General') as cat, count(*) as total")
-            ->groupBy('cat')
-            ->orderByDesc('total')
-            ->pluck('total', 'cat')
-            ->toArray();
+        $ver = SigemReportExporter::cacheVersion();
 
-        $top = [];
-        $otras = 0;
-        $idx = 0;
-        foreach ($todasCategorias as $catNom => $catCant) {
-            if ($idx < 8) {
-                $top[$catNom] = $catCant;
-            } else {
-                $otras += $catCant;
+        return Cache::remember("sigem_dash_cat_top_v{$ver}", SigemReportExporter::CACHE_TTL_SECONDS, function () {
+            $todasCategorias = Inventario::query()
+                ->join('material', 'inventario.id_producto', '=', 'material.id_producto')
+                ->leftJoin('tipo_material', 'material.id_tipodematerial', '=', 'tipo_material.id_tipodematerial')
+                ->selectRaw("COALESCE(tipo_material.nombre, 'General') as cat, count(*) as total")
+                ->groupBy('cat')
+                ->orderByDesc('total')
+                ->pluck('total', 'cat')
+                ->toArray();
+
+            $top = [];
+            $otras = 0;
+            $idx = 0;
+            foreach ($todasCategorias as $catNom => $catCant) {
+                if ($idx < 8) {
+                    $top[$catNom] = $catCant;
+                } else {
+                    $otras += $catCant;
+                }
+                $idx++;
             }
-            $idx++;
-        }
-        if ($otras > 0) {
-            $top['Otras categorías'] = $otras;
-        }
+            if ($otras > 0) {
+                $top['Otras categorías'] = $otras;
+            }
 
-        return $top;
+            return $top;
+        });
     }
 
     public static function exportarInventarioExcel($livewire = null): ?\Symfony\Component\HttpFoundation\BinaryFileResponse
