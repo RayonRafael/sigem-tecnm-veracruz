@@ -23,9 +23,10 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 trait ConPanelConfig
 {
     /** @param array<string, mixed> $config */
-    protected function configureBasePanel(Panel $panel, array $config): Panel
+    protected function configureBasePanel(Panel $panel, string $id, array $config): Panel
     {
         return $panel
+            ->id($id)
             ->login()
             ->profile(EditProfile::class, isSimple: false)
             ->passwordReset()

@@ -13,7 +13,7 @@ class ServicioSocialPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
-        return $this->configureBasePanel($panel, [
+        return $this->configureBasePanel($panel, 'servicio-social', [
             'brandName' => 'SIGEM - Servicio Social',
             'loginBadgeClasses' => 'bg-emerald-50 text-emerald-700 border border-emerald-200',
             'loginBadgeLabel' => '👥 Panel de Servicio Social',
@@ -33,7 +33,6 @@ class ServicioSocialPanelProvider extends PanelProvider
                 'profile' => 'Mi Perfil',
             ],
         ])
-            ->id('servicio-social')
             ->path('servicio-social')
             ->navigationGroups($this->makeNavigationGroups([
                 'Panel principal',

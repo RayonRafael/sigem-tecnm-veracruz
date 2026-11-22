@@ -13,7 +13,7 @@ class AdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
-        return $this->configureBasePanel($panel, [
+        return $this->configureBasePanel($panel, 'admin', [
             'brandName' => 'SIGEM - TecNM Veracruz',
             'loginBadgeClasses' => 'bg-blue-50 text-blue-700 border border-blue-200',
             'loginBadgeLabel' => '🔒 Panel de Administración',
@@ -35,7 +35,6 @@ class AdminPanelProvider extends PanelProvider
             ],
         ])
             ->default()
-            ->id('admin')
             ->path('admin')
             ->navigationGroups($this->makeNavigationGroups([
                 'Panel principal',
