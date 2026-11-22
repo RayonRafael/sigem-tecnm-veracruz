@@ -4,8 +4,10 @@
     'departamentosFiltro' => [],
     'categoriasFiltro' => [],
     'areasFiltro' => [],
+    'aulasFiltro' => [],
     'inventariosPaginados' => null,
     'inventariosCompletos' => [],
+    'paginaActualIds' => [],
     'sortColumn' => 'created_at',
     'sortDirection' => 'desc',
     'perPage' => 10,
@@ -15,6 +17,7 @@
     'inventarioAsignados' => 0,
     'inventarioDanados' => 0,
     'categoriasTop' => [],
+    'resumenRentas' => ['total' => 0, 'vigentes' => 0, 'por_vencer' => 0, 'vencidas' => 0],
     'selectedRows' => [],
     'selectAll' => false,
     'showSidePanel' => false,
@@ -29,6 +32,9 @@
     
     $items = $inventariosPaginados ?? $inventariosCompletos ?? [];
     $isPaginator = $inventariosPaginados instanceof \Illuminate\Pagination\LengthAwarePaginator;
+    $itemsColeccion = collect($isPaginator ? $items->items() : $items);
+    $mostrarColumnaRenta = (($resumenRentas['total'] ?? 0) > 0)
+        || $itemsColeccion->contains(fn ($r) => ($r->tipo_propiedad ?? '') === 'Rentado');
 
     $renderSort = function (string $col) use ($sortColumn, $sortDirection) {
         if (($sortColumn ?? '') === $col) {
@@ -131,12 +137,19 @@
                     <table class="fi-ta-table">
                         <thead>
                             <tr>
+                                @php
+                                    $idsPagStr = array_map('strval', $paginaActualIds ?? []);
+                                    $selStr = array_map('strval', $selectedRows ?? []);
+                                    $todosEnPaginaSeleccionados = count($idsPagStr) > 0
+                                        && count(array_intersect($idsPagStr, $selStr)) === count($idsPagStr);
+                                @endphp
                                 <th style="width: 44px; min-width: 44px; text-align: center; padding: 6px;">
                                     <input
                                         type="checkbox"
-                                        wire:model.live="selectAll"
+                                        wire:click="toggleSeleccionarPagina"
+                                        @checked($todosEnPaginaSeleccionados)
                                         class="sigem-checkbox"
-                                        title="Seleccionar todos los registros visibles"
+                                        title="Seleccionar solo esta página"
                                     />
                                 </th>
                                 <th style="min-width: 170px; cursor: pointer; user-select: none;" wire:click="sortBy('departamento')" title="Ordenar por departamento">
@@ -151,6 +164,11 @@
                                 <th style="min-width: 130px; cursor: pointer; user-select: none;" wire:click="sortBy('estado')" title="Ordenar por estado">
                                     ESTADO {!! $renderSort('estado') !!}
                                 </th>
+                                @if($mostrarColumnaRenta)
+                                    <th style="min-width: 125px; user-select: none;" title="Estado de vigencia de equipos rentados (máximo 3 años)">
+                                        ESTADO RENTA
+                                    </th>
+                                @endif
                                 <th style="min-width: 160px; cursor: pointer; user-select: none;" wire:click="sortBy('area')" title="Ordenar por área">
                                     ÁREA {!! $renderSort('area') !!}
                                 </th>
@@ -226,6 +244,9 @@
                                         <option value="Baja">Baja</option>
                                     </select>
                                 </th>
+                                @if($mostrarColumnaRenta)
+                                    <th class="fi-table-individual-search-cell" style="padding: 4px 6px;"></th>
+                                @endif
                                 <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
                                     <select wire:model.live="tableColumnSearches.area" class="fi-table-individual-search-select" title="Filtrar por área">
                                         <option value="">Todas</option>
@@ -237,13 +258,14 @@
                                     </select>
                                 </th>
                                 <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
-                                    <input
-                                        type="search"
-                                        wire:model.live.debounce.500ms="tableColumnSearches.aula"
-                                        placeholder="Filtrar..."
-                                        class="sigem-dash-filter-input"
-                                        title="Filtrar por aula"
-                                    />
+                                    <select wire:model.live="tableColumnSearches.aula" class="fi-table-individual-search-select" title="Filtrar por aula">
+                                        <option value="">Todas</option>
+                                        @foreach (($aulasFiltro ?? []) as $optVal => $optLbl)
+                                            @if($optVal !== '')
+                                                <option value="{{ $optVal }}">{{ $optLbl }}</option>
+                                            @endif
+                                        @endforeach
+                                    </select>
                                 </th>
                                 <th class="fi-table-individual-search-cell" style="padding: 4px 6px;">
                                     <input
@@ -398,6 +420,35 @@
                                             </span>
                                         </td>
 
+                                        {{-- 4b. ESTADO RENTA (solo si hay equipos rentados) --}}
+                                        @if($mostrarColumnaRenta)
+                                            <td style="min-width: 125px; white-space: nowrap;">
+                                                @if(($inv->tipo_propiedad ?? '') === 'Rentado' && $inv->renta_estado)
+                                                    @php
+                                                        $rentaEst = $inv->renta_estado;
+                                                        $rentaFinStr = $inv->renta_fecha_fin?->format('d/m/Y') ?? '—';
+                                                        $rentaDias = $inv->renta_dias_restantes ?? 0;
+                                                        $rentaPillCls = match ($rentaEst) {
+                                                            'Vencida' => 'danger',
+                                                            'Por vencer' => 'warn',
+                                                            default => 'ok',
+                                                        };
+                                                        $rentaEmoji = match ($rentaEst) {
+                                                            'Vencida' => '🔴',
+                                                            'Por vencer' => '🟡',
+                                                            default => '🟢',
+                                                        };
+                                                        $rentaTooltip = "Vence el {$rentaFinStr} ({$rentaDias} días)";
+                                                    @endphp
+                                                    <span class="sigem-pill {{ $rentaPillCls }}" style="white-space: nowrap;" title="{{ $rentaTooltip }}">
+                                                        {{ $rentaEmoji }} {{ $rentaEst }}
+                                                    </span>
+                                                @else
+                                                    <span style="color: var(--sig-muted);">—</span>
+                                                @endif
+                                            </td>
+                                        @endif
+
                                         {{-- 5. ÁREA --}}
                                         <td style="min-width: 160px; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ $areaUbicacion }}">
                                             <span style="font-size: 13.5px; color: var(--sig-muted);">{{ $areaUbicacion }}</span>
@@ -462,7 +513,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="11" style="text-align: center; padding: 28px; color: var(--sig-muted);">
+                                        <td colspan="{{ $mostrarColumnaRenta ? 12 : 11 }}" style="text-align: center; padding: 28px; color: var(--sig-muted);">
                                             {{ $emptyMessage }}
                                         </td>
                                     </tr>

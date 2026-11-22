@@ -33,19 +33,29 @@ class Dashboard extends BaseDashboard
     public string $sortColumn = 'created_at';
     public string $sortDirection = 'desc';
 
-    public function updatedTableColumnSearches(): void
+    public function updatedTableColumnSearches($value = null, $key = null): void
     {
+        if ($key === 'departamento') {
+            $this->tableColumnSearches['area'] = '';
+            $this->tableColumnSearches['aula'] = '';
+        } elseif ($key === 'area') {
+            $this->tableColumnSearches['aula'] = '';
+        }
+
+        $this->limpiarSeleccionActiva();
         $this->resetPage();
     }
 
     public function updatedPerPage(): void
     {
+        $this->limpiarSeleccionActiva();
         $this->resetPage();
     }
 
     public function resetTableColumnSearches(): void
     {
         $this->tableColumnSearches = [];
+        $this->limpiarSeleccionActiva();
         $this->resetPage();
     }
 
@@ -269,11 +279,7 @@ class Dashboard extends BaseDashboard
                 $id = $arguments['id'] ?? $arguments['record'] ?? null;
                 return $id ? Inventario::with(['material.marca', 'material.tipo', 'area', 'salon'])->find($id) : null;
             })
-            ->form([
-                Tabs::make('Tabs')
-                    ->tabs(InventarioResource::getEditFormTabs())
-                    ->columnSpanFull(),
-            ])
+            ->form(InventarioResource::getEditFormTabs())
             ->slideOver()
             ->modalSubmitActionLabel('Guardar cambios')
             ->modalCancelActionLabel('Cancelar')
@@ -349,22 +355,33 @@ class Dashboard extends BaseDashboard
         $inventarioDadosDeBaja = (int) ($inventarioStats->dados_de_baja ?? 0);
         $creadosEsteMes = (int) ($inventarioStats->creados_este_mes ?? 0);
 
-        // 2. Estadísticas de Mantenimiento
-        $mantenimientosPendientes = Mantenimiento::toBase()
-            ->whereIn('estado', ['Pendiente Revision Admin', 'Solicitado'])
-            ->count();
-
-        // 3. Estadísticas de Solicitudes
-        $solicitudesPendientes = Solicitud::toBase()
-            ->where('estado', 'Pendiente')
-            ->count();
+        // 2 & 3. Estadísticas de Mantenimiento y Solicitudes en 1 sola consulta escalar
+        $pendientesStats = \Illuminate\Support\Facades\DB::selectOne("
+            SELECT
+                (SELECT COUNT(*) FROM mantenimiento WHERE estado IN ('Pendiente Revision Admin', 'Solicitado')) as mant_pendientes,
+                (SELECT COUNT(*) FROM solicitud WHERE estado = 'Pendiente') as sol_pendientes
+        ");
+        $mantenimientosPendientes = (int) ($pendientesStats->mant_pendientes ?? 0);
+        $solicitudesPendientes = (int) ($pendientesStats->sol_pendientes ?? 0);
 
         // 4. Materiales con Stock Bajo (Usa el scope derivado)
         $materialesStockBajoCount = Material::stockBajo()->count();
 
-        // 5. Opciones de filtros y registros filtrados paginados
-        [$categoriasFiltro, $areasFiltro, $departamentosFiltro] = InventarioResource::obtenerOpcionesFiltrosDashboard();
+        // 5. Opciones de filtros (encadenados Depto -> Área -> Aula) y registros paginados
+        [$categoriasFiltro, $areasFiltroBase, $departamentosFiltro] = InventarioResource::obtenerOpcionesFiltrosDashboard();
+        $deptoActivo = trim((string) ($this->tableColumnSearches['departamento'] ?? ''));
+        $areasFiltro = ($deptoActivo !== '' && strtoupper($deptoActivo) !== 'TODOS')
+            ? $this->areasFiltradas
+            : $areasFiltroBase;
+        $aulasFiltro = $this->aulasFiltradas;
+
         $inventariosPaginados = $this->getFilteredTableQuery()->paginate($this->perPage);
+        $this->paginaActualIds = $inventariosPaginados
+            ->getCollection()
+            ->pluck('id_inventario')
+            ->map(fn ($id) => (string) $id)
+            ->values()
+            ->toArray();
 
         return [
             'totalActivos' => $totalActivos,
@@ -383,13 +400,16 @@ class Dashboard extends BaseDashboard
 
             'categoriasFiltro' => $categoriasFiltro,
             'areasFiltro' => $areasFiltro,
+            'aulasFiltro' => $aulasFiltro,
             'departamentosFiltro' => $departamentosFiltro,
             'inventariosPaginados' => $inventariosPaginados,
             'inventariosCompletos' => $inventariosPaginados,
+            'paginaActualIds' => $this->paginaActualIds,
             'sortColumn' => $this->sortColumn,
             'sortDirection' => $this->sortDirection,
             'perPage' => $this->perPage,
             'categoriasTop' => InventarioResource::obtenerCategoriasTop(),
+            'resumenRentas' => Inventario::resumenRentas(),
             'selectedRows' => $this->selectedRows,
             'selectAll' => $this->selectAll,
             'showSidePanel' => $this->showSidePanel,

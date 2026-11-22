@@ -130,7 +130,7 @@
         }
 
         .desc-body {
-            height: 270px;
+            height: 215px;
             vertical-align: top;
             font-size: 10.5px;
             line-height: 1.45;
@@ -222,9 +222,20 @@
         <span class="field-label">Nombre y Firma Solicitante:</span>&nbsp;&nbsp;&nbsp;{{ $solicitante }}
     </div>
 
-    <!-- Fecha de Elaboración -->
+    <!-- Fecha y Hora de Elaboración -->
     <div class="field-box">
         <span class="field-label">Fecha de Elaboración:</span>&nbsp;&nbsp;&nbsp;{{ $fecha }}
+        &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;
+        <span class="field-label">Hora:</span>&nbsp;&nbsp;{{ $hora ?? '—' }}
+    </div>
+
+    <!-- Área, Receptor y Tipo de Propiedad -->
+    <div class="field-box" style="font-size: 9.5px;">
+        <span class="field-label">Área:</span> {{ $area ?? '—' }}
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <span class="field-label">Receptor:</span> {{ $receptor ?? '—' }}
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <span class="field-label">Tipo de Propiedad:</span> {{ $tipoPropiedad ?? 'Propio' }}
     </div>
 
     <!-- Descripción del servicio solicitado o falla a reparar -->

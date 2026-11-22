@@ -8,7 +8,9 @@ use App\Models\Area;
 use App\Models\Departamento;
 use App\Models\Inventario;
 use App\Models\MarcaMaterial;
+use App\Models\Receptor;
 use App\Models\Salon;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class RegistrarMultiplesEquipos
@@ -96,6 +98,36 @@ class RegistrarMultiplesEquipos
                 ?? \App\Models\User::where('email', 'admin@tecnm.edu.mx')->value('id')
                 ?? \App\Models\User::first()?->id;
 
+            // Resolver Receptor opcional (se guarda en especificaciones sin alterar esquema BD)
+            $receptorId = $data['id_receptor'] ?? ($data['especificaciones']['id_receptor'] ?? null);
+            $receptorSpecs = [];
+            if (filled($receptorId)) {
+                $receptorModel = Receptor::find((int) $receptorId);
+                if ($receptorModel) {
+                    $receptorSpecs = [
+                        'id_receptor' => $receptorModel->id_receptor,
+                        'receptor_nombre' => $receptorModel->nombre_completo,
+                    ];
+                }
+            }
+
+            // Regla de negocio: Equipos rentados tienen vigencia máxima de 3 años desde fecha_registro
+            $tipoPropiedad = $data['tipo_propiedad'] ?? 'Propio';
+            $fechaRegistro = $data['fecha_registro'] ?? now();
+            $rentaFechaFinStr = null;
+
+            if ($tipoPropiedad === 'Rentado') {
+                $fechaRegCarbon = Carbon::parse($fechaRegistro)->startOfDay();
+                $manualFin = $data['renta_fecha_fin']
+                    ?? ($data['especificaciones']['renta_fecha_fin'] ?? ($data['fecha_fin_renta'] ?? null));
+                $rentaFinCarbon = filled($manualFin)
+                    ? Carbon::parse($manualFin)->startOfDay()
+                    : $fechaRegCarbon->copy()->addYears(3);
+
+                $rentaFechaFinStr = $rentaFinCarbon->format('Y-m-d');
+                $receptorSpecs['renta_fecha_fin'] = $rentaFechaFinStr;
+            }
+
             $baseData = [
                 'departamento_id' => $departamentoId,
                 'area_id' => $areaId,
@@ -103,8 +135,16 @@ class RegistrarMultiplesEquipos
                 'aula' => $aula,
                 'estacion' => $estacion,
                 'estado' => $data['estado'] ?? 'Disponible',
-                'tipo_propiedad' => $data['tipo_propiedad'] ?? 'Propio',
-                'fecha_registro' => $data['fecha_registro'] ?? now(),
+                'tipo_propiedad' => $tipoPropiedad,
+                'fecha_registro' => $fechaRegistro,
+                'id_proveedor' => $data['id_proveedor'] ?? null,
+                'num_factura' => $data['num_factura'] ?? null,
+                'fecha_factura' => $data['fecha_factura'] ?? null,
+                'garantia_fecha_fin' => $data['garantia_fecha_fin'] ?? null,
+                'garantia_estado' => ! empty($data['garantia_estado']) ? $data['garantia_estado'] : 'sin_garantia',
+                'fecha_inicio_renta' => $tipoPropiedad === 'Rentado' ? ($data['fecha_inicio_renta'] ?? $fechaRegistro) : null,
+                'fecha_fin_renta' => $rentaFechaFinStr,
+                'observaciones_renta' => $tipoPropiedad === 'Rentado' ? ($data['observaciones_renta'] ?? null) : null,
                 'id_usuario' => $usuarioId,
                 'ubicacion_fisica' => $ubicacionFisica,
                 'aprobado' => $aprobado,
@@ -122,13 +162,13 @@ class RegistrarMultiplesEquipos
                 if (! $noTieneMonitor && filled($data['especificaciones']['monitor_sn'] ?? null)) {
                     $monMarca = $limpiarMarca($data['especificaciones']['monitor_marca'] ?? null);
                     $monSpecsTexto = $limpiarEspec($data['especificaciones']['monitor_specs'] ?? null);
-                    $monSpecs = [
+                    $monSpecs = array_merge([
                         'tipo_equipo' => 'pc',
                         'componente' => 'monitor',
                         'estacion' => $estacion,
                         'aula' => $aula,
                         'marca' => $monMarca,
-                    ];
+                    ], $receptorSpecs);
                     $monitor = Inventario::create(array_merge($baseData, [
                         'subtipo' => 'Monitor',
                         'num_serie' => $data['especificaciones']['monitor_sn'],
@@ -145,13 +185,13 @@ class RegistrarMultiplesEquipos
                 if (! $noTieneTeclado && filled($data['especificaciones']['teclado_sn'] ?? null)) {
                     $tecMarca = $limpiarMarca($data['especificaciones']['teclado_marca'] ?? null);
                     $tecSpecsTexto = $limpiarEspec($data['especificaciones']['teclado_specs'] ?? null);
-                    $tecSpecs = [
+                    $tecSpecs = array_merge([
                         'tipo_equipo' => 'pc',
                         'componente' => 'teclado',
                         'estacion' => $estacion,
                         'aula' => $aula,
                         'marca' => $tecMarca,
-                    ];
+                    ], $receptorSpecs);
                     $teclado = Inventario::create(array_merge($baseData, [
                         'subtipo' => 'Teclado',
                         'num_serie' => $data['especificaciones']['teclado_sn'],
@@ -168,13 +208,13 @@ class RegistrarMultiplesEquipos
                 if (! $noTieneMouse && filled($data['especificaciones']['mouse_sn'] ?? null)) {
                     $mouMarca = $limpiarMarca($data['especificaciones']['mouse_marca'] ?? null);
                     $mouSpecsTexto = $limpiarEspec($data['especificaciones']['mouse_specs'] ?? null);
-                    $mouSpecs = [
+                    $mouSpecs = array_merge([
                         'tipo_equipo' => 'pc',
                         'componente' => 'mouse',
                         'estacion' => $estacion,
                         'aula' => $aula,
                         'marca' => $mouMarca,
-                    ];
+                    ], $receptorSpecs);
                     $mouse = Inventario::create(array_merge($baseData, [
                         'subtipo' => 'Mouse',
                         'num_serie' => $data['especificaciones']['mouse_sn'],
@@ -189,7 +229,7 @@ class RegistrarMultiplesEquipos
                 // 4. CPU (SIEMPRE se crea para pc)
                 $cpuMarca = $limpiarMarca($data['especificaciones']['cpu_marca'] ?? $data['especificaciones']['marca'] ?? null);
                 $cpuSpecsTexto = $limpiarEspec($data['especificacion_texto'] ?? null);
-                $cpuSpecs = [
+                $cpuSpecs = array_merge([
                     'tipo_equipo' => 'pc',
                     'componente' => 'cpu',
                     'estacion' => $estacion,
@@ -202,7 +242,7 @@ class RegistrarMultiplesEquipos
                     'disco' => $data['especificaciones']['disco'] ?? $data['disco'] ?? null,
                     'sistema_operativo' => $data['especificaciones']['sistema_operativo'] ?? $data['sistema_operativo'] ?? null,
                     '_total_registrados' => count($registrosCreados) + 1,
-                ];
+                ], $receptorSpecs);
 
                 $cpu = Inventario::create(array_merge($baseData, [
                     'subtipo' => 'CPU',
@@ -227,13 +267,13 @@ class RegistrarMultiplesEquipos
                 if (! $noTieneTeclado && filled($data['especificaciones']['teclado_sn'] ?? null)) {
                     $tecMarca = $limpiarMarca($data['especificaciones']['teclado_marca'] ?? null);
                     $tecSpecsTexto = $limpiarEspec($data['especificaciones']['teclado_specs'] ?? null);
-                    $tecSpecs = [
+                    $tecSpecs = array_merge([
                         'tipo_equipo' => 'aio',
                         'componente' => 'teclado',
                         'estacion' => $estacion,
                         'aula' => $aula,
                         'marca' => $tecMarca,
-                    ];
+                    ], $receptorSpecs);
                     $teclado = Inventario::create(array_merge($baseData, [
                         'subtipo' => 'Teclado',
                         'num_serie' => $data['especificaciones']['teclado_sn'],
@@ -250,13 +290,13 @@ class RegistrarMultiplesEquipos
                 if (! $noTieneMouse && filled($data['especificaciones']['mouse_sn'] ?? null)) {
                     $mouMarca = $limpiarMarca($data['especificaciones']['mouse_marca'] ?? null);
                     $mouSpecsTexto = $limpiarEspec($data['especificaciones']['mouse_specs'] ?? null);
-                    $mouSpecs = [
+                    $mouSpecs = array_merge([
                         'tipo_equipo' => 'aio',
                         'componente' => 'mouse',
                         'estacion' => $estacion,
                         'aula' => $aula,
                         'marca' => $mouMarca,
-                    ];
+                    ], $receptorSpecs);
                     $mouse = Inventario::create(array_merge($baseData, [
                         'subtipo' => 'Mouse',
                         'num_serie' => $data['especificaciones']['mouse_sn'],
@@ -271,7 +311,7 @@ class RegistrarMultiplesEquipos
                 // 3. All in One (SIEMPRE se crea)
                 $aioMarca = $limpiarMarca($data['especificaciones']['marca'] ?? null);
                 $aioSpecsTexto = $limpiarEspec($data['especificacion_texto'] ?? null);
-                $aioSpecs = [
+                $aioSpecs = array_merge([
                     'tipo_equipo' => 'aio',
                     'componente' => 'aio',
                     'estacion' => $estacion,
@@ -284,7 +324,7 @@ class RegistrarMultiplesEquipos
                     'disco' => $data['especificaciones']['disco'] ?? $data['disco'] ?? null,
                     'sistema_operativo' => $data['especificaciones']['sistema_operativo'] ?? $data['sistema_operativo'] ?? null,
                     '_total_registrados' => count($registrosCreados) + 1,
-                ];
+                ], $receptorSpecs);
 
                 $aio = Inventario::create(array_merge($baseData, [
                     'subtipo' => 'All in One',
@@ -321,7 +361,7 @@ class RegistrarMultiplesEquipos
                 $marca = $limpiarMarca($data['especificaciones']['marca'] ?? null);
                 $specsTexto = $limpiarEspec($data['especificacion_texto'] ?? null);
 
-                $singleSpecs = [
+                $singleSpecs = array_merge([
                     'tipo_equipo' => $tipo,
                     'componente' => $tipo,
                     'estacion' => $estacion,
@@ -335,7 +375,7 @@ class RegistrarMultiplesEquipos
                     'disco' => $data['especificaciones']['disco'] ?? $data['disco'] ?? null,
                     'sistema_operativo' => $data['especificaciones']['sistema_operativo'] ?? $data['sistema_operativo'] ?? null,
                     '_total_registrados' => 1,
-                ];
+                ], $receptorSpecs);
 
                 $itemData = array_merge($baseData, [
                     'subtipo' => $subtipo,

@@ -58,11 +58,7 @@ class InventarioResource extends Resource
         }
 
         return $form
-            ->schema([
-                Forms\Components\Tabs::make('Tabs')
-                    ->tabs(static::getEditFormTabs())
-                    ->columnSpanFull(),
-            ]);
+            ->schema(static::getEditFormTabs());
     }
 
     public static function getEditFormTabs(): array

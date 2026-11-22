@@ -43,6 +43,7 @@
                     :is-skeleton-preview="$isSkeletonPreview"
                     :mantenimientos-pendientes="$mantenimientosPendientes ?? 0"
                     :solicitudes-pendientes="$solicitudesPendientes ?? 0"
+                    :resumen-rentas="$resumenRentas ?? ['total' => 0, 'vigentes' => 0, 'por_vencer' => 0, 'vencidas' => 0]"
                 />
 
                 <div class="sigem-quick-desc-none"></div>
@@ -54,8 +55,10 @@
                     :departamentos-filtro="$departamentosFiltro ?? []"
                     :categorias-filtro="$categoriasFiltro ?? []"
                     :areas-filtro="$areasFiltro ?? []"
+                    :aulas-filtro="$aulasFiltro ?? []"
                     :inventarios-paginados="$inventariosPaginados ?? null"
                     :inventarios-completos="$inventariosCompletos ?? []"
+                    :pagina-actual-ids="$paginaActualIds ?? []"
                     :sort-column="$sortColumn ?? 'created_at'"
                     :sort-direction="$sortDirection ?? 'desc'"
                     :per-page="$perPage ?? 10"
@@ -65,6 +68,7 @@
                     :inventario-asignados="$inventarioAsignados ?? 0"
                     :inventario-danados="$inventarioDanados ?? 0"
                     :categorias-top="$categoriasTop ?? []"
+                    :resumen-rentas="$resumenRentas ?? ['total' => 0, 'vigentes' => 0, 'por_vencer' => 0, 'vencidas' => 0]"
                     :selected-rows="$selectedRows ?? []"
                     :select-all="$selectAll ?? false"
                     :show-side-panel="$showSidePanel ?? false"

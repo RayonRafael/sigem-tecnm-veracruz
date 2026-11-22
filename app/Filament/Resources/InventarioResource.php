@@ -11,6 +11,7 @@ use App\Models\Inventario;
 use App\Models\MarcaMaterial;
 use App\Models\Salon;
 use App\Models\TipoMaterial;
+use App\Support\SigemReportExporter;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Form;
@@ -22,6 +23,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
 
@@ -66,11 +68,7 @@ class InventarioResource extends Resource
         }
 
         return $form
-            ->schema([
-                Forms\Components\Tabs::make('Tabs')
-                    ->tabs(static::getEditFormTabs())
-                    ->columnSpanFull(),
-            ]);
+            ->schema(static::getEditFormTabs());
     }
 
     public static function getMockupFormSchema(): array
@@ -97,6 +95,10 @@ class InventarioResource extends Resource
     {
         if (! $record) {
             return 'Equipo registrado exitosamente';
+        }
+
+        if ($record->tipo_propiedad === 'Rentado' && $record->renta_fecha_fin) {
+            return 'Equipo registrado como rentado. Vence el ' . $record->renta_fecha_fin->format('d/m/Y');
         }
 
         $total = $record->especificaciones['_total_registrados'] ?? 1;
@@ -261,11 +263,14 @@ class InventarioResource extends Resource
             return $data;
         }
 
+        $data['codigo'] = $record->codigo ?: ('#' . $record->id_inventario);
         $data['nombre_equipo'] = $record->material?->nombre ?? $record->subtipo ?? '';
         $data['marca'] = $record->especificaciones['marca']
             ?? $record->especificaciones['cpu_marca']
             ?? $record->material?->marca?->nombre
             ?? '';
+        $data['departamento_id'] = $record->departamento_id ?? $record->area?->id_departamento;
+        $data['id_receptor'] = $record->id_receptor;
         $data['aula'] = $record->aula
             ?? $record->salon?->nombre
             ?? ($record->especificaciones['aula'] ?? null)
@@ -273,15 +278,18 @@ class InventarioResource extends Resource
             ?? '';
         $data['categoria_display'] = $record->material?->tipo?->nombre ?? $record->subtipo ?? 'General';
         $data['especificacion_texto'] = $record->especificacion_texto ?? ($record->especificaciones['especificaciones'] ?? '');
-        $data['procesador'] = $record->procesador ?? ($record->especificaciones['procesador'] ?? '—');
-        $data['ram'] = $record->ram ?? ($record->especificaciones['ram'] ?? '—');
-        $data['disco'] = $record->disco ?? ($record->especificaciones['disco'] ?? '—');
-        $data['sistema_operativo'] = $record->sistema_operativo ?? ($record->especificaciones['sistema_operativo'] ?? '—');
+        $data['procesador'] = $record->procesador ?? ($record->especificaciones['procesador'] ?? '');
+        $data['ram'] = $record->ram ?? ($record->especificaciones['ram'] ?? '');
+        $data['disco'] = $record->disco ?? ($record->especificaciones['disco'] ?? '');
+        $data['sistema_operativo'] = $record->sistema_operativo ?? ($record->especificaciones['sistema_operativo'] ?? '');
         $data['tipo_impresora'] = $record->tipo_impresora ?? ($record->especificaciones['tipo_impresora'] ?? '—');
         $data['num_puertos'] = $record->especificaciones['num_puertos'] ?? '—';
         $data['ip_address'] = $record->ip_address ?? ($record->especificaciones['ip_address'] ?? '');
         $data['mac_address'] = $record->mac_address ?? ($record->especificaciones['mac_address'] ?? '');
         $data['observaciones_adicionales'] = $record->observaciones_generales ?? '';
+        $data['renta_fecha_fin'] = $record->tipo_propiedad === 'Rentado'
+            ? ($record->especificaciones['renta_fecha_fin'] ?? $record->fecha_fin_renta?->format('Y-m-d'))
+            : null;
 
         return $data;
     }
@@ -405,13 +413,30 @@ class InventarioResource extends Resource
                 $record->especificaciones = $specs;
             }
 
-            // 5. Área
+            // 5. Departamento, Área y Receptor
+            if (isset($data['departamento_id']) && filled($data['departamento_id'])) {
+                $record->departamento_id = (int) $data['departamento_id'];
+            }
             if (isset($data['area_id']) && filled($data['area_id'])) {
                 $record->area_id = $data['area_id'];
                 $area = Area::find($data['area_id']);
                 if ($area && $area->id_departamento) {
                     $record->departamento_id = $area->id_departamento;
                 }
+            }
+            if (array_key_exists('id_receptor', $data)) {
+                $specs = $record->especificaciones ?? [];
+                if (filled($data['id_receptor'])) {
+                    $receptor = \App\Models\Receptor::find((int) $data['id_receptor']);
+                    if ($receptor) {
+                        $specs['id_receptor'] = $receptor->id_receptor;
+                        $specs['receptor_nombre'] = $receptor->nombre_completo;
+                    }
+                } else {
+                    unset($specs['id_receptor'], $specs['receptor_nombre']);
+                }
+                $record->especificaciones = $specs;
+                unset($data['id_receptor']);
             }
 
             // 6. Datos técnicos, modelo y número de serie
@@ -434,6 +459,27 @@ class InventarioResource extends Resource
                 $record->observaciones_generales = $data['observaciones_adicionales'] ?? null;
                 unset($data['observaciones_adicionales']);
             }
+
+            // 7b. Seguimiento de renta (3 años máximo, guardado en especificaciones sin migración)
+            $tipoPropFinal = $data['tipo_propiedad'] ?? $record->tipo_propiedad;
+            $specs = $record->especificaciones ?? [];
+            if ($tipoPropFinal === 'Propio') {
+                unset($specs['renta_fecha_fin']);
+                $record->fecha_fin_renta = null;
+            } elseif ($tipoPropFinal === 'Rentado') {
+                if (array_key_exists('renta_fecha_fin', $data) && filled($data['renta_fecha_fin'])) {
+                    $finStr = \Illuminate\Support\Carbon::parse($data['renta_fecha_fin'])->format('Y-m-d');
+                    $specs['renta_fecha_fin'] = $finStr;
+                    $record->fecha_fin_renta = $finStr;
+                } elseif (empty($specs['renta_fecha_fin']) && ! $record->fecha_fin_renta) {
+                    $fechaRegRef = $data['fecha_registro'] ?? $record->fecha_registro ?? now();
+                    $finStr = \Illuminate\Support\Carbon::parse($fechaRegRef)->addYears(3)->format('Y-m-d');
+                    $specs['renta_fecha_fin'] = $finStr;
+                    $record->fecha_fin_renta = $finStr;
+                }
+            }
+            $record->especificaciones = $specs;
+            unset($data['renta_fecha_fin']);
 
             // 8. Fill other allowable fields
             $record->fill($data);
@@ -1010,22 +1056,26 @@ class InventarioResource extends Resource
 
     public static function obtenerOpcionesFiltrosDashboard(): array
     {
-        $categoriasFiltro = ['' => 'Todas'];
-        try {
-            $categoriasFiltro += TipoMaterial::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
-        } catch (\Throwable $e) {}
+        $ver = SigemReportExporter::cacheVersion();
 
-        $areasFiltro = ['' => 'Todas'];
-        try {
-            $areasFiltro += Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
-        } catch (\Throwable $e) {}
+        return Cache::remember("sigem_dash_filtros_v{$ver}", SigemReportExporter::CACHE_TTL_SECONDS, function () {
+            $categoriasFiltro = ['' => 'Todas'];
+            try {
+                $categoriasFiltro += TipoMaterial::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+            } catch (\Throwable $e) {}
 
-        $departamentosFiltro = ['' => 'Todos'];
-        try {
-            $departamentosFiltro += Departamento::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
-        } catch (\Throwable $e) {}
+            $areasFiltro = ['' => 'Todas'];
+            try {
+                $areasFiltro += Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+            } catch (\Throwable $e) {}
 
-        return [$categoriasFiltro, $areasFiltro, $departamentosFiltro];
+            $departamentosFiltro = ['' => 'Todos'];
+            try {
+                $departamentosFiltro += Departamento::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+            } catch (\Throwable $e) {}
+
+            return [$categoriasFiltro, $areasFiltro, $departamentosFiltro];
+        });
     }
 
     public static function obtenerInventariosDashboardQuery(
@@ -1034,12 +1084,12 @@ class InventarioResource extends Resource
         string $sortDirection = 'desc'
     ): Builder {
         $invQuery = Inventario::query()
-            ->with(['material.marca', 'material.tipo', 'proveedor', 'usuario', 'area', 'departamento', 'salon'])
+            ->with(['material.tipo', 'area.departamento', 'departamento', 'salon'])
             ->select('inventario.*');
 
         // Filtro Departamento
         $deptoSearch = $searches['departamento'] ?? $searches['departamento_nombre'] ?? null;
-        if (filled($deptoSearch)) {
+        if (filled($deptoSearch) && strtoupper(trim((string) $deptoSearch)) !== 'TODOS') {
             $termDepto = '%' . trim((string) $deptoSearch) . '%';
             $invQuery->where(function (Builder $q) use ($termDepto) {
                 $q->whereHas('departamento', fn ($sub) => $sub->where('nombre', 'like', $termDepto))
@@ -1178,31 +1228,35 @@ class InventarioResource extends Resource
 
     public static function obtenerCategoriasTop(): array
     {
-        $todasCategorias = Inventario::query()
-            ->join('material', 'inventario.id_producto', '=', 'material.id_producto')
-            ->leftJoin('tipo_material', 'material.id_tipodematerial', '=', 'tipo_material.id_tipodematerial')
-            ->selectRaw("COALESCE(tipo_material.nombre, 'General') as cat, count(*) as total")
-            ->groupBy('cat')
-            ->orderByDesc('total')
-            ->pluck('total', 'cat')
-            ->toArray();
+        $ver = SigemReportExporter::cacheVersion();
 
-        $top = [];
-        $otras = 0;
-        $idx = 0;
-        foreach ($todasCategorias as $catNom => $catCant) {
-            if ($idx < 8) {
-                $top[$catNom] = $catCant;
-            } else {
-                $otras += $catCant;
+        return Cache::remember("sigem_dash_cat_top_v{$ver}", SigemReportExporter::CACHE_TTL_SECONDS, function () {
+            $todasCategorias = Inventario::query()
+                ->join('material', 'inventario.id_producto', '=', 'material.id_producto')
+                ->leftJoin('tipo_material', 'material.id_tipodematerial', '=', 'tipo_material.id_tipodematerial')
+                ->selectRaw("COALESCE(tipo_material.nombre, 'General') as cat, count(*) as total")
+                ->groupBy('cat')
+                ->orderByDesc('total')
+                ->pluck('total', 'cat')
+                ->toArray();
+
+            $top = [];
+            $otras = 0;
+            $idx = 0;
+            foreach ($todasCategorias as $catNom => $catCant) {
+                if ($idx < 8) {
+                    $top[$catNom] = $catCant;
+                } else {
+                    $otras += $catCant;
+                }
+                $idx++;
             }
-            $idx++;
-        }
-        if ($otras > 0) {
-            $top['Otras categorías'] = $otras;
-        }
+            if ($otras > 0) {
+                $top['Otras categorías'] = $otras;
+            }
 
-        return $top;
+            return $top;
+        });
     }
 
     public static function exportarInventarioExcel($livewire = null): ?\Symfony\Component\HttpFoundation\BinaryFileResponse

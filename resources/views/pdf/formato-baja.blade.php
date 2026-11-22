@@ -331,6 +331,18 @@
         $fechaBaja = $inv->fecha_baja
             ? \Carbon\Carbon::parse($inv->fecha_baja)->format('d/m/Y')
             : now()->format('d/m/Y');
+
+        $horaRegistro = $inv->created_at
+            ? \Carbon\Carbon::parse($inv->created_at)->format('H:i')
+            : now()->format('H:i');
+
+        $deptoNombre = $inv->departamento?->nombre
+            ?? $inv->area?->departamento?->nombre
+            ?? '—';
+
+        $areaNombre = $inv->area?->nombre ?? '—';
+        $receptorNombre = $inv->receptor_nombre ?: '—';
+        $tipoPropiedad = $inv->tipo_propiedad ?? 'Propio';
     @endphp
 
     <div class="baja-pagina{{ ! $loop->last ? ' page-break' : '' }}">
@@ -384,10 +396,12 @@
                         <tr>
                             <td style="width: 44%;">
                                 <div class="campo-label">ÁREA SOLICITANTE</div>
-                                <div class="campo-valor">{{ mb_strtoupper($inv->departamento?->nombre ?? '—', 'UTF-8') }}</div>
+                                <div class="campo-valor">{{ mb_strtoupper($deptoNombre, 'UTF-8') }}</div>
+                                <div style="font-size: 8px; color: #374151; margin-top: 2px;">Área: {{ $areaNombre }}</div>
                             </td>
                             <td style="width: 22%;">
                                 <div class="campo-valor">{{ $fechaBaja }}</div>
+                                <div style="font-size: 8px; color: #374151; margin-top: 2px;">Hora: {{ $horaRegistro }}</div>
                             </td>
                             <td style="width: 34%;">
                                 <div class="campo-label">FOLIO SIBESEP</div>
@@ -403,6 +417,9 @@
                 <td class="cell-desc-bien" colspan="3">
                     <div class="campo-label">DESCRIPCIÓN ESPECIFICA DEL BIEN</div>
                     <div class="campo-valor">{{ $nombreBien }}</div>
+                    <div style="font-size: 8px; color: #374151; margin-top: 3px;">
+                        Propiedad: <strong>{{ $tipoPropiedad }}</strong> &nbsp;|&nbsp; Receptor: <strong>{{ $receptorNombre }}</strong>
+                    </div>
                 </td>
             </tr>
 

@@ -200,8 +200,8 @@
         </tr>
     </table>
 
-    <!-- Fecha -->
-    <div class="fecha-line">Fecha: {{ $fecha }}</div>
+    <!-- Fecha y Hora -->
+    <div class="fecha-line">Fecha: {{ $fecha }} &nbsp;&nbsp;|&nbsp;&nbsp; Hora: {{ $hora ?? '—' }}</div>
 @endsection
 
 @section('contenido')
@@ -220,7 +220,14 @@
         </thead>
         <tbody>
             <tr>
-                <td class="col-espacio">{{ $espacioRevisado }}</td>
+                <td class="col-espacio">
+                    {{ $espacioRevisado }}
+                    <div style="font-size: 9px; color: #374151; margin-top: 8px; line-height: 1.4;">
+                        <strong>Depto:</strong> {{ $departamento ?? '—' }}<br>
+                        <strong>Receptor:</strong> {{ $receptor ?? '—' }}<br>
+                        <strong>Propiedad:</strong> {{ $tipoPropiedad ?? 'Propio' }}
+                    </div>
+                </td>
                 <td class="col-hallazgo">{!! nl2br(e($hallazgo)) !!}</td>
                 <td class="col-si">{{ $atendidoSi ? 'X' : '' }}</td>
                 <td class="col-no">{{ $atendidoSi ? '' : 'X' }}</td>

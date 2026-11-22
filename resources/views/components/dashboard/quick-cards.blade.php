@@ -4,6 +4,7 @@
     'mantenimientosPendientes' => 0,
     'solicitudesPendientes' => 0,
     'misSolicitudesPendientes' => 0,
+    'resumenRentas' => ['total' => 0, 'vigentes' => 0, 'por_vencer' => 0, 'vencidas' => 0],
 ])
 
 @if($isSkeletonPreview)
@@ -49,12 +50,31 @@
                 <div class="sigem-quick-desc">Aprobar o rechazar</div>
             </a>
 
-            <!-- 3. Registrar activo -->
-            <a class="sigem-quick" href="javascript:void(0)" wire:click="mountAction('registrarEquipo')">
+            {{-- 3. Equipos en renta --}}
+            @php
+                $rentVigentes = (int) ($resumenRentas['vigentes'] ?? 0);
+                $rentPorVencer = (int) ($resumenRentas['por_vencer'] ?? 0);
+                $rentVencidas = (int) ($resumenRentas['vencidas'] ?? 0);
+            @endphp
+            <a class="sigem-quick" href="{{ url('/admin/reportes?pestana=nuevos&subpestana=rentas&reporte=rent_seguimiento') }}" title="Ver seguimiento de equipos en renta">
                 <div class="arrow">→</div>
-                <div class="sigem-quick-ico sigem-i-success">＋</div>
-                <div class="sigem-quick-title">Registrar activo</div>
-                <div class="sigem-quick-desc">Da de alta un equipo</div>
+                <div class="sigem-quick-ico sigem-i-info">🏢</div>
+                <div class="sigem-quick-title">
+                    Equipos en renta
+                    @if($rentVencidas > 0)
+                        <span class="sigem-qbadge" style="background: #fee2e2; color: #b91c1c;">{{ $rentVencidas }}</span>
+                    @elseif($rentPorVencer > 0)
+                        <span class="sigem-qbadge" style="background: #fef3c7; color: #b45309;">{{ $rentPorVencer }}</span>
+                    @endif
+                </div>
+                <div class="sigem-quick-desc" style="display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 12px;">
+                    <span title="Vigentes (> 6 meses)">🟢 {{ $rentVigentes }} vigente{{ $rentVigentes === 1 ? '' : 's' }}</span>
+                    <span>|</span>
+                    <span title="Por vencer (0-6 meses)">🟡 {{ $rentPorVencer }} por vencer</span>
+                    <span>|</span>
+                    <span title="Vencidas">🔴 {{ $rentVencidas }} vencida{{ $rentVencidas === 1 ? '' : 's' }}</span>
+                </div>
+                <div style="font-size: 11.5px; font-weight: 600; color: #1b65d4; margin-top: 4px;">→ Ver detalle</div>
             </a>
 
             <!-- 4. Ver bitácora -->

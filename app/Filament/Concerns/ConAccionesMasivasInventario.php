@@ -32,7 +32,12 @@ trait ConAccionesMasivasInventario
     public array $selectedRows = [];
 
     /**
-     * Indicador de si el checkbox maestro está activado.
+     * IDs visibles en la página actual de la tabla (para seleccionar solo la página actual).
+     */
+    public array $paginaActualIds = [];
+
+    /**
+     * Indicador de si el checkbox maestro de la página actual está activado.
      */
     public bool $selectAll = false;
 
@@ -84,6 +89,10 @@ trait ConAccionesMasivasInventario
      */
     public function updatedSelectedRows(): void
     {
+        $this->selectedRows = array_values(array_unique(array_map('strval', $this->selectedRows)));
+        $idsPagina = array_map('strval', $this->paginaActualIds);
+        $this->selectAll = ! empty($idsPagina)
+            && count(array_intersect($idsPagina, $this->selectedRows)) === count($idsPagina);
         $this->showSidePanel = ! empty($this->selectedRows);
         if (empty($this->selectedRows)) {
             $this->slideOverStep = 'principal';
@@ -91,23 +100,201 @@ trait ConAccionesMasivasInventario
     }
 
     /**
-     * Alterna la selección de todos los registros que cumplen el filtro actual.
+     * Checkbox cabecera: alterna la selección SOLO de los registros visibles en la página actual.
      */
-    public function updatedSelectAll($value): void
+    public function toggleSeleccionarPagina(): void
     {
-        if ($value) {
-            $this->selectedRows = $this->getFilteredTableQuery()
-                ->pluck('inventario.id_inventario')
-                ->map(fn ($id) => (string) $id)
-                ->toArray();
+        $idsPagina = $this->obtenerIdsPaginaActual();
+
+        if (empty($idsPagina)) {
+            $this->deseleccionarTodos();
+
+            return;
+        }
+
+        $seleccionadosStr = array_map('strval', $this->selectedRows);
+        $todosSeleccionados = count(array_intersect($idsPagina, $seleccionadosStr)) === count($idsPagina);
+
+        if ($todosSeleccionados) {
+            $this->selectedRows = array_values(array_diff($seleccionadosStr, $idsPagina));
+            $this->selectAll = false;
         } else {
-            $this->selectedRows = [];
+            $this->selectedRows = array_values(array_unique(array_merge($seleccionadosStr, $idsPagina)));
+            $this->selectAll = true;
         }
 
         $this->showSidePanel = ! empty($this->selectedRows);
         if (empty($this->selectedRows)) {
             $this->slideOverStep = 'principal';
         }
+    }
+
+    /**
+     * Alterna la selección SOLO de los registros visibles en la página actual (compatibilidad con wire:model="selectAll").
+     */
+    public function updatedSelectAll($value): void
+    {
+        $idsPagina = $this->obtenerIdsPaginaActual();
+
+        if ($value) {
+            $this->selectedRows = $idsPagina;
+            $this->selectAll = ! empty($idsPagina);
+        } else {
+            $this->selectedRows = [];
+            $this->selectAll = false;
+        }
+
+        $this->showSidePanel = ! empty($this->selectedRows);
+        if (empty($this->selectedRows)) {
+            $this->slideOverStep = 'principal';
+        }
+    }
+
+    /**
+     * Obtiene los IDs de la página actual (ya hidratados o consultando la página activa).
+     *
+     * @return list<string>
+     */
+    protected function obtenerIdsPaginaActual(): array
+    {
+        if (! empty($this->paginaActualIds)) {
+            return array_values(array_map('strval', $this->paginaActualIds));
+        }
+
+        $perPage = property_exists($this, 'perPage') ? (int) $this->perPage : 10;
+
+        return $this->getFilteredTableQuery()
+            ->paginate($perPage)
+            ->getCollection()
+            ->pluck('id_inventario')
+            ->map(fn ($id) => (string) $id)
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * Al cambiar de página en Livewire (WithPagination), limpiar selección activa.
+     */
+    public function updatedPaginators($page, $pageName): void
+    {
+        $this->limpiarSeleccionActiva();
+    }
+
+    /**
+     * Alias para limpieza al cambiar página.
+     */
+    public function updatedPagina($value): void
+    {
+        $this->limpiarSeleccionActiva();
+    }
+
+    /**
+     * Limpia únicamente el estado de selección (sin reiniciar formularios si no hace falta).
+     */
+    protected function limpiarSeleccionActiva(): void
+    {
+        $this->selectedRows = [];
+        $this->selectAll = false;
+        $this->showSidePanel = false;
+        $this->slideOverStep = 'principal';
+    }
+
+    /**
+     * Computed property: Áreas disponibles según el departamento seleccionado en los filtros de tabla.
+     *
+     * @return array<string, string>
+     */
+    public function getAreasFiltradasProperty(): array
+    {
+        $deptoRaw = trim((string) ($this->tableColumnSearches['departamento'] ?? ''));
+
+        if ($deptoRaw === '' || strtoupper($deptoRaw) === 'TODOS') {
+            return ['' => 'Todas'] + Area::orderBy('nombre')->pluck('nombre', 'nombre')->toArray();
+        }
+
+        $depto = is_numeric($deptoRaw)
+            ? Departamento::find((int) $deptoRaw)
+            : Departamento::where('nombre', $deptoRaw)->first();
+
+        if (! $depto) {
+            return ['' => 'Todas'];
+        }
+
+        return ['' => 'Todas'] + Area::where('id_departamento', $depto->id_departamento)
+            ->orderBy('nombre')
+            ->pluck('nombre', 'nombre')
+            ->toArray();
+    }
+
+    /**
+     * Computed property: Aulas disponibles según el área (o departamento) seleccionado en los filtros de tabla.
+     *
+     * @return array<string, string>
+     */
+    public function getAulasFiltradasProperty(): array
+    {
+        $deptoRaw = trim((string) ($this->tableColumnSearches['departamento'] ?? ''));
+        $areaRaw = trim((string) ($this->tableColumnSearches['area'] ?? ''));
+
+        $areaId = null;
+        if ($areaRaw !== '' && strtoupper($areaRaw) !== 'TODAS') {
+            $area = is_numeric($areaRaw)
+                ? Area::find((int) $areaRaw)
+                : Area::where('nombre', $areaRaw)
+                    ->when($deptoRaw !== '' && strtoupper($deptoRaw) !== 'TODOS', function ($q) use ($deptoRaw) {
+                        $depto = is_numeric($deptoRaw)
+                            ? Departamento::find((int) $deptoRaw)
+                            : Departamento::where('nombre', $deptoRaw)->first();
+                        if ($depto) {
+                            $q->where('id_departamento', $depto->id_departamento);
+                        }
+                    })
+                    ->first();
+            $areaId = $area?->id_area;
+        }
+
+        $deptoId = null;
+        if (! $areaId && $deptoRaw !== '' && strtoupper($deptoRaw) !== 'TODOS') {
+            $depto = is_numeric($deptoRaw)
+                ? Departamento::find((int) $deptoRaw)
+                : Departamento::where('nombre', $deptoRaw)->first();
+            $deptoId = $depto?->id_departamento;
+        }
+
+        $aulasInv = Inventario::query()
+            ->when($areaId, fn ($q) => $q->where('area_id', $areaId))
+            ->when(! $areaId && $deptoId, function ($q) use ($deptoId) {
+                $q->where(function ($sub) use ($deptoId) {
+                    $sub->where('departamento_id', $deptoId)
+                        ->orWhereHas('area', fn ($aq) => $aq->where('id_departamento', $deptoId));
+                });
+            })
+            ->whereNotNull('aula')
+            ->where('aula', '!=', '')
+            ->distinct()
+            ->pluck('aula');
+
+        $aulasSalon = Salon::query()
+            ->when($areaId, fn ($q) => $q->where('area_id', $areaId))
+            ->when(! $areaId && $deptoId, fn ($q) => $q->whereHas('area', fn ($aq) => $aq->where('id_departamento', $deptoId)))
+            ->whereNotNull('nombre')
+            ->where('nombre', '!=', '')
+            ->distinct()
+            ->pluck('nombre');
+
+        $aulas = $aulasInv->merge($aulasSalon)
+            ->map(fn ($a) => trim((string) $a))
+            ->filter()
+            ->unique()
+            ->sort(SORT_NATURAL | SORT_FLAG_CASE)
+            ->values();
+
+        $opciones = ['' => 'Todas'];
+        foreach ($aulas as $aula) {
+            $opciones[$aula] = $aula;
+        }
+
+        return $opciones;
     }
 
     /**
@@ -176,18 +363,20 @@ trait ConAccionesMasivasInventario
     }
 
     /**
-     * Hook reactivo: Al cambiar departamento destino, limpia el área.
+     * Hook reactivo: Al cambiar departamento destino, limpia el área y el aula.
      */
     public function updatedCambioDepartamentoId($value): void
     {
         $this->cambioNuevaAreaId = '';
+        $this->cambioAula = '';
     }
 
     /**
-     * Hook reactivo: Al cambiar área destino, autocompleta depto si está vacío.
+     * Hook reactivo: Al cambiar área destino, limpia el aula y autocompleta depto si está vacío.
      */
     public function updatedCambioNuevaAreaId($value): void
     {
+        $this->cambioAula = '';
         if (! empty($value)) {
             $area = Area::find($value);
             if ($area && empty($this->cambioDepartamentoId)) {

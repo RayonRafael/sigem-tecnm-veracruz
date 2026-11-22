@@ -4,39 +4,93 @@ namespace App\Filament\Resources\InventarioResource\Schemas;
 
 use App\Models\Inventario;
 use App\Models\MarcaMaterial;
+use App\Models\Receptor;
 use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
+use Illuminate\Support\Carbon;
 
 trait InventarioFormFields
 {
+    public static function getRentaFechaFinField(): Forms\Components\DatePicker
+    {
+        return Forms\Components\DatePicker::make('renta_fecha_fin')
+            ->label('Fecha fin de renta')
+            ->prefixIcon('heroicon-m-calendar-days')
+            ->visible(fn (Forms\Get $get): bool => $get('tipo_propiedad') === 'Rentado')
+            ->helperText(function (Forms\Get $get, ?Inventario $record = null): string {
+                $inicioRaw = $get('fecha_registro') ?: $record?->fecha_registro;
+                $inicio = $inicioRaw ? Carbon::parse($inicioRaw) : now();
+                $max = $inicio->copy()->addYears(3)->format('d/m/Y');
+
+                return "⚠️ Máximo permitido: {$max} (3 años desde registro). Si se deja vacío se calcula automáticamente.";
+            })
+            ->rule(function (Forms\Get $get, ?Inventario $record = null): \Closure {
+                return function (string $attribute, $value, \Closure $fail) use ($get, $record): void {
+                    if (blank($value) || $get('tipo_propiedad') !== 'Rentado') {
+                        return;
+                    }
+
+                    $inicioRaw = $get('fecha_registro') ?: $record?->fecha_registro;
+                    $inicio = $inicioRaw ? Carbon::parse($inicioRaw)->startOfDay() : now()->startOfDay();
+                    $fin = Carbon::parse($value)->startOfDay();
+                    $maxPermitido = $inicio->copy()->addYears(3);
+
+                    if ($fin->lt($inicio)) {
+                        $fail("La fecha fin de renta no puede ser anterior a la fecha de registro ({$inicio->format('d/m/Y')}).");
+                    }
+
+                    if ($fin->gt($maxPermitido)) {
+                        $fail("La fecha fin de renta no puede exceder el máximo de 3 años ({$maxPermitido->format('d/m/Y')}).");
+                    }
+                };
+            })
+            ->afterStateHydrated(function (Forms\Components\DatePicker $component, ?Inventario $record): void {
+                if ($record && $record->tipo_propiedad === 'Rentado' && blank($component->getState())) {
+                    $fin = $record->especificaciones['renta_fecha_fin'] ?? $record->fecha_fin_renta?->format('Y-m-d');
+                    if ($fin) {
+                        $component->state($fin);
+                    }
+                }
+            });
+    }
+
+    public static function getReceptorSelectField(): Forms\Components\Select
+    {
+        return Forms\Components\Select::make('id_receptor')
+            ->label('Receptor')
+            ->placeholder('Sin receptor asignado...')
+            ->options(fn (): array => Receptor::orderBy('nombre')
+                ->orderBy('apellido_paterno')
+                ->get()
+                ->mapWithKeys(fn (Receptor $r): array => [$r->id_receptor => $r->nombre_completo])
+                ->toArray())
+            ->searchable()
+            ->preload()
+            ->nullable()
+            ->prefixIcon('heroicon-m-user')
+            ->afterStateHydrated(function (Forms\Components\Select $component, ?Inventario $record): void {
+                if ($record && blank($component->getState())) {
+                    $component->state($record->id_receptor);
+                }
+            });
+    }
+
     protected static function getDatosTecnicosSection(
-        string $heading = '⚙️ Datos técnicos (opcional, se pueden capturar después)',
+        string $heading = '🔧 Especificaciones técnicas',
         ?\Closure $dehydratedCondition = null
     ): Forms\Components\Section {
         $fields = [
-            Forms\Components\TextInput::make('ip_address')
-                ->label('Dirección IP')
-                ->placeholder('192.168.1.__')
-                ->prefixIcon('heroicon-m-globe-alt')
-                ->maxLength(50),
-
-            Forms\Components\TextInput::make('mac_address')
-                ->label('Dirección MAC')
-                ->placeholder('AA:BB:CC:DD:EE:FF')
-                ->prefixIcon('heroicon-m-signal')
-                ->maxLength(50),
+            Forms\Components\TextInput::make('ram')
+                ->label('Memoria RAM')
+                ->placeholder('ej. 8 GB DDR4')
+                ->prefixIcon('heroicon-m-circle-stack')
+                ->maxLength(100),
 
             Forms\Components\TextInput::make('procesador')
                 ->label('Procesador')
                 ->placeholder('ej. Intel Core i5-8500')
                 ->prefixIcon('heroicon-m-cpu-chip')
-                ->maxLength(100),
-
-            Forms\Components\TextInput::make('ram')
-                ->label('Memoria RAM')
-                ->placeholder('ej. 8 GB DDR4')
-                ->prefixIcon('heroicon-m-circle-stack')
                 ->maxLength(100),
 
             Forms\Components\TextInput::make('disco')
@@ -50,6 +104,18 @@ trait InventarioFormFields
                 ->placeholder('ej. Windows 11 Pro')
                 ->prefixIcon('heroicon-m-computer-desktop')
                 ->maxLength(100),
+
+            Forms\Components\TextInput::make('ip_address')
+                ->label('Dirección IP')
+                ->placeholder('192.168.1.__')
+                ->prefixIcon('heroicon-m-globe-alt')
+                ->maxLength(50),
+
+            Forms\Components\TextInput::make('mac_address')
+                ->label('Dirección MAC')
+                ->placeholder('AA:BB:CC:DD:EE:FF')
+                ->prefixIcon('heroicon-m-signal')
+                ->maxLength(50),
         ];
 
         if ($dehydratedCondition) {
@@ -59,8 +125,7 @@ trait InventarioFormFields
         }
 
         return Forms\Components\Section::make($heading)
-            ->collapsible()
-            ->collapsed()
+            ->description('Detalles técnicos y de conectividad del equipo')
             ->schema([
                 Forms\Components\Grid::make(['default' => 1, 'sm' => 2])
                     ->schema($fields),
@@ -68,7 +133,7 @@ trait InventarioFormFields
     }
 
     protected static function getDatosRedSection(
-        string $heading = '🌐 Datos de red (opcional)',
+        string $heading = '🔧 Especificaciones técnicas (Red)',
         ?\Closure $dehydratedCondition = null
     ): Forms\Components\Section {
         $fields = [
@@ -92,8 +157,7 @@ trait InventarioFormFields
         }
 
         return Forms\Components\Section::make($heading)
-            ->collapsible()
-            ->collapsed()
+            ->description('Parámetros de conexión a la red institucional')
             ->schema([
                 Forms\Components\Grid::make(['default' => 1, 'sm' => 2])
                     ->schema($fields),
