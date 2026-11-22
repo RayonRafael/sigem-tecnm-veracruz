@@ -189,7 +189,6 @@ class SigemReportExporter
                 self::aplicarFiltrosInventario($q, $filtros);
 
                 foreach ($q->get() as $inv) {
-                    $deptoId = $inv->departamento_id ?? $inv->area?->id_departamento;
                     $rows[] = [
                         $inv->codigo ?: ('#' . $inv->id_inventario),
                         $inv->material?->nombre ?? $inv->subtipo ?? 'Equipo',
@@ -197,9 +196,13 @@ class SigemReportExporter
                         $inv->material?->marca?->nombre ?? ($inv->especificaciones['marca'] ?? '—'),
                         $inv->modelo ?? $inv->material?->modelo ?? '—',
                         $inv->estado ?? 'Disponible',
-                        ($deptoId && isset($deptosMap[$deptoId])) ? $deptosMap[$deptoId] : 'Sin depto',
-                        $inv->area?->nombre ?? 'Sin área',
+                        self::resolverAreaNombre($inv),
+                        self::resolverDeptoNombre($inv, $deptosMap),
                         $inv->aula_efectiva ?? ($inv->aula ?: ($inv->salon?->nombre ?? '—')),
+                        self::resolverReceptorNombre($inv),
+                        self::resolverFechaRegistro($inv),
+                        self::resolverHoraRegistro($inv),
+                        self::resolverTipoPropiedad($inv),
                         $inv->num_serie ?: 'S/N',
                     ];
                 }
@@ -256,16 +259,25 @@ class SigemReportExporter
                 // 1 sola consulta GROUP BY en lugar de N queries por área
                 $countsQ = Inventario::query()
                     ->whereNotNull('area_id')
-                    ->selectRaw('area_id, COUNT(*) as total')
+                    ->selectRaw("
+                        area_id,
+                        COUNT(*) as total,
+                        SUM(CASE WHEN tipo_propiedad = 'Rentado' THEN 1 ELSE 0 END) as rentados
+                    ")
                     ->groupBy('area_id');
                 self::aplicarFiltroFechas($countsQ, $filtros);
-                $countsByArea = $countsQ->pluck('total', 'area_id');
+                $countsByArea = $countsQ->get()->keyBy('area_id');
 
                 foreach ($areas as $area) {
+                    $stat = $countsByArea->get($area->id_area);
+                    $total = (int) ($stat->total ?? 0);
+                    $rentados = (int) ($stat->rentados ?? 0);
                     $rows[] = [
                         $area->nombre,
                         ($area->id_departamento && isset($deptosMap[$area->id_departamento])) ? $deptosMap[$area->id_departamento] : 'Sin depto',
-                        (int) ($countsByArea[$area->id_area] ?? 0),
+                        $total,
+                        $total - $rentados,
+                        $rentados,
                     ];
                 }
                 break;
@@ -299,15 +311,20 @@ class SigemReportExporter
                 $baseQ = Inventario::query();
                 self::aplicarFiltrosInventario($baseQ, $filtros);
 
-                $estadosDb = $baseQ->selectRaw("COALESCE(estado, 'Disponible') as est, COUNT(*) as cant")
+                $estadosDb = $baseQ->selectRaw("
+                        COALESCE(estado, 'Disponible') as est,
+                        COUNT(*) as cant,
+                        SUM(CASE WHEN tipo_propiedad = 'Rentado' THEN 1 ELSE 0 END) as rentados
+                    ")
                     ->groupByRaw("COALESCE(estado, 'Disponible')")
-                    ->pluck('cant', 'est')
-                    ->toArray();
-                $totalGeneral = array_sum($estadosDb);
+                    ->get();
+                $totalGeneral = (int) $estadosDb->sum('cant');
 
-                foreach ($estadosDb as $estadoNom => $cant) {
+                foreach ($estadosDb as $estRow) {
+                    $cant = (int) $estRow->cant;
+                    $rentados = (int) ($estRow->rentados ?? 0);
                     $porcentaje = $totalGeneral > 0 ? round(($cant / $totalGeneral) * 100, 1) . '%' : '0%';
-                    $rows[] = [$estadoNom, (int) $cant, $porcentaje];
+                    $rows[] = [$estRow->est, $cant, $porcentaje, $cant - $rentados, $rentados];
                 }
                 break;
 
@@ -326,15 +343,18 @@ class SigemReportExporter
                 foreach ($agrupados as $grupo) {
                     $primer = $grupo->first();
                     $aulaNom = $primer->aula_efectiva ?? ($primer->aula ?: ($primer->salon?->nombre ?? 'Sin aula'));
-                    $areaNom = $primer->area?->nombre ?? 'Sin área';
-                    $deptoId = $primer->departamento_id ?? $primer->area?->id_departamento;
-                    $deptoNom = ($deptoId && isset($deptosMap[$deptoId])) ? $deptosMap[$deptoId] : 'Sin depto';
+                    $areaNom = self::resolverAreaNombre($primer);
+                    $deptoNom = self::resolverDeptoNombre($primer, $deptosMap);
+                    $totalGrupo = $grupo->count();
+                    $rentadosGrupo = $grupo->where('tipo_propiedad', 'Rentado')->count();
 
                     $rows[] = [
                         $aulaNom,
                         $areaNom,
                         $deptoNom,
-                        $grupo->count(),
+                        $totalGrupo,
+                        $totalGrupo - $rentadosGrupo,
+                        $rentadosGrupo,
                     ];
                 }
                 break;
@@ -343,6 +363,7 @@ class SigemReportExporter
             // SUB-PESTAÑA 2: ESTADÍSTICAS (6 reportes)
             // ==========================================
             case 'estadisticas_antiguos':
+                $deptosMap = self::getDepartamentosMap();
                 $q = Inventario::with(['material', 'departamento', 'area.departamento']);
                 self::aplicarFiltrosInventario($q, $filtros);
                 $q->orderByRaw('COALESCE(fecha_factura, fecha_registro, created_at) ASC')->limit(20);
@@ -356,14 +377,19 @@ class SigemReportExporter
                         $inv->codigo ?: ('#' . $inv->id_inventario),
                         $inv->material?->nombre ?? $inv->subtipo ?? 'Equipo',
                         $fecha,
-                        $inv->departamento?->nombre ?? $inv->area?->departamento?->nombre ?? 'Sin depto',
+                        self::resolverHoraRegistro($inv),
+                        self::resolverAreaNombre($inv),
+                        self::resolverDeptoNombre($inv, $deptosMap),
+                        self::resolverReceptorNombre($inv),
+                        self::resolverTipoPropiedad($inv),
                         $inv->estado ?? 'Disponible',
                     ];
                 }
                 break;
 
             case 'estadisticas_sin_asignar':
-                $q = Inventario::with(['material.tipo'])->where('estado', 'Disponible')
+                $deptosMap = self::getDepartamentosMap();
+                $q = Inventario::with(['material.tipo', 'area'])->where('estado', 'Disponible')
                     ->where(function ($sub) {
                         $sub->whereNull('departamento_id')->orWhereNull('area_id');
                     });
@@ -374,7 +400,12 @@ class SigemReportExporter
                         $inv->codigo ?: ('#' . $inv->id_inventario),
                         $inv->material?->nombre ?? $inv->subtipo ?? 'Equipo',
                         $inv->material?->tipo?->nombre ?? 'General',
-                        $inv->fecha_registro ? $inv->fecha_registro->format('d/m/Y') : '—',
+                        self::resolverAreaNombre($inv),
+                        self::resolverDeptoNombre($inv, $deptosMap),
+                        self::resolverReceptorNombre($inv),
+                        self::resolverFechaRegistro($inv),
+                        self::resolverHoraRegistro($inv),
+                        self::resolverTipoPropiedad($inv),
                     ];
                 }
                 break;
@@ -405,6 +436,7 @@ class SigemReportExporter
                 break;
 
             case 'estadisticas_mas_movidos':
+                $deptosMap = self::getDepartamentosMap();
                 // Agregación SQL + carga en bloque whereIn (elimina N+1 de find() en bucle)
                 $agg = HistorialEstado::query()
                     ->where(function ($q) {
@@ -421,18 +453,25 @@ class SigemReportExporter
 
                 $ids = $agg->pluck('id_inventario')->filter()->all();
                 $inventariosMap = ! empty($ids)
-                    ? Inventario::with('material')->whereIn('id_inventario', $ids)->get()->keyBy('id_inventario')
+                    ? Inventario::with(['material', 'area'])->whereIn('id_inventario', $ids)->get()->keyBy('id_inventario')
                     : collect();
 
                 foreach ($agg as $row) {
                     $inv = $inventariosMap->get($row->id_inventario);
                     if ($inv) {
-                        $fechaUltimo = $row->ultimo_cambio ? Carbon::parse($row->ultimo_cambio)->format('d/m/Y') : '—';
+                        $dtUltimo = $row->ultimo_cambio ? Carbon::parse($row->ultimo_cambio) : null;
+                        $fechaUltimo = $dtUltimo ? $dtUltimo->format('d/m/Y') : '—';
+                        $horaUltimo = $dtUltimo ? $dtUltimo->format('H:i') : self::resolverHoraRegistro($inv);
                         $rows[] = [
                             $inv->codigo ?: ('#' . $inv->id_inventario),
                             $inv->material?->nombre ?? $inv->subtipo ?? 'Equipo',
                             (int) $row->cant,
                             $fechaUltimo,
+                            $horaUltimo,
+                            self::resolverAreaNombre($inv),
+                            self::resolverDeptoNombre($inv, $deptosMap),
+                            self::resolverReceptorNombre($inv),
+                            self::resolverTipoPropiedad($inv),
                         ];
                     }
                 }
@@ -560,17 +599,23 @@ class SigemReportExporter
                 break;
 
             case 'mantenimiento_en_curso':
+                $deptosMap = self::getDepartamentosMap();
                 $mants = Mantenimiento::with(['inventario.material', 'inventario.departamento', 'inventario.area.departamento'])
                     ->whereIn('estado', ['Pendiente', 'En proceso', 'En Mantenimiento'])
                     ->get();
 
                 foreach ($mants as $m) {
                     $inv = $m->inventario;
+                    $horaMant = $m->created_at ? $m->created_at->format('H:i') : self::resolverHoraRegistro($inv);
                     $rows[] = [
                         $inv?->codigo ?: ('#' . $inv?->id_inventario),
                         $inv?->material?->nombre ?? $inv?->subtipo ?? 'Equipo',
-                        $inv?->departamento?->nombre ?? $inv?->area?->departamento?->nombre ?? 'Sin depto',
+                        self::resolverAreaNombre($inv),
+                        self::resolverDeptoNombre($inv, $deptosMap),
+                        self::resolverReceptorNombre($inv),
                         $m->fecha_solicitud ? Carbon::parse($m->fecha_solicitud)->format('d/m/Y') : '—',
+                        $horaMant,
+                        self::resolverTipoPropiedad($inv),
                     ];
                 }
                 break;
@@ -604,7 +649,8 @@ class SigemReportExporter
                 break;
 
             case 'mantenimiento_historial_equipo':
-                $mants = Mantenimiento::with(['inventario.material'])->orderBy('fecha_solicitud', 'desc');
+                $deptosMap = self::getDepartamentosMap();
+                $mants = Mantenimiento::with(['inventario.material', 'inventario.area'])->orderBy('fecha_solicitud', 'desc');
                 if (! empty($filtros['fecha_desde'])) {
                     $mants->where('fecha_solicitud', '>=', $filtros['fecha_desde']);
                 }
@@ -614,10 +660,16 @@ class SigemReportExporter
 
                 foreach ($mants->limit(200)->get() as $m) {
                     $inv = $m->inventario;
+                    $horaMant = $m->created_at ? $m->created_at->format('H:i') : self::resolverHoraRegistro($inv);
                     $rows[] = [
                         $inv?->codigo ?: ('#' . $inv?->id_inventario),
                         $inv?->material?->nombre ?? $inv?->subtipo ?? 'Equipo',
+                        self::resolverAreaNombre($inv),
+                        self::resolverDeptoNombre($inv, $deptosMap),
+                        self::resolverReceptorNombre($inv),
                         $m->fecha_solicitud ? Carbon::parse($m->fecha_solicitud)->format('d/m/Y') : '—',
+                        $horaMant,
+                        self::resolverTipoPropiedad($inv),
                         $m->tipo_servicio ?? $m->tipo_mantenimiento ?? 'Correctivo',
                         $m->estado ?? 'Pendiente',
                     ];
@@ -625,31 +677,41 @@ class SigemReportExporter
                 break;
 
             // ==========================================
-            // SUB-PESTAÑA 4: RENTAS (5 reportes)
+            // SUB-PESTAÑA 4: RENTAS (6 reportes)
             // ==========================================
             case 'rentas_equipos':
-                $q = Inventario::where('tipo_propiedad', 'Rentado')->with(['material', 'proveedor']);
+                $deptosMap = self::getDepartamentosMap();
+                $q = Inventario::where('tipo_propiedad', 'Rentado')->with(['material', 'proveedor', 'area']);
                 self::aplicarFiltrosInventario($q, $filtros);
 
                 foreach ($q->get() as $inv) {
-                    $ini = $inv->fecha_inicio_renta?->format('d/m/Y') ?? ($inv->especificaciones['fecha_inicio_renta'] ?? '—');
-                    $fin = $inv->fecha_fin_renta?->format('d/m/Y') ?? ($inv->especificaciones['fecha_fin_renta'] ?? '—');
+                    $ini = $inv->fecha_inicio_renta?->format('d/m/Y')
+                        ?? ($inv->especificaciones['fecha_inicio_renta'] ?? self::resolverFechaRegistro($inv));
+                    $fin = $inv->fecha_fin_renta?->format('d/m/Y')
+                        ?? $inv->renta_fecha_fin?->format('d/m/Y')
+                        ?? ($inv->especificaciones['fecha_fin_renta'] ?? '—');
 
                     $rows[] = [
                         $inv->codigo ?: ('#' . $inv->id_inventario),
                         $inv->material?->nombre ?? $inv->subtipo ?? 'Equipo',
                         $inv->proveedor?->nombre_empresa ?? 'Sin proveedor',
+                        self::resolverAreaNombre($inv),
+                        self::resolverDeptoNombre($inv, $deptosMap),
+                        self::resolverReceptorNombre($inv),
                         $ini,
+                        self::resolverHoraRegistro($inv),
                         $fin,
+                        self::resolverTipoPropiedad($inv),
                     ];
                 }
                 break;
 
             case 'rentas_proximas_vencer':
+                $deptosMap = self::getDepartamentosMap();
                 $hoy = Carbon::now()->startOfDay();
                 $limite = Carbon::now()->addDays(90)->endOfDay();
 
-                $rentados = Inventario::where('tipo_propiedad', 'Rentado')->with(['material', 'proveedor'])->get();
+                $rentados = Inventario::where('tipo_propiedad', 'Rentado')->with(['material', 'proveedor', 'area'])->get();
                 foreach ($rentados as $inv) {
                     $fechaFin = $inv->fecha_fin_renta ?? (! empty($inv->especificaciones['fecha_fin_renta']) ? Carbon::parse($inv->especificaciones['fecha_fin_renta']) : null);
                     if ($fechaFin && $fechaFin->gte($hoy) && $fechaFin->lte($limite)) {
@@ -660,14 +722,21 @@ class SigemReportExporter
                             $inv->proveedor?->nombre_empresa ?? 'Sin proveedor',
                             $fechaFin->format('d/m/Y'),
                             max(0, $diasRestantes) . ' días',
+                            self::resolverAreaNombre($inv),
+                            self::resolverDeptoNombre($inv, $deptosMap),
+                            self::resolverReceptorNombre($inv),
+                            self::resolverFechaRegistro($inv),
+                            self::resolverHoraRegistro($inv),
+                            self::resolverTipoPropiedad($inv),
                         ];
                     }
                 }
                 break;
 
             case 'rentas_vencidas':
+                $deptosMap = self::getDepartamentosMap();
                 $hoy = Carbon::now()->startOfDay();
-                $rentados = Inventario::where('tipo_propiedad', 'Rentado')->with(['material', 'proveedor'])->get();
+                $rentados = Inventario::where('tipo_propiedad', 'Rentado')->with(['material', 'proveedor', 'area'])->get();
 
                 foreach ($rentados as $inv) {
                     $fechaFin = $inv->fecha_fin_renta ?? (! empty($inv->especificaciones['fecha_fin_renta']) ? Carbon::parse($inv->especificaciones['fecha_fin_renta']) : null);
@@ -677,8 +746,14 @@ class SigemReportExporter
                             $inv->codigo ?: ('#' . $inv->id_inventario),
                             $inv->material?->nombre ?? $inv->subtipo ?? 'Equipo',
                             $inv->proveedor?->nombre_empresa ?? 'Sin proveedor',
+                            self::resolverAreaNombre($inv),
+                            self::resolverDeptoNombre($inv, $deptosMap),
+                            self::resolverReceptorNombre($inv),
+                            self::resolverFechaRegistro($inv),
+                            self::resolverHoraRegistro($inv),
                             $fechaFin->format('d/m/Y'),
                             $diasVencida . ' días vencida',
+                            self::resolverTipoPropiedad($inv),
                         ];
                     }
                 }
@@ -738,7 +813,8 @@ class SigemReportExporter
                 break;
 
             case 'rent_seguimiento':
-                $q = Inventario::where('tipo_propiedad', 'Rentado')->with(['material', 'proveedor']);
+                $deptosMap = self::getDepartamentosMap();
+                $q = Inventario::where('tipo_propiedad', 'Rentado')->with(['material', 'proveedor', 'area']);
                 self::aplicarFiltrosInventario($q, $filtros);
 
                 $items = [];
@@ -767,6 +843,11 @@ class SigemReportExporter
                             $inv->renta_fecha_fin ? $inv->renta_fecha_fin->format('d/m/Y') : '—',
                             $dias !== null ? ($dias . ' días') : '—',
                             $badgeTexto,
+                            self::resolverAreaNombre($inv),
+                            self::resolverDeptoNombre($inv, $deptosMap),
+                            self::resolverReceptorNombre($inv),
+                            self::resolverHoraRegistro($inv),
+                            self::resolverTipoPropiedad($inv),
                         ],
                     ];
                 }
@@ -787,11 +868,12 @@ class SigemReportExporter
             // SUB-PESTAÑA 5: HISTÓRICO (5 reportes)
             // ==========================================
             case 'historico_cambios_area':
+                $deptosMap = self::getDepartamentosMap();
                 $historial = HistorialEstado::where(function ($q) {
                     $q->where('motivo_cambio', 'like', '%área%')
                         ->orWhere('motivo_cambio', 'like', '%ubicación%')
                         ->orWhere('motivo_cambio', 'like', '%Cambio%');
-                })->with(['inventario.material', 'usuario'])->orderBy('fecha_cambio', 'desc');
+                })->with(['inventario.material', 'inventario.area', 'usuario'])->orderBy('fecha_cambio', 'desc');
 
                 if (! empty($filtros['fecha_desde'])) {
                     $historial->where('fecha_cambio', '>=', Carbon::parse($filtros['fecha_desde'])->startOfDay());
@@ -801,14 +883,21 @@ class SigemReportExporter
                 }
 
                 foreach ($historial->limit(200)->get() as $h) {
+                    $inv = $h->inventario;
                     $motivo = $h->motivo_cambio ?? '';
                     $partes = explode('→', $motivo);
                     $origen = isset($partes[0]) ? trim(str_replace(['Cambio de área:', 'Cambio de ubicación:'], '', $partes[0])) : '—';
                     $destino = isset($partes[1]) ? trim($partes[1]) : ($h->ubicacion_fisica ?: '—');
+                    $dtCambio = $h->fecha_cambio ? Carbon::parse($h->fecha_cambio) : ($h->created_at ? Carbon::parse($h->created_at) : null);
 
                     $rows[] = [
-                        $h->fecha_cambio ? Carbon::parse($h->fecha_cambio)->format('d/m/Y H:i') : '—',
-                        $h->inventario?->codigo ?: ($h->inventario?->material?->nombre ?? ('#' . $h->id_inventario)),
+                        $dtCambio ? $dtCambio->format('d/m/Y') : '—',
+                        $dtCambio ? $dtCambio->format('H:i') : self::resolverHoraRegistro($inv),
+                        $inv?->codigo ?: ($inv?->material?->nombre ?? ('#' . $h->id_inventario)),
+                        self::resolverAreaNombre($inv),
+                        self::resolverDeptoNombre($inv, $deptosMap),
+                        self::resolverReceptorNombre($inv),
+                        self::resolverTipoPropiedad($inv),
                         $origen ?: 'Sin origen',
                         $destino ?: 'Sin destino',
                         $h->usuario?->name ?? 'Sistema',
@@ -817,14 +906,23 @@ class SigemReportExporter
                 break;
 
             case 'historico_bajas':
-                $bajas = Inventario::whereIn('estado', ['Dado de baja', 'Baja'])->with(['material', 'usuario'])->orderBy('fecha_baja', 'desc');
+                $deptosMap = self::getDepartamentosMap();
+                $bajas = Inventario::whereIn('estado', ['Dado de baja', 'Baja'])->with(['material', 'area', 'usuario'])->orderBy('fecha_baja', 'desc');
                 self::aplicarFiltrosInventario($bajas, $filtros);
 
                 foreach ($bajas->get() as $inv) {
+                    $horaBaja = ($inv->fecha_baja && $inv->fecha_baja->format('H:i') !== '00:00')
+                        ? $inv->fecha_baja->format('H:i')
+                        : self::resolverHoraRegistro($inv);
                     $rows[] = [
                         $inv->codigo ?: ('#' . $inv->id_inventario),
                         $inv->material?->nombre ?? $inv->subtipo ?? 'Equipo',
+                        self::resolverAreaNombre($inv),
+                        self::resolverDeptoNombre($inv, $deptosMap),
+                        self::resolverReceptorNombre($inv),
                         $inv->fecha_baja ? Carbon::parse($inv->fecha_baja)->format('d/m/Y') : '—',
+                        $horaBaja,
+                        self::resolverTipoPropiedad($inv),
                         $inv->motivo_baja ?? ($inv->especificaciones['motivo_baja'] ?? 'Dictamen técnico'),
                         $inv->usuario?->name ?? 'Administrador',
                     ];
@@ -832,7 +930,8 @@ class SigemReportExporter
                 break;
 
             case 'historico_entregas':
-                $solicitudes = Solicitud::with(['detalles.inventario.material', 'receptor', 'usuario'])
+                $deptosMap = self::getDepartamentosMap();
+                $solicitudes = Solicitud::with(['detalles.inventario.material', 'detalles.inventario.area', 'receptor.area.departamento', 'usuario'])
                     ->where(function ($q) {
                         $q->where('tipo_movimiento', 'like', '%entrega%')
                             ->orWhere('tipo_movimiento', 'like', '%asignac%')
@@ -848,17 +947,30 @@ class SigemReportExporter
                 }
 
                 foreach ($solicitudes->limit(200)->get() as $sol) {
-                    $recNom = $sol->receptor ? trim("{$sol->receptor->nombre} {$sol->receptor->apellido_paterno}") : 'Sin receptor';
-                    $deptoRec = $sol->receptor?->departamento ?? '—';
+                    $recNom = $sol->receptor ? trim("{$sol->receptor->nombre} {$sol->receptor->apellido_paterno}") : '—';
+                    $deptoRec = $sol->receptor?->area?->departamento?->nombre ?? $sol->receptor?->departamento ?? '—';
+                    $areaRec = $sol->receptor?->area?->nombre ?? 'Sin área';
                     $fechaSol = $sol->fecha_solicitud ? Carbon::parse($sol->fecha_solicitud)->format('d/m/Y') : '—';
+                    $horaSol = $sol->created_at ? $sol->created_at->format('H:i') : '—';
 
                     if ($sol->detalles->isNotEmpty()) {
                         foreach ($sol->detalles as $det) {
-                            $cod = $det->inventario?->codigo ?: ($det->inventario?->material?->nombre ?? ('Sol #' . $sol->id_solicitud));
-                            $rows[] = [$fechaSol, $cod, $recNom, $deptoRec];
+                            $inv = $det->inventario;
+                            $cod = $inv?->codigo ?: ($inv?->material?->nombre ?? ('Sol #' . $sol->id_solicitud));
+                            $areaNom = $inv?->area?->nombre ?? $areaRec;
+                            $deptoNom = $inv ? self::resolverDeptoNombre($inv, $deptosMap) : $deptoRec;
+                            $rows[] = [
+                                $fechaSol,
+                                $horaSol,
+                                $cod,
+                                $areaNom,
+                                $deptoNom,
+                                $recNom ?: self::resolverReceptorNombre($inv),
+                                self::resolverTipoPropiedad($inv),
+                            ];
                         }
                     } else {
-                        $rows[] = [$fechaSol, 'Solicitud #' . $sol->id_solicitud, $recNom, $deptoRec];
+                        $rows[] = [$fechaSol, $horaSol, 'Solicitud #' . $sol->id_solicitud, $areaRec, $deptoRec, $recNom, 'Propio'];
                     }
                 }
                 break;
@@ -887,7 +999,8 @@ class SigemReportExporter
                 break;
 
             case 'historico_general':
-                $historial = HistorialEstado::with(['inventario.material', 'usuario'])->orderBy('fecha_cambio', 'desc');
+                $deptosMap = self::getDepartamentosMap();
+                $historial = HistorialEstado::with(['inventario.material', 'inventario.area', 'usuario'])->orderBy('fecha_cambio', 'desc');
                 if (! empty($filtros['fecha_desde'])) {
                     $historial->where('fecha_cambio', '>=', Carbon::parse($filtros['fecha_desde'])->startOfDay());
                 }
@@ -896,10 +1009,17 @@ class SigemReportExporter
                 }
 
                 foreach ($historial->limit(500)->get() as $h) {
-                    $eq = $h->inventario?->codigo ?: ($h->inventario?->material?->nombre ?? ('Equipo #' . $h->id_inventario));
+                    $inv = $h->inventario;
+                    $eq = $inv?->codigo ?: ($inv?->material?->nombre ?? ('Equipo #' . $h->id_inventario));
+                    $dtCambio = $h->fecha_cambio ? Carbon::parse($h->fecha_cambio) : ($h->created_at ? Carbon::parse($h->created_at) : null);
                     $rows[] = [
-                        $h->fecha_cambio ? Carbon::parse($h->fecha_cambio)->format('d/m/Y H:i') : '—',
+                        $dtCambio ? $dtCambio->format('d/m/Y') : '—',
+                        $dtCambio ? $dtCambio->format('H:i') : self::resolverHoraRegistro($inv),
                         $eq,
+                        self::resolverAreaNombre($inv),
+                        self::resolverDeptoNombre($inv, $deptosMap),
+                        self::resolverReceptorNombre($inv),
+                        self::resolverTipoPropiedad($inv),
                         $h->estado_anterior ?? '—',
                         $h->estado_nuevo ?? '—',
                         $h->motivo_cambio ?? '—',
@@ -1293,6 +1413,97 @@ class SigemReportExporter
                     ->orWhere("{$tablePrefix}.created_at", '<=', $hasta);
             });
         }
+    }
+
+    /**
+     * Resuelve el nombre del área sin disparar consultas N+1.
+     */
+    protected static function resolverAreaNombre(?Inventario $inv): string
+    {
+        return $inv?->area?->nombre ?? 'Sin área';
+    }
+
+    /**
+     * Resuelve el nombre del departamento usando el mapa cacheado o relaciones cargadas.
+     */
+    protected static function resolverDeptoNombre(?Inventario $inv, array $deptosMap = []): string
+    {
+        if (! $inv) {
+            return 'Sin depto';
+        }
+
+        $deptoId = $inv->departamento_id ?? $inv->area?->id_departamento;
+        if ($deptoId && isset($deptosMap[$deptoId])) {
+            return $deptosMap[$deptoId];
+        }
+
+        if ($inv->relationLoaded('departamento') && $inv->departamento) {
+            return $inv->departamento->nombre;
+        }
+
+        if ($inv->relationLoaded('area') && $inv->area && $inv->area->relationLoaded('departamento') && $inv->area->departamento) {
+            return $inv->area->departamento->nombre;
+        }
+
+        return 'Sin depto';
+    }
+
+    /**
+     * Resuelve el nombre del receptor desde especificaciones JSON (sin N+1).
+     */
+    protected static function resolverReceptorNombre(?Inventario $inv): string
+    {
+        if (! $inv) {
+            return '—';
+        }
+
+        $specs = is_array($inv->especificaciones) ? $inv->especificaciones : [];
+        $nombre = trim((string) ($specs['receptor_nombre'] ?? ''));
+
+        if ($nombre !== '') {
+            return $nombre;
+        }
+
+        if ($inv->relationLoaded('receptor') && $inv->receptor) {
+            $completo = trim((string) $inv->receptor->nombre_completo);
+            if ($completo !== '') {
+                return $completo;
+            }
+        }
+
+        return '—';
+    }
+
+    /**
+     * Resuelve la fecha de registro en formato DD/MM/AAAA.
+     */
+    protected static function resolverFechaRegistro(?Inventario $inv): string
+    {
+        if (! $inv) {
+            return '—';
+        }
+
+        if ($inv->fecha_registro) {
+            return $inv->fecha_registro->format('d/m/Y');
+        }
+
+        return $inv->created_at ? $inv->created_at->format('d/m/Y') : '—';
+    }
+
+    /**
+     * Resuelve la hora de registro en formato 24h HH:MM desde created_at.
+     */
+    protected static function resolverHoraRegistro(?Inventario $inv): string
+    {
+        return ($inv && $inv->created_at) ? $inv->created_at->format('H:i') : '—';
+    }
+
+    /**
+     * Resuelve el tipo de propiedad ("Propio" / "Rentado").
+     */
+    protected static function resolverTipoPropiedad(?Inventario $inv): string
+    {
+        return $inv?->tipo_propiedad ?: 'Propio';
     }
 }
 

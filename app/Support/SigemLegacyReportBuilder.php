@@ -98,11 +98,15 @@ class SigemLegacyReportBuilder
             $asig = (int) $st->asignados;
             $cambio = (int) $st->reasignados;
             $baja = (int) $st->solicitud_baja;
+            $propios = (int) $st->propios;
+            $rentados = (int) $st->rentados;
 
             if ($formato === 'xlsx') {
                 $rows[] = [
                     'categoria' => $tipo->nombre,
                     'total' => $total,
+                    'propio' => $propios,
+                    'rentado' => $rentados,
                     'disponible' => $disp,
                     'en_mantto' => $mantto,
                     'asignado' => $asig,
@@ -113,6 +117,8 @@ class SigemLegacyReportBuilder
                 $rows[] = [
                     'categoria' => '<strong>' . e($tipo->nombre) . '</strong>',
                     'total' => '<span class="sigem-td-folio">' . $total . '</span>',
+                    'propio' => self::renderBadgeConteo($propios, 'info'),
+                    'rentado' => self::renderBadgeConteo($rentados, 'warn'),
                     'disponible' => self::renderBadgeConteo($disp, 'ok'),
                     'en_mantto' => self::renderBadgeConteo($mantto, 'warn'),
                     'asignado' => self::renderBadgeConteo($asig, 'info'),
@@ -127,7 +133,7 @@ class SigemLegacyReportBuilder
             'emoji' => '📦',
             'titulo' => 'Inventario por categoría',
             'fecha' => $fecha,
-            'headers' => ['Categoría', 'Total', 'Disponible', 'En mantto', 'Asignado', 'Cambio área', 'Solicitud baja'],
+            'headers' => ['Categoría', 'Total', 'Propio', 'Rentado', 'Disponible', 'En mantto', 'Asignado', 'Cambio área', 'Solicitud baja'],
             'rows' => $rows,
         ];
     }
@@ -188,11 +194,17 @@ class SigemLegacyReportBuilder
             $baja = $areaInventarios->where(function ($i) {
                 return in_array($i->estado, ['Dañado', 'Baja']) || $i->estado_registro === 'Rechazado';
             })->count();
+            $propios = $areaInventarios->where('tipo_propiedad', 'Propio')->count();
+            $rentados = $areaInventarios->where('tipo_propiedad', 'Rentado')->count();
+            $deptoNombre = $area->departamento?->nombre ?? 'Sin depto';
 
             if ($formato === 'xlsx') {
                 $rows[] = [
-                    'area' => $area->nombre . ($area->departamento ? ' (' . $area->departamento->nombre . ')' : ''),
+                    'area' => $area->nombre,
+                    'departamento' => $deptoNombre,
                     'total' => $total,
+                    'propio' => $propios,
+                    'rentado' => $rentados,
                     'disponible' => $disp,
                     'en_mantto' => $mantto,
                     'asignado' => $asig,
@@ -201,8 +213,11 @@ class SigemLegacyReportBuilder
                 ];
             } else {
                 $rows[] = [
-                    'area' => '<strong>' . e($area->nombre) . '</strong>' . ($area->departamento ? '<div style="font-size:12px;color:var(--sig-muted);">' . e($area->departamento->nombre) . '</div>' : ''),
+                    'area' => '<strong>' . e($area->nombre) . '</strong>',
+                    'departamento' => e($deptoNombre),
                     'total' => '<span class="sigem-td-folio">' . $total . '</span>',
+                    'propio' => self::renderBadgeConteo($propios, 'info'),
+                    'rentado' => self::renderBadgeConteo($rentados, 'warn'),
                     'disponible' => self::renderBadgeConteo($disp, 'ok'),
                     'en_mantto' => self::renderBadgeConteo($mantto, 'warn'),
                     'asignado' => self::renderBadgeConteo($asig, 'info'),
@@ -219,29 +234,40 @@ class SigemLegacyReportBuilder
             'fecha' => $fecha,
             'headers' => $formato === 'csv'
                 ? ['Departamento', 'Área', 'Total Activos', 'Propio', 'Renta', 'Disponibles', 'Asignados']
-                : ['Área', 'Total', 'Disponible', 'En mantto', 'Asignado', 'Cambio área', 'Solicitud baja'],
+                : ['Área', 'Departamento', 'Total', 'Propio', 'Rentado', 'Disponible', 'En mantto', 'Asignado', 'Cambio área', 'Solicitud baja'],
             'rows' => $rows,
         ];
     }
 
     protected static function equiposMantenimiento(string $fecha, string $formato): array
     {
-        $mantenimientos = Mantenimiento::with(['inventario.material.tipo', 'inventario.area', 'inventario.salon'])
+        $mantenimientos = Mantenimiento::with(['inventario.material.tipo', 'inventario.area.departamento', 'inventario.departamento', 'inventario.salon'])
             ->latest('fecha_solicitud')
             ->get();
         $rows = [];
 
         if ($formato === 'csv') {
             foreach ($mantenimientos as $m) {
-                $esPropio = ($m->inventario?->tipo_propiedad ?? 'Propio') === 'Propio';
+                $inv = $m->inventario;
+                $esPropio = ($inv?->tipo_propiedad ?? 'Propio') === 'Propio';
+                $area = $inv?->area?->nombre ?? 'Sin área';
+                $depto = $inv?->departamento?->nombre ?? $inv?->area?->departamento?->nombre ?? 'Sin depto';
+                $receptor = self::extraerReceptor($inv);
+                $fechaStr = $m->fecha_solicitud ? $m->fecha_solicitud->format('d/m/Y') : ($inv?->fecha_registro?->format('d/m/Y') ?? '—');
+                $horaStr = $m->created_at ? $m->created_at->format('H:i') : ($inv?->created_at?->format('H:i') ?? '—');
+
                 $rows[] = [
-                    'serie' => $m->inventario?->num_serie ?? 'S/N',
-                    'equipo' => $m->inventario?->material?->nombre ?? 'N/A',
+                    'serie' => $inv?->num_serie ?? 'S/N',
+                    'equipo' => $inv?->material?->nombre ?? 'N/A',
+                    'area' => $area,
+                    'departamento' => $depto,
+                    'receptor' => $receptor,
+                    'fecha' => $fechaStr,
+                    'hora' => $horaStr,
                     'propiedad' => $esPropio ? 'Propio' : 'Rentado',
                     'servicio' => $m->tipo_servicio,
                     'mantenimiento' => $m->tipo_mantenimiento,
                     'tecnico' => $m->nombre_tecnico,
-                    'fecha' => $m->fecha_solicitud ? $m->fecha_solicitud->format('d/m/Y') : 'N/A',
                     'estado' => $m->estado,
                 ];
             }
@@ -251,7 +277,7 @@ class SigemLegacyReportBuilder
                 'emoji' => '🔧',
                 'titulo' => 'Equipos en mantenimiento',
                 'fecha' => $fecha,
-                'headers' => ['No. Serie', 'Equipo / Material', 'Propiedad', 'Servicio', 'Tipo', 'Técnico', 'Fecha', 'Estado'],
+                'headers' => ['No. Serie', 'Equipo / Material', 'Área', 'Departamento', 'Receptor', 'Fecha', 'Hora', 'Tipo Propiedad', 'Servicio', 'Tipo', 'Técnico', 'Estado'],
                 'rows' => $rows,
             ];
         }
@@ -263,7 +289,12 @@ class SigemLegacyReportBuilder
             $codigo = $inv?->codigo ?: ($inv?->num_serie ?: ('#' . $m->id_inventario));
             $equipo = $inv?->material?->nombre ?? $inv?->subtipo ?? 'N/A';
             $categoria = $inv?->material?->tipo?->nombre ?? $inv?->subtipo ?? 'General';
-            $area = $inv?->area?->nombre ?? ($inv?->ubicacion_fisica ?: 'Centro de Cómputo');
+            $area = $inv?->area?->nombre ?? ($inv?->ubicacion_fisica ?: 'Sin área');
+            $depto = $inv?->departamento?->nombre ?? $inv?->area?->departamento?->nombre ?? 'Sin depto';
+            $receptor = self::extraerReceptor($inv);
+            $fechaStr = $m->fecha_solicitud ? $m->fecha_solicitud->format('d/m/Y') : ($inv?->fecha_registro?->format('d/m/Y') ?? '—');
+            $horaStr = $m->created_at ? $m->created_at->format('H:i') : ($inv?->created_at?->format('H:i') ?? '—');
+            $tipoProp = $inv?->tipo_propiedad ?? 'Propio';
 
             if ($formato === 'xlsx') {
                 $rows[] = [
@@ -271,7 +302,12 @@ class SigemLegacyReportBuilder
                     'equipo' => $equipo,
                     'categoria' => $categoria,
                     'area' => $area,
+                    'departamento' => $depto,
                     'aula' => $aula,
+                    'receptor' => $receptor,
+                    'fecha' => $fechaStr,
+                    'hora' => $horaStr,
+                    'tipo_propiedad' => $tipoProp,
                 ];
             } else {
                 $rows[] = [
@@ -279,7 +315,12 @@ class SigemLegacyReportBuilder
                     'equipo' => '<strong>' . e($equipo) . '</strong>',
                     'categoria' => '<span class="sigem-pill neutral">' . e($categoria) . '</span>',
                     'area' => e($area),
+                    'departamento' => e($depto),
                     'aula' => '<span class="sigem-td-folio">' . e($aula) . '</span>',
+                    'receptor' => e($receptor),
+                    'fecha' => '<span class="sigem-td-folio">' . e($fechaStr) . '</span>',
+                    'hora' => '<span class="sigem-td-folio">' . e($horaStr) . '</span>',
+                    'tipo_propiedad' => '<span class="sigem-pill ' . ($tipoProp === 'Rentado' ? 'warn' : 'info') . '">' . e($tipoProp) . '</span>',
                 ];
             }
         }
@@ -289,14 +330,14 @@ class SigemLegacyReportBuilder
             'emoji' => '🔧',
             'titulo' => 'Equipos en mantenimiento',
             'fecha' => $fecha,
-            'headers' => ['Código', 'Equipo', 'Categoría', 'Área', 'Aula'],
+            'headers' => ['Código', 'Equipo', 'Categoría', 'Área', 'Departamento', 'Aula', 'Receptor', 'Fecha', 'Hora', 'Tipo Propiedad'],
             'rows' => $rows,
         ];
     }
 
     protected static function equiposBajaDanados(string $fecha, string $formato): array
     {
-        $inventarios = Inventario::with(['material.tipo', 'area'])
+        $inventarios = Inventario::with(['material.tipo', 'area.departamento', 'departamento'])
             ->where(function ($q) {
                 $q->whereIn('estado', ['Dañado', 'Baja'])
                     ->orWhere('estado_registro', 'Rechazado');
@@ -308,15 +349,24 @@ class SigemLegacyReportBuilder
 
         if ($formato === 'csv') {
             foreach ($inventarios as $i) {
-                $fFecha = $i->fecha_baja ? $i->fecha_baja->format('d/m/Y') : ($i->fecha_registro ? $i->fecha_registro->format('d/m/Y') : 'N/A');
+                $fFecha = $i->fecha_baja ? $i->fecha_baja->format('d/m/Y') : ($i->fecha_registro ? $i->fecha_registro->format('d/m/Y') : '—');
+                $fHora = $i->created_at ? $i->created_at->format('H:i') : '—';
+                $area = $i->area?->nombre ?? 'Sin área';
+                $depto = $i->departamento?->nombre ?? $i->area?->departamento?->nombre ?? 'Sin depto';
+                $receptor = self::extraerReceptor($i);
+
                 $rows[] = [
                     'serie' => $i->num_serie ?? 'S/N',
                     'material' => $i->material?->nombre ?? 'N/A',
+                    'area' => $area,
+                    'departamento' => $depto,
+                    'receptor' => $receptor,
+                    'fecha' => $fFecha,
+                    'hora' => $fHora,
                     'propiedad' => $i->tipo_propiedad ?? 'Propio',
                     'ubicacion' => $i->ubicacion_fisica ?? 'No especificada',
                     'estado' => $i->estado,
                     'registro' => $i->estado_registro ?? 'Pendiente',
-                    'fecha' => $fFecha,
                 ];
             }
 
@@ -325,17 +375,21 @@ class SigemLegacyReportBuilder
                 'emoji' => '⚠️',
                 'titulo' => 'Equipos con solicitud de baja',
                 'fecha' => $fecha,
-                'headers' => ['No. Serie', 'Material', 'Propiedad', 'Ubicación', 'Estado', 'Registro', 'Fecha'],
+                'headers' => ['No. Serie', 'Material', 'Área', 'Departamento', 'Receptor', 'Fecha', 'Hora', 'Tipo Propiedad', 'Ubicación', 'Estado', 'Registro'],
                 'rows' => $rows,
             ];
         }
 
         foreach ($inventarios as $i) {
-            $fFecha = $i->fecha_baja ? $i->fecha_baja->format('d/m/Y') : ($i->updated_at ? $i->updated_at->format('d/m/Y') : 'N/A');
+            $fFecha = $i->fecha_baja ? $i->fecha_baja->format('d/m/Y') : ($i->fecha_registro ? $i->fecha_registro->format('d/m/Y') : ($i->updated_at ? $i->updated_at->format('d/m/Y') : '—'));
+            $fHora = $i->created_at ? $i->created_at->format('H:i') : '—';
             $codigo = $i->codigo ?: ($i->num_serie ?: ('#' . $i->id_inventario));
             $equipo = $i->material?->nombre ?? $i->subtipo ?? 'N/A';
             $categoria = $i->material?->tipo?->nombre ?? $i->subtipo ?? 'General';
-            $area = $i->area?->nombre ?? ($i->ubicacion_fisica ?: 'Centro de Cómputo');
+            $area = $i->area?->nombre ?? ($i->ubicacion_fisica ?: 'Sin área');
+            $depto = $i->departamento?->nombre ?? $i->area?->departamento?->nombre ?? 'Sin depto';
+            $receptor = self::extraerReceptor($i);
+            $tipoProp = $i->tipo_propiedad ?? 'Propio';
 
             if ($formato === 'xlsx') {
                 $rows[] = [
@@ -343,7 +397,11 @@ class SigemLegacyReportBuilder
                     'equipo' => $equipo,
                     'categoria' => $categoria,
                     'area' => $area,
-                    'ultimo_movimiento' => $fFecha,
+                    'departamento' => $depto,
+                    'receptor' => $receptor,
+                    'fecha' => $fFecha,
+                    'hora' => $fHora,
+                    'tipo_propiedad' => $tipoProp,
                 ];
             } else {
                 $rows[] = [
@@ -351,7 +409,11 @@ class SigemLegacyReportBuilder
                     'equipo' => '<strong>' . e($equipo) . '</strong>',
                     'categoria' => '<span class="sigem-pill neutral">' . e($categoria) . '</span>',
                     'area' => e($area),
-                    'ultimo_movimiento' => '<span class="sigem-td-folio">' . e($fFecha) . '</span>',
+                    'departamento' => e($depto),
+                    'receptor' => e($receptor),
+                    'fecha' => '<span class="sigem-td-folio">' . e($fFecha) . '</span>',
+                    'hora' => '<span class="sigem-td-folio">' . e($fHora) . '</span>',
+                    'tipo_propiedad' => '<span class="sigem-pill ' . ($tipoProp === 'Rentado' ? 'warn' : 'info') . '">' . e($tipoProp) . '</span>',
                 ];
             }
         }
@@ -361,7 +423,7 @@ class SigemLegacyReportBuilder
             'emoji' => '⚠️',
             'titulo' => 'Equipos con solicitud de baja',
             'fecha' => $fecha,
-            'headers' => ['Código', 'Equipo', 'Categoría', 'Área', 'Último movimiento'],
+            'headers' => ['Código', 'Equipo', 'Categoría', 'Área', 'Departamento', 'Receptor', 'Fecha', 'Hora', 'Tipo Propiedad'],
             'rows' => $rows,
         ];
     }
@@ -376,9 +438,11 @@ class SigemLegacyReportBuilder
                     'folio' => 'FOLIO-' . str_pad((string) $s->id_solicitud, 5, '0', STR_PAD_LEFT),
                     'tipo' => (string) $s->tipo_movimiento,
                     'solicitante' => $s->usuario?->name ?? 'N/A',
-                    'receptor' => $s->receptor?->nombre ?? 'N/A',
-                    'departamento' => $s->receptor?->area?->departamento?->nombre ?? 'N/A',
-                    'fecha' => $s->fecha_solicitud ? $s->fecha_solicitud->format('d/m/Y') : 'N/A',
+                    'receptor' => $s->receptor?->nombre_completo ?? $s->receptor?->nombre ?? '—',
+                    'area' => $s->receptor?->area?->nombre ?? 'Sin área',
+                    'departamento' => $s->receptor?->area?->departamento?->nombre ?? 'Sin depto',
+                    'fecha' => $s->fecha_solicitud ? $s->fecha_solicitud->format('d/m/Y') : '—',
+                    'hora' => $s->created_at ? $s->created_at->format('H:i') : '—',
                     'estado' => (string) $s->estado,
                 ];
             }
@@ -388,7 +452,7 @@ class SigemLegacyReportBuilder
                 'emoji' => '📋',
                 'titulo' => 'Solicitudes de material',
                 'fecha' => $fecha,
-                'headers' => ['Folio', 'Tipo Movimiento', 'Solicitante', 'Receptor', 'Departamento', 'Fecha', 'Estado'],
+                'headers' => ['Folio', 'Tipo Movimiento', 'Solicitante', 'Receptor', 'Área', 'Departamento', 'Fecha', 'Hora', 'Estado'],
                 'rows' => $rows,
             ];
         }
@@ -470,7 +534,8 @@ class SigemLegacyReportBuilder
         if ($formato === 'csv') {
             foreach ($activities as $a) {
                 $rows[] = [
-                    'fecha' => $a->created_at ? $a->created_at->format('d/m/Y H:i') : 'N/A',
+                    'fecha' => $a->created_at ? $a->created_at->format('d/m/Y') : '—',
+                    'hora' => $a->created_at ? $a->created_at->format('H:i') : '—',
                     'usuario' => $a->causer?->name ?? 'Sistema',
                     'accion' => $a->event ?? $a->description ?? 'evento',
                     'modulo' => class_basename($a->subject_type ?? 'Sistema'),
@@ -483,13 +548,14 @@ class SigemLegacyReportBuilder
                 'emoji' => '📝',
                 'titulo' => 'Movimientos SS',
                 'fecha' => $fecha,
-                'headers' => ['Fecha y Hora', 'Usuario', 'Acción', 'Módulo', 'Descripción'],
+                'headers' => ['Fecha', 'Hora', 'Usuario', 'Acción', 'Módulo', 'Descripción'],
                 'rows' => $rows,
             ];
         }
 
         foreach ($activities as $a) {
-            $fFecha = $a->created_at ? $a->created_at->format('d/m/Y H:i') : 'N/A';
+            $fFecha = $a->created_at ? $a->created_at->format('d/m/Y') : '—';
+            $fHora = $a->created_at ? $a->created_at->format('H:i') : '—';
             $usuario = $a->causer?->name ?? 'Sistema';
             $accion = ucfirst($a->event ?? $a->description ?? 'Actividad');
             $detalle = $a->description ?? 'Sin detalle adicional';
@@ -497,6 +563,7 @@ class SigemLegacyReportBuilder
             if ($formato === 'xlsx') {
                 $rows[] = [
                     'fecha' => $fFecha,
+                    'hora' => $fHora,
                     'usuario' => $usuario,
                     'accion' => $accion,
                     'detalle' => $detalle,
@@ -504,6 +571,7 @@ class SigemLegacyReportBuilder
             } else {
                 $rows[] = [
                     'fecha' => '<span class="sigem-td-folio">' . e($fFecha) . '</span>',
+                    'hora' => '<span class="sigem-td-folio">' . e($fHora) . '</span>',
                     'usuario' => '<strong>' . e($usuario) . '</strong>',
                     'accion' => self::renderBadgeAccion($accion),
                     'detalle' => e($detalle),
@@ -516,9 +584,24 @@ class SigemLegacyReportBuilder
             'emoji' => '📝',
             'titulo' => 'Movimientos SS',
             'fecha' => $fecha,
-            'headers' => ['Fecha', 'Usuario', 'Acción', 'Detalle'],
+            'headers' => ['Fecha', 'Hora', 'Usuario', 'Acción', 'Detalle'],
             'rows' => $rows,
         ];
+    }
+
+    /**
+     * Extrae el nombre del receptor desde especificaciones JSON sin disparar consultas N+1.
+     */
+    protected static function extraerReceptor(?Inventario $inv): string
+    {
+        if (! $inv) {
+            return '—';
+        }
+
+        $specs = is_array($inv->especificaciones) ? $inv->especificaciones : json_decode($inv->especificaciones ?? '[]', true);
+        $nombre = trim((string) ($specs['receptor_nombre'] ?? ''));
+
+        return $nombre !== '' ? $nombre : '—';
     }
 
     public static function renderBadgeConteo(int $conteo, string $tipo): string

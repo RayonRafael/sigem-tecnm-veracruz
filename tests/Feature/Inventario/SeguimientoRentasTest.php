@@ -289,7 +289,10 @@ class SeguimientoRentasTest extends TestCase
 
         $this->assertSame('Seguimiento de Rentas', $reporte['titulo']);
         $this->assertFalse($reporte['has_chart']);
-        $this->assertSame(['Código', 'Equipo', 'Proveedor', 'Inicio renta', 'Fin renta', 'Días restantes', 'Estado'], $reporte['headers']);
+        $this->assertSame(
+            ['Código', 'Equipo', 'Proveedor', 'Inicio renta', 'Fin renta', 'Días restantes', 'Estado', 'Área', 'Depto', 'Receptor', 'Hora', 'Tipo Propiedad'],
+            $reporte['headers']
+        );
         $this->assertCount(3, $reporte['rows']);
 
         // Orden estricto: 1. 🔴 Vencida -> 2. 🟡 Por vencer -> 3. 🟢 Vigente

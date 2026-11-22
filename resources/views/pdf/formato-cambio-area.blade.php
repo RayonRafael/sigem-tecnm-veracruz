@@ -292,7 +292,7 @@
                 </div>
                 @if(in_array('fecha_cambio', $camposSeleccionados, true))
                     <div class="fecha-row">
-                        H. Veracruz, Ver., <span class="fecha-highlight">{{ $fecha }}</span>
+                        H. Veracruz, Ver., <span class="fecha-highlight">{{ $fecha }}</span> · {{ $hora ?? now()->format('H:i') }} hrs
                     </div>
                 @endif
             </td>
@@ -354,6 +354,10 @@
         <p class="dato-opcional"><strong>Motivo del cambio:</strong> {{ $motivo ?: 'Reubicación operativa de equipo' }}</p>
     @endif
 
+    @if(!empty($receptor) && $receptor !== '—')
+        <p class="dato-opcional"><strong>Receptor asignado:</strong> {{ $receptor }}</p>
+    @endif
+
     <!-- Tabla de equipos (SIEMPRE visible; Serie y Descripción extendida condicionales) -->
     <table class="equipos-table">
         <thead>
@@ -362,6 +366,7 @@
                 <th class="col-desc">Descripción</th>
                 <th class="col-marca">Marca</th>
                 <th class="col-modelo">Modelo</th>
+                <th style="width: 11%;">Propiedad</th>
                 @if($mostrarSerie)
                     <th class="col-serie">Serie</th>
                 @endif
@@ -390,6 +395,7 @@
                         ?? ($item->especificaciones['modelo'] ?? null)
                         ?? '—';
                     $serie = $item->num_serie ?: ($item->codigo ?: '—');
+                    $propItem = $item->tipo_propiedad ?? ($tipoPropiedad ?? 'Propio');
                 @endphp
                 <tr>
                     <td class="col-cant">1</td>
@@ -401,6 +407,7 @@
                     </td>
                     <td class="col-marca">{{ $marca }}</td>
                     <td class="col-modelo">{{ $modelo }}</td>
+                    <td>{{ $propItem }}</td>
                     @if($mostrarSerie)
                         <td class="col-serie">{{ $serie }}</td>
                     @endif
@@ -411,6 +418,7 @@
                     <td class="col-desc">{{ $inventario->material?->nombre ?? 'Equipo' }}</td>
                     <td class="col-marca">{{ $inventario->material?->marca?->nombre ?? '—' }}</td>
                     <td class="col-modelo">{{ $inventario->modelo ?? '—' }}</td>
+                    <td>{{ $inventario->tipo_propiedad ?? ($tipoPropiedad ?? 'Propio') }}</td>
                     @if($mostrarSerie)
                         <td class="col-serie">{{ $inventario->num_serie ?: ($inventario->codigo ?: '—') }}</td>
                     @endif

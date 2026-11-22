@@ -681,7 +681,7 @@ class AdminResourceTest extends TestCase
         $lines = array_values(array_filter(explode("\n", str_replace(["\r\n", "\r"], "\n", $cleanCsv))));
 
         $headers = str_getcsv(array_shift($lines));
-        $this->assertEquals(['Folio', 'Tipo Movimiento', 'Solicitante', 'Receptor', 'Departamento', 'Fecha', 'Estado'], $headers);
+        $this->assertEquals(['Folio', 'Tipo Movimiento', 'Solicitante', 'Receptor', 'Área', 'Departamento', 'Fecha', 'Hora', 'Estado'], $headers);
 
         $folioEsperado = 'FOLIO-' . str_pad($solicitud->id_solicitud, 5, '0', STR_PAD_LEFT);
         $matchingRow = null;
@@ -697,9 +697,11 @@ class AdminResourceTest extends TestCase
         $this->assertEquals($folioEsperado, $matchingRow[0]);
         $this->assertStringContainsString('Asignacion Temporal', $matchingRow[1]); // Tipo Movimiento
         $this->assertEquals($user->name, $matchingRow[2]); // Solicitante
-        $this->assertEquals('María', $matchingRow[3]); // Receptor
-        $this->assertEquals('Depto Solicitudes CSV', $matchingRow[4]); // Departamento
-        $this->assertEquals('Autorizado', $matchingRow[6]); // Estado
+        $this->assertEquals('María Hernández Ruiz', $matchingRow[3]); // Receptor
+        $this->assertEquals('Área Solicitudes CSV', $matchingRow[4]); // Área
+        $this->assertEquals('Depto Solicitudes CSV', $matchingRow[5]); // Departamento
+        $this->assertMatchesRegularExpression('/^\d{2}:\d{2}$/', $matchingRow[7]); // Hora
+        $this->assertEquals('Autorizado', $matchingRow[8]); // Estado
     }
 
     public function test_search_field_override_exists_with_sigem_markers(): void

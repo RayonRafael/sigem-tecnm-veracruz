@@ -150,8 +150,12 @@ class SigemPdfGenerator
         return array_merge([
             'config' => $config,
             'departamento' => $departamento,
+            'area' => $mantenimiento->inventario?->area?->nombre ?? '—',
+            'receptor' => $mantenimiento->inventario?->receptor_nombre ?: '—',
             'solicitante' => $solicitante,
             'fecha' => self::formatearFechaPdf($mantenimiento->fecha_solicitud),
+            'hora' => $mantenimiento->created_at ? $mantenimiento->created_at->format('H:i') : now()->format('H:i'),
+            'tipoPropiedad' => $mantenimiento->inventario?->tipo_propiedad ?? 'Propio',
             'descripcion_falla' => $mantenimiento->descripcion_falla ?: '—',
         ], self::logosInstitucionales($config));
     }
@@ -197,7 +201,7 @@ class SigemPdfGenerator
      */
     public static function datosListaVerificacion(\App\Models\Mantenimiento $mantenimiento): array
     {
-        $mantenimiento->loadMissing(['inventario.area']);
+        $mantenimiento->loadMissing(['inventario.area.departamento', 'inventario.departamento']);
 
         $config = self::datosInstitucionales();
 
@@ -214,10 +218,18 @@ class SigemPdfGenerator
             : '—';
 
         $fecha = self::formatearFechaPdf($mantenimiento->fecha_fin ?: $mantenimiento->fecha_solicitud);
+        $hora = $mantenimiento->created_at ? $mantenimiento->created_at->format('H:i') : now()->format('H:i');
 
         $espacioRevisado = filled($mantenimiento->inventario?->area?->nombre)
             ? $mantenimiento->inventario->area->nombre
             : 'Mantenimiento y Equipo';
+
+        $departamento = $mantenimiento->inventario?->departamento?->nombre
+            ?? $mantenimiento->inventario?->area?->departamento?->nombre
+            ?? '—';
+
+        $receptor = $mantenimiento->inventario?->receptor_nombre ?: '—';
+        $tipoPropiedad = $mantenimiento->inventario?->tipo_propiedad ?? 'Propio';
 
         $hallazgo = collect([
             $mantenimiento->descripcion_trabajo,
@@ -237,7 +249,11 @@ class SigemPdfGenerator
             'subdireccion' => $subdireccion,
             'jefeSubdireccion' => $jefeSubdireccion,
             'fecha' => $fecha,
+            'hora' => $hora,
             'espacioRevisado' => $espacioRevisado,
+            'departamento' => $departamento,
+            'receptor' => $receptor,
+            'tipoPropiedad' => $tipoPropiedad,
             'hallazgo' => $hallazgo,
             'atendidoSi' => $atendidoSi,
             'nombreTecnico' => $nombreTecnico,
@@ -270,10 +286,12 @@ class SigemPdfGenerator
         ?\App\Models\DetalleSolicitud $detalle = null
     ): array {
         $solicitud->loadMissing([
-            'receptor',
+            'receptor.area.departamento',
             'usuario',
             'autorizadoPor',
             'detalles.inventario.material.marca',
+            'detalles.inventario.area.departamento',
+            'detalles.inventario.departamento',
             'detalles.material.marca',
         ]);
 
@@ -288,6 +306,18 @@ class SigemPdfGenerator
         $unidadOrganica = $receptor
             ? (self::unirNombre($receptor->nombre, $receptor->apellido_paterno, $receptor->apellido_materno) ?: '—')
             : '—';
+
+        $departamento = $inventario?->departamento?->nombre
+            ?? $inventario?->area?->departamento?->nombre
+            ?? $receptor?->area?->departamento?->nombre
+            ?? $receptor?->departamento
+            ?? '—';
+
+        $area = $inventario?->area?->nombre
+            ?? $receptor?->area?->nombre
+            ?? '—';
+
+        $tipoPropiedad = $inventario?->tipo_propiedad ?? 'Propio';
 
         $fecha = self::formatearFechaPdf($solicitud->fecha_solicitud ?: $inventario?->fecha_asignacion);
         $hora = $solicitud->created_at
@@ -320,6 +350,9 @@ class SigemPdfGenerator
             'config' => $config,
             'bienEntrega' => $bienEntrega,
             'unidadOrganica' => $unidadOrganica,
+            'departamento' => $departamento,
+            'area' => $area,
+            'tipoPropiedad' => $tipoPropiedad,
             'fecha' => $fecha,
             'hora' => $hora,
             'descripcion' => $descripcion,
@@ -382,11 +415,11 @@ class SigemPdfGenerator
             : collect($inventarios);
 
         if ($registros instanceof \Illuminate\Database\Eloquent\Collection) {
-            $registros->loadMissing(['departamento', 'material.marca']);
+            $registros->loadMissing(['departamento', 'area.departamento', 'material.marca']);
         } else {
             $registros->each(function ($item): void {
                 if ($item instanceof \App\Models\Inventario) {
-                    $item->loadMissing(['departamento', 'material.marca']);
+                    $item->loadMissing(['departamento', 'area.departamento', 'material.marca']);
                 }
             });
         }
@@ -559,6 +592,9 @@ class SigemPdfGenerator
             'equipos' => $equipos,
             'fecha' => $fechaTexto,
             'fechaCorta' => $ahora->format('d/m/Y'),
+            'hora' => $ahora->format('H:i'),
+            'receptor' => $inventario->receptor_nombre ?: '—',
+            'tipoPropiedad' => $inventario->tipo_propiedad ?? 'Propio',
             'origenDepto' => $origenDepto,
             'origenArea' => $origenArea,
             'jefeOrigen' => $jefeOrigen,

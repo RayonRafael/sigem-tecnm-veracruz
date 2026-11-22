@@ -23,7 +23,7 @@ class SigemReportCatalog
                     'descripcion' => 'Listado completo de todos los equipos registrados en el inventario con sus datos técnicos y de ubicación.',
                     'icono' => '📋',
                     'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Tipo', 'Marca', 'Modelo', 'Estado', 'Depto', 'Área', 'Aula', 'Serie'],
+                    'columnas' => ['Código', 'Equipo', 'Tipo', 'Marca', 'Modelo', 'Estado', 'Área', 'Depto', 'Aula', 'Receptor', 'Fecha', 'Hora', 'Tipo Propiedad', 'Serie'],
                 ],
                 'inventario_por_departamento' => [
                     'num' => 2,
@@ -48,7 +48,7 @@ class SigemReportCatalog
                     'descripcion' => 'Distribución detallada de equipos en cada área académica y administrativa con su departamento.',
                     'icono' => '🗂️',
                     'has_chart' => false,
-                    'columnas' => ['Área', 'Depto', 'Cantidad equipos'],
+                    'columnas' => ['Área', 'Depto', 'Cantidad equipos', 'Propios', 'Rentados'],
                 ],
                 'inventario_por_tipo' => [
                     'num' => 4,
@@ -74,7 +74,7 @@ class SigemReportCatalog
                     'has_chart' => true,
                     'chart_type' => 'doughnut',
                     'chart_colors' => ['#059669', '#1b65d4', '#d97706', '#dc2626', '#8b5cf6'],
-                    'columnas' => ['Estado', 'Cantidad', 'Porcentaje'],
+                    'columnas' => ['Estado', 'Cantidad', 'Porcentaje', 'Propios', 'Rentados'],
                 ],
                 'inventario_por_aula' => [
                     'num' => 6,
@@ -85,7 +85,7 @@ class SigemReportCatalog
                     'descripcion' => 'Concentrado de equipos localizados físicamente por aula, área y departamento institucional.',
                     'icono' => '🏫',
                     'has_chart' => false,
-                    'columnas' => ['Aula', 'Área', 'Depto', 'Cantidad'],
+                    'columnas' => ['Aula', 'Área', 'Depto', 'Cantidad', 'Propios', 'Rentados'],
                 ],
             ],
 
@@ -99,7 +99,7 @@ class SigemReportCatalog
                     'descripcion' => 'Los 20 equipos con mayor tiempo registrados en la institución según fecha de factura o registro.',
                     'icono' => '⏳',
                     'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Fecha compra', 'Depto', 'Estado'],
+                    'columnas' => ['Código', 'Equipo', 'Fecha compra', 'Hora', 'Área', 'Depto', 'Receptor', 'Tipo Propiedad', 'Estado'],
                 ],
                 'estadisticas_sin_asignar' => [
                     'num' => 8,
@@ -110,7 +110,7 @@ class SigemReportCatalog
                     'descripcion' => 'Equipos disponibles en almacén o bodega sin departamento o área específica asignada.',
                     'icono' => '📦',
                     'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Tipo', 'Fecha registro'],
+                    'columnas' => ['Código', 'Equipo', 'Tipo', 'Área', 'Depto', 'Receptor', 'Fecha registro', 'Hora', 'Tipo Propiedad'],
                 ],
                 'estadisticas_depto_mas_equipos' => [
                     'num' => 9,
@@ -137,7 +137,7 @@ class SigemReportCatalog
                     'has_chart' => true,
                     'chart_type' => 'bar',
                     'chart_color' => '#1b65d4',
-                    'columnas' => ['Código', 'Equipo', 'Cantidad cambios', 'Último cambio'],
+                    'columnas' => ['Código', 'Equipo', 'Cantidad cambios', 'Último cambio', 'Hora', 'Área', 'Depto', 'Receptor', 'Tipo Propiedad'],
                 ],
                 'estadisticas_propio_vs_rentado' => [
                     'num' => 11,
@@ -213,7 +213,7 @@ class SigemReportCatalog
                     'descripcion' => 'Equipos que se encuentran actualmente bajo intervención técnica o pendientes de atención.',
                     'icono' => '🔧',
                     'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Depto', 'Fecha entrada'],
+                    'columnas' => ['Código', 'Equipo', 'Área', 'Depto', 'Receptor', 'Fecha entrada', 'Hora', 'Tipo Propiedad'],
                 ],
                 'mantenimiento_tiempo_promedio' => [
                     'num' => 17,
@@ -235,7 +235,7 @@ class SigemReportCatalog
                     'descripcion' => 'Relación cronológica de todas las intervenciones técnicas realizadas a cada equipo registrado.',
                     'icono' => '📑',
                     'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Fecha', 'Tipo servicio', 'Estado'],
+                    'columnas' => ['Código', 'Equipo', 'Área', 'Depto', 'Receptor', 'Fecha', 'Hora', 'Tipo Propiedad', 'Tipo servicio', 'Estado'],
                 ],
             ],
 
@@ -249,7 +249,7 @@ class SigemReportCatalog
                     'descripcion' => 'Catálogo completo de equipos en esquema de arrendamiento con proveedor y vigencia contractual.',
                     'icono' => '💳',
                     'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Proveedor', 'Fecha inicio', 'Fecha fin'],
+                    'columnas' => ['Código', 'Equipo', 'Proveedor', 'Área', 'Depto', 'Receptor', 'Fecha inicio', 'Hora', 'Fecha fin', 'Tipo Propiedad'],
                 ],
                 'rentas_proximas_vencer' => [
                     'num' => 20,
@@ -262,7 +262,7 @@ class SigemReportCatalog
                     'has_chart' => true,
                     'chart_type' => 'pie',
                     'chart_colors' => ['#059669', '#d97706', '#dc2626'],
-                    'columnas' => ['Código', 'Equipo', 'Proveedor', 'Fecha fin', 'Días restantes'],
+                    'columnas' => ['Código', 'Equipo', 'Proveedor', 'Fecha fin', 'Días restantes', 'Área', 'Depto', 'Receptor', 'Fecha registro', 'Hora', 'Tipo Propiedad'],
                 ],
                 'rentas_vencidas' => [
                     'num' => 21,
@@ -273,7 +273,7 @@ class SigemReportCatalog
                     'descripcion' => 'Contratos de arrendamiento cuya fecha límite ha expirado y requieren devolución o regularización.',
                     'icono' => '🚨',
                     'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Proveedor', 'Fecha fin', 'Días vencida'],
+                    'columnas' => ['Código', 'Equipo', 'Proveedor', 'Área', 'Depto', 'Receptor', 'Fecha registro', 'Hora', 'Fecha fin', 'Días vencida', 'Tipo Propiedad'],
                 ],
                 'rentas_gasto_mensual' => [
                     'num' => 22,
@@ -308,7 +308,7 @@ class SigemReportCatalog
                     'descripcion' => 'Seguimiento semafórico de todos los equipos rentados (periodo máximo 3 años) ordenados por urgencia de vencimiento.',
                     'icono' => '🚦',
                     'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Proveedor', 'Inicio renta', 'Fin renta', 'Días restantes', 'Estado'],
+                    'columnas' => ['Código', 'Equipo', 'Proveedor', 'Inicio renta', 'Fin renta', 'Días restantes', 'Estado', 'Área', 'Depto', 'Receptor', 'Hora', 'Tipo Propiedad'],
                 ],
             ],
 
@@ -324,7 +324,7 @@ class SigemReportCatalog
                     'has_chart' => true,
                     'chart_type' => 'line',
                     'chart_color' => '#0891b2',
-                    'columnas' => ['Fecha', 'Equipo', 'Origen', 'Destino', 'Usuario'],
+                    'columnas' => ['Fecha', 'Hora', 'Equipo', 'Área', 'Depto', 'Receptor', 'Tipo Propiedad', 'Origen', 'Destino', 'Usuario'],
                 ],
                 'historico_bajas' => [
                     'num' => 25,
@@ -335,7 +335,7 @@ class SigemReportCatalog
                     'descripcion' => 'Relación de equipos dados de baja institucionalmente con su motivo y usuario dictaminador.',
                     'icono' => '🗑️',
                     'has_chart' => false,
-                    'columnas' => ['Código', 'Equipo', 'Fecha baja', 'Motivo', 'Usuario'],
+                    'columnas' => ['Código', 'Equipo', 'Área', 'Depto', 'Receptor', 'Fecha baja', 'Hora', 'Tipo Propiedad', 'Motivo', 'Usuario'],
                 ],
                 'historico_entregas' => [
                     'num' => 26,
@@ -346,7 +346,7 @@ class SigemReportCatalog
                     'descripcion' => 'Historial de solicitudes de asignación y entrega autorizadas formalmente a personal receptor.',
                     'icono' => '🤝',
                     'has_chart' => false,
-                    'columnas' => ['Fecha', 'Equipo', 'Receptor', 'Depto'],
+                    'columnas' => ['Fecha', 'Hora', 'Equipo', 'Área', 'Depto', 'Receptor', 'Tipo Propiedad'],
                 ],
                 'historico_actividad_usuario' => [
                     'num' => 27,
@@ -371,7 +371,7 @@ class SigemReportCatalog
                     'descripcion' => 'Línea de tiempo cronológica completa de todas las transacciones de estado y ubicación del inventario.',
                     'icono' => '📜',
                     'has_chart' => false,
-                    'columnas' => ['Fecha', 'Equipo', 'Estado anterior', 'Estado nuevo', 'Motivo', 'Usuario'],
+                    'columnas' => ['Fecha', 'Hora', 'Equipo', 'Área', 'Depto', 'Receptor', 'Tipo Propiedad', 'Estado anterior', 'Estado nuevo', 'Motivo', 'Usuario'],
                 ],
             ],
         ];

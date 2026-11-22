@@ -27,7 +27,7 @@
                 @forelse (($rep['top5_rows'] ?? []) as $tr)
                     <tr>
                         @foreach ($tr as $td)
-                            <td class="{{ preg_match('/^\d{2}\/\d{2}\/\d{4}$/', trim((string) $td)) ? 'sigem-td-nowrap' : '' }}">{{ $td }}</td>
+                            <td class="{{ preg_match('/^(\d{2}\/\d{2}\/\d{4}|\d{2}:\d{2})$/', trim((string) $td)) ? 'sigem-td-nowrap' : '' }}">{{ $td }}</td>
                         @endforeach
                     </tr>
                 @empty

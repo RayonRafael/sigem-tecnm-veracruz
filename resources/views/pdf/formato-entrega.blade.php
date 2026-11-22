@@ -291,12 +291,19 @@
         </tr>
     </table>
 
-    <!-- Fecha y Hora -->
+    <!-- Fecha, Hora y Ubicación / Propiedad -->
     <table class="fecha-hora-table">
         <tr>
             <td>
                 Fecha: <span class="underline-val">{{ $fecha }}</span>
                 Hora: <span class="underline-val">{{ $hora }}</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 9.5px;">
+                <strong>Departamento:</strong> {{ $departamento ?? '—' }} &nbsp;|&nbsp;
+                <strong>Área:</strong> {{ $area ?? '—' }} &nbsp;|&nbsp;
+                <strong>Tipo de Propiedad:</strong> {{ $tipoPropiedad ?? 'Propio' }}
             </td>
         </tr>
     </table>

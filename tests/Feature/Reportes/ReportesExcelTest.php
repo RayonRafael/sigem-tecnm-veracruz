@@ -86,28 +86,28 @@ class ReportesExcelTest extends TestCase
         // 1. Inventario por categoría
         $rep1 = $page->getDatosReporte('inventario_categoria', 'xlsx');
         $this->assertEquals(
-            ['Categoría', 'Total', 'Disponible', 'En mantto', 'Asignado', 'Cambio área', 'Solicitud baja'],
+            ['Categoría', 'Total', 'Propio', 'Rentado', 'Disponible', 'En mantto', 'Asignado', 'Cambio área', 'Solicitud baja'],
             $rep1['headers']
         );
 
         // 2. Equipos por área
         $rep2 = $page->getDatosReporte('equipos_area', 'xlsx');
         $this->assertEquals(
-            ['Área', 'Total', 'Disponible', 'En mantto', 'Asignado', 'Cambio área', 'Solicitud baja'],
+            ['Área', 'Departamento', 'Total', 'Propio', 'Rentado', 'Disponible', 'En mantto', 'Asignado', 'Cambio área', 'Solicitud baja'],
             $rep2['headers']
         );
 
         // 3. Equipos en mantenimiento
         $rep3 = $page->getDatosReporte('equipos_mantenimiento', 'xlsx');
         $this->assertEquals(
-            ['Código', 'Equipo', 'Categoría', 'Área', 'Aula'],
+            ['Código', 'Equipo', 'Categoría', 'Área', 'Departamento', 'Aula', 'Receptor', 'Fecha', 'Hora', 'Tipo Propiedad'],
             $rep3['headers']
         );
 
         // 4. Equipos con solicitud de baja
         $rep4 = $page->getDatosReporte('equipos_baja_danados', 'xlsx');
         $this->assertEquals(
-            ['Código', 'Equipo', 'Categoría', 'Área', 'Último movimiento'],
+            ['Código', 'Equipo', 'Categoría', 'Área', 'Departamento', 'Receptor', 'Fecha', 'Hora', 'Tipo Propiedad'],
             $rep4['headers']
         );
 
@@ -121,7 +121,7 @@ class ReportesExcelTest extends TestCase
         // 6. Movimientos SS
         $rep6 = $page->getDatosReporte('movimientos_recientes', 'xlsx');
         $this->assertEquals(
-            ['Fecha', 'Usuario', 'Acción', 'Detalle'],
+            ['Fecha', 'Hora', 'Usuario', 'Acción', 'Detalle'],
             $rep6['headers']
         );
     }
