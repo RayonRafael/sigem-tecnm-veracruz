@@ -6,6 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 trait ConCatalogoSoloLectura
 {
+    protected static function esSoloLectura(): bool
+    {
+        return true;
+    }
+
     public static function canCreate(): bool
     {
         return false;

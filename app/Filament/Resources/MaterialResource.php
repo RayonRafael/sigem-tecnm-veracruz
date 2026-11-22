@@ -2,42 +2,22 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\MaterialResource\Pages;
+use App\Filament\Concerns\ConCatalogoResource;
+use App\Filament\Resources\MaterialResource\Schemas\MaterialSchema;
 use App\Models\Material;
-use App\Support\SubformSlideOverHelper;
-use Filament\Forms;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Tabs;
-use Filament\Infolists\Components\Tabs\Tab;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 class MaterialResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
+    use ConCatalogoResource;
 
     protected static ?string $model = Material::class;
-
     protected static ?string $recordTitleAttribute = 'nombre';
-
     protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
-
     protected static ?string $navigationLabel = 'Materiales';
-
     protected static ?string $modelLabel = 'material';
-
     protected static ?string $pluralModelLabel = 'materiales';
-
-    protected static ?string $navigationGroup = 'Catálogos';
-
     protected static ?int $navigationSort = 1;
 
     public static function getEloquentQuery(): Builder
@@ -52,282 +32,10 @@ class MaterialResource extends Resource
         return ['nombre', 'descripcion', 'modelo'];
     }
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\Wizard::make([
-                    Forms\Components\Wizard\Step::make('🔧 Datos del material')
-                        ->icon('heroicon-m-cube')
-                        ->schema([
-                            Forms\Components\Grid::make(2)
-                                ->schema([
-                                    Forms\Components\TextInput::make('nombre')
-                                        ->placeholder('Ej. Computadora de Escritorio OptiPlex')
-                                        ->required()
-                                        ->prefixIcon('heroicon-m-tag')
-                                        ->maxLength(150)
-                                        ->columnSpanFull(),
-                                    Forms\Components\TextInput::make('modelo')
-                                        ->placeholder('Ej. OptiPlex 7090')
-                                        ->prefixIcon('heroicon-m-qr-code')
-                                        ->maxLength(100),
-                                    Forms\Components\Textarea::make('descripcion')
-                                        ->label('Descripción')
-                                        ->placeholder('Ej. Especificaciones y características generales del material...')
-                                        ->rows(3)
-                                        ->columnSpanFull(),
-                                ]),
-                            Forms\Components\Grid::make(2)
-                                ->schema([
-                                    Forms\Components\Select::make('id_marca')->placeholder('Selecciona...')
-                                        ->label('Marca')
-                                        ->relationship('marca', 'nombre')
-                                        ->required()
-                                        ->searchable()
-                                        ->preload()
-                                        ->prefixIcon('heroicon-m-star')
-                                        ->createOptionForm([
-                                            SubformSlideOverHelper::headerNav(),
-                                            Forms\Components\TextInput::make('nombre')
-                                                ->label('Nombre de la marca')
-                                                ->placeholder('Ej. Dell')
-                                                ->required()
-                                                ->maxLength(100),
-                                            SubformSlideOverHelper::catalogTip('La marca estará disponible inmediatamente en el catálogo.'),
-                                        ])
-                                        ->createOptionAction(function (Action $action) {
-                                            return SubformSlideOverHelper::configureAction(
-                                                $action,
-                                                '✏️ Agregar marca como nueva opción',
-                                                '+ Agregar',
-                                                'Marca creada correctamente'
-                                            );
-                                        }),
-                                    Forms\Components\Select::make('id_tipodematerial')->placeholder('Selecciona...')
-                                        ->label('Tipo de material')
-                                        ->relationship('tipo', 'nombre')
-                                        ->required()
-                                        ->searchable()
-                                        ->preload()
-                                        ->prefixIcon('heroicon-m-square-3-stack-3d')
-                                        ->createOptionForm([
-                                            SubformSlideOverHelper::headerNav(),
-                                            Forms\Components\TextInput::make('nombre')
-                                                ->label('Nombre del tipo de material')
-                                                ->placeholder('Ej. Equipo de Cómputo')
-                                                ->required()
-                                                ->maxLength(100),
-                                            SubformSlideOverHelper::catalogTip('El tipo de material estará disponible inmediatamente en el catálogo.'),
-                                        ])
-                                        ->createOptionAction(function (Action $action) {
-                                            return SubformSlideOverHelper::configureAction(
-                                                $action,
-                                                '✏️ Agregar tipo de material como nueva opción',
-                                                '+ Agregar',
-                                                'Tipo de material creado correctamente'
-                                            );
-                                        }),
-                                    Forms\Components\Select::make('id_unidad')->placeholder('Selecciona...')
-                                        ->label('Unidad de medida')
-                                        ->relationship('unidad', 'nombre')
-                                        ->required()
-                                        ->searchable()
-                                        ->preload()
-                                        ->prefixIcon('heroicon-m-scale')
-                                        ->columnSpanFull()
-                                        ->createOptionForm([
-                                            SubformSlideOverHelper::headerNav(),
-                                            Forms\Components\TextInput::make('nombre')
-                                                ->label('Nombre de la unidad de medida')
-                                                ->placeholder('Ej. Pieza')
-                                                ->required()
-                                                ->maxLength(100),
-                                            SubformSlideOverHelper::catalogTip('La unidad de medida estará disponible inmediatamente en el catálogo.'),
-                                        ])
-                                        ->createOptionAction(function (Action $action) {
-                                            return SubformSlideOverHelper::configureAction(
-                                                $action,
-                                                '✏️ Agregar unidad de medida como nueva opción',
-                                                '+ Agregar',
-                                                'Unidad de medida creada correctamente'
-                                            );
-                                        }),
-                                ]),
-                        ]),
-
-                    Forms\Components\Wizard\Step::make('Control de stock')
-                        ->icon('heroicon-m-chart-bar')
-                        ->schema([
-                        Forms\Components\TextInput::make('stock_actual')
-                            ->label('Stock actual')
-                            ->numeric()
-                            ->prefixIcon('heroicon-m-archive-box')
-                            ->disabled()
-                            ->dehydrated(false)
-                            ->helperText('Calculado automáticamente'),
-                        Forms\Components\TextInput::make('stock_minimo')
-                            ->label('Stock mínimo')
-                            ->placeholder('Ej. 5')
-                            ->numeric()
-                            ->minValue(0)
-                            ->default(0)
-                            ->prefixIcon('heroicon-m-bell-alert')
-                            ->required(),
-                        Forms\Components\ToggleButtons::make('requiere_control_individual')
-                            ->label('Requiere control individual')
-                            ->boolean(trueLabel: 'Sí', falseLabel: 'No')
-                            ->inline()
-                            ->default(true)
-                            ->columnSpanFull(),
-                    ])->columns(2),
-                ])->columnSpanFull(),
-            ]);
-    }
-
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
-                    ->label('Nombre')
-                    ->searchable(isIndividual: true)
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('modelo')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
-                    ->label('Modelo')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('marca.nombre')->wrap(false)->limit(30)->grow(false)
-                    ->label('Marca')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('tipo.nombre')->wrap(false)->limit(30)->grow(false)
-                    ->label('Tipo')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('stock_actual')->wrap(false)->limit(30)->grow(false)
-                    ->label('Stock actual')
-                    ->numeric()
-                    // Se ordena por el stock derivado, no por la columna fisica obsoleta.
-                    ->sortable(query: function (Builder $query, string $direction) {
-                        $direction = strtolower($direction) === 'desc' ? 'DESC' : 'ASC';
-
-                        return $query->orderByRaw(\App\Models\Material::stockDerivadoSql().' '.$direction);
-                    }),
-                Tables\Columns\TextColumn::make('stock_minimo')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)
-                    ->label('Stock mín.')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('stock_status')->wrap(false)->limit(30)->grow(false)
-                    ->label('Estado de stock')
-                    ->getStateUsing(fn ($record) => $record->stock_actual < $record->stock_minimo ? 'Stock bajo' : 'Normal')
-                    ->badge()
-                    ->colors([
-                        'danger' => 'Stock bajo',
-                        'success' => 'Normal',
-                    ])
-                    ->icons([
-                        'heroicon-m-exclamation-triangle' => 'Stock bajo',
-                        'heroicon-m-check-circle' => 'Normal',
-                    ])
-                    ->sortable(query: function (Builder $query, string $direction) {
-                        $direction = strtolower($direction) === 'desc' ? 'DESC' : 'ASC';
-
-                        return $query->orderByRaw(\App\Models\Material::stockDerivadoSql().' - material.stock_minimo '.$direction);
-                    }),
-            ])
-            ->defaultSort('nombre', 'asc')
-            ->striped()
-            ->searchPlaceholder('Buscar por nombre, modelo, marca o tipo...')
-            ->defaultPaginationPageOption(10)
-            ->filters([
-                TrashedFilter::make(),
-                //
-            ])
-            ->recordUrl(null)
-            ->recordAction(null)
-            ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
-                Tables\Actions\EditAction::make()
-                    ->iconButton()
-                    ->tooltip('Editar')
-                    ->extraAttributes(['title' => 'Editar'])
-                    ->modalHeading(fn (?Material $record) => 'Editar: ' . ($record?->nombre ?? 'material'))
-                    ->modalDescription(fn (?Material $record) => new \Illuminate\Support\HtmlString(
-                        e($record?->tipo?->nombre ?? '—') . ' · ID: #' . e($record?->getKey())
-                    ))
-                    ->successNotificationTitle('Material actualizado correctamente'),
-                Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->successNotificationTitle('Material eliminado'),
-                ]),
-            ]);
-    }
-
-    public static function infolist(Infolist $infolist): Infolist
-    {
-        return $infolist
-            ->schema([
-                Tabs::make('Detalle')
-                    ->tabs([
-                        Tab::make('Información')
-                            ->icon('heroicon-m-tag')
-                            ->schema([
-                                Section::make('🔧 Datos del material')
-                                    ->schema([
-                                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-tag'),
-                                        TextEntry::make('modelo')->label('Modelo')->icon('heroicon-m-qr-code'),
-                                        TextEntry::make('descripcion')->label('Descripción')->columnSpanFull(),
-                                    ])->columns(2),
-                                Section::make('Clasificación')
-                                    ->schema([
-                                        TextEntry::make('marca.nombre')->label('Marca')->icon('heroicon-m-star'),
-                                        TextEntry::make('tipo.nombre')->label('Tipo')->icon('heroicon-m-square-3-stack-3d'),
-                                        TextEntry::make('unidad.nombre')->label('Unidad de medida')->icon('heroicon-m-scale'),
-                                    ])->columns(3),
-                            ]),
-                        Tab::make('Control de stock')
-                            ->icon('heroicon-m-chart-bar')
-                            ->schema([
-                                Section::make('Inventario y Existencias')
-                                    ->schema([
-                                        TextEntry::make('stock_actual')->label('Stock actual')->icon('heroicon-m-archive-box'),
-                                        TextEntry::make('stock_minimo')->label('Stock mínimo')->icon('heroicon-m-bell-alert'),
-                                        TextEntry::make('estado_stock')
-                                            ->label('Estado')
-                                            ->getStateUsing(fn ($record) => $record->stock_actual < $record->stock_minimo ? 'Stock bajo' : 'Normal')
-                                            ->badge()
-                                            ->color(fn (string $state): string => match ($state) {
-                                                'Stock bajo' => 'danger',
-                                                'Normal' => 'success',
-                                                default => 'gray',
-                                            })
-                                            ->icon(fn (string $state): string => match ($state) {
-                                                'Stock bajo' => 'heroicon-m-exclamation-triangle',
-                                                'Normal' => 'heroicon-m-check-circle',
-                                                default => 'heroicon-m-minus',
-                                            }),
-                                        IconEntry::make('requiere_control_individual')
-                                            ->label('Control individual')
-                                            ->boolean(),
-                                    ])->columns(4),
-                            ]),
-                    ]),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListMaterials::route('/'),
-            'create' => Pages\CreateMaterial::route('/create'),
-            'edit' => Pages\EditMaterial::route('/{record}/edit'),
-        ];
-    }
+    protected static function getFormSchema(): array { return MaterialSchema::getFormSchema(); }
+    protected static function getTableColumns(): array { return MaterialSchema::getTableColumns(); }
+    protected static function getTableActions(bool $soloLectura): array { return MaterialSchema::getTableActions($soloLectura); }
+    protected static function getInfolistTabs(): array { return MaterialSchema::getInfolistTabs(); }
+    protected static function getSearchPlaceholder(): string { return 'Buscar por nombre, modelo, marca o tipo...'; }
+    protected static function getDeleteBulkSuccessMessage(): string { return 'Material eliminado'; }
 }

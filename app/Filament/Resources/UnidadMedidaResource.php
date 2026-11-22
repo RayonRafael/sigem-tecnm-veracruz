@@ -2,130 +2,56 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UnidadMedidaResource\Pages;
+use App\Filament\Concerns\ConCatalogoResource;
+use App\Filament\Schemas\CatalogoBaseFormSchema;
+use App\Filament\Schemas\CatalogoBaseTableSchema;
 use App\Models\UnidadMedida;
-use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Tabs;
-use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
 
 class UnidadMedidaResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
+    use ConCatalogoResource;
 
     protected static ?string $model = UnidadMedida::class;
-
     protected static ?string $recordTitleAttribute = 'nombre';
-
     protected static ?string $navigationIcon = 'heroicon-o-bars-3-bottom-left';
-
     protected static ?string $navigationLabel = 'Unidades de medida';
-
     protected static ?string $modelLabel = 'unidad de medida';
-
     protected static ?string $pluralModelLabel = 'unidades de medida';
-
-    protected static ?string $navigationGroup = 'Catálogos';
-
     protected static ?int $navigationSort = 5;
 
-    public static function getGloballySearchableAttributes(): array
-    {
-        return ['nombre'];
-    }
+    public static function getGloballySearchableAttributes(): array { return ['nombre']; }
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('📏 Datos de la unidad de medida')
-                    ->icon('heroicon-m-bars-3-bottom-left')
-                    ->schema([
-                        Forms\Components\TextInput::make('nombre')
-                            ->label('Nombre de la unidad')
-                            ->placeholder('Ej. Pieza, Caja, Metro')
-                            ->required()
-                            ->prefixIcon('heroicon-m-bars-3-bottom-left')
-                            ->maxLength(50),
-                    ]),
-            ]);
-    }
-
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
-                    ->label('Nombre')
-                    ->searchable(isIndividual: true)
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)->label('Fecha de creación')
-                    ->dateTime('d/m/Y')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->defaultSort('nombre', 'asc')
-            ->striped()
-            ->searchPlaceholder('Buscar por nombre de la unidad...')
-            ->defaultPaginationPageOption(10)
-            ->filters([
-                TrashedFilter::make(),
-                //
-            ])
-            ->recordUrl(null)
-            ->recordAction(null)
-            ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Unidad de medida actualizada correctamente'),
-                Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->successNotificationTitle('Unidad de medida eliminada'),
-                ]),
-            ]);
-    }
-
-    public static function infolist(Infolist $infolist): Infolist
-    {
-        return $infolist
-            ->schema([
-                Tabs::make('Detalle')
-                    ->tabs([
-                        Tab::make('Información')
-                            ->icon('heroicon-m-tag')
-                            ->schema([
-                                Section::make('📏 Datos de la unidad de medida')
-                                    ->schema([
-                                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-bars-3-bottom-left'),
-                                        TextEntry::make('materiales_count')
-                                            ->label('Materiales vinculados')
-                                            ->state(fn (UnidadMedida $record): string => $record->materiales()->count() . ' vinculados')
-                                            ->icon('heroicon-m-cube'),
-                                    ])->columns(2),
-                            ]),
-                    ]),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [];
-    }
-
-    public static function getPages(): array
+    protected static function getFormSchema(): array
     {
         return [
-            'index' => Pages\ListUnidadMedidas::route('/'),
-            'create' => Pages\CreateUnidadMedida::route('/create'),
-            'edit' => Pages\EditUnidadMedida::route('/{record}/edit'),
+            CatalogoBaseFormSchema::section('📏 Datos de la unidad de medida', 'heroicon-m-bars-3-bottom-left', [
+                CatalogoBaseFormSchema::campoNombre('Nombre de la unidad', 'Ej. Pieza, Caja, Metro', 'heroicon-m-bars-3-bottom-left', 50),
+            ]),
         ];
     }
+
+    protected static function getTableColumns(): array
+    {
+        return [
+            CatalogoBaseTableSchema::columnaTexto('nombre', 'Nombre', individualSearch: true, sortable: true),
+            CatalogoBaseTableSchema::columnaFechaCreacion(),
+        ];
+    }
+
+    protected static function getInfolistSections(): array
+    {
+        return [
+            Section::make('📏 Datos de la unidad de medida')->schema([
+                TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-bars-3-bottom-left'),
+                TextEntry::make('materiales_count')->label('Materiales vinculados')->state(fn (UnidadMedida $record): string => $record->materiales()->count() . ' vinculados')->icon('heroicon-m-cube'),
+            ])->columns(2),
+        ];
+    }
+
+    protected static function getSearchPlaceholder(): string { return 'Buscar por nombre de la unidad...'; }
+    protected static function getEditSuccessMessage(): string { return 'Unidad de medida actualizada correctamente'; }
+    protected static function getDeleteBulkSuccessMessage(): string { return 'Unidad de medida eliminada'; }
 }

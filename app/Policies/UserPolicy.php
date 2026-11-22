@@ -2,53 +2,26 @@
 
 namespace App\Policies;
 
-use App\Enums\RoleEnum;
 use App\Models\User;
+use App\Policies\Concerns\ConCatalogoPolicy;
+use Illuminate\Database\Eloquent\Model;
 
 class UserPolicy
 {
-    private function isAdmin(User $user): bool
-    {
-        return $user->hasPermissionTo(RoleEnum::PERM_ACCESS_ADMIN) || $user->tipo_usuario === RoleEnum::ADMIN->value;
-    }
+    use ConCatalogoPolicy;
 
-    public function viewAny(User $user): bool
+    public function delete(User $user, Model $modelInstance): bool
     {
-        return $this->isAdmin($user);
-    }
-
-    public function view(User $user, User $modelInstance): bool
-    {
-        return $this->isAdmin($user);
-    }
-
-    public function create(User $user): bool
-    {
-        return $this->isAdmin($user);
-    }
-
-    public function update(User $user, User $modelInstance): bool
-    {
-        return $this->isAdmin($user);
-    }
-
-    public function delete(User $user, User $modelInstance): bool
-    {
-        if ($user->id === $modelInstance->id) {
+        if ($user->id === $modelInstance->getKey()) {
             return false; // No puede eliminarse a sí mismo
         }
 
         return $this->isAdmin($user);
     }
 
-    public function restore(User $user, User $modelInstance): bool
+    public function forceDelete(User $user, Model $modelInstance): bool
     {
-        return $this->isAdmin($user);
-    }
-
-    public function forceDelete(User $user, User $modelInstance): bool
-    {
-        if ($user->id === $modelInstance->id) {
+        if ($user->id === $modelInstance->getKey()) {
             return false; // No puede eliminarse a sí mismo
         }
 

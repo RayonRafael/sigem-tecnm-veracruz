@@ -2,64 +2,26 @@
 
 namespace App\Policies;
 
-use App\Enums\RoleEnum;
-use App\Models\Solicitud;
 use App\Models\User;
+use App\Policies\Concerns\ConCatalogoPolicy;
+use Illuminate\Database\Eloquent\Model;
 
 class SolicitudPolicy
 {
-    private function isAdmin(User $user): bool
+    use ConCatalogoPolicy;
+
+    protected function permitirLecturaServicioSocial(): bool { return true; }
+
+    public function view(User $user, Model $modelInstance): bool
     {
-        return $user->hasPermissionTo(RoleEnum::PERM_ACCESS_ADMIN) || $user->tipo_usuario === RoleEnum::ADMIN->value;
+        return $this->isAdmin($user) || ($this->isShared($user) && $modelInstance->id_usuario === $user->id);
     }
 
-    private function isShared(User $user): bool
+    public function create(User $user): bool { return $this->isShared($user); }
+
+    public function update(User $user, Model $modelInstance): bool
     {
-        return $this->isAdmin($user) || $user->hasPermissionTo(RoleEnum::PERM_ACCESS_SERVICIO) || $user->tipo_usuario === RoleEnum::SERVICIO_TIPO->value;
-    }
-
-    public function viewAny(User $user): bool
-    {
-        return $this->isShared($user);
-    }
-
-    public function view(User $user, Solicitud $modelInstance): bool
-    {
-        if ($this->isAdmin($user)) {
-            return true;
-        }
-
-        return $this->isShared($user) && $modelInstance->id_usuario === $user->id;
-    }
-
-    public function create(User $user): bool
-    {
-        return $this->isShared($user);
-    }
-
-    public function update(User $user, Solicitud $modelInstance): bool
-    {
-        if ($this->isAdmin($user)) {
-            return true;
-        }
-
-        return $this->isShared($user) 
-            && $modelInstance->id_usuario === $user->id 
-            && $modelInstance->estado === 'Pendiente';
-    }
-
-    public function delete(User $user, Solicitud $modelInstance): bool
-    {
-        return $this->isAdmin($user);
-    }
-
-    public function restore(User $user, Solicitud $modelInstance): bool
-    {
-        return $this->isAdmin($user);
-    }
-
-    public function forceDelete(User $user, Solicitud $modelInstance): bool
-    {
-        return $this->isAdmin($user);
+        return $this->isAdmin($user)
+            || ($this->isShared($user) && $modelInstance->id_usuario === $user->id && $modelInstance->estado === 'Pendiente');
     }
 }

@@ -2,165 +2,56 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\AreaResource\Pages;
+use App\Filament\Concerns\ConCatalogoResource;
+use App\Filament\Schemas\CatalogoBaseFormSchema;
+use App\Filament\Schemas\CatalogoBaseTableSchema;
 use App\Models\Area;
-use App\Support\SubformSlideOverHelper;
-use Filament\Forms;
-use Filament\Forms\Components\Actions\Action;
-use Filament\Forms\Form;
 use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Tabs;
-use Filament\Infolists\Components\Tabs\Tab;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
 class AreaResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
+    use ConCatalogoResource;
 
     protected static ?string $model = Area::class;
-
     protected static ?string $recordTitleAttribute = 'nombre';
-
     protected static ?string $navigationIcon = 'heroicon-o-map-pin';
-
     protected static ?string $navigationLabel = 'Áreas';
-
     protected static ?string $modelLabel = 'área';
-
     protected static ?string $pluralModelLabel = 'áreas';
-
-    protected static ?string $navigationGroup = 'Catálogos';
-
     protected static ?int $navigationSort = 2;
 
-    public static function getEloquentQuery(): Builder
+    public static function getEloquentQuery(): Builder { return parent::getEloquentQuery()->with(['departamento']); }
+    public static function getGloballySearchableAttributes(): array { return ['nombre']; }
+
+    protected static function getFormSchema(): array
     {
-        return parent::getEloquentQuery()
-            ->with(['departamento']);
+        return [CatalogoBaseFormSchema::section('📍 Datos del área', 'heroicon-m-map-pin', [
+            CatalogoBaseFormSchema::campoNombre('Nombre del área', 'Ej. Laboratorio de Redes'),
+            CatalogoBaseFormSchema::selectRelacionConCreacion('id_departamento', 'Departamento', 'departamento', 'heroicon-m-building-office-2', '✏️ Agregar departamento como nueva opción', 'Nombre del departamento', 'Ej. Sistemas y Computación', 'El departamento estará disponible inmediatamente en el catálogo.', 'Departamento creado correctamente', true),
+        ], 2)];
     }
 
-    public static function getGloballySearchableAttributes(): array
-    {
-        return ['nombre'];
-    }
-
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('📍 Datos del área')
-                    ->icon('heroicon-m-map-pin')
-                    ->schema([
-                        Forms\Components\TextInput::make('nombre')
-                            ->label('Nombre del área')
-                            ->placeholder('Ej. Laboratorio de Redes')
-                            ->required()
-                            ->prefixIcon('heroicon-m-tag')
-                            ->maxLength(100),
-                        Forms\Components\Select::make('id_departamento')->placeholder('Selecciona...')
-                            ->label('Departamento')
-                            ->relationship('departamento', 'nombre')
-                            ->required()
-                            ->searchable()
-                            ->preload()
-                            ->prefixIcon('heroicon-m-building-office-2')
-                            ->columnSpanFull()
-                            ->createOptionForm([
-                                SubformSlideOverHelper::headerNav(),
-                                Forms\Components\TextInput::make('nombre')
-                                    ->label('Nombre del departamento')
-                                    ->placeholder('Ej. Sistemas y Computación')
-                                    ->required()
-                                    ->maxLength(100),
-                                SubformSlideOverHelper::catalogTip('El departamento estará disponible inmediatamente en el catálogo.'),
-                            ])
-                            ->createOptionAction(function (Action $action) {
-                                return SubformSlideOverHelper::configureAction(
-                                    $action,
-                                    '✏️ Agregar departamento como nueva opción',
-                                    '+ Agregar',
-                                    'Departamento creado correctamente'
-                                );
-                            }),
-                    ])->columns(2),
-            ]);
-    }
-
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
-                    ->label('Nombre')
-                    ->searchable(isIndividual: true)
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('departamento.nombre')->wrap(false)->limit(30)->grow(false)
-                    ->label('Departamento')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)->label('Fecha de creación')
-                    ->dateTime('d/m/Y')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->defaultSort('nombre', 'asc')
-            ->striped()
-            ->searchPlaceholder('Buscar por nombre o departamento...')
-            ->defaultPaginationPageOption(10)
-            ->filters([
-                TrashedFilter::make(),
-                //
-            ])
-            ->recordUrl(null)
-            ->recordAction(null)
-            ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Área actualizada correctamente'),
-                Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->successNotificationTitle('Área eliminada'),
-                ]),
-            ]);
-    }
-
-    public static function infolist(Infolist $infolist): Infolist
-    {
-        return $infolist
-            ->schema([
-                Tabs::make('Detalle')
-                    ->tabs([
-                        Tab::make('Información')
-                            ->icon('heroicon-m-tag')
-                            ->schema([
-                                Section::make('📍 Datos del área')
-                                    ->schema([
-                                        TextEntry::make('nombre')->label('Nombre del área')->icon('heroicon-m-map-pin'),
-                                        TextEntry::make('departamento.nombre')->label('Departamento')->icon('heroicon-m-building-office-2'),
-                                    ])->columns(2),
-                            ]),
-                    ]),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [];
-    }
-
-    public static function getPages(): array
+    protected static function getTableColumns(): array
     {
         return [
-            'index' => Pages\ListAreas::route('/'),
-            'create' => Pages\CreateArea::route('/create'),
-            'edit' => Pages\EditArea::route('/{record}/edit'),
+            CatalogoBaseTableSchema::columnaTexto('nombre', 'Nombre', individualSearch: true, sortable: true),
+            CatalogoBaseTableSchema::columnaTexto('departamento.nombre', 'Departamento', sortable: true),
+            CatalogoBaseTableSchema::columnaFechaCreacion(),
         ];
     }
+
+    protected static function getInfolistSections(): array
+    {
+        return [Section::make('📍 Datos del área')->schema([
+            TextEntry::make('nombre')->label('Nombre del área')->icon('heroicon-m-map-pin'),
+            TextEntry::make('departamento.nombre')->label('Departamento')->icon('heroicon-m-building-office-2'),
+        ])->columns(2)];
+    }
+
+    protected static function getSearchPlaceholder(): string { return 'Buscar por nombre o departamento...'; }
+    protected static function getEditSuccessMessage(): string { return 'Área actualizada correctamente'; }
+    protected static function getDeleteBulkSuccessMessage(): string { return 'Área eliminada'; }
 }

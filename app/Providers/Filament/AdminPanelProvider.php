@@ -3,309 +3,50 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Dashboard;
-use App\Filament\Pages\EditProfile;
-use Filament\Http\Middleware\Authenticate;
-use Filament\Http\Middleware\AuthenticateSession;
-use Filament\Http\Middleware\DisableBladeIconComponents;
-use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\NavigationGroup;
+use App\Providers\Filament\Concerns\ConPanelConfig;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
-use Filament\View\PanelsRenderHook;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Support\Facades\Blade;
-use Illuminate\Support\HtmlString;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
+    use ConPanelConfig;
+
     public function panel(Panel $panel): Panel
     {
-        return $panel
+        return $this->configureBasePanel($panel, [
+            'brandName' => 'SIGEM - TecNM Veracruz',
+            'loginBadgeClasses' => 'bg-blue-50 text-blue-700 border border-blue-200',
+            'loginBadgeLabel' => '🔒 Panel de Administración',
+            'switchPanelUrl' => '/servicio-social/login',
+            'switchPanelLabel' => '¿Eres de Servicio Social? Inicia sesión aquí',
+            'logoutRoute' => 'filament.admin.auth.logout',
+            'mostrarRolePill' => false,
+            'roleBannerClass' => 'sigem-role-banner sigem-role-admin',
+            'roleBannerTitle' => 'Acceso completo de administración',
+            'roleBannerLabel' => '👑 Administrador',
+            'sectionRoutes' => [
+                'inventarios' => 'Inventario general',
+                'solicituds' => 'Lista de solicitudes de materiales',
+                'mantenimientos' => 'Mantenimiento',
+                'configuracion' => 'Configuración y Catálogos',
+                'reportes' => 'Reportes',
+                'users' => 'Usuarios',
+                'profile' => 'Mi Perfil',
+            ],
+        ])
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
-            ->profile(EditProfile::class, isSimple: false)
-            ->passwordReset()
-            ->brandName('SIGEM - TecNM Veracruz')
-            ->brandLogo(new HtmlString('<div class="sigem-brand"><img src="' . asset('images/sigem-icon.svg') . '" alt="SIGEM" class="sigem-brand-logo"></div>'))
-            ->brandLogoHeight('auto')
-            ->favicon(asset('images/sigem-icon.svg'))
-            ->font('DM Sans')
-            ->globalSearch(false)
-            ->darkMode(false)
-            ->colors([
-                'primary' => Color::hex('#1b65d4'),
-                'success' => Color::hex('#059669'),
-                'warning' => Color::hex('#d97706'),
-                'danger'  => Color::hex('#dc2626'),
-                'info'    => Color::hex('#0891b2'),
-                'reassign'=> Color::hex('#8b5cf6'),
-            ])
-            ->renderHook(
-                PanelsRenderHook::HEAD_END,
-                fn (): string => Blade::render('
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<link rel="stylesheet" href="{{ asset(\'css/sigem-theme.css\') }}?v={{ file_exists(public_path(\'css/sigem-theme.css\')) ? filemtime(public_path(\'css/sigem-theme.css\')) : 1 }}">
-<script src="{{ asset(\'js/sigem-network.js\') }}" defer></script>
-<script src="{{ asset(\'js/sigem-titles.js\') }}" defer></script>
-')
-            )
-            ->renderHook(
-                PanelsRenderHook::TOPBAR_START,
-                fn (): string => Blade::render('
-<button type="button" class="sigem-hamburger" onclick="toggleSidebar()" aria-label="Abrir menú lateral">☰</button>
-<div class="sigem-topbar-brand flex items-center gap-x-3">
-    <img src="{{ asset(\'images/sigem-logo.svg\') }}" alt="SIGEM" class="h-8">
-    <span class="font-bold text-lg hidden sm:block">SIGEM - TecNM Veracruz</span>
-</div>
-')
-            )
-            ->renderHook(
-                PanelsRenderHook::AUTH_LOGIN_FORM_BEFORE,
-                fn (): string => Blade::render('
-<div class="flex flex-col items-center gap-3 mb-6">
-    <div class="flex justify-center items-center gap-4">
-        <img src="{{ asset(\'images/sigem-logo.svg\') }}" alt="SIGEM" style="height: 38px; object-fit: contain;">
-        <img src="{{ asset(\'images/tecnm-logo.webp\') }}" alt="TecNM" loading="lazy" style="height: 38px; object-fit: contain;">
-        <img src="{{ asset(\'images/itv-logo.webp\') }}" alt="ITV" loading="lazy" style="height: 38px; object-fit: contain;">
-    </div>
-    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200 shadow-sm">
-        🔒 Panel de Administración
-    </span>
-</div>
-<script>
-    (function() {
-        function applyPlaceholders() {
-            var email = document.querySelector(\'.fi-simple-main input[type="email"], input[type="email"]\');
-            if (email && !email.getAttribute(\'placeholder\')) {
-                email.setAttribute(\'placeholder\', \'usuario@veracruz.tecnm.mx\');
-            }
-            var pass = document.querySelector(\'.fi-simple-main input[type="password"], input[type="password"]\');
-            if (pass && !pass.getAttribute(\'placeholder\')) {
-                pass.setAttribute(\'placeholder\', \'••••••••\');
-            }
-        }
-        applyPlaceholders();
-        setTimeout(applyPlaceholders, 50);
-        setTimeout(applyPlaceholders, 200);
-        setTimeout(applyPlaceholders, 600);
-    })();
-</script>
-')
-            )
-            ->renderHook(
-                PanelsRenderHook::AUTH_LOGIN_FORM_AFTER,
-                fn (): string => Blade::render('
-<div class="text-center mt-6 flex flex-col gap-3">
-    <a href="{{ url(\'/servicio-social/login\') }}" class="text-sm font-medium" style="color: #1b65d4; text-decoration: underline;">
-        ¿Eres de Servicio Social? Inicia sesión aquí
-    </a>
-    <a href="{{ url(\'/\') }}" class="text-sm text-gray-500 hover:text-gray-700 font-medium">
-        &larr; Ir al inicio
-    </a>
-</div>
-')
-            )
-            ->renderHook(
-                PanelsRenderHook::SIDEBAR_FOOTER,
-                fn (): string => Blade::render('
-<div class="sigem-user-card">
-    <div class="sigem-avatar" title="{{ auth()->user()?->name ?? \'Usuario\' }}">
-        {{ mb_strtoupper(mb_substr(auth()->user()?->name ?? \'U\', 0, 1)) }}
-    </div>
-    <form method="POST" action="{{ route(\'filament.admin.auth.logout\') }}" class="m-0 p-0 flex items-center justify-center">
-        @csrf
-        <button type="submit" class="sigem-logout" title="Cerrar sesión" aria-label="Cerrar sesión">
-            &#x23FB;
-        </button>
-    </form>
-</div>
-')
-            )
-            ->renderHook(
-                PanelsRenderHook::USER_MENU_BEFORE,
-                fn (): string => Blade::render('
-@if (auth()->check())
-@php
-    $path = request()->path();
-    $section = match(true) {
-        str_contains($path, "inventarios") => "Inventario general",
-        str_contains($path, "solicituds") => "Lista de solicitudes de materiales",
-        str_contains($path, "mantenimientos") => "Mantenimiento",
-        str_contains($path, "configuracion") => "Configuración y Catálogos",
-        str_contains($path, "reportes") => "Reportes",
-        str_contains($path, "users") => "Usuarios",
-        str_contains($path, "profile") => "Mi Perfil",
-        default => "Panel principal",
-    };
-@endphp
-<span class="sigem-crumb">SIGEM › <b>{{ $section }}</b></span>
-{{-- Campo de búsqueda aparente en el topbar (Fase 9: Buscador global) --}}
-<div class="sigem-topbar-search"
-     role="button"
-     tabindex="0"
-     aria-label="Buscar en SIGEM"
-     onclick="window.dispatchEvent(new CustomEvent(\'abrir-command-palette\'))"
-     onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.dispatchEvent(new CustomEvent(\'abrir-command-palette\'));}">
-    <span>🔍</span>
-    <span>Buscar en SIGEM…</span>
-</div>
-<span class="sigem-role-banner sigem-role-admin"
-      title="Acceso completo de administración">👑 Administrador</span>
-@endif
-')
-            )
-            ->renderHook(
-                PanelsRenderHook::BODY_END,
-                fn (): string => Blade::render('
-@if (auth()->check())
-    @livewire(\App\Livewire\CommandPalette::class)
-@endif
-<div class="sigem-sidebar-overlay" onclick="toggleSidebar()"></div>
-<script>
-    window.toggleSidebar = function () {
-        var sidebar = document.querySelector(\'.fi-sidebar\');
-        var overlay = document.querySelector(\'.sigem-sidebar-overlay\');
-        if (sidebar) sidebar.classList.toggle(\'is-open\');
-        if (overlay) overlay.classList.toggle(\'is-active\');
-    };
-    document.addEventListener(\'livewire:navigated\', function () {
-        var sidebar = document.querySelector(\'.fi-sidebar\');
-        var overlay = document.querySelector(\'.sigem-sidebar-overlay\');
-        if (sidebar) sidebar.classList.remove(\'is-open\');
-        if (overlay) overlay.classList.remove(\'is-active\');
-    });
-    document.addEventListener(\'keydown\', function (e) {
-        if (e.key === \'Escape\') {
-            var sidebar = document.querySelector(\'.fi-sidebar\');
-            var overlay = document.querySelector(\'.sigem-sidebar-overlay\');
-            if (sidebar) sidebar.classList.remove(\'is-open\');
-            if (overlay) overlay.classList.remove(\'is-active\');
-        }
-    });
-    (function () {
-        var isTooltipsUpdating = false;
-        function initSidebarTooltips() {
-            if (isTooltipsUpdating) return;
-            isTooltipsUpdating = true;
-            try {
-                document.querySelectorAll(\'.fi-sidebar-item\').forEach(function (item) {
-                    var label = item.querySelector(\'.fi-sidebar-item-label, .fi-sidebar-nav-item-label\');
-                    var text = label ? label.textContent.trim() : \'\';
-                    if (!text) {
-                        var link = item.querySelector(\'a\');
-                        if (link && link.title) {
-                            text = link.title.trim();
-                        }
-                    }
-                    if (text && item.getAttribute(\'data-tooltip\') !== text) {
-                        item.setAttribute(\'data-tooltip\', text);
-                    }
-                });
-            } finally {
-                isTooltipsUpdating = false;
-            }
-        }
-        if (document.readyState === \'loading\') {
-            document.addEventListener(\'DOMContentLoaded\', initSidebarTooltips);
-        } else {
-            initSidebarTooltips();
-        }
-        document.addEventListener(\'livewire:navigated\', initSidebarTooltips);
-        var sidebarObserver = new MutationObserver(function () {
-            initSidebarTooltips();
-        });
-        var sidebar = document.querySelector(\'.fi-sidebar\');
-        if (sidebar) {
-            sidebarObserver.observe(sidebar, { childList: true, subtree: true });
-        }
-
-        var isSlideUpdating = false;
-        function updateSlideOverState() {
-            if (isSlideUpdating) return;
-            isSlideUpdating = true;
-            try {
-                var openSlideOver = document.querySelector(\'.fi-modal-open .fi-modal-slide-over-window, .fi-modal.fi-modal-open .fi-modal-slide-over-window\');
-                if (openSlideOver) {
-                    if (!document.body.classList.contains(\'slide-over-open\')) {
-                        document.body.classList.add(\'slide-over-open\');
-                    }
-                } else {
-                    if (document.body.classList.contains(\'slide-over-open\')) {
-                        document.body.classList.remove(\'slide-over-open\');
-                    }
-                }
-            } finally {
-                Promise.resolve().then(function () {
-                    isSlideUpdating = false;
-                });
-            }
-        }
-        window.addEventListener(\'modal-opened\', function () { setTimeout(updateSlideOverState, 30); });
-        window.addEventListener(\'modal-closed\', function () { setTimeout(updateSlideOverState, 30); });
-        window.addEventListener(\'close-modal\', function () { setTimeout(updateSlideOverState, 30); });
-        window.addEventListener(\'open-modal\', function () { setTimeout(updateSlideOverState, 30); });
-        document.addEventListener(\'livewire:navigated\', function () { setTimeout(updateSlideOverState, 30); });
-
-        var slideObserver = new MutationObserver(function (mutations) {
-            for (var i = 0; i < mutations.length; i++) {
-                var target = mutations[i].target;
-                if (target === document.body) continue;
-                if (target && target.classList && (target.classList.contains(\'fi-modal\') || target.classList.contains(\'fi-modal-window\') || (target.closest && target.closest(\'.fi-modal\')))) {
-                    updateSlideOverState();
-                    break;
-                }
-            }
-        });
-        slideObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: [\'class\'] });
-    })();
-</script>
-')
-            )
-
-            ->navigationGroups([
-                NavigationGroup::make()
-                    ->label('Panel principal')
-                    ->collapsible(false),
-                NavigationGroup::make()
-                    ->label('Gestión de inventario')
-                    ->collapsible(false),
-                NavigationGroup::make()
-                    ->label('Catálogos')
-                    ->collapsible(false),
-                NavigationGroup::make()
-                    ->label('Administración')
-                    ->collapsible(false),
-            ])
-            ->sidebarWidth('64px')
+            ->navigationGroups($this->makeNavigationGroups([
+                'Panel principal',
+                'Gestión de inventario',
+                'Catálogos',
+                'Administración',
+            ]))
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Dashboard::class,
-            ])
-            ->widgets([])
-            ->middleware([
-                EncryptCookies::class,
-                AddQueuedCookiesToResponse::class,
-                StartSession::class,
-                AuthenticateSession::class,
-                ShareErrorsFromSession::class,
-                VerifyCsrfToken::class,
-                SubstituteBindings::class,
-                DisableBladeIconComponents::class,
-                DispatchServingFilamentEvent::class,
-            ])
-            ->authMiddleware([
-                Authenticate::class,
             ]);
     }
 }

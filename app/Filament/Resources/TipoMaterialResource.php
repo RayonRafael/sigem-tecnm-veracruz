@@ -2,38 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TipoMaterialResource\Pages;
+use App\Filament\Concerns\ConCatalogoResource;
+use App\Filament\Resources\TipoMaterialResource\Schemas\TipoMaterialSchema;
 use App\Models\TipoMaterial;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Infolists\Components\Section;
-use Filament\Infolists\Components\Tabs;
-use Filament\Infolists\Components\Tabs\Tab;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Table;
 
 class TipoMaterialResource extends Resource
 {
-    protected static bool $shouldRegisterNavigation = false;
+    use ConCatalogoResource;
 
     protected static ?string $model = TipoMaterial::class;
-
     protected static ?string $recordTitleAttribute = 'nombre';
-
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
     protected static ?string $navigationLabel = 'Tipos de material';
-
     protected static ?string $modelLabel = 'tipo de material';
-
     protected static ?string $pluralModelLabel = 'tipos de material';
-
-    protected static ?string $navigationGroup = 'Catálogos';
-
     protected static ?int $navigationSort = 4;
 
     public static function getGloballySearchableAttributes(): array
@@ -55,111 +38,10 @@ class TipoMaterialResource extends Resource
         ];
     }
 
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                Forms\Components\Section::make('📦 Datos del tipo de material')
-                    ->icon('heroicon-m-rectangle-stack')
-                    ->schema([
-                        Forms\Components\TextInput::make('nombre')
-                            ->label('Nombre del tipo')
-                            ->placeholder('Ej. Equipo de Cómputo')
-                            ->required()
-                            ->prefixIcon('heroicon-m-rectangle-stack')
-                            ->maxLength(100),
-                        Forms\Components\Select::make('familia')
-                            ->label('Familia')
-                            ->placeholder('Selecciona la familia...')
-                            ->options(self::getFamiliasOptions())
-                            ->nullable()
-                            ->searchable()
-                            ->prefixIcon('heroicon-m-tag'),
-                    ]),
-            ]);
-    }
-
-    public static function table(Table $table): Table
-    {
-        return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('nombre')->wrap(false)->limit(30)->grow(false)
-                    ->label('Nombre')
-                    ->searchable(isIndividual: true)
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('familia')
-                    ->label('Familia')
-                    ->badge()
-                    ->color('info')
-                    ->placeholder('—')
-                    ->searchable(isIndividual: true)
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')->wrap(false)->limit(30)->grow(false)->toggleable(isToggledHiddenByDefault: true)->label('Fecha de creación')
-                    ->dateTime('d/m/Y')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->defaultSort('nombre', 'asc')
-            ->striped()
-            ->searchPlaceholder('Buscar por nombre del tipo...')
-            ->defaultPaginationPageOption(10)
-            ->filters([
-                TrashedFilter::make(),
-                //
-            ])
-            ->recordUrl(null)
-            ->recordAction(null)
-            ->actions([
-                Tables\Actions\ViewAction::make()->iconButton()->tooltip('Ver detalle')->slideOver(),
-                Tables\Actions\EditAction::make()->iconButton()->tooltip('Editar')->successNotificationTitle('Tipo de material actualizado correctamente'),
-                Tables\Actions\DeleteAction::make()->iconButton()->tooltip('Eliminar')->extraAttributes(['title' => 'Eliminar'])->successNotificationTitle('Registro eliminado correctamente'),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()->successNotificationTitle('Tipo de material eliminado'),
-                ]),
-            ]);
-    }
-
-    public static function infolist(Infolist $infolist): Infolist
-    {
-        return $infolist
-            ->schema([
-                Tabs::make('Detalle')
-                    ->tabs([
-                        Tab::make('Información')
-                            ->icon('heroicon-m-tag')
-                            ->schema([
-                                Section::make('📦 Datos del tipo de material')
-                                    ->schema([
-                                        TextEntry::make('nombre')->label('Nombre')->icon('heroicon-m-rectangle-stack'),
-                                        TextEntry::make('familia')
-                                            ->label('Familia')
-                                            ->badge()
-                                            ->color('info')
-                                            ->placeholder('—')
-                                            ->icon('heroicon-m-tag'),
-                                        TextEntry::make('materiales_count')
-                                            ->label('Materiales registrados')
-                                            ->state(fn (TipoMaterial $record): string => $record->materiales()->count() . ' registrados')
-                                            ->icon('heroicon-m-cube'),
-                                    ])->columns(2),
-                            ]),
-                    ]),
-            ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListTipoMaterials::route('/'),
-            'create' => Pages\CreateTipoMaterial::route('/create'),
-            'edit' => Pages\EditTipoMaterial::route('/{record}/edit'),
-        ];
-    }
+    protected static function getFormSchema(): array { return TipoMaterialSchema::getFormSchema(); }
+    protected static function getTableColumns(): array { return TipoMaterialSchema::getTableColumns(); }
+    protected static function getInfolistSections(): array { return TipoMaterialSchema::getInfolistSections(); }
+    protected static function getSearchPlaceholder(): string { return 'Buscar por nombre del tipo...'; }
+    protected static function getEditSuccessMessage(): string { return 'Tipo de material actualizado correctamente'; }
+    protected static function getDeleteBulkSuccessMessage(): string { return 'Tipo de material eliminado'; }
 }
