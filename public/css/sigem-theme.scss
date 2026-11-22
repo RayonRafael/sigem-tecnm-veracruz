@@ -1,15 +1,18 @@
-// SIGEM Theme — Main entry (TecNM Veracruz)
+// SIGEM Theme — Main entry (chronological cascade order = 100% parity with Render + Mi Perfil)
 @use 'scss/tokens';
 @use 'scss/base';
 @use 'scss/auth';
+@use 'scss/dashboard';
 @use 'scss/sidebar';
 @use 'scss/tables';
-@use 'scss/forms';
-@use 'scss/modals';
-@use 'scss/dashboard';
 @use 'scss/reports';
-@use 'scss/badges-btns';
-@use 'scss/animations';
-@use 'scss/filament-overrides';
-@use 'scss/responsive';
 @use 'scss/utilities';
+@use 'scss/modals';
+@use 'scss/forms';
+@use 'scss/filament-overrides';
+@use 'scss/badges-btns';
+@use 'scss/tables-overrides';
+@use 'scss/animations';
+@use 'scss/responsive';
+@use 'scss/theme-global';
+@use 'scss/profile';

@@ -1,202 +1,38 @@
-// SIGEM Theme — Sidebar, Topbar & User Menu
+/* ==================================================== */
+/* FASE 4: SIDEBAR INVGATE (ICON-ONLY CON TOOLTIPS)      */
+/* ==================================================== */
+.fi-sidebar {
+  width: 64px !important;
 
-body:has(.sigem-professional) .fi-topbar {
-    display: flex !important;
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 20 !important;
-    background: var(--sig-surface) !important;
-    border-bottom: 1px solid var(--sig-border) !important;
-    height: auto !important;
-    overflow: visible !important;
-}
-
-body:has(.sigem-professional) .fi-topbar nav, .fi-topbar nav {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
-    width: 100% !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-}
-
-.fi-topbar nav .ms-auto, .fi-topbar nav > div:has(.fi-user-menu), .fi-topbar nav > div:has(.sigem-topbar-search) {
-    margin-left: auto !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 16px !important;
-}
-
-.fi-dropdown-panel, .fi-dropdown-list, .fi-dropdown-list-item, .fi-user-menu {
-    background-color: #ffffff !important;
-}
-
-.fi-dropdown-panel *, .fi-dropdown-list-item * {
-    color: #1a1a2e !important;
-}
-
-.fi-dropdown-list-item:hover {
-    background-color: #f1f5f9 !important;
-}
-
-body:has(.sigem-professional) .sigem-topbar-brand {
+  .fi-sidebar-item-label,
+  .fi-sidebar-nav-item-label,
+  .fi-sidebar-group-button {
     display: none !important;
-}
+  }
 
-.fi-sidebar-item, .fi-sidebar-item-button {
-    border-radius: var(--sig-radius-sm) !important;
-}
-
-.fi-sidebar-item .fi-icon, .fi-sidebar-item .fi-sidebar-item-icon, .fi-sidebar-item-icon {
-    width: 40px !important;
-    height: 40px !important;
-    border-radius: 11px !important;
+  .fi-sidebar-item {
     display: flex !important;
-    align-items: center !important;
     justify-content: center !important;
-    box-sizing: border-box !important;
-    padding: 7px !important;
-    border: 1.5px solid transparent !important;
-    transition: all 0.15s ease-in-out !important;
-    overflow: visible !important;
-}
-
-.fi-sidebar-item:hover .fi-icon, .fi-sidebar-item:hover .fi-sidebar-item-icon {
-    transform: translateY(-1px);
-}
-
-.fi-sidebar-item:not(.fi-active):not(.fi-sidebar-item-active) .fi-sidebar-item-icon, .fi-sidebar-item:not(.fi-active):not(.fi-sidebar-item-active) .fi-icon {
-    stroke: currentColor;
-    fill: none;
-}
-
-.fi-sidebar-item:not(.fi-active):not(.fi-sidebar-item-active) svg path, .fi-sidebar-item:not(.fi-active):not(.fi-sidebar-item-active) .fi-icon svg path, .fi-sidebar-item:not(.fi-active):not(.fi-sidebar-item-active) .fi-sidebar-item-icon svg path {
-    stroke: currentColor;
-    fill: none;
-}
-
-.fi-sidebar-item .fi-icon svg, .fi-sidebar-item .fi-sidebar-item-icon svg, .fi-sidebar-item svg {
-    stroke: currentColor;
-    fill: none;
-}
-
-.fi-sidebar-item a .fi-sidebar-item-icon, .fi-sidebar-item a .fi-icon {
-    background: var(--mod-cfg-l);
-    color: var(--mod-cfg);
-    border-color: color-mix(in srgb, var(--mod-cfg) 45%, transparent);
-}
-
-.fi-sidebar-item a:is([href$="/admin"], [href$="/admin/"]) :is(.fi-sidebar-item-icon, .fi-icon) {
-    background: var(--sig-primary-light) !important;
-    color: var(--sig-primary) !important;
-    border-color: color-mix(in srgb, var(--sig-primary) 45%, transparent) !important;
-}
-
-.fi-sidebar-item a[href*=inventario] :is(.fi-sidebar-item-icon, .fi-icon) {
-    background: var(--mod-inv-l) !important;
-    color: var(--mod-inv) !important;
-    border-color: color-mix(in srgb, var(--mod-inv) 45%, transparent) !important;
-}
-
-.fi-sidebar-item a[href*=solicitud] :is(.fi-sidebar-item-icon, .fi-icon) {
-    background: var(--mod-sol-l) !important;
-    color: var(--mod-sol) !important;
-    border-color: color-mix(in srgb, var(--mod-sol) 45%, transparent) !important;
-}
-
-.fi-sidebar-item a[href*=mantenimiento] :is(.fi-sidebar-item-icon, .fi-icon) {
-    background: var(--mod-mant-l) !important;
-    color: var(--mod-mant) !important;
-    border-color: color-mix(in srgb, var(--mod-mant) 45%, transparent) !important;
-}
-
-.fi-sidebar-item a[href*=reporte] :is(.fi-sidebar-item-icon, .fi-icon) {
-    background: var(--mod-rep-l) !important;
-    color: var(--mod-rep) !important;
-    border-color: color-mix(in srgb, var(--mod-rep) 45%, transparent) !important;
-}
-
-.fi-sidebar-item a:is([href*=catalogo], [href*=configuracion], [href*=area], [href*=departamento], [href*=material], [href*=proveedor], [href*=receptor], [href*=unidad-medida], [href*=user]) :is(.fi-sidebar-item-icon, .fi-icon) {
-    background: var(--mod-cfg-l) !important;
-    color: var(--mod-cfg) !important;
-    border-color: color-mix(in srgb, var(--mod-cfg) 45%, transparent) !important;
-}
-
-.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active) a:is([href$="/admin"], [href$="/admin/"]) :is(.fi-sidebar-item-icon, .fi-icon) {
-    background: var(--sig-primary) !important;
-    border-color: var(--sig-primary) !important;
-    color: #ffffff !important;
-}
-
-.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active) a[href*=inventario] :is(.fi-sidebar-item-icon, .fi-icon) {
-    background: var(--mod-inv) !important;
-    border-color: var(--mod-inv) !important;
-    color: #ffffff !important;
-}
-
-.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active) a[href*=solicitud] :is(.fi-sidebar-item-icon, .fi-icon) {
-    background: var(--mod-sol) !important;
-    border-color: var(--mod-sol) !important;
-    color: #ffffff !important;
-}
-
-.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active) a[href*=mantenimiento] :is(.fi-sidebar-item-icon, .fi-icon) {
-    background: var(--mod-mant) !important;
-    border-color: var(--mod-mant) !important;
-    color: #ffffff !important;
-}
-
-.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active) a[href*=reporte] :is(.fi-sidebar-item-icon, .fi-icon) {
-    background: var(--mod-rep) !important;
-    border-color: var(--mod-rep) !important;
-    color: #ffffff !important;
-}
-
-.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active) a:is([href*=catalogo], [href*=configuracion], [href*=area], [href*=departamento], [href*=material], [href*=proveedor], [href*=receptor], [href*=unidad-medida], [href*=user]) :is(.fi-sidebar-item-icon, .fi-icon) {
-    background: var(--mod-cfg) !important;
-    border-color: var(--mod-cfg) !important;
-    color: #ffffff !important;
-}
-
-.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active, [aria-current=page]) :is(.fi-sidebar-item-icon, .fi-icon, svg), .fi-sidebar-item a[aria-current=page] :is(.fi-sidebar-item-icon, svg) {
-    color: #ffffff !important;
-    stroke: #ffffff !important;
-    fill: none !important;
-}
-
-.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active, [aria-current=page]) svg :is(path, *), .fi-sidebar-item a[aria-current=page] svg :is(path, *) {
-    color: #ffffff !important;
-    stroke: #ffffff !important;
-    fill: none !important;
-}
-
-.fi-sidebar-item .fi-badge {
-    background: #dc2626 !important;
-    color: #fff !important;
-    font-size: 12.5px !important;
-    font-weight: 700 !important;
-    min-width: 19px !important;
-    height: 19px !important;
+    align-items: center !important;
+    height: 44px !important;
+    margin-bottom: 4px !important;
     border-radius: 9px !important;
-    border: 2px solid var(--sig-surface) !important;
-}
+    position: relative !important;
+    width: 100% !important;
 
-.fi-sidebar .fi-sidebar-item-label, .fi-sidebar .fi-sidebar-nav-item-label, .fi-sidebar .fi-sidebar-group-button {
-    display: none !important;
-}
+    &:hover {
+      background: var(--sig-bg);
+    }
 
-.fi-sidebar .fi-sidebar-item:hover {
-    background: var(--sig-bg);
-}
+    .fi-badge {
+      position: absolute !important;
+      top: 0px !important;
+      right: 0px !important;
+      z-index: 10 !important;
+    }
+  }
 
-.fi-sidebar .fi-sidebar-item .fi-badge {
-    position: absolute !important;
-    top: 0px !important;
-    right: 0px !important;
-    z-index: 10 !important;
-}
-
-.fi-sidebar .fi-sidebar-item-button {
+  .fi-sidebar-item-button {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
@@ -206,27 +42,47 @@ body:has(.sigem-professional) .sigem-topbar-brand {
     gap: 0 !important;
     margin: 0 auto !important;
     background: transparent !important;
-}
 
-.fi-sidebar .fi-sidebar-item-button:hover {
-    background: var(--sig-bg) !important;
-}
+    &:hover {
+      background: var(--sig-bg) !important;
+    }
+  }
 
-.fi-sidebar .fi-sidebar-nav {
+  .fi-sidebar-nav {
     padding: 14px 10px !important;
+  }
 }
 
+/* Estructura fija en Desktop */
+@media (min-width: 1024px) {
+
+  .fi-sidebar,
+  aside.fi-sidebar {
+    width: 64px !important;
+    min-width: 64px !important;
+    max-width: 64px !important;
+    display: flex !important;
+    transform: none !important;
+    position: sticky !important;
+    top: 0 !important;
+    height: 100vh !important;
+    background: var(--sig-surface) !important;
+    border-right: 1px solid var(--sig-border) !important;
+    box-shadow: none !important;
+  }
+}
+
+/* Marca */
 .sigem-brand {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 14px 8px;
-    border-bottom: 1px solid var(--sig-border);
-    text-align: center;
-    width: 100%;
-}
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 14px 8px;
+  border-bottom: 1px solid var(--sig-border);
+  text-align: center;
+  width: 100%;
 
-.sigem-brand-logo {
+  &-logo {
     width: 36px;
     height: 36px;
     border-radius: 10px;
@@ -239,27 +95,34 @@ body:has(.sigem-professional) .sigem-topbar-brand {
     font-size: 19px;
     flex-shrink: 0;
     user-select: none;
+  }
+
+  :is(.fi-simple-main, .fi-simple-layout) & {
+    border-bottom: none !important;
+    padding: 0 !important;
+  }
 }
 
 img.sigem-brand-logo {
-    background: transparent;
-    border-radius: 0;
-    object-fit: contain;
-    width: 36px;
-    height: 36px;
+  background: transparent !important;
+  border-radius: 0 !important;
+  object-fit: contain !important;
+  width: 36px !important;
+  height: 36px !important;
 }
 
 .fi-sidebar-header {
-    padding: 0 !important;
-    height: auto !important;
-    min-height: 64px !important;
-    border-bottom: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    justify-content: center !important;
-}
+  padding: 0 !important;
+  height: auto !important;
+  min-height: 64px !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  justify-content: center !important;
 
-.fi-sidebar-header > div, .fi-sidebar-header a, .fi-sidebar-header .fi-logo {
+  > div,
+  a,
+  .fi-logo {
     width: 100% !important;
     height: auto !important;
     display: flex !important;
@@ -267,23 +130,30 @@ img.sigem-brand-logo {
     text-decoration: none !important;
     pointer-events: none !important;
     cursor: default !important;
-}
+  }
 
-.fi-sidebar-header button, .fi-sidebar-header .fi-icon-btn {
+  button,
+  .fi-icon-btn {
     display: none !important;
+  }
 }
 
-.fi-sidebar-header a, .fi-topbar a.fi-topbar-brand, .sigem-brand {
-    pointer-events: none !important;
-    cursor: default !important;
+/* Logo del sidebar/topbar solo decorativo (sin navegación ni recarga) */
+.fi-sidebar-header a,
+.fi-topbar a.fi-topbar-brand,
+.sigem-brand {
+  pointer-events: none !important;
+  cursor: default !important;
 }
 
-.fi-sidebar-item::after {
+/* Tooltip al hover */
+.fi-sidebar-item {
+  &::after {
     content: attr(data-tooltip);
     position: absolute;
     left: calc(100% + 12px);
     top: 50%;
-    transform: translateY(-50%) scale(0.92);
+    transform: translateY(-50%) scale(.92);
     background: #0f172a;
     color: #fff;
     padding: 6px 11px;
@@ -291,404 +161,98 @@ img.sigem-brand-logo {
     font-weight: 600;
     white-space: nowrap;
     border-radius: 6px;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .22);
     pointer-events: none;
     opacity: 0;
-    transition: all 0.15s ease;
+    transition: all .15s ease;
     z-index: 999;
-}
+  }
 
-.fi-sidebar-item:hover::after {
+  &:hover::after {
     opacity: 1;
     transform: translateY(-50%) scale(1);
-}
+  }
 
-.fi-sidebar-item:not([data-tooltip])::after, .fi-sidebar-item[data-tooltip=""]::after {
+  &:not([data-tooltip])::after,
+  &[data-tooltip=""]::after {
     display: none !important;
+  }
 }
 
-.sigem-logout:hover {
-    background: var(--sig-bg);
-    color: #dc2626;
-}
-
-.fi-sidebar, aside.fi-sidebar, .fi-sidebar > div, .fi-sidebar .overflow-x-clip, .fi-sidebar .fi-sidebar-nav, .fi-sidebar-nav-groups, .fi-sidebar-group, .fi-sidebar-group-items {
-    overflow: visible !important;
-}
-
-.fi-sidebar-nav-groups {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    gap: 6px !important;
-}
-
-.fi-sidebar-group-items {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 4px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    list-style: none !important;
-}
-
-.sigem-topbar-search {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--sig-bg);
-    border: 1px solid var(--sig-border);
-    border-radius: 10px;
-    padding: 8px 13px;
-    color: var(--sig-light);
-    font-size: 15px;
-    cursor: pointer;
-    min-width: 220px;
-    transition: all 0.15s;
-    user-select: none;
-    margin-left: auto !important;
-    margin-right: 8px;
-}
-
-.sigem-topbar-search:hover {
-    border-color: var(--sig-primary);
-    color: var(--sig-muted);
-}
-
-.fi-topbar * {
-    max-width: 100% !important;
-}
-
-.fi-topbar .sigem-topbar-search {
-    min-width: 120px !important;
-    flex-shrink: 1 !important;
-}
-
-.fi-sidebar .sigem-user-card, .fi-sidebar .sigem-avatar, .fi-sidebar .sigem-logout {
-    display: flex !important;
-}
-
-.sigem-role-banner {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    background: var(--sig-info-light);
-    color: var(--sig-info);
-    font-size: 14px;
-    font-weight: 600;
-    padding: 6px 14px;
-    border-radius: 99px;
-    white-space: nowrap;
-}
-
-.fi-sidebar-item a[href$="/servicio-social"] .fi-sidebar-item-icon, .fi-sidebar-item a[href$="/servicio-social/"] .fi-sidebar-item-icon, .fi-sidebar-item:has(a[href$="/servicio-social"]) .fi-sidebar-item-icon, .fi-sidebar-item:has(a[href$="/servicio-social/"]) .fi-sidebar-item-icon {
-    background: var(--sig-primary-light) !important;
-    color: var(--sig-primary) !important;
-    border-color: color-mix(in srgb, var(--sig-primary) 45%, transparent) !important;
-}
-
-.fi-sidebar-item.fi-active a[href$="/servicio-social"] .fi-sidebar-item-icon, .fi-sidebar-item.fi-sidebar-item-active a[href$="/servicio-social"] .fi-sidebar-item-icon, .fi-sidebar-item a[href$="/servicio-social"][aria-current=page] .fi-sidebar-item-icon, .fi-sidebar-item.fi-active:has(a[href$="/servicio-social"]) .fi-sidebar-item-icon, .fi-sidebar-item.fi-sidebar-item-active:has(a[href$="/servicio-social"]) .fi-sidebar-item-icon {
-    background: var(--sig-primary) !important;
-    border-color: var(--sig-primary) !important;
-    color: #ffffff !important;
-}
-
-.fi-sidebar-item a[href*="/servicio-social/solicitud"] .fi-sidebar-item-icon {
-    background: var(--mod-sol-l) !important;
-    color: var(--mod-sol) !important;
-    border-color: color-mix(in srgb, var(--mod-sol) 45%, transparent) !important;
-}
-
-.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active) a[href*="/servicio-social/solicitud"] .fi-sidebar-item-icon, .fi-sidebar-item a[href*="/servicio-social/solicitud"][aria-current=page] .fi-sidebar-item-icon {
-    background: var(--mod-sol) !important;
-    border-color: var(--mod-sol) !important;
-    color: #ffffff !important;
-}
-
-.fi-sidebar-item a[href*="/servicio-social/mantenimiento"] .fi-sidebar-item-icon {
-    background: var(--mod-mant-l) !important;
-    color: var(--mod-mant) !important;
-    border-color: color-mix(in srgb, var(--mod-mant) 45%, transparent) !important;
-}
-
-.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active) a[href*="/servicio-social/mantenimiento"] .fi-sidebar-item-icon, .fi-sidebar-item a[href*="/servicio-social/mantenimiento"][aria-current=page] .fi-sidebar-item-icon {
-    background: var(--mod-mant) !important;
-    border-color: var(--mod-mant) !important;
-    color: #ffffff !important;
-}
-
-.fi-sidebar-item a[href*="/servicio-social/inventario"] .fi-sidebar-item-icon {
-    background: var(--mod-inv-l) !important;
-    color: var(--mod-inv) !important;
-    border-color: color-mix(in srgb, var(--mod-inv) 45%, transparent) !important;
-}
-
-.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active) a[href*="/servicio-social/inventario"] .fi-sidebar-item-icon, .fi-sidebar-item a[href*="/servicio-social/inventario"][aria-current=page] .fi-sidebar-item-icon {
-    background: var(--mod-inv) !important;
-    border-color: var(--mod-inv) !important;
-    color: #ffffff !important;
-}
-
-.fi-sidebar-item a:is([href*="/servicio-social/catalogo"], [href*="/servicio-social/materials"], [href*="/servicio-social/areas"], [href*="/servicio-social/receptors"], [href*="/servicio-social/marca-materials"], [href*="/servicio-social/tipo-materials"], [href*="/servicio-social/unidad-medidas"]) .fi-sidebar-item-icon {
-    background: var(--mod-cat-l) !important;
-    color: var(--mod-cat) !important;
-    border-color: color-mix(in srgb, var(--mod-cat) 45%, transparent) !important;
-}
-
-.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active) a:is([href*="/servicio-social/catalogo"], [href*="/servicio-social/materials"], [href*="/servicio-social/areas"], [href*="/servicio-social/receptors"], [href*="/servicio-social/marca-materials"], [href*="/servicio-social/tipo-materials"], [href*="/servicio-social/unidad-medidas"]) .fi-sidebar-item-icon, .fi-sidebar-item a:is([href*="/servicio-social/catalogo"], [href*="/servicio-social/materials"], [href*="/servicio-social/areas"], [href*="/servicio-social/receptors"], [href*="/servicio-social/marca-materials"], [href*="/servicio-social/tipo-materials"], [href*="/servicio-social/unidad-medidas"])[aria-current=page] .fi-sidebar-item-icon {
-    background: var(--mod-cat) !important;
-    border-color: var(--mod-cat) !important;
-    color: #ffffff !important;
-}
-
-.fi-sidebar-item a[href*="/servicio-social/reporte"] .fi-sidebar-item-icon {
-    background: var(--mod-rep-l) !important;
-    color: var(--mod-rep) !important;
-    border-color: color-mix(in srgb, var(--mod-rep) 45%, transparent) !important;
-}
-
-.fi-sidebar-item:is(.fi-active, .fi-sidebar-item-active) a[href*="/servicio-social/reporte"] .fi-sidebar-item-icon, .fi-sidebar-item a[href*="/servicio-social/reporte"][aria-current=page] .fi-sidebar-item-icon {
-    background: var(--mod-rep) !important;
-    border-color: var(--mod-rep) !important;
-    color: #ffffff !important;
-}
-
-body:has(.sigem-role-banner) .sigem-topbar-brand {
-    display: none !important;
-}
-
-body:has(.sigem-role-banner) .fi-topbar:first-of-type .sigem-topbar-brand {
-    display: none !important;
-}
-
-.fi-sidebar, aside.fi-sidebar {
-    background: var(--sig-surface) !important;
-    border-right: 1px solid var(--sig-border) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-}
-
-.fi-sidebar nav, .fi-sidebar .fi-sidebar-nav {
-    flex: 1 1 auto !important;
-    overflow: visible !important;
-    min-height: 0 !important;
-}
-
-.fi-sidebar-footer, .fi-sidebar .fi-sidebar-footer {
-    flex: 0 0 auto !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: max-content !important;
-    padding: 6px 6px !important;
-    margin-top: auto !important;
-}
-
+/* Pie de usuario */
 .sigem-user-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-top: 1px solid var(--sig-border);
-    background: var(--sig-surface);
-    flex: 0 0 auto;
-    height: auto;
-    min-height: 0;
-    max-height: max-content;
-    width: 100%;
-    max-width: 64px;
-    box-sizing: border-box;
-    overflow-x: hidden;
-    padding: 6px 2px;
-    gap: 3px;
-    margin-top: auto;
-    justify-content: center;
-}
-
-.sigem-user-card form {
-    margin: 0 !important;
-    padding: 0 !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    height: auto !important;
-    flex: 0 0 auto !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  border-top: 1px solid var(--sig-border);
+  margin-top: auto;
+  background: var(--sig-surface);
 }
 
 .sigem-avatar {
-    border-radius: 50%;
-    background: #e8f0fe;
-    color: #1b65d4;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    flex-shrink: 0;
-    user-select: none;
-    width: 30px;
-    height: 30px;
-    font-size: 14px;
-    flex: 0 0 auto;
-}
-
-.sigem-role-pill {
-    font-weight: 700;
-    border-radius: 6px;
-    background: var(--sig-info-light);
-    color: var(--sig-info);
-    text-align: center;
-    font-size: 10px;
-    padding: 1px 4px;
-    line-height: 1.2;
-    flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e8f0fe;
+  color: #1b65d4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+  user-select: none;
 }
 
 .sigem-logout {
-    border-radius: 50%;
-    background: var(--sig-surface);
-    border: 1px solid var(--sig-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    color: var(--sig-muted);
-    text-decoration: none;
-    outline: none;
-    transition: all 0.15s ease;
-    width: 20px;
-    height: 20px;
-    font-size: 12px;
-    padding: 0;
-    line-height: 1;
-    flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--sig-surface);
+  border: 1px solid var(--sig-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--sig-muted);
+  text-decoration: none;
+  padding: 0;
+  line-height: 1;
+  outline: none;
+  transition: all .15s ease;
+
+  &:hover {
+    background: var(--sig-bg);
+    color: #dc2626;
+  }
 }
 
-.sigem-role-admin {
-    background: var(--sig-primary-light);
-    color: var(--sig-primary);
+/* Los tooltips no deben recortarse */
+.fi-sidebar,
+aside.fi-sidebar,
+.fi-sidebar>div,
+.fi-sidebar .overflow-x-clip,
+.fi-sidebar .fi-sidebar-nav,
+.fi-sidebar-nav-groups,
+.fi-sidebar-group,
+.fi-sidebar-group-items {
+  overflow: visible !important;
 }
 
-.fi-topbar .fi-dropdown-panel {
-    max-width: 240px !important;
-    width: max-content !important;
-    left: auto !important;
-    right: 16px !important;
+.fi-sidebar-nav-groups {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  gap: 6px !important;
 }
 
-.fi-topbar .fi-dropdown-panel * {
-    max-width: none !important;
-}
-
-.fi-sidebar .fi-sidebar-item {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    height: 44px !important;
-    margin-bottom: 4px !important;
-    border-radius: 9px !important;
-    position: relative !important;
-    width: 100% !important;
-    max-width: 64px !important;
-    box-sizing: border-box !important;
-    overflow: visible !important;
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-}
-
-.fi-sidebar::-webkit-scrollbar, .fi-sidebar nav::-webkit-scrollbar, .fi-sidebar .fi-sidebar-nav::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-}
-
-.fi-sidebar, .fi-sidebar nav {
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-}
-
-.fi-topbar, header.fi-topbar {
-    background-color: #ffffff !important;
-    border-left: none !important;
-    min-height: 50px !important;
-    height: 50px !important;
-    padding: 0 16px !important;
-    display: flex !important;
-    align-items: center !important;
-}
-
-.fi-topbar nav > div.ms-auto, header.fi-topbar nav > div.ms-auto, .fi-topbar nav > div:has(.sigem-crumb) {
-    flex: 1 1 auto !important;
-    width: 100% !important;
-    justify-content: flex-end !important;
-}
-
-.fi-sidebar {
-    width: 64px !important;
-    height: 100vh !important;
-    position: sticky !important;
-    top: 0;
-    flex-shrink: 0;
-    overflow-y: visible !important;
-    overflow-x: hidden !important;
-    background-color: #ffffff !important;
-    border: none !important;
-    border-right: 1px solid #e5e7eb !important;
-    box-shadow: none !important;
-}
-
-.fi-topbar {
-    position: sticky !important;
-    margin-left: 0 !important;
-    top: 0 !important;
-    z-index: 40 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    box-shadow: none !important;
-}
-
-.fi-topbar > nav {
-    border-radius: 0 !important;
-}
-
-.sigem-crumb {
-    font-size: 15px !important;
-    color: var(--sig-muted) !important;
-    margin-right: auto !important;
-    white-space: nowrap !important;
-    font-weight: 500 !important;
-}
-
-.sigem-crumb b {
-    color: var(--sig-text);
-    font-weight: 700;
-    font-size: 15px;
-}
-
-.fi-sidebar-item-label {
-    font-size: 12px !important;
-    font-weight: 500 !important;
-    line-height: 1.2 !important;
-}
-
-.fi-ta-header-ctn .fi-dropdown-trigger button.fi-ac-btn-group .fi-btn-label {
-    white-space: nowrap !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    color: var(--sig-text, #0f172a) !important;
-    line-height: 1 !important;
-}
-
-.fi-ta-header-ctn .fi-dropdown-trigger button.fi-ac-btn-group svg {
-    color: var(--sig-muted, #64748b) !important;
-    width: 16px !important;
-    height: 16px !important;
-    flex-shrink: 0 !important;
-}
-
-.sigem-hamburger {
-    display: none;
-}
-
-.fi-topbar, .fi-topbar nav, header.fi-topbar {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-    border-bottom: 1px solid var(--sig-border, #e5e7eb) !important;
+.fi-sidebar-group-items {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  list-style: none !important;
 }

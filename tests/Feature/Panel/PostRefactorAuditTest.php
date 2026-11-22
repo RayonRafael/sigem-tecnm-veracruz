@@ -365,9 +365,13 @@ class PostRefactorAuditTest extends TestCase
             ->assertOk()
             ->assertSee('EQ-AUDIT-001');
 
-        // #45 Compiled CSS theme exists & non-empty
+        // #45 Compiled CSS theme exists, includes Mi Perfil styles and 11-column table rules
         $cssPath = public_path('css/sigem-theme.css');
         $this->assertFileExists($cssPath);
         $this->assertGreaterThan(100_000, filesize($cssPath));
+        $cssContent = file_get_contents($cssPath);
+        $this->assertStringContainsString('.sigem-profile-card', $cssContent);
+        $this->assertStringContainsString('.sigem-profile-avatar', $cssContent);
+        $this->assertStringContainsString('.fi-ta-table:has(th:nth-child(9))', $cssContent);
     }
 }

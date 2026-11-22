@@ -1,47 +1,109 @@
-// SIGEM Theme — Tables, Pagination, Selection & Toolbar
-
-.fi-panel-servicio-social .fi-ta-table tbody tr:hover {
-    background: #f8fafc !important;
-}
-
-.fi-pagination-item {
-    border-radius: 8px !important;
-    margin: 0 2px !important;
-}
-
-.fi-ta-empty-state-heading {
-    color: #475569 !important;
-    font-weight: 600 !important;
-}
-
-.fi-ta-empty-state-icon {
-    color: #cbd5e1 !important;
-}
-
-.fi-ta-header th, th.fi-ta-header-cell span, .fi-ta-table thead th span {
-    color: var(--sig-muted) !important;
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    letter-spacing: 0.06em !important;
-}
-
+/* ==================================================== */
+/* FASE 5: TABLA DE INVENTARIO ESTILO INVGATE           */
+/* ==================================================== */
 .fi-ta-table thead th * {
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.06em !important;
-    color: #475569 !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .06em !important;
+  color: #475569 !important;
 }
+
 
 .fi-ta-table .fi-ta-text-item-label {
-    font-weight: 600 !important;
+  font-weight: 600 !important;
+}
+
+
+/* Píldoras de estado (punto + texto) */
+.sigem-pill,
+.fi-ta-table .fi-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  padding: 3.5px 10px !important;
+  border-radius: 99px !important;
+  white-space: nowrap !important;
+  line-height: 1.2 !important;
+}
+
+.sigem-pill::before,
+.fi-ta-table .fi-badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.sigem-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+.sigem-pill:has(.sigem-dot)::before {
+  display: none !important;
 }
 
 .fi-ta-table .fi-badge svg {
-    display: none !important;
+  display: none !important;
 }
 
-.fi-ta-filters input, .fi-ta-filters select {
+.sigem-pill.ok,
+.fi-ta-table .fi-badge.fi-color-success,
+.fi-ta-table .fi-badge-color-success {
+  background: #d1fae5 !important;
+  color: #059669 !important;
+}
+
+.sigem-pill.warn,
+.fi-ta-table .fi-badge.fi-color-warning,
+.fi-ta-table .fi-badge-color-warning {
+  background: #fef3c7 !important;
+  color: #d97706 !important;
+}
+
+.sigem-pill.danger,
+.fi-ta-table .fi-badge.fi-color-danger,
+.fi-ta-table .fi-badge-color-danger {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+
+.sigem-pill.info,
+.fi-ta-table .fi-badge.fi-color-info,
+.fi-ta-table .fi-badge-color-info {
+  background: #cffafe !important;
+  color: #0891b2 !important;
+}
+
+.sigem-pill.reassign,
+.fi-badge.fi-color-reassign,
+.fi-ta-table .fi-badge.fi-color-reassign,
+.fi-ta-table .fi-badge-color-reassign {
+  background: #ede9fe !important;
+  color: #8b5cf6 !important;
+}
+
+.sigem-pill.neutral,
+.fi-ta-table .fi-badge.fi-color-gray,
+.fi-ta-table .fi-badge-color-gray {
+  background: var(--sig-bg) !important;
+  color: var(--sig-muted) !important;
+}
+
+/* Filtros por columna */
+.fi-ta-filters {
+  input,
+  select {
     width: 100%;
     min-width: 84px;
     height: 31px;
@@ -52,504 +114,563 @@
     border-radius: 7px;
     background: var(--sig-surface);
     color: var(--sig-text);
+  }
+}
+
+/* Panel lateral "Resumen del inventario" */
+.sigem-inv-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 18px;
+  align-items: start;
+}
+
+.sigem-inv-side {
+  position: sticky;
+  top: 72px;
+  max-height: calc(100vh - 90px);
+  overflow: auto;
+  background: var(--sig-surface);
+  border: 1px solid var(--sig-border);
+  border-radius: 14px;
+  padding: 16px 18px;
+}
+
+.sigem-inv-side-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+@keyframes sigemSlideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* ==========================================================================
+   LAYOUT DEL DASHBOARD CON PANEL LATERAL (EMPUJA EL CONTENIDO)
+   ========================================================================== */
+.sigem-dashboard-layout {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+  width: 100%;
+  position: relative;
+  transition: gap 0.3s ease;
+
+  &.has-panel-open {
+    gap: 20px;
+  }
+}
+
+.sigem-dashboard-main {
+  flex: 1 1 0%;
+  min-width: 0;
+  width: 100%;
+  transition: flex 0.3s ease, width 0.3s ease;
+}
+
+/* Panel Lateral Slide-Over de Selección de Equipos (Empuja contenido, ancho 420px) */
+.sigem-selection-side-panel {
+  position: sticky !important;
+  top: 16px !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: 420px !important;
+  min-width: 420px !important;
+  max-width: 420px !important;
+  flex: 0 0 420px !important;
+  height: calc(100vh - 32px) !important;
+  max-height: calc(100vh - 32px) !important;
+  background: #ffffff !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08) !important;
+  z-index: 20 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  transition: all 0.3s ease !important;
+  animation: sigemSlideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+.sigem-selection-side-panel[style*="display: none"] {
+  display: none !important;
+}
+
+.sigem-sel-backdrop {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .sigem-dashboard-layout {
+    flex-direction: column;
+    gap: 16px !important;
+  }
+  .sigem-selection-side-panel {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 auto !important;
+    position: static !important;
+    height: auto !important;
+    max-height: 80vh !important;
+  }
 }
 
 .sigem-sel-back-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: transparent;
-    border: 1px solid #e5e7eb;
-    color: #374151;
-    font-size: 13.5px;
-    font-weight: 600;
-    cursor: pointer;
-    padding: 6px 12px;
-    border-radius: 8px;
-    transition: all 0.15s ease;
-}
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
 
-.sigem-sel-back-btn:hover {
+  &:hover {
     background: #f3f4f6;
     border-color: #d1d5db;
     color: #111827;
+  }
 }
 
 .sigem-sel-form-summary {
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 18px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
 }
 
 .sigem-sel-form-tip {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    font-size: 12.5px;
-    color: #4b5563;
-    line-height: 1.4;
-    padding-top: 10px;
-    border-top: 1px solid #e5e7eb;
-    margin-top: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  color: #4b5563;
+  line-height: 1.4;
+  padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 10px;
 }
 
 .sigem-sel-form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
 }
 
 .sigem-sel-form-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
 }
 
 .sigem-sel-form-control {
-    width: 100%;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    padding: 9px 12px;
-    font-size: 13.5px;
-    color: #111827;
-    background-color: #ffffff;
-    box-sizing: border-box;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13.5px;
+  color: #111827;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 
-.sigem-sel-form-control:focus {
+  &:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  }
+}
+
+.sigem-sel-form-textarea {
+  resize: vertical;
+  min-height: 72px;
 }
 
 .sigem-sel-header {
-    padding: 18px 20px 14px 20px;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-    background: #ffffff;
-    flex-shrink: 0;
+  padding: 18px 20px 14px 20px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  background: #ffffff;
+  flex-shrink: 0;
 }
 
 .sigem-sel-header-title {
-    font-weight: 700;
-    font-size: 18px;
-    color: #111827;
-    line-height: 1.25;
+  font-weight: 700;
+  font-size: 18px;
+  color: #111827;
+  line-height: 1.25;
 }
 
 .sigem-sel-header-sub {
-    font-size: 14px;
-    color: #6b7280;
-    margin-top: 3px;
-    line-height: 1.35;
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 3px;
+  line-height: 1.35;
 }
 
 .sigem-sel-close-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: #6b7280;
-    font-size: 18px;
-    line-height: 1;
-    padding: 4px 6px;
-    border-radius: 6px;
-    transition: all 0.15s ease;
-}
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 18px;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: all 0.15s ease;
 
-.sigem-sel-close-btn:hover {
+  &:hover {
     background: #f3f4f6;
     color: #111827;
+  }
 }
 
 .sigem-sel-body {
-    flex: 1 1 auto;
-    overflow-y: auto;
-    padding: 18px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .sigem-sel-section-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: #6b7280;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
 }
 
 .sigem-sel-actions-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .sigem-sel-action-card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-    gap: 4px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    width: 100%;
-    box-sizing: border-box;
-}
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
 
-.sigem-sel-action-card:hover {
+  &:hover {
     border-color: #3b82f6;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
-}
+  }
 
-.sigem-sel-action-card .sigem-sel-action-icon {
+  .sigem-sel-action-icon {
     font-size: 20px;
     line-height: 1;
     margin-bottom: 4px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-}
+  }
 
-.sigem-sel-action-card .sigem-sel-action-title {
+  .sigem-sel-action-title {
     font-weight: 700;
     font-size: 14px;
     color: #111827;
     line-height: 1.25;
-}
+  }
 
-.sigem-sel-action-card .sigem-sel-action-desc {
+  .sigem-sel-action-desc {
     font-size: 12px;
     color: #6b7280;
     line-height: 1.35;
     font-weight: 400;
-}
+  }
 
-.sigem-sel-action-card.is-danger .sigem-sel-action-title, .sigem-sel-action-card.is-danger .sigem-sel-action-icon {
-    color: #dc2626;
-}
+  &.is-danger {
+    .sigem-sel-action-title,
+    .sigem-sel-action-icon {
+      color: #dc2626;
+    }
+  }
 
-.sigem-sel-action-card.is-export .sigem-sel-action-title, .sigem-sel-action-card.is-export .sigem-sel-action-icon {
-    color: #2563eb;
-}
+  &.is-export {
+    .sigem-sel-action-title,
+    .sigem-sel-action-icon {
+      color: #2563eb;
+    }
+  }
 
-.sigem-sel-action-card.is-pdf {
+  &.is-pdf {
     border-color: #dbeafe;
-}
 
-.sigem-sel-action-card.is-pdf .sigem-sel-action-title, .sigem-sel-action-card.is-pdf .sigem-sel-action-icon {
-    color: #2563eb;
-}
+    .sigem-sel-action-title,
+    .sigem-sel-action-icon {
+      color: #2563eb;
+    }
 
-.sigem-sel-action-card.is-pdf:hover {
-    background: #eff6ff;
-    border-color: #2563eb;
+    &:hover {
+      background: #eff6ff;
+      border-color: #2563eb;
+    }
+  }
 }
 
 .sigem-sel-state-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .sigem-sel-state-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    border-radius: 9999px;
-    font-size: 12.5px;
-    font-weight: 600;
-    line-height: 1.3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 .sigem-sel-items-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-height: 220px;
-    overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
 }
 
 .sigem-sel-item-card {
-    background: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 10px 12px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .sigem-sel-item-code {
-    font-size: 13px;
-    font-weight: 700;
-    color: #111827;
-    line-height: 1.3;
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.3;
 }
 
 .sigem-sel-item-desc {
-    font-size: 11px;
-    color: #6b7280;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-top: 2px;
+  font-size: 11px;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
 }
 
 .sigem-sel-mini-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 8px;
-    border-radius: 9999px;
-    font-size: 11px;
-    font-weight: 600;
-    white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .sigem-sel-item-remove {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: #9ca3af;
-    font-size: 14px;
-    line-height: 1;
-    padding: 2px 4px;
-    border-radius: 4px;
-    transition: all 0.15s ease;
-}
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  font-size: 14px;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.15s ease;
 
-.sigem-sel-item-remove:hover {
+  &:hover {
     color: #ef4444;
     background: #fee2e2;
+  }
 }
 
 .sigem-sel-bitacora-note {
-    background: #ecfdf5;
-    border-radius: 8px;
-    padding: 10px 12px;
-    font-size: 12px;
-    color: #065f46;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    line-height: 1.4;
+  background: #ecfdf5;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12px;
+  color: #065f46;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.4;
 }
 
 .sigem-sel-footer {
-    border-top: 1px solid #e5e7eb;
-    background: #f9fafb;
-    padding: 12px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    flex-shrink: 0;
+  border-top: 1px solid #e5e7eb;
+  background: #f9fafb;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
 .sigem-sel-footer-btn {
-    background: #ffffff;
-    border: 1px solid #d1d5db;
-    color: #374151;
-    border-radius: 8px;
-    padding: 7px 14px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s ease;
-}
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
 
-.sigem-sel-footer-btn:hover {
+  &:hover {
     background: #f3f4f6;
     border-color: #9ca3af;
     color: #111827;
+  }
 }
 
-:is(.fi-ta-table .fi-ta-filters, .fi-ta-filters) input, :is(.fi-ta-table .fi-ta-filters, .fi-ta-filters) select {
-    width: 100%;
-    min-width: 84px;
-    height: 31px;
-    font: inherit;
-    font-size: 15.5px;
-    padding: 0 8px;
-    border: 1px solid var(--sig-border);
-    border-radius: 7px;
-    background: var(--sig-surface);
-    color: var(--sig-text);
+.sigem-checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid var(--sig-border, #cbd5e1);
+  accent-color: #0284c7;
+  cursor: pointer;
+  vertical-align: middle;
 }
 
-:is(.fi-ta-table .fi-ta-filters, .fi-ta-filters) input:focus-visible, :is(.fi-ta-table .fi-ta-filters, .fi-ta-filters) select:focus-visible {
-    outline: 2px solid var(--sig-primary);
-    outline-offset: 1px;
+.sigem-selection-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #e0f2fe;
+  color: #0284c7;
+  font-weight: 600;
+  font-size: 12.5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid #bae6fd;
 }
 
-:is(.fi-ta-table .fi-ta-filters, .fi-ta-filters) .on {
-    border-color: var(--sig-primary) !important;
-    background: var(--sig-primary-light) !important;
-    color: var(--sig-primary-dark) !important;
-    font-weight: 600 !important;
+/* Dona SVG */
+.sigem-donut {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
 }
 
-.sigem-td-folio {
-    font-weight: 700 !important;
-    font-variant-numeric: tabular-nums;
+.sigem-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1.1;
 }
 
-.fi-ta-table td:nth-child(2), .fi-ta-table th:nth-child(2) {
-    max-width: 320px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.sigem-donut-center b {
+  font-size: 27px;
+  font-variant-numeric: tabular-nums;
 }
 
-.fi-ta-actions .fi-icon-btn {
-    border-radius: 8px !important;
-    transition: background-color 0.2s !important;
-    width: 32px;
-    height: 32px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+.sigem-donut-center span {
+  font-size: 13.5px;
+  color: var(--sig-muted);
+  font-weight: 600;
 }
 
-.fi-ta-actions .fi-icon-btn:hover {
-    background: var(--sig-bg);
+/* Leyenda de estados */
+.sigem-lg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15.5px;
+  padding: 3px 6px;
+  border-radius: 6px;
 }
 
-.fi-ta-header-toolbar {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    gap: 8px !important;
-    min-height: 36px !important;
-    padding: 4px 10px !important;
-    background: var(--sig-bg, #f4f6f8) !important;
+.sigem-lg i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
-.fi-ta-header-toolbar > .ms-auto {
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    flex: 1 1 auto !important;
-    justify-content: flex-start !important;
+.sigem-lg b {
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
 }
 
-.sigem-toolbar-date {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
+/* Barras por categoría */
+.sigem-cb {
+  display: grid;
+  grid-template-columns: 116px 1fr 18px;
+  gap: 8px;
+  align-items: center;
+  font-size: 15px;
+  margin: 5px 0;
 }
 
-.sigem-toolbar-date-label {
-    font-size: 11.5px !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    color: var(--sig-muted, #64748b) !important;
+.sigem-cb>span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.sigem-toolbar-date-input {
-    height: 36px !important;
-    width: 135px !important;
-    font-size: 12px !important;
-    padding: 4px 8px !important;
-    border-radius: 8px !important;
-    border: 1px solid var(--sig-border, #e2e8f0) !important;
-    background: var(--sig-surface, #ffffff) !important;
-    color: var(--sig-text, #0f172a) !important;
-    outline: none !important;
-    transition: all 0.15s ease !important;
+.sigem-cb div {
+  height: 8px;
+  border-radius: 99px;
+  background: var(--sig-border);
+  overflow: hidden;
 }
 
-.sigem-toolbar-date-input:focus {
-    border-color: var(--sig-primary, #1b65d4) !important;
-    box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+.sigem-cb div span {
+  display: block;
+  height: 100%;
+  background: var(--sig-primary);
+  border-radius: 99px;
 }
 
-.sigem-toolbar-reset-btn {
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 4px !important;
-    height: 36px !important;
-    padding: 0 12px !important;
-    border-radius: 8px !important;
-    border: 1px solid var(--sig-border, #e2e8f0) !important;
-    background: transparent !important;
-    color: var(--sig-muted, #64748b) !important;
-    font-size: 12px !important;
-    font-weight: 600 !important;
-    cursor: pointer !important;
-    flex-shrink: 0 !important;
-    white-space: nowrap !important;
-    transition: all 0.15s ease !important;
-}
+@media (max-width: 1024px) {
+  .sigem-inv-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
 
-.sigem-toolbar-reset-btn:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
-    color: var(--sig-text, #0f172a);
-}
-
-.fi-ta-search {
-    flex: 1 1 300px !important;
-}
-
-.fi-ta-search input {
-    border-radius: 10px !important;
-    border: 1px solid var(--sig-border, #e5e7eb) !important;
-    padding: 8px 12px !important;
-}
-
-.fi-table-cell-tipo-movimiento .fi-badge::before, .fi-table-cell-estado .fi-badge::before {
-    display: none !important;
-}
-
-.fi-ta-table tbody td .fi-ta-text-description {
-    font-size: 12.5px !important;
-    line-height: 1.2 !important;
-    margin-top: 1px !important;
-    font-weight: 400 !important;
-}
-
-:is(.fi-table-individual-search-cell, [class*=fi-table-individual-search-cell]) {
-    padding: 4px 8px !important;
-    background: var(--sig-bg, #f4f6f8) !important;
-    border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
-}
-
-:is(.fi-table-individual-search-cell, [class*=fi-table-individual-search-cell]) input:focus {
-    border-color: var(--sig-primary, #1b65d4) !important;
-    box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
-    outline: none !important;
-}
-
-.sigem-search-emoji {
-    font-size: 15px;
-    line-height: 1;
-    background: transparent;
-}
-
-:is(.fi-table-individual-search-cell, [class*=fi-table-individual-search-cell]) input {
-    font-size: 12.5px !important;
-    height: 32px !important;
-    min-height: 32px !important;
-    padding: 4px 10px !important;
-    border-radius: 6px !important;
-    border: 1px solid var(--sig-border, #e2e8f0) !important;
-    background: var(--sig-surface, #ffffff) !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
+  .sigem-inv-side {
+    position: static;
+    max-height: none;
+  }
 }

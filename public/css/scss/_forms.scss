@@ -1,652 +1,301 @@
-// SIGEM Theme — Forms, Inputs, Selects, Choices & Toggles
+/* ==========================================================================
+   ToggleButtons: Estados claro / seleccionado / hover (Problema 3)
+   - NO seleccionado: borde gris, texto gris, fondo blanco
+   - SELECCIONADO: fondo azul, texto blanco, borde azul
+   - HOVER (no seleccionado): borde azul suave, fondo azul claro
+   ========================================================================== */
+.fi-fo-toggle-buttons label.fi-btn,
+.fi-fo-toggle-buttons input:not(:checked)+label.fi-btn,
+.fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn {
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background-color: var(--sig-surface, #ffffff) !important;
+  background: var(--sig-surface, #ffffff) !important;
+  color: var(--sig-muted, #64748b) !important;
+  box-shadow: none !important;
+  outline: none !important;
+  opacity: 1 !important;
+  transition: all 0.15s ease !important;
+}
 
-.fi-input, .fi-select-input, textarea, select {
-    background-color: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
+.fi-fo-toggle-buttons label.fi-btn *,
+.fi-fo-toggle-buttons input:not(:checked)+label.fi-btn *,
+.fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn * {
+  color: var(--sig-muted, #64748b) !important;
+}
+
+/* HOVER en NO seleccionado */
+.fi-fo-toggle-buttons input:not(:checked)+label.fi-btn:hover,
+.fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn:hover {
+  border-color: #93c5fd !important;
+  background-color: #eff6ff !important;
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  box-shadow: none !important;
+}
+
+.fi-fo-toggle-buttons input:not(:checked)+label.fi-btn:hover *,
+.fi-fo-toggle-buttons div:not(:has(input:checked))>label.fi-btn:hover * {
+  color: #1d4ed8 !important;
+}
+
+/* SELECCIONADO */
+.fi-fo-toggle-buttons input:checked+label.fi-btn,
+.fi-fo-toggle-buttons div:has(input:checked)>label.fi-btn {
+  background-color: var(--sig-primary, #002855) !important;
+  background: var(--sig-primary, #002855) !important;
+  border: 1px solid var(--sig-primary, #002855) !important;
+  border-color: var(--sig-primary, #002855) !important;
+  color: #ffffff !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.fi-fo-toggle-buttons input:checked+label.fi-btn *,
+.fi-fo-toggle-buttons div:has(input:checked)>label.fi-btn * {
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   Slide-over: Acciones / Footer integrados al contenido (Problema 4)
+   ========================================================================== */
+.fi-modal-slide-over-window .fi-modal-footer-actions,
+.fi-modal-slide-over-window .fi-form-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+/* Botones dentro del footer de slide-over */
+.fi-modal-slide-over-window {
+
+  .fi-modal-footer .fi-btn,
+  .fi-form-actions .fi-btn {
     border-radius: 8px !important;
-    color: #0f172a !important;
-    transition: all 0.2s;
-}
-
-.fi-input:focus, .fi-select-input:focus, textarea:focus, select:focus {
-    border-color: #2563eb !important;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
-}
-
-.fi-fo-toggle-buttons label.fi-btn {
-    opacity: 1 !important;
-}
-
-.fi-fo-toggle-buttons input[type=radio]:checked + label.fi-btn, .fi-fo-toggle-buttons input[type=checkbox]:checked + label.fi-btn {
-    border: 2px solid #2563eb !important;
-    background-color: #eff6ff !important;
-    color: #1e40af !important;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
-}
-
-.fi-fo-toggle-buttons input[type=radio]:checked + label.fi-btn *, .fi-fo-toggle-buttons input[type=checkbox]:checked + label.fi-btn * {
-    color: #1e40af !important;
-}
-
-.fi-fo-radio label {
-    border: 1px solid #e2e8f0 !important;
-    background-color: #ffffff !important;
-    padding: 12px 16px !important;
-    border-radius: 8px !important;
-    transition: all 0.2s ease !important;
-    display: flex !important;
-    align-items: center !important;
+    padding: 9px 20px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    line-height: 1.4 !important;
     cursor: pointer !important;
-}
+  }
 
-.fi-fo-radio label:has(input[type=radio]:checked) {
-    border: 2px solid #2563eb !important;
-    background-color: #eff6ff !important;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
-}
-
-.fi-fo-radio label:has(input[type=radio]:checked) * {
-    color: #1e40af !important;
-}
-
-.fi-fo-radio input[type=radio]:checked {
-    background-color: #2563eb !important;
-    border-color: #2563eb !important;
-}
-
-.fi-checkbox-input:checked {
-    background-color: #2563eb !important;
-    border-color: #2563eb !important;
-    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e") !important;
-}
-
-.fi-fo-field-wrp-label, .fi-fo-field-wrp-label * {
-    color: #334155 !important;
-    font-weight: 600 !important;
-}
-
-.fi-fo-component-ctn .fi-section, .fi-fo-component-ctn .fi-section-content {
-    overflow: visible !important;
-}
-
-.fi-input-wrp:has(.choices) {
-    overflow: visible !important;
-    min-width: 0 !important;
-}
-
-.fi-input-wrp:has(.choices) > .min-w-0.flex-1 {
-    min-width: 0 !important;
-    max-width: 100% !important;
-    overflow: visible !important;
-}
-
-.choices {
-    position: relative !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    overflow: visible !important;
-    margin-bottom: 0 !important;
-}
-
-.choices:not(.is-open) .choices__list--dropdown {
-    display: none !important;
-}
-
-.choices__inner {
-    display: flex !important;
-    align-items: center !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    min-height: 38px !important;
-    max-height: 40px !important;
-    padding: 4px 32px 4px 12px !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-    box-sizing: border-box !important;
-}
-
-.choices__inner:has(.choices__button) {
-    padding-inline-end: 52px !important;
-}
-
-.choices__list--single {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-    line-height: 1.4 !important;
-}
-
-.choices__list--single .choices__item {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-    line-height: 1.4 !important;
-}
-
-.choices__list--dropdown, .choices__list[aria-expanded] {
-    position: absolute !important;
-    top: calc(100% + 4px) !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    z-index: 50 !important;
-    max-height: 250px !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    background-color: #ffffff !important;
-    border-radius: 8px !important;
-    border: 1px solid #cbd5e1 !important;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
-}
-
-.choices__list--dropdown .choices__list, .choices__list[aria-expanded] .choices__list {
-    max-height: 200px !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-}
-
-.choices__list--dropdown .choices__item, .choices__list[aria-expanded] .choices__item {
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-    max-width: 100% !important;
-}
-
-.choices__item--choice:hover {
-    background-color: #f8fafc !important;
-}
-
-.choices__item--selectable.is-highlighted {
-    background-color: #dbeafe !important;
-    color: #2563eb !important;
-}
-
-.sigem-selection-side-panel {
-    position: sticky !important;
-    top: 16px !important;
-    right: auto !important;
-    bottom: auto !important;
-    width: 420px !important;
-    min-width: 420px !important;
-    max-width: 420px !important;
-    flex: 0 0 420px !important;
-    height: calc(100vh - 32px) !important;
-    max-height: calc(100vh - 32px) !important;
-    background: #ffffff !important;
-    border: 1px solid var(--sig-border, #e5e7eb) !important;
-    border-radius: 14px !important;
-    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08) !important;
-    z-index: 20 !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    transition: all 0.3s ease !important;
-    animation: sigemSlideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-}
-
-.sigem-selection-side-panel[style*="display: none"] {
-    display: none;
-}
-
-.sigem-sel-form-textarea {
-    resize: vertical;
-    min-height: 72px;
-}
-
-.sigem-selection-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    background: #e0f2fe;
-    color: #0284c7;
-    font-weight: 600;
-    font-size: 12.5px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    border: 1px solid #bae6fd;
-}
-
-:is(button, input, select, textarea, [role=button], .sigem-tab, .sigem-cat-tab, .sigem-pref-chips button, .sigem-topbar-search, .sigem-lg, .sigem-cb, .sigem-rep-card, .fi-btn, .fi-icon-btn):focus-visible {
-    outline: 2px solid var(--sig-primary) !important;
-    outline-offset: 2px !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-toggle-buttons {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 8px !important;
-    width: 100% !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-toggle-buttons label.fi-btn {
-    margin: 0 !important;
-    white-space: nowrap !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-wizard > div > div > .fi-fo-component-ctn > .fi-section:nth-of-type(1) .fi-section-header-heading::before {
-    content: "🏷️" !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-wizard > div > div > .fi-fo-component-ctn > .fi-section:nth-of-type(2) .fi-section-header-heading::before {
-    content: "⚙️" !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-field-wrp-label {
-    min-width: 0 !important;
-    max-width: 100% !important;
-    white-space: normal !important;
-    word-break: normal !important;
-    overflow-wrap: normal !important;
-    line-height: 1.35 !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-field-wrp-label label {
-    font-size: 13px !important;
-    font-weight: 600 !important;
-    color: var(--sig-text, #0f172a) !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-field-wrp-error-message {
-    font-size: 11.5px !important;
-    line-height: 1.25 !important;
-    margin-top: 3px !important;
-    margin-bottom: 0 !important;
-    color: #dc2626 !important;
-    font-weight: 500 !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-field-wrp:has(.fi-fo-field-wrp-error-message) .fi-input-wrp, .fi-modal-slide-over-window .fi-fo-field-wrp:has(.fi-fo-field-wrp-error-message) .choices__inner {
-    border-color: #ef4444 !important;
-    box-shadow: 0 0 0 1px #ef4444 !important;
-}
-
-.fi-modal-slide-over-window .fi-in-entry-wrp {
-    padding-bottom: 8px !important;
-    border-bottom: 1px solid var(--sig-border, #f1f5f9) !important;
-    margin-bottom: 8px !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    overflow-wrap: break-word !important;
-    word-break: break-word !important;
-    white-space: normal !important;
-}
-
-.fi-modal-slide-over-window .fi-in-entry-wrp dt, .fi-modal-slide-over-window .fi-in-entry-wrp .fi-in-entry-wrp-label, .fi-modal-slide-over-window .fi-in-entry-wrp .fi-in-entry-wrp-label span {
-    font-size: 12px !important;
-    color: var(--sig-muted, #64748b) !important;
-    font-weight: 500 !important;
-    margin-bottom: 2px !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    overflow-wrap: break-word !important;
-    word-break: break-word !important;
-    white-space: normal !important;
-}
-
-.fi-modal-slide-over-window .fi-in-entry-wrp dd, .fi-modal-slide-over-window .fi-in-entry-wrp .fi-in-text, .fi-modal-slide-over-window .fi-in-entry-wrp .fi-in-text-item {
-    font-size: 13.5px !important;
-    font-weight: 600 !important;
-    color: var(--sig-text, #0f172a) !important;
-    min-width: 0 !important;
-    max-width: 100% !important;
-    overflow-wrap: break-word !important;
-    word-break: break-word !important;
-    white-space: normal !important;
-}
-
-.fi-modal-slide-over-window .fi-in-entry-wrp .fi-badge {
-    max-width: 100% !important;
-    white-space: normal !important;
-    word-break: break-word !important;
-    height: auto !important;
-}
-
-.fi-fo-wizard-header, .fi-modal-slide-over-window .fi-fo-wizard-header {
-    display: flex !important;
-    overflow-x: hidden !important;
-    max-width: 100% !important;
-    flex-wrap: nowrap !important;
-    scrollbar-width: none !important;
-}
-
-.fi-fo-wizard-header::-webkit-scrollbar, .fi-modal-slide-over-window .fi-fo-wizard-header::-webkit-scrollbar {
-    display: none !important;
-}
-
-.fi-fo-wizard-header-step, .fi-modal-slide-over-window .fi-fo-wizard-header-step {
-    flex: 1 1 0% !important;
-    min-width: 0 !important;
-}
-
-.fi-fo-wizard-header-step-button, .fi-modal-slide-over-window .fi-fo-wizard-header-step-button {
-    padding: 8px 4px !important;
-    gap: 4px !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-wizard-header-step-icon-ctn, .fi-fo-wizard-header-step-icon-ctn, .fi-modal-slide-over .fi-fo-wizard-header-step-icon-ctn {
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    width: auto !important;
-    height: auto !important;
-    min-width: auto !important;
-    min-height: auto !important;
-    box-shadow: none !important;
-    --tw-ring-color: transparent !important;
-    --tw-ring-shadow: none !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-.fi-fo-wizard-header-step-icon-ctn svg, .fi-modal-slide-over-window .fi-fo-wizard-header-step-icon-ctn svg {
-    display: none !important;
-}
-
-.fi-fo-wizard-header-step-icon-ctn::before, .fi-modal-slide-over-window .fi-fo-wizard-header-step-icon-ctn::before {
-    font-size: 15px !important;
-    line-height: 1 !important;
-}
-
-.fi-fo-wizard-header-step:nth-child(1) .fi-fo-wizard-header-step-icon-ctn::before, .fi-modal-slide-over-window .fi-fo-wizard-header-step:nth-child(1) .fi-fo-wizard-header-step-icon-ctn::before {
-    content: "📋" !important;
-}
-
-.fi-fo-wizard-header-step:nth-child(2) .fi-fo-wizard-header-step-icon-ctn::before, .fi-modal-slide-over-window .fi-fo-wizard-header-step:nth-child(2) .fi-fo-wizard-header-step-icon-ctn::before {
-    content: "🧾" !important;
-}
-
-.fi-fo-wizard-header-step:nth-child(3) .fi-fo-wizard-header-step-icon-ctn::before, .fi-modal-slide-over-window .fi-fo-wizard-header-step:nth-child(3) .fi-fo-wizard-header-step-icon-ctn::before {
-    content: "🛡️" !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window .fi-fo-wizard-header-step-button [class*=grid], .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window .fi-fo-wizard-header-step-label {
-    font-size: 11.5px !important;
-    white-space: normal !important;
-    max-width: 100% !important;
-    line-height: 1.15 !important;
-    overflow: hidden !important;
-    min-width: 0 !important;
-    display: block !important;
-}
-
-.fi-fo-wizard-header-step-description, .fi-modal-slide-over-window .fi-fo-wizard-header-step-description, .fi-fo-wizard-header-step-separator, .fi-modal-slide-over-window .fi-fo-wizard-header-step-separator {
-    display: none !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-component-ctn {
-    overflow: visible !important;
-    max-width: 100% !important;
-    max-height: none !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-field, .fi-modal-slide-over-window .fi-fo-field-wrp {
-    width: 100% !important;
-}
-
-.fi-modal-slide-over-window *:not(.fi-fo-wizard-header)::-webkit-scrollbar {
-    display: none !important;
-}
-
-.fi-modal-slide-over-window *:not(.fi-fo-wizard-header) {
-    scrollbar-width: none;
-}
-
-.fi-fo-toggle-buttons label.fi-btn, .fi-fo-toggle-buttons input:not(:checked) + label.fi-btn, .fi-fo-toggle-buttons div:not(:has(input:checked)) > label.fi-btn {
-    border: 1px solid var(--sig-border, #e2e8f0) !important;
-    background-color: var(--sig-surface, #ffffff) !important;
-    background: var(--sig-surface, #ffffff) !important;
-    color: var(--sig-muted, #64748b) !important;
-    box-shadow: none !important;
-    outline: none !important;
-    opacity: 1 !important;
-    transition: all 0.15s ease !important;
-}
-
-.fi-fo-toggle-buttons label.fi-btn *, .fi-fo-toggle-buttons input:not(:checked) + label.fi-btn *, .fi-fo-toggle-buttons div:not(:has(input:checked)) > label.fi-btn * {
-    color: var(--sig-muted, #64748b) !important;
-}
-
-.fi-fo-toggle-buttons input:not(:checked) + label.fi-btn:hover, .fi-fo-toggle-buttons div:not(:has(input:checked)) > label.fi-btn:hover {
-    border-color: #93c5fd !important;
-    background-color: #eff6ff !important;
-    background: #eff6ff !important;
-    color: #1d4ed8 !important;
-    box-shadow: none !important;
-}
-
-.fi-fo-toggle-buttons input:not(:checked) + label.fi-btn:hover *, .fi-fo-toggle-buttons div:not(:has(input:checked)) > label.fi-btn:hover * {
-    color: #1d4ed8 !important;
-}
-
-.fi-fo-toggle-buttons input:checked + label.fi-btn, .fi-fo-toggle-buttons div:has(input:checked) > label.fi-btn {
+  // Botón primario
+  .fi-modal-footer .fi-btn-color-primary,
+  .fi-modal-footer .fi-color-primary,
+  .fi-form-actions .fi-btn-color-primary {
     background-color: var(--sig-primary, #002855) !important;
-    background: var(--sig-primary, #002855) !important;
     border: 1px solid var(--sig-primary, #002855) !important;
-    border-color: var(--sig-primary, #002855) !important;
     color: #ffffff !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-}
+  }
 
-.fi-fo-toggle-buttons input:checked + label.fi-btn *, .fi-fo-toggle-buttons div:has(input:checked) > label.fi-btn * {
-    color: #ffffff !important;
-}
+  .fi-modal-footer .fi-btn-color-primary:hover,
+  .fi-modal-footer .fi-color-primary:hover {
+    background-color: #001f42 !important;
+  }
 
-.fi-modal-slide-over-window .fi-fo-wizard > div:last-child {
+  // Botones secundarios / cancelar (gris)
+  .fi-modal-footer .fi-btn-color-gray,
+  .fi-modal-footer .fi-color-gray,
+  .fi-form-actions .fi-btn-color-gray {
+    background-color: #ffffff !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    color: #334155 !important;
+  }
+
+  .fi-modal-footer .fi-btn-color-gray:hover,
+  .fi-modal-footer .fi-color-gray:hover,
+  .fi-form-actions .fi-btn-color-gray:hover {
+    background-color: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  // Navegación al final de wizards dentro de slide-over
+  .fi-fo-wizard>div:last-child {
     margin-top: 24px !important;
     padding-top: 16px !important;
     border-top: 1px solid var(--sig-border, #e2e8f0) !important;
+  }
 }
 
-.fi-modal-slide-over-window .fi-fo-component-ctn .fi-fieldset, .fi-modal-slide-over-window .fi-fo-component-ctn [class*=fieldset] {
+/* ==========================================================================
+   FIX 1: Sin scroll horizontal en el topbar con el slide-over abierto
+   ========================================================================== */
+
+body.slide-over-open .fi-topbar,
+body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar {
+  overflow-x: hidden !important;
+}
+
+body.slide-over-open .fi-topbar nav,
+body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+}
+
+.fi-topbar * {
+  max-width: 100% !important;
+}
+
+.fi-topbar .sigem-topbar-search {
+  min-width: 120px !important;
+  flex-shrink: 1 !important;
+}
+
+/* ==========================================================================
+   FIX 2: Botones de accion DENTRO del contenido del panel (no pegados al borde)
+   En Filament v3 el pie del modal es .fi-modal-footer > .fi-modal-footer-actions
+   ========================================================================== */
+.fi-modal-slide-over-window .fi-modal-footer-actions,
+.fi-modal-slide-over-window .fi-form-actions {
+  gap: 10px !important;
+  position: relative !important;
+  bottom: auto !important;
+}
+
+.fi-modal-slide-over-window .fi-modal-footer .fi-btn,
+.fi-modal-slide-over-window .fi-form-actions .fi-btn {
+  font-weight: 600 !important;
+}
+
+
+/* ==========================================================================
+   Mejora de diseño de formularios e infolists en slide-over + Botones catálogo
+   ========================================================================== */
+
+/* Botones de acción en tablas de catálogo (Ver / Editar / Eliminar) */
+.fi-icon-btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--sig-muted, #64748b);
+  background: var(--sig-surface, #ffffff);
+  border: 1px solid var(--sig-border, #e2e8f0);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fi-icon-btn:hover {
+  color: var(--sig-primary, #1b65d4);
+  background: var(--sig-bg, #f8fafc);
+  border-color: var(--sig-border-strong, #cbd5e1);
+}
+
+.fi-icon-btn-danger {
+  color: var(--sig-muted, #64748b) !important;
+}
+
+.fi-icon-btn-danger:hover {
+  color: #dc2626 !important;
+  background: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+}
+
+/* Los grupos de campos sin doble recuadro */
+.fi-modal-slide-over-window {
+
+  .fi-fo-component-ctn .fi-fieldset,
+  .fi-fo-component-ctn [class*="fieldset"] {
     border: none !important;
     padding: 0 !important;
     margin-bottom: 16px !important;
-}
+  }
 
-.fi-modal-slide-over-window .fi-fo-field-wrp {
-    min-width: 0 !important;
+  // Mejor espaciado de campos
+  .fi-fo-field-wrp {
     margin-bottom: 14px !important;
-}
+  }
 
-.fi-modal-slide-over-window :is(.fi-fo-component-ctn, form) :is(.fi-section, section.fi-section) {
+  // Iconos de inputs con color primario (FIX 4)
+  .fi-input-wrp>div:first-child,
+  .fi-input-wrp svg {
+    color: var(--sig-primary, #1b65d4) !important;
+  }
+
+  .fi-input-wrp .fi-input-wrp-prefix,
+  .fi-input-wrp .fi-input-wrp-icon {
+    color: var(--sig-primary, #1b65d4) !important;
+    padding-left: 10px !important;
+  }
+
+  // FIX 1: Eliminar doble recuadro en formularios dentro del slide-over
+  :is(.fi-fo-component-ctn, form) {
+    :is(.fi-section, section.fi-section) {
+      border: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+      padding: 0 !important;
+      margin-bottom: 0 !important;
+      overflow: visible !important;
+    }
+
+    .fi-section-header {
+      border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+      padding: 0 0 10px 0 !important;
+      margin-bottom: 14px !important;
+      background: transparent !important;
+    }
+
+    .fi-section-content {
+      padding: 0 !important;
+    }
+  }
+
+  .fi-fo-wizard {
     border: none !important;
     box-shadow: none !important;
     background: transparent !important;
     padding: 0 !important;
     margin-bottom: 0 !important;
     overflow: visible !important;
-}
+  }
 
-.fi-modal-slide-over-window :is(.fi-fo-component-ctn, form) .fi-section-header {
-    border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
-    padding: 0 0 10px 0 !important;
-    margin-bottom: 14px !important;
-    background: transparent !important;
-}
-
-.fi-modal-slide-over-window :is(.fi-fo-component-ctn, form) .fi-section-content {
-    padding: 0 !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-wizard {
-    border: none !important;
-    box-shadow: none !important;
-    background: transparent !important;
-    padding: 0 !important;
-    margin-bottom: 0 !important;
-    overflow: visible !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-wizard-header {
+  .fi-fo-wizard-header {
     border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
     margin-bottom: 16px !important;
-}
+  }
 
-.fi-modal-slide-over-window:not(:has(.fi-fo-component-ctn)) .fi-modal-footer-actions button[x-on\:click*=close], .fi-modal-slide-over-window:not(:has(.fi-fo-component-ctn)) .fi-modal-footer-actions button.fi-btn-color-gray {
+  // FIX 2: Footer bipolar — Cancelar (izq) + Confirmar (der)
+  .fi-modal-footer-actions {
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+  }
+
+  // En formularios Crear/Editar: Cancelar a la izquierda, Confirmar a la derecha
+  &:has(.fi-fo-component-ctn) .fi-modal-footer-actions button.fi-btn-color-gray,
+  &:has(.fi-fo-component-ctn) .fi-modal-footer-actions button[x-on\:click*="close"],
+  &:has(form) .fi-modal-footer-actions button.fi-btn-color-gray,
+  &:has(form) .fi-modal-footer-actions button[x-on\:click*="close"] {
+    order: -1 !important;
+    margin-right: auto !important;
+    margin-left: 0 !important;
+  }
+
+  &:has(.fi-fo-component-ctn) .fi-modal-footer-actions button.fi-btn-color-primary,
+  &:has(.fi-fo-component-ctn) .fi-modal-footer-actions button[type="submit"],
+  &:has(form) .fi-modal-footer-actions button.fi-btn-color-primary,
+  &:has(form) .fi-modal-footer-actions button[type="submit"] {
     order: 2 !important;
     margin-left: auto !important;
     margin-right: 0 !important;
-}
+  }
 
-.fi-fo-toggle-buttons [data-color=reassign], .fi-fo-toggle-buttons .fi-color-reassign {
-    --color-50: 237, 233, 254;
-    --color-100: 237, 233, 254;
-    --color-500: 139, 92, 246;
-    --color-600: 124, 58, 237;
-}
+  // En vista Detalle/Ver: Atajos de acción (Editar/Eliminar) a la izquierda, Cerrar a la derecha
+  .fi-modal-footer-actions button.fi-btn-color-warning,
+  .fi-modal-footer-actions button.fi-btn-color-danger {
+    order: -2 !important;
+    margin-left: 0 !important;
+    margin-right: 8px !important;
+  }
 
-.fi-ta-search input, .fi-input, .fi-select {
-    font-size: 14px !important;
-    font-weight: 400 !important;
-}
-
-.fi-fo-field-wrp-label, .fi-fo-field-wrp-label span {
-    font-size: 15px !important;
-    font-weight: 600 !important;
-}
-
-.fi-modal-slide-over-window .fi-fo-component-ctn, .fi-modal-slide-over-window .fi-fo-wizard, .fi-modal-slide-over-window .fi-fo-wizard.fi-contained, .fi-modal-slide-over-window .fi-in-tabs, .fi-modal-slide-over-window .fi-in-tabs.fi-contained, .fi-modal-slide-over-window .fi-in-tabs-tab {
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    --tw-ring-color: transparent !important;
-    --tw-ring-shadow: none !important;
-    --tw-ring-offset-shadow: none !important;
-    --tw-shadow: 0 0 #0000 !important;
-    background: transparent !important;
-    background-color: transparent !important;
-}
-
-.fi-modal-slide-over-window .fi-in-tabs-tab, .fi-modal-slide-over-window .fi-fo-wizard-step {
-    padding: 16px 0 0 0 !important;
-    scroll-margin-top: 160px !important;
-}
-
-:is(.fi-table-individual-search-cell, [class*=fi-table-individual-search-cell]) input::placeholder {
-    color: var(--sig-muted, #64748b) !important;
-    font-size: 11.5px !important;
-}
-
-:is(.fi-table-individual-search-cell, [class*=fi-table-individual-search-cell]) select {
-    width: 100% !important;
-    font-size: 12.5px !important;
-    height: 32px !important;
-    min-height: 32px !important;
-    padding: 4px 28px 4px 10px !important;
-    border-radius: 6px !important;
-    border: 1px solid var(--sig-border, #e2e8f0) !important;
-    background: var(--sig-surface, #ffffff) !important;
-    appearance: auto !important;
-    cursor: pointer !important;
-    color: var(--sig-text, #0f172a) !important;
-}
-
-:is(.fi-table-individual-search-cell, [class*=fi-table-individual-search-cell]) select:focus {
-    border-color: var(--sig-primary, #1b65d4) !important;
-    box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
-    outline: none !important;
-}
-
-.fi-table-individual-search-select {
-    width: 100% !important;
-    font-size: 12.5px !important;
-    height: 32px !important;
-    min-height: 32px !important;
-    padding: 4px 28px 4px 10px !important;
-    border-radius: 6px !important;
-    border: 1px solid var(--sig-border, #e2e8f0) !important;
-    background: var(--sig-surface, #ffffff) !important;
-    appearance: auto !important;
-    cursor: pointer !important;
-    color: var(--sig-text, #0f172a) !important;
-}
-
-.fi-table-individual-search-select:focus {
-    border-color: var(--sig-primary, #1b65d4) !important;
-    box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
-    outline: none !important;
-}
-
-.sigem-dash-filter-input::placeholder {
-    color: var(--sig-muted, #64748b) !important;
-    font-size: 11.5px !important;
-}
-
-.sigem-dash-toolbar .fi-input-wrp {
-    display: flex !important;
-    align-items: center !important;
-    background: var(--sig-surface, #ffffff) !important;
-    border: 1px solid var(--sig-border, #e2e8f0) !important;
-    border-radius: 8px !important;
-    height: 36px !important;
-    padding-left: 10px !important;
-}
-
-.fi-modal-slide-over-window .fi-in-tabs, .fi-modal-slide-over-window .fi-fo-tabs, .fi-modal-window .fi-in-tabs, .fi-modal-window .fi-fo-tabs, .fi-modal-slide-over .fi-in-tabs, .fi-modal-slide-over .fi-fo-tabs {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    white-space: normal !important;
-    overflow: visible !important;
-}
-
-.fi-modal-slide-over-window .fi-in-tabs-tab, .fi-modal-slide-over-window .fi-fo-tabs-tab, .fi-modal-window .fi-in-tabs-tab, .fi-modal-window .fi-fo-tabs-tab, .fi-modal-slide-over .fi-in-tabs-tab, .fi-modal-slide-over .fi-fo-tabs-tab {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    white-space: normal !important;
-    box-sizing: border-box !important;
-}
-
-.fi-modal-slide-over-window .fi-in-tabs-tab:not(.fi-active), .fi-modal-slide-over-window .fi-fo-tabs-tab:not(.fi-active), .fi-modal-window .fi-in-tabs-tab:not(.fi-active), .fi-modal-window .fi-fo-tabs-tab:not(.fi-active), .fi-modal-slide-over .fi-in-tabs-tab:not(.fi-active), .fi-modal-slide-over .fi-fo-tabs-tab:not(.fi-active) {
-    display: none !important;
-}
-
-.fi-modal-slide-over-window .fi-in-tabs-tab.fi-active, .fi-modal-slide-over-window .fi-fo-tabs-tab.fi-active, .fi-modal-window .fi-in-tabs-tab.fi-active, .fi-modal-window .fi-fo-tabs-tab.fi-active, .fi-modal-slide-over .fi-in-tabs-tab.fi-active, .fi-modal-slide-over .fi-fo-tabs-tab.fi-active {
-    display: block !important;
-}
-
-.fi-modal-slide-over-window .fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window .fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window .fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window .fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window .fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window .fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window .fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window .fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window .fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window .fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window .fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window .fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window .fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window .fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window .fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window .fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window nav.fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window nav.fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window nav.fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window nav.fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window nav.fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window nav.fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window nav.fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window nav.fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window nav.fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window nav.fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window nav.fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window nav.fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window nav.fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window nav.fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window nav.fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window nav.fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window .fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window .fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window .fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window .fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window .fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window .fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window .fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window .fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window .fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window .fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window .fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window .fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window .fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window .fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window .fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window .fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window ol.fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window ol.fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window ol.fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window ol.fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window ol.fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window ol.fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window ol.fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window ol.fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window ol.fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window ol.fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window ol.fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window ol.fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over-window ol.fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over-window ol.fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over-window ol.fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over-window ol.fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window .fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-window .fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-window .fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-window .fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window .fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-window .fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-window .fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-window .fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window .fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-window .fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-window .fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-window .fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window .fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-window .fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-window .fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-window .fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window nav.fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-window nav.fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-window nav.fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-window nav.fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window nav.fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-window nav.fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-window nav.fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-window nav.fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window nav.fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-window nav.fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-window nav.fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-window nav.fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window nav.fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-window nav.fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-window nav.fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-window nav.fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window .fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-window .fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-window .fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-window .fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window .fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-window .fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-window .fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-window .fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window .fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-window .fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-window .fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-window .fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window .fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-window .fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-window .fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-window .fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window ol.fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-window ol.fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-window ol.fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-window ol.fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window ol.fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-window ol.fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-window ol.fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-window ol.fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window ol.fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-window ol.fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-window ol.fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-window ol.fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-window ol.fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-window ol.fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-window ol.fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-window ol.fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over .fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over .fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over .fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over .fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over .fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over .fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over .fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over .fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over .fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over .fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over .fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over .fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over .fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over .fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over .fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over .fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over nav.fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over nav.fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over nav.fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over nav.fi-tabs .fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over nav.fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over nav.fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over nav.fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over nav.fi-tabs button.fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over nav.fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over nav.fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over nav.fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over nav.fi-tabs .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over nav.fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over nav.fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over nav.fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over nav.fi-tabs li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over .fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over .fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over .fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over .fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over .fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over .fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over .fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over .fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over .fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over .fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over .fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over .fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over .fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over .fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over .fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over .fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over ol.fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over ol.fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over ol.fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over ol.fi-fo-wizard-header .fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over ol.fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button, .fi-modal-slide-over ol.fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-label, .fi-modal-slide-over ol.fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over ol.fi-fo-wizard-header button.fi-tabs-item .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over ol.fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over ol.fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over ol.fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over ol.fi-fo-wizard-header .fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid], .fi-modal-slide-over ol.fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button, .fi-modal-slide-over ol.fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-label, .fi-modal-slide-over ol.fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button > div, .fi-modal-slide-over ol.fi-fo-wizard-header li.fi-fo-wizard-header-step .fi-fo-wizard-header-step-button [class*=grid] {
-    display: inline-flex !important;
-    white-space: nowrap !important;
-    flex-shrink: 0 !important;
-    overflow: visible !important;
-    text-overflow: clip !important;
-}
-
-::placeholder, input::placeholder, textarea::placeholder, .fi-input-wrp input::placeholder, .choices__placeholder, .choices__input::placeholder {
-    color: #64748b !important;
-    opacity: 1 !important;
-}
-
-.sigem-fmt-section select {
-    background-color: #ffffff !important;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 10px center !important;
-    background-size: 16px 16px !important;
-    padding-right: 34px !important;
-    text-overflow: ellipsis;
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
-    cursor: pointer;
+  &:not(:has(.fi-fo-component-ctn)) .fi-modal-footer-actions button[x-on\:click*="close"],
+  &:not(:has(.fi-fo-component-ctn)) .fi-modal-footer-actions button.fi-btn-color-gray {
+    order: 2 !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
 }

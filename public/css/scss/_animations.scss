@@ -1,14 +1,426 @@
-// SIGEM Theme — Animations, Keyframes, Skeletons & Spinners
+/* ==========================================================================
+   Slide-over Infolists y Modales: Eliminación de doble recuadro y footer
+   ========================================================================== */
+/* ==========================================================================
+   Slide-over Infolists y Modales: Eliminación de doble recuadro y footer
+   ========================================================================== */
+.fi-modal-slide-over-window {
 
-@keyframes sigemSlideInRight {
-  from {
-    transform: translateX(100%);
+  .fi-section,
+  section.fi-section {
+    border: none !important;
+    box-shadow: none !important;
+    --tw-ring-color: transparent !important;
+    --tw-ring-shadow: none !important;
+    --tw-ring-offset-shadow: none !important;
+    --tw-shadow: 0 0 #0000 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+
+    .fi-section-header {
+      border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+      padding: 0 0 10px 0 !important;
+      margin-bottom: 14px !important;
+      background: transparent !important;
+    }
+
+    .fi-section-content {
+      padding: 0 !important;
+    }
   }
-  to {
-    transform: translateX(0);
+
+  // En vista Detalle/Ver: Atajos de acción (Editar/Eliminar/Cambio/Baja/Modificar) a la izquierda, Cerrar a la derecha
+  .fi-modal-footer-actions button:is(.fi-btn-color-info, .fi-color-info) {
+    order: -2 !important;
+    margin-left: 0 !important;
+    margin-right: 8px !important;
+  }
+
+  // Botón Cerrar en modales sin botón submit de formulario: siempre a la derecha
+  .fi-modal-footer-actions:not(:has(button[type="submit"], button.fi-btn-color-primary)) button:is(.fi-btn-color-gray, [x-on\:click*="close"]),
+  .fi-modal-footer-actions:has(> button:only-of-type) button,
+  .fi-modal-footer-actions:has(> :only-child) button,
+  &:has(.fi-fo-component-ctn) .fi-modal-footer-actions:has(> button:only-of-type) button,
+  &:has(.fi-fo-component-ctn) .fi-modal-footer-actions:has(> :only-child) button {
+    order: 2 !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+
+  // ============================================
+  // FIX: Eliminar doble recuadro completo + espacio bajo footer
+  // ============================================
+  // 1. Limpiar bordes, sombras y rings en contenedores de infolists y wizards
+  .fi-fo-component-ctn,
+  .fi-fo-wizard,
+  .fi-fo-wizard.fi-contained,
+  .fi-in-tabs,
+  .fi-in-tabs.fi-contained,
+  .fi-in-tabs-tab {
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    --tw-ring-color: transparent !important;
+    --tw-ring-shadow: none !important;
+    --tw-ring-offset-shadow: none !important;
+    --tw-shadow: 0 0 #0000 !important;
+    background: transparent !important;
+    background-color: transparent !important;
+  }
+
+  // 2. Quitar padding redundante del tab panel y wizard step
+  .fi-in-tabs-tab,
+  .fi-fo-wizard-step {
+    padding: 16px 0 0 0 !important;
+    scroll-margin-top: 160px !important;
+  }
+
+  scroll-padding-top: 160px !important;
+
+  // 3. Contenido crece para ocupar el alto disponible (consolidado)
+  .fi-modal-content {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 16px 20px !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+    max-height: none !important;
+  }
+
+  // 4. Footer pegado abajo (sticky + margin-top auto, consolidado)
+  .fi-modal-footer {
+    padding: 16px 20px 20px !important;
+    border-top: 1px solid var(--sig-border, #e2e8f0) !important;
+    background: var(--sig-surface, #ffffff) !important;
+    box-shadow: none !important;
+    margin-top: auto !important;
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 10 !important;
+    display: flex !important;
+    width: 100% !important;
   }
 }
 
+/* Tablas de reportes: layout libre sin restricciones de Filament */
+.sigem-rep-table {
+  width: 100% !important;
+  min-width: 850px;
+  table-layout: auto !important;
+  border-collapse: collapse;
+
+  thead th {
+    white-space: normal !important;
+    max-width: none !important;
+    width: auto !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    line-height: 1.25 !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: .05em !important;
+    color: var(--sig-muted) !important;
+    padding: 6px 10px !important;
+    background: var(--sig-bg, #f4f6f8) !important;
+  }
+
+  tbody {
+    td {
+      white-space: nowrap !important;
+      max-width: none !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      padding: 6px 10px !important;
+    }
+
+    tr {
+      background: var(--sig-surface, #ffffff) !important;
+
+      &:hover {
+        background: #f8fafc !important;
+      }
+    }
+  }
+
+  thead th:last-child,
+  tbody td:last-child {
+    min-width: auto !important;
+    max-width: none !important;
+    width: auto !important;
+  }
+}
+
+/* Inputs de búsqueda por columna (isIndividual) */
+:is(.fi-table-individual-search-cell, [class*="fi-table-individual-search-cell"]) {
+  padding: 4px 8px !important;
+  background: var(--sig-bg, #f4f6f8) !important;
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+
+  input {
+    font-size: 12.5px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 4px 10px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    background: var(--sig-surface, #ffffff) !important;
+
+    &:focus {
+      border-color: var(--sig-primary, #1b65d4) !important;
+      box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+      outline: none !important;
+    }
+
+    &::placeholder {
+      color: var(--sig-muted, #64748b) !important;
+      font-size: 11.5px !important;
+    }
+  }
+
+  select {
+    width: 100% !important;
+    font-size: 12.5px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 4px 28px 4px 10px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    background: var(--sig-surface, #ffffff) !important;
+    appearance: auto !important;
+    cursor: pointer !important;
+    color: var(--sig-text, #0f172a) !important;
+
+    &:focus {
+      border-color: var(--sig-primary, #1b65d4) !important;
+      box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+      outline: none !important;
+    }
+  }
+}
+
+.fi-table-individual-search-select {
+  width: 100% !important;
+  font-size: 12.5px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 4px 28px 4px 10px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: var(--sig-surface, #ffffff) !important;
+  appearance: auto !important;
+  cursor: pointer !important;
+  color: var(--sig-text, #0f172a) !important;
+
+  &:focus {
+    border-color: var(--sig-primary, #1b65d4) !important;
+    box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+    outline: none !important;
+  }
+}
+
+/* ============================================
+   FIX 2: Fondo gris uniforme (sin huecos blancos)
+   ============================================ */
+.fi-ta-ctn,
+.fi-ta-header-ctn,
+.fi-ta-header,
+.fi-ta-header-toolbar,
+.fi-ta-content,
+.fi-ta-table thead,
+.fi-ta-table thead tr,
+.fi-ta-table thead th,
+.fi-table-individual-search-cell,
+[class*="fi-table-individual-search-cell"] {
+  background: var(--sig-bg, #f4f6f8) !important;
+}
+
+.fi-ta-header-ctn {
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+}
+
+/* Filas de la tabla: fondo blanco limpio con hover */
+.fi-ta-table tbody tr {
+  background: #ffffff !important;
+
+  &:hover {
+    background: #f8fafc !important;
+  }
+}
+
+/* ============================================
+   FIX 4: Eliminar icono de 3 barras (toggle de columnas)
+   ============================================ */
+.fi-ta-col-toggle,
+.fi-ta-header-toolbar button[class*="column-toggle"],
+.fi-ta-header-toolbar .fi-ta-col-toggle,
+.fi-ta-header-toolbar button:has(svg[class*="view-columns"]),
+.fi-ta-header-toolbar button:has(svg[data-slot="icon"][class*="columns"]) {
+  display: none !important;
+}
+
+/* ============================================
+   FILTROS DASHBOARD: inputs y botón reset
+   ============================================ */
+.sigem-dash-filter {
+  &-row th {
+    background: var(--sig-bg, #f4f6f8) !important;
+    border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+  }
+
+  &-input {
+    width: 100% !important;
+    font-size: 12.5px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 4px 10px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    background: var(--sig-surface, #ffffff) !important;
+    color: var(--sig-text, #0f172a) !important;
+
+    &:focus {
+      border-color: var(--sig-primary, #1b65d4) !important;
+      box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+      outline: none !important;
+    }
+
+    &::placeholder {
+      color: var(--sig-muted, #64748b) !important;
+      font-size: 11.5px !important;
+    }
+  }
+
+  &-clear {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    background: #ffffff !important;
+    color: var(--sig-muted, #64748b) !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+
+    &:hover {
+      background: #fee2e2 !important;
+      color: #ef4444 !important;
+      border-color: #fca5a5 !important;
+    }
+  }
+}
+
+
+
+
+/* FIX: huecos blancos + emoji lupa */
+.fi-table-individual-search-cell,
+.fi-table-individual-search-cell:empty,
+.fi-ta-table thead th:last-child,
+.fi-ta-table thead th:last-child *,
+.fi-ta-table thead tr th,
+.fi-ta-table thead tr td,
+[class*="fi-table-individual-search-cell"] {
+  background: var(--sig-bg, #f4f6f8) !important;
+}
+
+.sigem-search-emoji {
+  font-size: 15px !important;
+  line-height: 1 !important;
+  background: transparent !important;
+}
+
+
+.fi-ta-table thead,
+.fi-ta-table thead tr,
+.fi-ta-table thead th,
+.fi-ta-table thead td,
+.fi-ta-table thead th.fi-ta-selection-cell,
+.fi-ta-table thead td.fi-ta-selection-cell,
+.fi-ta-table thead th.fi-ta-actions-header-cell,
+.fi-ta-table thead th>div,
+.fi-ta-table thead th.fi-ta-selection-cell>div {
+  background: var(--sig-bg, #f4f6f8) !important;
+}
+
+
+/* FIX (DOM real): la fila de filtros es <tr class="fi-ta-row"> dentro de TBODY (no thead); se identifica por contener .fi-ta-search-field */
+.fi-ta-table tbody tr.fi-ta-row {
+  &:has(.fi-ta-search-field) {
+    &,
+    &:hover,
+    > td {
+      background: var(--sig-bg, #f4f6f8) !important;
+      background-color: var(--sig-bg, #f4f6f8) !important;
+    }
+
+    > td:last-child:empty {
+      text-align: center !important;
+      vertical-align: middle !important;
+      min-width: 52px !important;
+
+      &::after {
+        content: "\2715";
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 26px !important;
+        height: 26px !important;
+        border-radius: 6px !important;
+        border: 1px solid var(--sig-border, #e2e8f0) !important;
+        background: var(--sig-surface, #ffffff) !important;
+        color: var(--sig-muted, #64748b) !important;
+        font-size: 13px !important;
+        opacity: 0.5 !important;
+        pointer-events: none !important;
+      }
+    }
+  }
+
+  // Celdas de datos: volver a blanco (la regla [class*=individual-search-cell] anterior tambien las alcanzaba)
+  &:not(:has(.fi-ta-search-field)) > td {
+    background: transparent !important;
+  }
+}
+
+
+/* Toolbar del Dashboard (reutiliza .sigem-table-toolbar-group etc.) */
+.sigem-dash-toolbar {
+  border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+
+  .fi-input-wrp {
+    display: flex !important;
+    align-items: center !important;
+    background: var(--sig-surface, #ffffff) !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    border-radius: 8px !important;
+    height: 36px !important;
+    padding-left: 10px !important;
+  }
+
+  .sigem-dash-search-input {
+    flex: 1 !important;
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    font-size: 13px !important;
+    padding: 0 10px 0 6px !important;
+  }
+}
+/* ==========================================================================
+   FASE 1 RED LENTA: Skeleton Loading Indicators
+   ========================================================================== */
+
+// Animacion de shimmer/pulso suave para skeletons
 @keyframes sigem-skeleton-pulse {
   0% {
     background-position: 200% 0;
@@ -18,69 +430,113 @@
   }
 }
 
+// Bloque base de skeleton con degradado shimmer
 .sigem-skeleton {
-    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
-    background-size: 200% 100%;
-    animation: sigem-skeleton-pulse 1.5s ease-in-out infinite;
-    border-radius: 6px;
-    display: block;
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: sigem-skeleton-pulse 1.5s ease-in-out infinite;
+  border-radius: 6px;
+  display: block;
 }
 
+// Skeleton de fila de tabla (flex o standalone)
+.sigem-skeleton-row {
+  display: flex;
+  gap: 12px;
+  padding: 8px 12px;
+  align-items: center;
+}
+
+// Celda individual de skeleton
 .sigem-skeleton-cell {
-    height: 14px;
-    border-radius: 4px;
+  height: 14px;
+  border-radius: 4px;
 }
 
+// Skeleton de tarjeta (KPI, quick card)
 .sigem-skeleton-card {
-    border-radius: 12px;
-    padding: 16px;
-    background: var(--sig-surface, #ffffff);
-    border: 1px solid var(--sig-border, #e2e8f0);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 16px;
+  background: var(--sig-surface, #ffffff);
+  border: 1px solid var(--sig-border, #e2e8f0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
+// Variantes de ancho utilitarias
+.sigem-skeleton-w-full { width: 100%; }
+.sigem-skeleton-w-3-4  { width: 75%; }
+.sigem-skeleton-w-1-2  { width: 50%; }
+.sigem-skeleton-w-1-4  { width: 25%; }
+
+// Fila de tabla skeleton dentro de table > tbody
 tr.sigem-skeleton-tr {
-    background: transparent !important;
-    pointer-events: none;
-}
+  background: transparent !important;
+  pointer-events: none;
 
-tr.sigem-skeleton-tr:hover {
+  &:hover {
     background: transparent !important;
-}
+  }
 
-tr.sigem-skeleton-tr td {
+  td {
     padding: 12px 14px !important;
     vertical-align: middle !important;
     background: transparent !important;
+  }
 }
 
-.sigem-quick-grid.sigem-skeleton-grid, .sigem-stats-grid.sigem-skeleton-grid {
-    pointer-events: none;
-    user-select: none;
+// Rejillas de skeleton para Dashboard (conservan dimensiones exactas de grid)
+.sigem-quick-grid.sigem-skeleton-grid,
+.sigem-stats-grid.sigem-skeleton-grid {
+  pointer-events: none;
+  user-select: none;
+
+  &[style*="display: none"],
+  &[style*="display:none"] {
+    display: none !important;
+  }
 }
 
-.sigem-quick-grid.sigem-skeleton-grid[style*="display: none"], .sigem-quick-grid.sigem-skeleton-grid[style*="display:none"], .sigem-stats-grid.sigem-skeleton-grid[style*="display: none"], .sigem-stats-grid.sigem-skeleton-grid[style*="display:none"] {
-    display: none;
+.sigem-quick-grid[style*="display: none"],
+.sigem-quick-grid[style*="display:none"],
+.sigem-stats-grid[style*="display: none"],
+.sigem-stats-grid[style*="display:none"] {
+  display: none !important;
 }
 
 .sigem-skeleton-quick {
-    min-height: 84px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  min-height: 84px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .sigem-skeleton-stat {
-    min-height: 98px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+  min-height: 98px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
+// Tablas de Filament (Opcion B: Mejora estetica del loading indicator y contenedor nativo)
 .fi-ta.animate-pulse {
-    animation: sigem-skeleton-pulse 1.5s ease-in-out infinite;
+  animation: sigem-skeleton-pulse 1.5s ease-in-out infinite;
 }
 
+.fi-ta-loading-indicator,
+.fi-ta-content-ctn .flex.h-32.items-center.justify-center {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(2px);
+  border-radius: 8px;
+  padding: 24px;
+  gap: 12px;
+  color: var(--sig-primary, #0f172a);
+}
+
+/* ==========================================================================
+   FASE 1 RED LENTA: Spinners en Botones (Batch 2A)
+   ========================================================================== */
+
+// Animacion de rotacion para spinners
 @keyframes sigem-spin {
   from {
     transform: rotate(0deg);
@@ -90,26 +546,82 @@ tr.sigem-skeleton-tr td {
   }
 }
 
-.sigem-btn-loading-content {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.375rem;
+// Spinner inline para botones de accion y formularios
+.sigem-btn-spinner {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  animation: sigem-spin 0.75s linear infinite;
+  flex-shrink: 0;
+  margin-right: 0.375rem;
+
+  circle {
+    stroke-dasharray: 80;
+    stroke-dashoffset: 60;
+  }
 }
 
-.fi-btn.is-loading, .fi-btn[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])), .fi-btn[disabled]:has(svg.animate-spin:not([style*="display: none"])) {
+// Contenedor de contenido en botones con spinner
+.sigem-btn-loading-content {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.375rem !important;
+}
+
+// Estilos de botones de Filament al estar en estado de carga
+.fi-btn {
+  &.is-loading,
+  &[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])),
+  &[disabled]:has(svg.animate-spin:not([style*="display: none"])) {
     cursor: wait !important;
     opacity: 0.85 !important;
+
+    .fi-btn-loading-indicator,
+    svg.animate-spin {
+      display: inline-block !important;
+      width: 1.1em !important;
+      height: 1.1em !important;
+      animation: sigem-spin 0.75s linear infinite !important;
+      margin-inline-end: 0.375rem !important;
+
+      &[style*="display: none"],
+      &[style*="display:none"] {
+        display: none !important;
+      }
+    }
+  }
 }
 
-.fi-btn.is-loading .fi-btn-loading-indicator, .fi-btn.is-loading svg.animate-spin, .fi-btn[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])) .fi-btn-loading-indicator, .fi-btn[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])) svg.animate-spin, .fi-btn[disabled]:has(svg.animate-spin:not([style*="display: none"])) .fi-btn-loading-indicator, .fi-btn[disabled]:has(svg.animate-spin:not([style*="display: none"])) svg.animate-spin {
-    display: inline-block !important;
-    width: 1.1em !important;
-    height: 1.1em !important;
-    animation: sigem-spin 0.75s linear infinite !important;
-    margin-inline-end: 0.375rem !important;
-}
-
-.fi-btn.is-loading .fi-btn-loading-indicator[style*="display: none"], .fi-btn.is-loading .fi-btn-loading-indicator[style*="display:none"], .fi-btn.is-loading svg.animate-spin[style*="display: none"], .fi-btn.is-loading svg.animate-spin[style*="display:none"], .fi-btn[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])) .fi-btn-loading-indicator[style*="display: none"], .fi-btn[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])) .fi-btn-loading-indicator[style*="display:none"], .fi-btn[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])) svg.animate-spin[style*="display: none"], .fi-btn[disabled]:has(.fi-btn-loading-indicator:not([style*="display: none"])) svg.animate-spin[style*="display:none"], .fi-btn[disabled]:has(svg.animate-spin:not([style*="display: none"])) .fi-btn-loading-indicator[style*="display: none"], .fi-btn[disabled]:has(svg.animate-spin:not([style*="display: none"])) .fi-btn-loading-indicator[style*="display:none"], .fi-btn[disabled]:has(svg.animate-spin:not([style*="display: none"])) svg.animate-spin[style*="display: none"], .fi-btn[disabled]:has(svg.animate-spin:not([style*="display: none"])) svg.animate-spin[style*="display:none"] {
+// FIX: Deduplicacion estricta de spinners en todos los botones del sistema
+// Garantiza que cada boton muestre MAXIMO 1 solo spinner (elimina segundo spinner nativo o inyectado)
+.fi-btn,
+button,
+[role="button"] {
+  svg.sigem-spinner-duplicate,
+  svg[style*="display: none"],
+  svg[style*="display:none"] {
     display: none !important;
+  }
+
+  // Si hay dos spinners contiguos o hermanos, ocultar absolutamente el segundo
+  svg.animate-spin ~ svg.animate-spin,
+  svg.animate-spin ~ svg.sigem-btn-spinner,
+  svg.sigem-btn-spinner ~ svg.sigem-btn-spinner,
+  svg.sigem-btn-spinner ~ svg.animate-spin,
+  .sigem-btn-spinner ~ .sigem-btn-spinner {
+    display: none !important;
+  }
+}
+
+// Estilos para botones de reportes y configuracion
+.sigem-rep-btn-primary,
+.sigem-rep-btn-sec,
+.sigem-btn-primary {
+  &.is-loading,
+  &[disabled] {
+    cursor: wait !important;
+    opacity: 0.85 !important;
+  }
 }

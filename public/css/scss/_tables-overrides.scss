@@ -1,0 +1,502 @@
+/* ============================================
+   Tabla Inventario Lista = Tabla Dashboard
+   ============================================ */
+
+/* Contenedor y tabla adaptiva — que no desborde */
+
+.fi-ta-header-cell {
+  font-size: 11.5px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1.2 !important;
+  color: var(--sig-muted) !important;
+  padding: 5px 8px !important;
+  background: var(--sig-bg, #f4f6f8) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.fi-ta-table {
+  table-layout: fixed !important;
+
+  // Headers compactos (consolidado)
+  thead th {
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    line-height: 1.2 !important;
+    color: var(--sig-muted) !important;
+    padding: 5px 8px !important;
+    background: var(--sig-bg, #f4f6f8) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+
+    button,
+    .fi-ta-header-cell-label {
+      font-size: 11.5px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      color: var(--sig-muted) !important;
+      padding: 0 !important;
+    }
+
+    &:last-child:empty::after,
+    &.fi-ta-actions-cell:empty::after,
+    &.fi-ta-actions-header-cell:empty::after {
+      content: 'ACCIONES' !important;
+      font-size: 11.5px !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      color: var(--sig-muted) !important;
+      display: block !important;
+      text-align: center !important;
+    }
+  }
+
+  // Filas ultra compactas (consolidado)
+  tbody td {
+    padding: 4px 8px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    line-height: 1.3 !important;
+    border-bottom: 1px solid var(--sig-border) !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Checkboxes: sin desbordar */
+.fi-ta-selection-cell,
+.fi-ta-table th.fi-ta-selection-cell,
+.fi-ta-table td.fi-ta-selection-cell {
+  width: 36px !important;
+  min-width: 36px !important;
+  max-width: 36px !important;
+  overflow: hidden !important;
+  padding: 4px 0 !important;
+  text-align: center !important;
+}
+
+.fi-ta-selection-cell>div,
+.fi-ta-selection-cell label {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.fi-ta-selection-cell input[type="checkbox"] {
+  margin: 0 !important;
+}
+
+/* Anular padding interno excesivo de celdas en Filament */
+.fi-ta-table thead th.fi-ta-selection-cell,
+.fi-ta-table thead th.fi-ta-selection-cell>div,
+.fi-ta-table thead th>div,
+.fi-ta-table tbody td.fi-ta-selection-cell,
+.fi-ta-table tbody td.fi-ta-selection-cell>div,
+.fi-ta-table tbody td .fi-ta-text,
+.fi-ta-table tbody td .fi-ta-col-wrp>div,
+.fi-ta-table tbody td.fi-ta-actions-cell>div {
+  padding: 1px 0 !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+/* Columna EQUIPO: gap mínimo entre título y S/N */
+.fi-ta-table tbody td .fi-ta-text {
+  gap: 0 !important;
+  row-gap: 0 !important;
+}
+
+/* Columna CÓDIGO — texto bold, tamaño normal */
+.fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2),
+.fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2) *,
+.fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2),
+.fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2) * {
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--sig-text, #0f172a) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Solo en tablas CON checkbox de selección */
+.fi-ta-table:has(.fi-ta-selection-cell) thead th:nth-child(2),
+.fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2),
+.fi-ta-table:has(.fi-ta-record-checkbox) thead th:nth-child(2),
+.fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2) {
+  width: 145px !important;
+  min-width: 145px !important;
+}
+
+/* En tablas SIN checkbox (SS), distribuir normalmente */
+.fi-ta-table:not(:has(.fi-ta-selection-cell)):not(:has(.fi-ta-record-checkbox)) thead th:nth-child(2),
+.fi-ta-table:not(:has(.fi-ta-selection-cell)):not(:has(.fi-ta-record-checkbox)) tbody td:nth-child(2) {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+/* EQUIPO: reducir ancho y controlar desborde */
+.fi-ta-table tbody td:nth-child(3),
+.fi-ta-table thead th:nth-child(3) {
+  max-width: 260px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.fi-ta-table tbody td .fi-ta-text-item-label,
+.fi-ta-table tbody td:nth-child(3) .fi-ta-text-item-label {
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  color: var(--sig-text, #0f172a) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  display: block !important;
+}
+
+.fi-ta-table tbody td .fi-ta-text p,
+.fi-ta-table tbody td:nth-child(3) p {
+  font-size: 11.5px !important;
+  color: var(--sig-muted, #64748b) !important;
+  line-height: 1.15 !important;
+  margin-top: 1px !important;
+  margin-bottom: 0 !important;
+  font-weight: 400 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Badges compactos (CATEGORÍA y ESTADO) */
+.fi-ta-table tbody td .fi-badge {
+  font-size: 11px !important;
+  padding: 2px 8px !important;
+  border-radius: 99px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+}
+
+/* ÁREA: texto normal gris */
+.fi-ta-table tbody td:nth-child(6),
+.fi-ta-table tbody td:nth-child(6) * {
+  color: var(--sig-muted, #64748b) !important;
+  font-weight: 400 !important;
+  font-size: 13px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Acciones de FILA: botones sin encimarse (SOLO en las celdas de la tabla, NO en toolbar ni bulk actions) */
+.fi-ta-actions-cell,
+.fi-ta-table thead th:last-child,
+.fi-ta-table thead th.fi-ta-actions-cell,
+.fi-ta-table thead th.fi-ta-actions-header-cell {
+  min-width: 148px !important;
+  width: 148px !important;
+  max-width: 180px !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+
+.fi-ta-actions-cell {
+  padding: 4px 6px !important;
+
+  .fi-ta-actions {
+    gap: 3px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+  }
+}
+
+.fi-ta-actions-cell .fi-ta-actions button,
+.fi-ta-actions-cell button {
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  min-height: 26px !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  background: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+/* Toolbar: compactar Exportar + Buscar + Filtros */
+.fi-ta-header {
+  padding: 4px 10px !important;
+  min-height: 36px !important;
+}
+
+/* Botón Exportar en la toolbar: texto completo sin truncar */
+.fi-ta-header .fi-ta-actions,
+.fi-ta-header-toolbar .fi-ta-actions {
+  display: flex !important;
+  gap: 8px !important;
+  width: auto !important;
+}
+
+.fi-ta-header .fi-btn,
+.fi-ta-header-toolbar .fi-btn,
+.fi-ta-header button.fi-btn {
+  width: auto !important;
+  min-width: fit-content !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 4px 12px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  background: #ffffff !important;
+  color: var(--sig-text, #0f172a) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Indicador de selección y Bulk Actions: dropdown limpio de una sola línea */
+.fi-ta-selection-indicator {
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+}
+
+@media (min-width: 768px) {
+
+  .fi-ta-header-ctn button.sm\:hidden,
+  .fi-ta-header-ctn .sm\:hidden,
+  .fi-ta-header-ctn button[title="Abrir acciones"].sm\:hidden {
+    display: none !important;
+  }
+}
+
+.fi-ta-header-ctn .fi-dropdown-trigger button.sm\:inline-grid,
+.fi-ta-header-ctn .fi-dropdown-trigger button.fi-ac-btn-group:not(.sm\:hidden),
+.fi-ta-header-ctn button.fi-ac-btn-group:not(.sm\:hidden) {
+  width: auto !important;
+  min-width: fit-content !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  padding: 4px 12px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  background: #ffffff !important;
+  color: var(--sig-text, #0f172a) !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.fi-ta-header-ctn .fi-dropdown-trigger button.fi-ac-btn-group .fi-btn-label {
+  white-space: nowrap !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  color: var(--sig-text, #0f172a) !important;
+  line-height: 1 !important;
+}
+
+.fi-ta-header-ctn .fi-dropdown-trigger button.fi-ac-btn-group svg {
+  color: var(--sig-muted, #64748b) !important;
+  width: 16px !important;
+  height: 16px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Ocultar badge flotante de filtros activos en la toolbar */
+.fi-ta-filters-dropdown .fi-icon-btn-badge-ctn,
+.fi-ta-filters-dropdown .fi-badge,
+.fi-ta-header .fi-ta-filters-dropdown .fi-icon-btn-badge-ctn,
+.fi-ta-header-toolbar .fi-ac-btn-group .fi-badge {
+  display: none !important;
+}
+
+/* Restaurar iconos SVG en botones de la toolbar (Filtros, Alternar columnas, etc.) */
+.fi-ta-header-toolbar .fi-icon-btn svg,
+.fi-ta-header-toolbar button svg,
+.fi-ta-header-ctn .fi-icon-btn svg,
+.fi-ta-header-ctn .fi-ta-filters-dropdown svg,
+.fi-ta-header-ctn .fi-ta-col-toggle svg {
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Dashboard: tabla de inventario y botones de acción compactos */
+.sigem-dash-table {
+  .fi-ta-table {
+    table-layout: fixed !important;
+    width: 100% !important;
+
+    tbody tr {
+      background: var(--sig-surface, #ffffff) !important;
+
+      &:hover {
+        background: #f8fafc !important;
+      }
+    }
+
+    thead th:first-child,
+    tbody td:first-child {
+      width: 130px !important;
+      max-width: 130px !important;
+    }
+
+    thead th:last-child,
+    tbody td:last-child {
+      width: 104px !important;
+      min-width: 104px !important;
+      max-width: 104px !important;
+      text-align: center !important;
+      padding: 4px 6px !important;
+    }
+  }
+}
+
+.sigem-dash-btn {
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  min-height: 26px !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  background: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  line-height: 1 !important;
+
+  &:hover {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  &::before {
+    font-size: 13px !important;
+    line-height: 1 !important;
+  }
+}
+
+/* Tablas de Catálogos (Configuración) */
+.sigem-cat-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+
+  tbody tr {
+    background: var(--sig-surface, #ffffff) !important;
+
+    &:hover {
+      background: #f8fafc !important;
+    }
+  }
+
+  .sigem-col-id,
+  thead th.sigem-col-id,
+  tbody td.sigem-col-id {
+    width: 55px !important;
+    min-width: 55px !important;
+    max-width: 65px !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+  }
+
+  .sigem-col-actions,
+  thead th.sigem-col-actions,
+  tbody td.sigem-col-actions {
+    width: 104px !important;
+    min-width: 104px !important;
+    max-width: 104px !important;
+    text-align: center !important;
+    padding: 4px 6px !important;
+  }
+
+  thead th:nth-child(2),
+  tbody td:nth-child(2) {
+    width: auto !important;
+    max-width: none !important;
+  }
+}
+
+.sigem-rep-table-wrap .fi-ta-table tbody tr {
+  background: var(--sig-surface, #ffffff) !important;
+
+  &:hover {
+    background: #f8fafc !important;
+  }
+}
+
+/* Botones de acción compactos de 26px en catálogos */
+.sigem-cat-btn {
+  width: 26px !important;
+  height: 26px !important;
+  min-width: 26px !important;
+  min-height: 26px !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 6px !important;
+  border: 1px solid var(--sig-border, #e5e7eb) !important;
+  background: #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+  line-height: 1 !important;
+
+  &:hover {
+    background: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  svg {
+    display: none !important;
+  }
+
+  &::before {
+    font-size: 13px !important;
+    line-height: 1 !important;
+  }
+
+  &[title*="Ver"]::before,
+  &[title*="Ver detalle"]::before {
+    content: "👁" !important;
+  }
+
+  &[title*="Editar"]::before {
+    content: "✏️" !important;
+  }
+
+  &[title*="Eliminar"]::before {
+    content: "🗑️" !important;
+  }
+}

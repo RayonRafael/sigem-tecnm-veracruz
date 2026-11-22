@@ -1,30 +1,593 @@
-// SIGEM Theme — Base, Reset, Typography & Global Canvas
-
-@charset "UTF-8";
-
-body, .fi-body, html {
-    background-image: none !important;
+/* ===== 0. TOPBAR EN EL DASHBOARD Y PANEL ===== */
+body:has(.sigem-professional) .fi-topbar {
+  display: flex !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  background: var(--sig-surface) !important;
+  border-bottom: 1px solid var(--sig-border) !important;
+  height: auto !important;
+  overflow: visible !important;
 }
 
-body, .fi-body {
-    color: var(--sig-text);
-    font-family: "DM Sans", sans-serif !important;
+body:has(.sigem-professional) .fi-main {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  min-height: calc(100vh - 64px) !important;
 }
 
-.sigem-sw input:focus-visible + .sigem-sw-ui {
-    outline: 2px solid var(--sig-primary);
-    outline-offset: 2px;
+body:has(.sigem-professional) .fi-main-ctn {
+  max-width: none !important;
+  width: 100% !important;
+  margin: 0 !important;
 }
 
-.sigem-section-head h2 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 0 0 4px;
-    color: var(--sig-text);
+body:has(.sigem-professional) .fi-header {
+  padding-top: 1.5rem !important;
 }
 
-html, body {
-    overflow-x: hidden !important;
+/* ===== 1. FONDO GENERAL Y APP ===== */
+body,
+.fi-body,
+html {
+  background-color: var(--sig-bg) !important;
+  background: var(--sig-bg) !important;
+  background-image: none !important;
+}
+
+/* ===== 2. CARDS Y CONTENEDORES ===== */
+.fi-main,
+.fi-main-ctn,
+.fi-ta-ctn,
+.fi-fo-component-ctn,
+.fi-section {
+  background: var(--sig-surface) !important;
+}
+
+.fi-ta-ctn,
+.fi-fo-component-ctn,
+.fi-section {
+  border-radius: 12px !important;
+  border: 1px solid var(--sig-border) !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .05) !important;
+}
+
+.fi-ta-ctn::before,
+.fi-fo-component-ctn::before,
+.fi-section::before {
+  display: none !important;
+  /* Quitar la barra de gradiente superior anterior */
+}
+
+.fi-panel-servicio-social {
+  .fi-ta-ctn,
+  .fi-ta-content,
+  .fi-ta-table tbody tr {
+    background-color: var(--sig-surface, #ffffff) !important;
+    background: var(--sig-surface, #ffffff) !important;
+    border-color: var(--sig-border, #e2e8f0) !important;
+  }
+
+  .fi-ta-table tbody tr:hover {
+    background: #f8fafc !important;
+  }
+}
+
+/* Padding en secciones */
+.fi-section-content {
+  padding: 1.5rem !important;
+}
+
+/* ===== 3. TÍTULOS DE PÁGINA ===== */
+h1,
+.fi-header-heading,
+.fi-panel-servicio-social .fi-header-heading,
+.fi-panel-servicio-social h1 {
+  color: var(--sig-text, #0f172a) !important;
+  font-weight: 700 !important;
+  font-size: 1.875rem !important;
+  letter-spacing: -0.025em !important;
+}
+
+/* Ocultar header nativo duplicado de Filament en páginas que tienen su propio encabezado InvGate */
+.fi-page:has(.sigem-rep-header) .fi-header,
+.fi-page:has(.sigem-rep-header) .fi-header-heading,
+.fi-page:has(.sigem-rep-header) .fi-header-subheading {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  border: none !important;
+}
+
+/* ===== 4. TABLAS DE LISTADO ===== */
+.fi-ta table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+
+
+.fi-ta-header-cell,
+th {
+  background-color: #fafbfc !important;
+  border-bottom: 1px solid var(--sig-border) !important;
+}
+
+.fi-ta-header-cell *,
+th * {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+.fi-ta-row,
+tr {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  transition: background-color 0.2s;
+}
+
+.fi-ta-row:hover,
+tr:hover {
+  background-color: #f8fafc !important;
+}
+
+.fi-ta-row:nth-child(even),
+tr:nth-child(even) {
+  background-color: #ffffff !important;
+}
+
+/* ===== 5. INPUTS, SELECTS, TEXTAREAS ===== */
+.fi-input,
+.fi-select-input,
+textarea,
+select {
+  background-color: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 8px !important;
+  color: #0f172a !important;
+  transition: all 0.2s;
+}
+
+.fi-input:focus,
+.fi-select-input:focus,
+textarea:focus,
+select:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
+}
+
+/* ===== 5.1 RADIO, CHECKBOX, TOGGLES (CORREGIDO) ===== */
+
+/* 1. Toggle Buttons (Usados en Estados de Inventario) */
+.fi-fo-toggle-buttons label.fi-btn {
+  border: 1px solid #e2e8f0 !important;
+  background-color: #ffffff !important;
+  color: #334155 !important;
+  opacity: 1 !important;
+}
+
+
+.fi-fo-toggle-buttons input[type="radio"]:checked+label.fi-btn,
+.fi-fo-toggle-buttons input[type="checkbox"]:checked+label.fi-btn {
+  border: 2px solid #2563eb !important;
+  background-color: #eff6ff !important;
+  color: #1e40af !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+
+.fi-fo-toggle-buttons input[type="radio"]:checked+label.fi-btn *,
+.fi-fo-toggle-buttons input[type="checkbox"]:checked+label.fi-btn * {
+  color: #1e40af !important;
+}
+
+/* 2. Radio Buttons clásicos */
+.fi-fo-radio label {
+  border: 1px solid #e2e8f0 !important;
+  background-color: #ffffff !important;
+  padding: 12px 16px !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  cursor: pointer !important;
+}
+
+.fi-fo-radio label:has(input[type="radio"]:checked) {
+  border: 2px solid #2563eb !important;
+  background-color: #eff6ff !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
+}
+
+.fi-fo-radio label:has(input[type="radio"]:checked) * {
+  color: #1e40af !important;
+}
+
+.fi-fo-radio input[type="radio"]:checked {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+/* 3. Checkboxes nativos */
+.fi-checkbox-input:checked {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+  background-image: url("data:image/svg+xml,%3csvg viewBox=\'0 0 16 16\' fill=\'white\' xmlns=\'http://www.w3.org/2000/svg\'%3e%3cpath d=\'M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z\'/%3e%3c/svg%3e") !important;
+}
+
+/* 4. Toggle switches */
+button[role="switch"][aria-checked="true"] {
+  background-color: #2563eb !important;
+}
+
+/* ===== 6. LABELS DE CAMPOS ===== */
+.fi-fo-field-wrp-label {
+  &,
+  * {
+    color: #334155 !important;
+    font-weight: 600 !important;
+  }
+}
+
+/* ===== 7. BOTONES ===== */
+.fi-btn {
+  border-radius: 8px !important;
+  transition: all 0.2s ease-in-out !important;
+  font-weight: 500 !important;
+}
+
+/* Primario */
+.fi-btn-color-primary,
+.btn-primary {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.fi-btn-color-primary *,
+.btn-primary * {
+  color: #ffffff !important;
+}
+
+.fi-btn-color-primary:hover,
+.btn-primary:hover {
+  background-color: #1d4ed8 !important;
+}
+
+/* Éxito */
+.fi-btn-color-success {
+  background-color: #10b981 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.fi-btn-color-success * {
+  color: #ffffff !important;
+}
+
+.fi-btn-color-success:hover {
+  background-color: #059669 !important;
+}
+
+/* Peligro */
+.fi-btn-color-danger,
+.btn-danger {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.fi-btn-color-danger *,
+.btn-danger * {
+  color: #ffffff !important;
+}
+
+.fi-btn-color-danger:hover,
+.btn-danger:hover {
+  background-color: #dc2626 !important;
+}
+
+/* Advertencia */
+.fi-btn-color-warning {
+  background-color: #f59e0b !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.fi-btn-color-warning * {
+  color: #ffffff !important;
+}
+
+.fi-btn-color-warning:hover {
+  background-color: #d97706 !important;
+}
+
+/* Info */
+.fi-btn-color-info {
+  background-color: #3b82f6 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.fi-btn-color-info * {
+  color: #ffffff !important;
+}
+
+.fi-btn-color-info:hover {
+  background-color: #2563eb !important;
+}
+
+/* Secundario / Gris */
+.fi-btn-color-gray,
+.btn-secondary {
+  background-color: #f8fafc !important;
+  color: #334155 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.fi-btn-color-gray *,
+.btn-secondary * {
+  color: #334155 !important;
+}
+
+.fi-btn-color-gray:hover,
+.btn-secondary:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* ===== 8. BADGES Y ETIQUETAS ===== */
+.fi-badge {
+  border-radius: 999px !important;
+  font-weight: 500 !important;
+}
+
+.fi-badge-color-success {
+  background-color: #d1fae5 !important;
+  color: #059669 !important;
+}
+
+.fi-badge-color-warning {
+  background-color: #fef3c7 !important;
+  color: #d97706 !important;
+}
+
+.fi-badge-color-danger {
+  background-color: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+
+.fi-badge-color-info {
+  background-color: #dbeafe !important;
+  color: #2563eb !important;
+}
+
+.fi-badge-color-gray {
+  background-color: #f1f5f9 !important;
+  color: #475569 !important;
+}
+
+/* ===== 9. BREADCRUMBS INTERNOS (OCULTOS — se usa "SIGEM › Sección" en topbar) ===== */
+.fi-breadcrumbs {
+  display: none !important;
+}
+
+/* ===== 10. PAGINACIÓN ===== */
+.fi-pagination-item {
+  border-radius: 8px !important;
+  margin: 0 2px !important;
+}
+
+
+/* ===== 11. FILTROS Y BÚSQUEDA ===== */
+.fi-ta-filters,
+.fi-ta-search,
+.fi-global-search {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+}
+
+/* ===== 12. NOTIFICACIONES Y TOASTS ===== */
+.fi-no-notification {
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+  background-color: #ffffff !important;
+}
+
+
+/* ===== 13. MODALES NATIVOS DE FILAMENT ===== */
+.fi-modal-window {
+  border-radius: 12px !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+.fi-modal-header {
+  background-color: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+/* ===== 14. BOTONES DE ACCIÓN EN TABLAS ===== */
+.fi-ta-actions .fi-icon-btn {
+  border-radius: 8px !important;
+  transition: background-color 0.2s !important;
+}
+
+
+/* ===== 16. SELECTS CON BÚSQUEDA ===== */
+.fi-fo-component-ctn .fi-section,
+.fi-fo-component-ctn .fi-section-content {
+  overflow: visible !important;
+}
+
+.fi-input-wrp:has(.choices) {
+  overflow: visible !important;
+  min-width: 0 !important;
+
+  > .min-w-0.flex-1 {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: visible !important;
+  }
+}
+
+.choices {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  margin-bottom: 0 !important;
+
+  &:not(.is-open) .choices__list--dropdown {
+    display: none !important;
+  }
+
+  &__inner {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 38px !important;
+    max-height: 40px !important;
+    padding: 4px 32px 4px 12px !important;
     overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+
+    &:has(.choices__button) {
+      padding-inline-end: 52px !important;
+    }
+  }
+
+  &__list--single {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    line-height: 1.4 !important;
+
+    .choices__item {
+      display: block !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      line-height: 1.4 !important;
+    }
+  }
+
+  &__list--dropdown,
+  &__list[aria-expanded] {
+    position: absolute !important;
+    top: calc(100% + 4px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 50 !important;
+    max-height: 250px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    background-color: #ffffff !important;
+    border-radius: 8px !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1) !important;
+
+    .choices__list {
+      max-height: 200px !important;
+      overflow-y: auto !important;
+      overflow-x: hidden !important;
+    }
+
+    .choices__item {
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      max-width: 100% !important;
+    }
+  }
+
+  &__item--choice:hover {
+    background-color: #f8fafc !important;
+  }
+
+  &__item--selectable.is-highlighted {
+    background-color: #dbeafe !important;
+    color: #2563eb !important;
+  }
+}
+
+/* ===== 18. TABLAS VACÍAS ===== */
+.fi-ta-empty-state-heading {
+  color: #475569 !important;
+  font-weight: 600 !important;
+}
+
+.fi-ta-empty-state-icon {
+  color: #cbd5e1 !important;
+}
+
+/* ===== TOPBAR ====== */
+body:has(.sigem-professional) .fi-topbar nav,
+.fi-topbar nav {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  width: 100% !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.fi-topbar nav .ms-auto,
+.fi-topbar nav>div:has(.fi-user-menu),
+.fi-topbar nav>div:has(.sigem-topbar-search) {
+  margin-left: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+}
+
+/* ===== DROPDOWN / MENU DE USUARIO ===== */
+.fi-dropdown-panel,
+.fi-dropdown-list,
+.fi-dropdown-list-item,
+.fi-user-menu {
+  background-color: #ffffff !important;
+}
+
+.fi-dropdown-panel *,
+.fi-dropdown-list-item * {
+  color: #1a1a2e !important;
+}
+
+.fi-dropdown-list-item:hover {
+  background-color: #f1f5f9 !important;
+}
+
+/* ===== LINKS INTERACTIVOS (TEXTO) ===== */
+.fi-main a:not([class*="btn"]),
+.fi-ta-text-item-label a {
+  color: #1b65d4 !important;
+  transition: color 0.2s;
+}
+
+.fi-main a:not([class*="btn"]):hover,
+.fi-ta-text-item-label a:hover {
+  color: #0d47a1 !important;
+}
+
+/* JetBrains Mono */
+.font-mono,
+.fi-ta-text-item-label code,
+.fi-ta-text-item-label[style*="monospace"] {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
 }

@@ -1,667 +1,742 @@
-// SIGEM Theme — Filament Layout & Table Structural Overrides
-
-.fi-main, .fi-main-ctn, .fi-ta-ctn, .fi-fo-component-ctn, .fi-section {
-    background: var(--sig-surface) !important;
+/* ===== TAREA: Sidebar Fijo Flexbox ===== */
+/* Evita scroll en el contenedor maestro */
+.fi-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden !important;
 }
 
-.fi-ta-ctn, .fi-fo-component-ctn, .fi-section {
-    border-radius: 12px !important;
-    border: 1px solid var(--sig-border) !important;
-    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05) !important;
+/* Fijar el sidebar a la izquierda usando sticky sobre flex */
+.fi-sidebar {
+  height: 100vh !important;
+  position: sticky !important;
+  top: 0;
+  flex-shrink: 0;
+  overflow-y: visible !important;
+  /* Permitir que los tooltips salgan del borde */
 }
 
-.fi-ta-ctn::before, .fi-fo-component-ctn::before, .fi-section::before {
-    display: none !important;
+/* Contenedor que agrupa topbar y main en flexbox */
+.fi-main-ctn {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden !important;
+  margin-left: 0 !important;
 }
 
-.fi-panel-servicio-social .fi-ta-ctn, .fi-panel-servicio-social .fi-ta-content, .fi-panel-servicio-social .fi-ta-table tbody tr {
-    background-color: var(--sig-surface, #ffffff) !important;
-    background: var(--sig-surface, #ffffff) !important;
-    border-color: var(--sig-border, #e2e8f0) !important;
-}
-
-.fi-section-content {
-    padding: 1.5rem !important;
-}
-
-h1, .fi-header-heading, .fi-panel-servicio-social .fi-header-heading, .fi-panel-servicio-social h1 {
-    color: var(--sig-text, #0f172a) !important;
-    font-weight: 700 !important;
-    font-size: 1.875rem !important;
-    letter-spacing: -0.025em !important;
-}
-
-.fi-ta table {
-    border-collapse: separate !important;
-    border-spacing: 0 !important;
-}
-
-.fi-breadcrumbs {
-    display: none !important;
-}
-
-.fi-ta-filters, .fi-ta-search, .fi-global-search {
-    background-color: #ffffff !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 8px !important;
-}
-
-.fi-main a:not([class*=btn]), .fi-ta-text-item-label a {
-    color: #1b65d4 !important;
-    transition: color 0.2s;
-}
-
-.fi-main a:not([class*=btn]):hover, .fi-ta-text-item-label a:hover {
-    color: #0d47a1 !important;
-}
-
-main.fi-main, .fi-main, .fi-main-ctn {
-    color: var(--sig-text);
-}
-
-.fi-topbar, .fi-topbar nav, .fi-header {
-    background: var(--sig-surface) !important;
-}
-
-.fi-header, .fi-page-header {
-    max-width: none !important;
-    width: 100% !important;
-}
-
-.fi-ta-ctn, .sigem-rep-view, .sigem-dash-table {
-    max-width: none !important;
-    width: 100% !important;
-    overflow-x: auto;
-}
-
-.fi-main, .fi-topbar {
-    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1), margin-right 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.fi-layout, .fi-main-ctn {
-    overflow: visible !important;
-}
-
+/* Permitir scroll SÓLO en el contenido principal */
 .fi-main {
-    flex-grow: 1;
-    overflow-y: auto !important;
-    margin-left: 0 !important;
-    height: 100vh !important;
-    overflow-x: hidden !important;
+  flex-grow: 1;
+  height: 100vh;
+  overflow-y: auto !important;
+  margin-left: 0 !important;
 }
 
-.fi-main, .fi-main-ctn, main.fi-main {
-    max-width: none !important;
-    width: 100% !important;
+/* Mantener el Topbar fijo sobre el contenido que hace scroll */
+.fi-topbar {
+  position: sticky !important;
+  top: 0;
+  z-index: 40;
+  margin-left: 0 !important;
+}
+
+/* Fallback: Ocultar el botón ☰ nativo si persiste por alguna clase residual */
+.fi-sidebar-group-collapse-button,
+button.fi-icon-btn[x-on\:click="isSidebarOpen = ! isSidebarOpen"],
+button.fi-icon-btn[x-on\:click*="sidebar"] {
+  display: none !important;
+}
+
+/* Garantizar visibilidad de avatar y logout */
+.fi-sidebar {
+  .sigem-user-card,
+  .sigem-avatar,
+  .sigem-logout {
+    display: flex !important;
+  }
+}
+
+/* ==================================================== */
+/* DISEÑO INVGATE: PANEL SERVICIO SOCIAL                */
+/* ==================================================== */
+
+/* Banner de rol en topbar */
+.sigem-role-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--sig-info-light);
+  color: var(--sig-info);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+/* Role pill en avatar del sidebar */
+.sigem-role-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: var(--sig-info-light);
+  color: var(--sig-info);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Píldora solo lectura */
+.sigem-pill.ro {
+  background: var(--sig-info-light);
+  color: var(--sig-info);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 99px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Sidebar colores Servicio Social: Dashboard */
+.fi-sidebar-item a[href$="/servicio-social"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href$="/servicio-social/"] .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href$="/servicio-social"]) .fi-sidebar-item-icon,
+.fi-sidebar-item:has(a[href$="/servicio-social/"]) .fi-sidebar-item-icon {
+  background: var(--sig-primary-light) !important;
+  color: var(--sig-primary) !important;
+  border-color: color-mix(in srgb, var(--sig-primary) 45%, transparent) !important;
+}
+
+.fi-sidebar-item.fi-active a[href$="/servicio-social"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active a[href$="/servicio-social"] .fi-sidebar-item-icon,
+.fi-sidebar-item a[href$="/servicio-social"][aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-active:has(a[href$="/servicio-social"]) .fi-sidebar-item-icon,
+.fi-sidebar-item.fi-sidebar-item-active:has(a[href$="/servicio-social"]) .fi-sidebar-item-icon {
+  background: var(--sig-primary) !important;
+  border-color: var(--sig-primary) !important;
+  color: #ffffff !important;
+}
+
+/* Solicitudes SS: #0d9488 (verde agua) */
+.fi-sidebar-item {
+  a[href*="/servicio-social/solicitud"] .fi-sidebar-item-icon {
+    background: var(--mod-sol-l) !important;
+    color: var(--mod-sol) !important;
+    border-color: color-mix(in srgb, var(--mod-sol) 45%, transparent) !important;
+  }
+
+  &:is(.fi-active, .fi-sidebar-item-active) a[href*="/servicio-social/solicitud"] .fi-sidebar-item-icon,
+  a[href*="/servicio-social/solicitud"][aria-current="page"] .fi-sidebar-item-icon {
+    background: var(--mod-sol) !important;
+    border-color: var(--mod-sol) !important;
+    color: #ffffff !important;
+  }
+
+  // Mantenimiento SS: #ea580c (naranja)
+  a[href*="/servicio-social/mantenimiento"] .fi-sidebar-item-icon {
+    background: var(--mod-mant-l) !important;
+    color: var(--mod-mant) !important;
+    border-color: color-mix(in srgb, var(--mod-mant) 45%, transparent) !important;
+  }
+
+  &:is(.fi-active, .fi-sidebar-item-active) a[href*="/servicio-social/mantenimiento"] .fi-sidebar-item-icon,
+  a[href*="/servicio-social/mantenimiento"][aria-current="page"] .fi-sidebar-item-icon {
+    background: var(--mod-mant) !important;
+    border-color: var(--mod-mant) !important;
+    color: #ffffff !important;
+  }
+
+  // Inventario SS: #7c3aed (morado)
+  a[href*="/servicio-social/inventario"] .fi-sidebar-item-icon {
+    background: var(--mod-inv-l) !important;
+    color: var(--mod-inv) !important;
+    border-color: color-mix(in srgb, var(--mod-inv) 45%, transparent) !important;
+  }
+
+  &:is(.fi-active, .fi-sidebar-item-active) a[href*="/servicio-social/inventario"] .fi-sidebar-item-icon,
+  a[href*="/servicio-social/inventario"][aria-current="page"] .fi-sidebar-item-icon {
+    background: var(--mod-inv) !important;
+    border-color: var(--mod-inv) !important;
+    color: #ffffff !important;
+  }
+
+  // Catálogos SS: #c026d3 (magenta)
+  a:is([href*="/servicio-social/catalogo"], [href*="/servicio-social/materials"],
+    [href*="/servicio-social/areas"], [href*="/servicio-social/receptors"],
+    [href*="/servicio-social/marca-materials"], [href*="/servicio-social/tipo-materials"],
+    [href*="/servicio-social/unidad-medidas"]) .fi-sidebar-item-icon {
+    background: var(--mod-cat-l) !important;
+    color: var(--mod-cat) !important;
+    border-color: color-mix(in srgb, var(--mod-cat) 45%, transparent) !important;
+  }
+
+  &:is(.fi-active, .fi-sidebar-item-active) a:is([href*="/servicio-social/catalogo"], [href*="/servicio-social/materials"],
+    [href*="/servicio-social/areas"], [href*="/servicio-social/receptors"],
+    [href*="/servicio-social/marca-materials"], [href*="/servicio-social/tipo-materials"],
+    [href*="/servicio-social/unidad-medidas"]) .fi-sidebar-item-icon,
+  a:is([href*="/servicio-social/catalogo"], [href*="/servicio-social/materials"],
+    [href*="/servicio-social/areas"], [href*="/servicio-social/receptors"],
+    [href*="/servicio-social/marca-materials"], [href*="/servicio-social/tipo-materials"],
+    [href*="/servicio-social/unidad-medidas"])[aria-current="page"] .fi-sidebar-item-icon {
+    background: var(--mod-cat) !important;
+    border-color: var(--mod-cat) !important;
+    color: #ffffff !important;
+  }
+
+  // Reportes SS: #ca8a04 (ámbar)
+  a[href*="/servicio-social/reporte"] .fi-sidebar-item-icon {
+    background: var(--mod-rep-l) !important;
+    color: var(--mod-rep) !important;
+    border-color: color-mix(in srgb, var(--mod-rep) 45%, transparent) !important;
+  }
+
+  &:is(.fi-active, .fi-sidebar-item-active) a[href*="/servicio-social/reporte"] .fi-sidebar-item-icon,
+  a[href*="/servicio-social/reporte"][aria-current="page"] .fi-sidebar-item-icon {
+    background: var(--mod-rep) !important;
+    border-color: var(--mod-rep) !important;
+    color: #ffffff !important;
+  }
+}
+
+/* FIX 1: Quitar topbar duplicado en Servicio Social */
+
+body:has(.sigem-role-banner) .sigem-topbar-brand {
+  display: none !important;
+}
+
+body:has(.sigem-role-banner) .fi-topbar:first-of-type .sigem-topbar-brand {
+  display: none !important;
+}
+
+/* FIX B: Logout compacto — diagnóstico real (intento 2) */
+.fi-sidebar,
+aside.fi-sidebar {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+}
+
+.fi-sidebar {
+  nav,
+  .fi-sidebar-nav {
+    flex: 1 1 auto !important;
+    overflow: visible !important;
+    min-height: 0 !important;
+  }
+}
+
+.fi-sidebar-footer,
+.fi-sidebar .fi-sidebar-footer {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: max-content !important;
+  padding: 6px 6px !important;
+  margin-top: auto !important;
+}
+
+.sigem-user-card {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: max-content !important;
+  width: 100% !important;
+  max-width: 64px !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+  padding: 6px 2px !important;
+  gap: 3px !important;
+  margin-top: auto !important;
+  justify-content: center !important;
+
+  form {
     margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: auto !important;
+    flex: 0 0 auto !important;
+  }
+}
+
+.sigem-avatar {
+  width: 30px !important;
+  height: 30px !important;
+  font-size: 14px !important;
+  flex: 0 0 auto !important;
+}
+
+.sigem-role-pill {
+  font-size: 10px !important;
+  padding: 1px 4px !important;
+  line-height: 1.2 !important;
+  flex: 0 0 auto !important;
+}
+
+.sigem-logout {
+  width: 20px !important;
+  height: 20px !important;
+  font-size: 12px !important;
+  padding: 0 !important;
+  line-height: 1 !important;
+  flex: 0 0 auto !important;
+}
+
+
+
+/* FIX 3: Dashboard SS y Admin — 4 acciones + 4 KPIs en 2 filas de 4 */
+.sigem-quick-grid,
+.sigem-stats-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 10px !important;
+  margin-bottom: 10px !important;
+}
+
+@media (max-width: 1024px) {
+
+  .sigem-quick-grid,
+  .sigem-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* FIX 4: Topbar sticky (permanece al hacer scroll en ambos paneles) */
+.fi-topbar {
+  top: 0 !important;
+  z-index: 40 !important;
+}
+
+.fi-layout,
+.fi-main-ctn {
+  overflow: visible !important;
+}
+
+/* FIX 5: Banner de rol en Admin */
+.sigem-role-admin {
+  background: var(--sig-primary-light);
+  color: var(--sig-primary);
+}
+
+/* ===== FIX: Desbordamiento de Menú de Usuario y Sidebar ===== */
+
+/* 1. Restringir el ancho del menú desplegable superior (Logout/Tema) */
+.fi-topbar .fi-dropdown-panel {
+  max-width: 240px !important;
+  width: max-content !important;
+  left: auto !important;
+  right: 16px !important;
+  /* Alineación segura a la derecha */
+}
+
+/* Revertir reglas globales previas que deforman el contenido del menú */
+.fi-topbar .fi-dropdown-panel * {
+  max-width: none !important;
+}
+
+/* 2. Eliminar barra de desplazamiento horizontal en el sidebar y su footer */
+.fi-sidebar {
+  overflow-x: hidden !important;
+}
+
+
+
+/* ===== FIX: Barras de desplazamiento redundantes ===== */
+
+/* 1. Eliminar doble scroll vertical en la página */
+html,
+body {
+  overflow: hidden !important;
+  /* Bloquea el scroll nativo del navegador */
 }
 
 .fi-layout {
-    display: flex;
-    height: 100vh !important;
-    gap: 0 !important;
-    padding: 0 !important;
+  height: 100vh !important;
 }
 
-body:has(.sigem-professional) .fi-main-ctn, .fi-main-ctn {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-    padding-top: 0 !important;
+/* El scroll vertical debe existir ÚNICAMENTE en el contenido principal */
+.fi-main {
+  height: 100vh !important;
+  overflow-x: hidden !important;
 }
 
-.sigem-stat, .fi-wi-stats-overview-stat {
-    display: grid !important;
-    grid-template-columns: auto 1fr auto !important;
-    grid-template-rows: auto auto !important;
-    align-items: center !important;
-    column-gap: 10px !important;
-    row-gap: 6px !important;
-}
+/* 2. Eliminar scroll horizontal en el menú lateral y proteger tooltips */
+/* En CSS, si usas overflow-y: auto, el navegador fuerza overflow-x: auto. 
+   Debemos forzar 'visible' para evitar barras y no recortar los tooltips. */
 
-.sigem-stat-ico, .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-icon {
-    grid-column: 1 !important;
-    grid-row: 1 !important;
-    margin: 0 !important;
-}
-
-.sigem-stat-label, .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-label {
-    grid-column: 2 !important;
-    grid-row: 1 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-.sigem-stat-val, .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-value {
-    grid-column: 3 !important;
-    grid-row: 1 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    font-size: 28px !important;
-    font-weight: 700 !important;
-    text-align: right !important;
-    line-height: 1 !important;
-}
-
-.sigem-stat-hint, .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-description {
-    grid-column: 1/-1 !important;
-    grid-row: 2 !important;
-    margin-top: 4px !important;
-    justify-self: start !important;
-    width: fit-content !important;
-}
-
-.sigem-quick, .sigem-stat, .fi-ta-ctn, .fi-section {
-    background-color: #ffffff !important;
-    border-radius: 12px !important;
-    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.08) !important;
-    border: 1px solid #e2e8f0 !important;
-}
-
-body:has(.sigem-professional) .fi-header, header.fi-header, .fi-header {
-    background-color: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-    border-bottom: none !important;
-}
-
-.fi-main-ctn {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    min-height: 0;
+/* Asegurar que los ítems no empujen el contenedor más allá de los 64px */
+.fi-sidebar {
+  .fi-sidebar-item {
+    max-width: 64px !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
     margin-left: 0 !important;
-    padding: 0 !important;
-}
+    margin-right: 0 !important;
+  }
 
-.fi-page {
-    max-width: none !important;
-    width: 100% !important;
-    gap: 8px !important;
-}
-
-header.fi-header, .fi-header {
-    padding: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-header.fi-header h1, header.fi-header h1.fi-header-heading, .fi-header h1, .fi-header h1.fi-header-heading {
-    line-height: 1.25 !important;
-    font-size: 17px !important;
-    margin-bottom: 0 !important;
-}
-
-header.fi-header p, header.fi-header p.fi-header-subheading, .fi-header p, .fi-header p.fi-header-subheading {
-    color: var(--sig-muted, #6b7280) !important;
-    font-size: 12.5px !important;
-    line-height: 1.2 !important;
-    margin-top: 2px !important;
-}
-
-header.fi-header h1.fi-header-heading, .fi-header h1.fi-header-heading {
-    font-size: 22px !important;
-    font-weight: 700 !important;
-    line-height: 1.2 !important;
-}
-
-header.fi-header p.fi-header-subheading, .fi-header p.fi-header-subheading {
-    font-size: 13.5px !important;
-    font-weight: 400 !important;
-}
-
-.sigem-section-head h2, .fi-section-header-heading {
-    font-size: 18px !important;
-    font-weight: 700 !important;
-    line-height: 1.25 !important;
-}
-
-.fi-main, main.fi-main, body:has(.sigem-professional) .fi-main {
-    padding: 12px 16px 12px !important;
-}
-
-.fi-page > section {
-    padding-top: 0 !important;
-    padding-bottom: 12px !important;
-    gap: 8px !important;
-    row-gap: 8px !important;
-}
-
-.fi-ta-actions-cell :is(button, a):is([title*=Aprobar], [title*=Autorizar], [x-tooltip*=Aprobar], [x-tooltip*=Autorizar])::before {
-    content: "✅" !important;
-    font-size: 14px !important;
-}
-
-.fi-ta-actions-cell button[title*=Rechazar]::before, .fi-ta-actions-cell button[x-tooltip*=Rechazar]::before, .fi-ta-actions-cell a[title*=Rechazar]::before {
-    content: "❌" !important;
-    font-size: 14px !important;
-}
-
-.fi-ta-actions-cell button[title*=Completar]::before, .fi-ta-actions-cell button[x-tooltip*=Completar]::before, .fi-ta-actions-cell a[title*=Completar]::before {
-    content: "🏁" !important;
-    font-size: 14px !important;
-}
-
-.fi-ta-actions-cell :is(button, a):not(.sigem-pdf-row-btn):is([title*="Ver detalle"], [title*=Detalle], [x-tooltip*=Ver], [x-tooltip*=Detalle])::before {
-    content: "👁" !important;
-    font-size: 14px !important;
-}
-
-.fi-ta-actions-cell button[title*=Editar]::before, .fi-ta-actions-cell button[x-tooltip*=Editar]::before, .fi-ta-actions-cell button[x-tooltip*=Edit]::before, .fi-ta-actions-cell a[title*=Editar]::before {
-    content: "✏️" !important;
-    font-size: 14px !important;
-}
-
-.fi-ta-actions-cell button[title*=Eliminar]::before, .fi-ta-actions-cell button[x-tooltip*=Eliminar]::before, .fi-ta-actions-cell button[wire\:click*=delete]::before, .fi-ta-actions-cell a[title*=Eliminar]::before {
-    content: "🗑️" !important;
-    font-size: 14px !important;
-}
-
-.fi-ta-actions-cell :is(button, a):not(.sigem-pdf-row-btn):is([title*=Aprobar], [x-tooltip*=Aprobar], [title*=Autorizar], [x-tooltip*=Autorizar], [title*=Rechazar], [x-tooltip*=Rechazar], [title*=Completar], [x-tooltip*=Completar], [title*="Ver detalle"], [title*=Detalle], [x-tooltip*=Ver], [x-tooltip*=Detalle], [title*=Editar], [x-tooltip*=Editar], [x-tooltip*=Edit], [title*=Eliminar], [x-tooltip*=Eliminar]) svg {
+  // Ocultar visualmente cualquier barra de scroll residual en el sidebar
+  &::-webkit-scrollbar,
+  nav::-webkit-scrollbar,
+  .fi-sidebar-nav::-webkit-scrollbar {
     display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  &,
+  nav {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
 }
 
-.fi-ta-header-cell {
+/* ITEM 4: Estado Reasignado */
+.sigem-pill.reassign {
+  background: #ede9fe;
+  color: #8b5cf6
+}
+
+
+.fi-fo-toggle-buttons [data-color="reassign"],
+.fi-fo-toggle-buttons .fi-color-reassign {
+  --color-50: 237, 233, 254;
+  --color-100: 237, 233, 254;
+  --color-500: 139, 92, 246;
+  --color-600: 124, 58, 237;
+}
+
+/* ============================================
+   PASO 1: Fondo gris + topbar mockup
+   ============================================ */
+
+/* 1. Fondo gris en el contenido */
+.fi-main,
+.fi-main-ctn,
+main.fi-main {
+  background-color: #f4f6f8 !important;
+}
+
+/* 2. Sidebar blanco */
+.fi-sidebar {
+  background-color: #ffffff !important;
+}
+
+/* 3. Topbar delgado (~50px) sin gap */
+.fi-topbar,
+header.fi-topbar {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  border-left: none !important;
+  min-height: 50px !important;
+  height: 50px !important;
+  padding: 0 16px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* 5. Tarjetas blancas sobre el gris */
+.sigem-quick,
+.sigem-stat,
+.fi-ta-ctn,
+.fi-section {
+  background-color: #ffffff !important;
+}
+
+/* ============================================
+   PASO 2: Densidad compacta (hero, cards, tabla)
+   ============================================ */
+
+/* 1. Hero más compacto */
+.sigem-hero,
+.hero {
+  padding: 14px 20px !important;
+  margin-bottom: 12px !important;
+}
+
+.sigem-hero {
+  h1 {
+    line-height: 1.25 !important;
+  }
+
+  p {
+    margin-bottom: 0 !important;
+  }
+}
+
+.sigem-quick-desc {
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+}
+
+.sigem-stat-ico {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 34px !important;
+}
+
+/* 5. Texto secundario en filas */
+.fi-ta-table tbody td .fi-ta-text-description {
+  font-size: 12.5px !important;
+  line-height: 1.2 !important;
+  margin-top: 1px !important;
+}
+
+/* ============================================
+   PASO 3: Emojis en iconos
+   ============================================ */
+
+/* Emojis en quick cards y KPIs */
+.sigem-quick-ico,
+.sigem-stat-ico {
+  font-size: 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Ocultar SVGs dentro de iconos si quedaron */
+.sigem-quick-ico svg,
+.sigem-stat-ico svg {
+  display: none !important;
+}
+
+/* Reemplazar iconos SVG de acciones por emojis (solo en celdas y filas de tabla) */
+:is(.fi-ta-table tbody .fi-ta-actions, .fi-ta-actions-cell) :is(button, .fi-icon-btn):not(.sigem-pdf-row-btn) svg,
+.sigem-row-actions button:not(.sigem-pdf-row-btn) svg,
+:is(button, .fi-icon-btn):not(.sigem-pdf-row-btn):is([title*="Ver"], [title*="Ver detalle"], [title*="Editar"], [title*="Eliminar"]) svg {
+  display: none !important;
+}
+
+:is(.fi-ta-actions button, .fi-icon-btn):not(.sigem-pdf-row-btn):is([title*="Ver"], [x-tooltip*="Ver"], [x-tooltip*="Detalle"])::before,
+button:not(.sigem-pdf-row-btn):is([title*="Ver detalle"], [title*="Ver equipo"])::before,
+.fi-ta-actions button:is([wire\:click*="ver"], [wire\:click*="view"])::before {
+  content: "👁" !important;
+  font-size: 16px !important;
+}
+
+:is(.fi-ta-actions button, .fi-icon-btn):is([title*="Edit"], [title*="Editar"], [x-tooltip*="Edit"], [x-tooltip*="Editar"])::before,
+button[title*="Editar"]::before,
+.fi-ta-actions button[wire\:click*="edit"]::before {
+  content: "✏️" !important;
+  font-size: 16px !important;
+}
+
+:is(.fi-ta-actions button, .fi-icon-btn):is([title*="Eliminar"], [x-tooltip*="Eliminar"])::before,
+button[title*="Eliminar"]::before,
+.fi-ta-actions button[wire\:click*="delete"]::before {
+  content: "🗑️" !important;
+  font-size: 16px !important;
+}
+
+/* ============================================
+   PASO 5: Badges, bordes y breadcrumb
+   ============================================ */
+
+/* Badges de estado */
+.fi-badge,
+.sigem-pill {
+  border-radius: 99px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  padding: 3px 10px !important;
+}
+
+/* Disponible — verde */
+.fi-badge.fi-color-success,
+.sigem-pill.ok {
+  background-color: #dcfce7 !important;
+  color: #059669 !important;
+}
+
+/* Asignado — celeste */
+.fi-badge.fi-color-info,
+.sigem-pill.info {
+  background-color: #cffafe !important;
+  color: #0891b2 !important;
+}
+
+/* Reasignado — violeta */
+.fi-badge.fi-color-reassign,
+.sigem-pill.reassign {
+  background-color: #ede9fe !important;
+}
+
+/* En Mantenimiento — ámbar */
+.fi-badge.fi-color-warning,
+.sigem-pill.warn {
+  background-color: #fef3c7 !important;
+  color: #d97706 !important;
+}
+
+/* Dañado — rojo */
+.fi-badge.fi-color-danger,
+.sigem-pill.danger {
+  background-color: #fee2e2 !important;
+  color: #dc2626 !important;
+}
+
+/* Baja — gris */
+.fi-badge.fi-color-gray,
+.sigem-pill.neutral {
+  background-color: #f3f4f6 !important;
+  color: #6b7280 !important;
+}
+
+/* Tarjetas con sombra sutil */
+.sigem-quick,
+.sigem-stat,
+.fi-ta-ctn,
+.fi-section {
+  border: 1px solid #e5e7eb !important;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04) !important;
+  border-radius: 12px !important;
+}
+
+/* Hover sutil en quick cards */
+.sigem-quick:hover {
+  box-shadow: 0 4px 12px rgba(16, 24, 40, 0.07) !important;
+  transform: translateY(-1px) !important;
+  transition: all 0.15s ease !important;
+}
+
+/* Breadcrumb en topbar */
+.fi-topbar nav>div.ms-auto,
+header.fi-topbar nav>div.ms-auto,
+.fi-topbar nav>div:has(.sigem-crumb) {
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  justify-content: flex-end !important;
+}
+
+.sigem-crumb {
+  font-size: 15px !important;
+  color: var(--sig-muted) !important;
+  margin-right: auto !important;
+  white-space: nowrap !important;
+}
+
+.sigem-crumb b {
+  color: var(--sig-text) !important;
+  font-weight: 700 !important;
+}
+
+/* ============================================
+   PASO 4a: Checkboxes de selección en tabla
+   ============================================ */
+.fi-ta-selection-cell {
+  width: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  padding: 5px 10px !important;
+}
+
+.fi-ta-selection-cell input[type="checkbox"] {
+  width: 16px !important;
+  height: 16px !important;
+  accent-color: var(--sig-primary) !important;
+}
+
+/* ============================================
+   TOOLBAR DE TABLAS: fila única (Acciones + Buscador + Fechas + Quitar)
+   ============================================ */
+.fi-ta-header-toolbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  min-height: 36px !important;
+  padding: 4px 10px !important;
+  background: var(--sig-bg, #f4f6f8) !important;
+}
+
+.fi-ta-header-toolbar>.ms-auto {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex: 1 1 auto !important;
+  justify-content: flex-start !important;
+}
+
+.sigem-table-toolbar-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  justify-content: flex-start !important;
+
+  .sigem-toolbar-search {
+    flex: 0 1 450px !important;
+    min-width: 280px !important;
+    max-width: 550px !important;
+    margin-left: 10px !important;
+
+    // Fechas y botón a la derecha
+    + .sigem-toolbar-date {
+      margin-left: auto !important;
+    }
+  }
+}
+
+.sigem-toolbar-date {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex-shrink: 0 !important;
+
+  &-label {
     font-size: 11.5px !important;
     font-weight: 700 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    line-height: 1.2 !important;
-    color: var(--sig-muted) !important;
-    padding: 5px 8px !important;
-    background: var(--sig-bg, #f4f6f8) !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-}
+    letter-spacing: .05em !important;
+    color: var(--sig-muted, #64748b) !important;
+  }
 
-.fi-ta-table {
-    table-layout: fixed !important;
-}
-
-.fi-ta-table thead th {
-    font-size: 11.5px !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    line-height: 1.2 !important;
-    padding: 5px 8px !important;
-    background: var(--sig-bg, #f4f6f8) !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-}
-
-.fi-ta-table thead th button, .fi-ta-table thead th .fi-ta-header-cell-label {
-    font-size: 11.5px !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    padding: 0 !important;
-}
-
-.fi-ta-table thead th:last-child:empty::after, .fi-ta-table thead th.fi-ta-actions-cell:empty::after, .fi-ta-table thead th.fi-ta-actions-header-cell:empty::after {
-    content: "ACCIONES" !important;
-    font-size: 11.5px !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    color: var(--sig-muted) !important;
-    display: block !important;
-    text-align: center !important;
-}
-
-.fi-ta-table tbody td {
+  &-input {
+    height: 36px !important;
+    width: 135px !important;
+    font-size: 12px !important;
     padding: 4px 8px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    line-height: 1.3 !important;
-    border-bottom: 1px solid var(--sig-border) !important;
-    vertical-align: middle !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-}
-
-.fi-ta-selection-cell, .fi-ta-table th.fi-ta-selection-cell, .fi-ta-table td.fi-ta-selection-cell {
-    width: 36px !important;
-    min-width: 36px !important;
-    max-width: 36px !important;
-    overflow: hidden !important;
-    padding: 4px 0 !important;
-    text-align: center !important;
-}
-
-.fi-ta-selection-cell > div, .fi-ta-selection-cell label {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
-    width: 100% !important;
-}
-
-.fi-ta-selection-cell input[type=checkbox] {
-    width: 16px !important;
-    height: 16px !important;
-    accent-color: var(--sig-primary) !important;
-    margin: 0 !important;
-}
-
-.fi-ta-table thead th.fi-ta-selection-cell, .fi-ta-table thead th.fi-ta-selection-cell > div, .fi-ta-table thead th > div, .fi-ta-table tbody td.fi-ta-selection-cell, .fi-ta-table tbody td.fi-ta-selection-cell > div, .fi-ta-table tbody td .fi-ta-text, .fi-ta-table tbody td .fi-ta-col-wrp > div, .fi-ta-table tbody td.fi-ta-actions-cell > div {
-    padding: 1px 0 !important;
-    height: auto !important;
-    min-height: auto !important;
-}
-
-.fi-ta-table tbody td .fi-ta-text {
-    gap: 0 !important;
-    row-gap: 0 !important;
-}
-
-.fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2), .fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2) *, .fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2), .fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2) * {
-    font-size: 13px !important;
-    font-weight: 700 !important;
-    color: var(--sig-text, #0f172a) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-.fi-ta-table:has(.fi-ta-selection-cell) thead th:nth-child(2), .fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2), .fi-ta-table:has(.fi-ta-record-checkbox) thead th:nth-child(2), .fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2) {
-    width: 145px !important;
-    min-width: 145px !important;
-}
-
-.fi-ta-table:not(:has(.fi-ta-selection-cell)):not(:has(.fi-ta-record-checkbox)) thead th:nth-child(2), .fi-ta-table:not(:has(.fi-ta-selection-cell)):not(:has(.fi-ta-record-checkbox)) tbody td:nth-child(2) {
-    width: auto !important;
-    min-width: 0 !important;
-    max-width: none !important;
-}
-
-.fi-ta-table tbody td:nth-child(3), .fi-ta-table thead th:nth-child(3) {
-    max-width: 260px !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-.fi-ta-table tbody td .fi-ta-text-item-label, .fi-ta-table tbody td:nth-child(3) .fi-ta-text-item-label {
-    font-size: 13.5px !important;
-    font-weight: 600 !important;
-    line-height: 1.2 !important;
-    color: var(--sig-text, #0f172a) !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-    display: block !important;
-}
-
-.fi-ta-table tbody td .fi-ta-text p, .fi-ta-table tbody td:nth-child(3) p {
-    font-size: 11.5px !important;
-    color: var(--sig-muted, #64748b) !important;
-    line-height: 1.15 !important;
-    margin-top: 1px !important;
-    margin-bottom: 0 !important;
-    font-weight: 400 !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-}
-
-.fi-ta-table tbody td .fi-badge {
-    font-size: 11px !important;
-    padding: 2px 8px !important;
-    border-radius: 99px !important;
-    font-weight: 600 !important;
-    white-space: nowrap !important;
-}
-
-.fi-ta-table tbody td:nth-child(6), .fi-ta-table tbody td:nth-child(6) * {
-    color: var(--sig-muted, #64748b) !important;
-    font-weight: 400 !important;
-    font-size: 13px !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-.fi-ta-actions-cell, .fi-ta-table thead th:last-child, .fi-ta-table thead th.fi-ta-actions-cell, .fi-ta-table thead th.fi-ta-actions-header-cell {
-    min-width: 148px !important;
-    width: 148px !important;
-    max-width: 180px !important;
-    white-space: nowrap !important;
-    text-align: center !important;
-}
-
-.fi-ta-actions-cell {
-    padding: 4px 6px !important;
-}
-
-.fi-ta-actions-cell .fi-ta-actions {
-    gap: 3px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-wrap: nowrap !important;
-}
-
-.fi-ta-actions-cell .fi-ta-actions button, .fi-ta-actions-cell button {
-    width: 26px !important;
-    height: 26px !important;
-    min-width: 26px !important;
-    min-height: 26px !important;
-    flex-shrink: 0 !important;
-    margin: 0 !important;
-    border-radius: 6px !important;
-    border: 1px solid var(--sig-border, #e5e7eb) !important;
-    background: #ffffff !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0 !important;
-}
-
-.fi-ta-header {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    flex-wrap: wrap !important;
-    padding-top: 4px !important;
-    padding-bottom: 4px !important;
-    padding: 4px 10px !important;
-    min-height: 36px !important;
-}
-
-.fi-ta-header .fi-ta-actions, .fi-ta-header-toolbar .fi-ta-actions {
-    display: flex !important;
-    gap: 8px !important;
-    width: auto !important;
-}
-
-.fi-ta-header .fi-btn, .fi-ta-header-toolbar .fi-btn, .fi-ta-header button.fi-btn {
-    width: auto !important;
-    min-width: fit-content !important;
-    height: 30px !important;
-    min-height: 30px !important;
-    padding: 4px 12px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    white-space: nowrap !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 6px !important;
-    border: 1px solid var(--sig-border, #e5e7eb) !important;
-    background: #ffffff !important;
-    color: var(--sig-text, #0f172a) !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-}
-
-.fi-ta-selection-indicator {
-    padding: 6px 12px !important;
-    font-size: 13px !important;
-}
-
-.fi-ta-header-ctn .fi-dropdown-trigger button.sm\:inline-grid, .fi-ta-header-ctn .fi-dropdown-trigger button.fi-ac-btn-group:not(.sm\:hidden), .fi-ta-header-ctn button.fi-ac-btn-group:not(.sm\:hidden) {
-    width: auto !important;
-    min-width: fit-content !important;
-    height: 30px !important;
-    min-height: 30px !important;
-    padding: 4px 12px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    white-space: nowrap !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    gap: 6px !important;
-    border-radius: 6px !important;
-    border: 1px solid var(--sig-border, #e5e7eb) !important;
-    background: #ffffff !important;
-    color: var(--sig-text, #0f172a) !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-}
-
-.fi-ta-filters-dropdown .fi-icon-btn-badge-ctn, .fi-ta-filters-dropdown .fi-badge, .fi-ta-header .fi-ta-filters-dropdown .fi-icon-btn-badge-ctn, .fi-ta-header-toolbar .fi-ac-btn-group .fi-badge {
-    display: none !important;
-}
-
-.fi-ta-header-toolbar .fi-icon-btn svg, .fi-ta-header-toolbar button svg, .fi-ta-header-ctn .fi-icon-btn svg, .fi-ta-header-ctn .fi-ta-filters-dropdown svg, .fi-ta-header-ctn .fi-ta-col-toggle svg {
-    display: block !important;
-    visibility: visible !important;
-}
-
-.fi-ta-ctn, .fi-ta-header-ctn, .fi-ta-header, .fi-ta-header-toolbar, .fi-ta-content, .fi-ta-table thead, .fi-ta-table thead tr, .fi-ta-table thead th, .fi-table-individual-search-cell, [class*=fi-table-individual-search-cell] {
-    background: var(--sig-bg, #f4f6f8) !important;
-}
-
-.fi-ta-header-ctn {
-    border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
-}
-
-.fi-ta-table tbody tr {
-    background: #ffffff !important;
-}
-
-.fi-ta-table tbody tr:hover {
-    background: #f8fafc !important;
-}
-
-.fi-ta-col-toggle, .fi-ta-header-toolbar button[class*=column-toggle], .fi-ta-header-toolbar .fi-ta-col-toggle, .fi-ta-header-toolbar button:has(svg[class*=view-columns]), .fi-ta-header-toolbar button:has(svg[data-slot=icon][class*=columns]) {
-    display: none !important;
-}
-
-.fi-table-individual-search-cell, .fi-table-individual-search-cell:empty, .fi-ta-table thead th:last-child, .fi-ta-table thead th:last-child *, .fi-ta-table thead tr th, .fi-ta-table thead tr td, [class*=fi-table-individual-search-cell] {
-    background: var(--sig-bg, #f4f6f8) !important;
-}
-
-.fi-ta-table thead, .fi-ta-table thead tr, .fi-ta-table thead th, .fi-ta-table thead td, .fi-ta-table thead th.fi-ta-selection-cell, .fi-ta-table thead td.fi-ta-selection-cell, .fi-ta-table thead th.fi-ta-actions-header-cell, .fi-ta-table thead th > div, .fi-ta-table thead th.fi-ta-selection-cell > div {
-    background: var(--sig-bg, #f4f6f8) !important;
-}
-
-.fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field), .fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field):hover, .fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field) > td {
-    background: var(--sig-bg, #f4f6f8) !important;
-    background-color: var(--sig-bg, #f4f6f8) !important;
-}
-
-.fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field) > td:last-child:empty {
-    text-align: center !important;
-    vertical-align: middle !important;
-    min-width: 52px !important;
-}
-
-.fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field) > td:last-child:empty::after {
-    content: "✕";
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 26px !important;
-    height: 26px !important;
-    border-radius: 6px !important;
+    border-radius: 8px !important;
     border: 1px solid var(--sig-border, #e2e8f0) !important;
     background: var(--sig-surface, #ffffff) !important;
-    color: var(--sig-muted, #64748b) !important;
-    font-size: 13px !important;
-    opacity: 0.5 !important;
-    pointer-events: none !important;
+    color: var(--sig-text, #0f172a) !important;
+    outline: none !important;
+    transition: all 0.15s ease !important;
+
+    &:focus {
+      border-color: var(--sig-primary, #1b65d4) !important;
+      box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+    }
+  }
 }
 
-.fi-ta-table tbody tr.fi-ta-row:not(:has(.fi-ta-search-field)) > td {
-    background: transparent !important;
-}
+.sigem-toolbar-reset-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  height: 36px !important;
+  padding: 0 12px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--sig-border, #e2e8f0) !important;
+  background: transparent !important;
+  color: var(--sig-muted, #64748b) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  transition: all 0.15s ease !important;
 
-.fi-ta-loading-indicator, .fi-ta-content-ctn .flex.h-32.items-center.justify-center {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(2px);
-    border-radius: 8px;
-    padding: 24px;
-    gap: 12px;
-    color: var(--sig-primary, #0f172a);
-}
-
-.fi-ta-table thead th, .fi-ta-table thead th *, .fi-ta-table thead th button, .fi-ta-table thead th .fi-ta-header-cell-label, .fi-ta-table thead th::after {
-    color: #475569 !important;
-}
-
-.fi-ta-ctn, .fi-ta-content, .sigem-rep-table-wrap {
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-}
-
-.fi-ta-table:has(th:nth-child(9)) {
-    min-width: 1250px !important;
-    table-layout: auto !important;
-}
-
-body, .fi-body, html, .fi-main, .fi-main-ctn, main.fi-main {
-    background-color: #f3f4f6 !important;
-    background: #f3f4f6 !important;
-}
-
-.fi-ta-ctn, .sigem-stat, .sigem-quick, .sigem-rep-view, .sigem-rep-card, .sigem-inv-side, .fi-section:not(.fi-modal-slide-over-window .fi-section):not(.fi-modal-window .fi-section) {
-    background: #ffffff !important;
-    background-color: #ffffff !important;
-    border: 1px solid var(--sig-border, #e5e7eb) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
-}
-
-.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn, .fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn {
-    border-color: #bfdbfe !important;
-    background: #eff6ff !important;
-    color: #2563eb !important;
-}
-
-.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn::before, .fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn::before {
-    content: none !important;
-    display: none !important;
-}
-
-.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn svg:not(.animate-spin), .fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn svg:not(.animate-spin) {
-    display: inline-block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    width: 15px !important;
-    height: 15px !important;
-    color: #2563eb !important;
-    stroke: currentColor !important;
-}
-
-.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn:hover, .fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn:hover {
-    background: #2563eb !important;
-    border-color: #2563eb !important;
-    color: #ffffff !important;
-}
-
-.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn:hover svg:not(.animate-spin), .fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn:hover svg:not(.animate-spin) {
-    color: #ffffff !important;
-    stroke: currentColor !important;
-}
-
-.fi-topbar nav {
-    background: #ffffff !important;
-}
-
-.fi-topbar {
-    background: #ffffff !important;
-}
-
-.sigem-stat-val {
-    line-height: 1.1 !important;
+  &:hover {
+    background: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+    color: var(--sig-text, #0f172a) !important;
+  }
 }
