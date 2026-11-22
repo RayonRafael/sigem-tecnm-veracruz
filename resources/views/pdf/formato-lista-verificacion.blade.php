@@ -68,7 +68,7 @@
         .tabla-responsables {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 18px;
+            margin-bottom: 12px;
         }
 
         .tabla-responsables td {
@@ -105,7 +105,7 @@
         .tabla-verificacion tbody td {
             border: 1px solid #000000;
             padding: 8px;
-            height: 475px;
+            height: 390px;
             vertical-align: top;
             font-size: 10.5px;
             line-height: 1.4;
@@ -252,7 +252,7 @@
 @endsection
 
 @section('footer')
-    <table class="footer-table" style="width: 100%; border-collapse: collapse; border-top: 1px solid #d1d5db; margin-top: 20px; padding-top: 6px;">
+    <table class="footer-table" style="width: 100%; border-collapse: collapse; border-top: 1px solid #d1d5db; margin-top: 12px; padding-top: 6px;">
         <tr>
             <td style="width: 26%; text-align: left; vertical-align: middle;">
                 @if(!empty($logoMargaritaMaza))
