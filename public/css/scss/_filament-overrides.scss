@@ -1,0 +1,667 @@
+// SIGEM Theme — Filament Layout & Table Structural Overrides
+
+.fi-main, .fi-main-ctn, .fi-ta-ctn, .fi-fo-component-ctn, .fi-section {
+    background: var(--sig-surface) !important;
+}
+
+.fi-ta-ctn, .fi-fo-component-ctn, .fi-section {
+    border-radius: 12px !important;
+    border: 1px solid var(--sig-border) !important;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05) !important;
+}
+
+.fi-ta-ctn::before, .fi-fo-component-ctn::before, .fi-section::before {
+    display: none !important;
+}
+
+.fi-panel-servicio-social .fi-ta-ctn, .fi-panel-servicio-social .fi-ta-content, .fi-panel-servicio-social .fi-ta-table tbody tr {
+    background-color: var(--sig-surface, #ffffff) !important;
+    background: var(--sig-surface, #ffffff) !important;
+    border-color: var(--sig-border, #e2e8f0) !important;
+}
+
+.fi-section-content {
+    padding: 1.5rem !important;
+}
+
+h1, .fi-header-heading, .fi-panel-servicio-social .fi-header-heading, .fi-panel-servicio-social h1 {
+    color: var(--sig-text, #0f172a) !important;
+    font-weight: 700 !important;
+    font-size: 1.875rem !important;
+    letter-spacing: -0.025em !important;
+}
+
+.fi-ta table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+.fi-breadcrumbs {
+    display: none !important;
+}
+
+.fi-ta-filters, .fi-ta-search, .fi-global-search {
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+}
+
+.fi-main a:not([class*=btn]), .fi-ta-text-item-label a {
+    color: #1b65d4 !important;
+    transition: color 0.2s;
+}
+
+.fi-main a:not([class*=btn]):hover, .fi-ta-text-item-label a:hover {
+    color: #0d47a1 !important;
+}
+
+main.fi-main, .fi-main, .fi-main-ctn {
+    color: var(--sig-text);
+}
+
+.fi-topbar, .fi-topbar nav, .fi-header {
+    background: var(--sig-surface) !important;
+}
+
+.fi-header, .fi-page-header {
+    max-width: none !important;
+    width: 100% !important;
+}
+
+.fi-ta-ctn, .sigem-rep-view, .sigem-dash-table {
+    max-width: none !important;
+    width: 100% !important;
+    overflow-x: auto;
+}
+
+.fi-main, .fi-topbar {
+    transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1), margin-right 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fi-layout, .fi-main-ctn {
+    overflow: visible !important;
+}
+
+.fi-main {
+    flex-grow: 1;
+    overflow-y: auto !important;
+    margin-left: 0 !important;
+    height: 100vh !important;
+    overflow-x: hidden !important;
+}
+
+.fi-main, .fi-main-ctn, main.fi-main {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+.fi-layout {
+    display: flex;
+    height: 100vh !important;
+    gap: 0 !important;
+    padding: 0 !important;
+}
+
+body:has(.sigem-professional) .fi-main-ctn, .fi-main-ctn {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+}
+
+.sigem-stat, .fi-wi-stats-overview-stat {
+    display: grid !important;
+    grid-template-columns: auto 1fr auto !important;
+    grid-template-rows: auto auto !important;
+    align-items: center !important;
+    column-gap: 10px !important;
+    row-gap: 6px !important;
+}
+
+.sigem-stat-ico, .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-icon {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    margin: 0 !important;
+}
+
+.sigem-stat-label, .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-label {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.sigem-stat-val, .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-value {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    text-align: right !important;
+    line-height: 1 !important;
+}
+
+.sigem-stat-hint, .fi-wi-stats-overview-stat .fi-wi-stats-overview-stat-description {
+    grid-column: 1/-1 !important;
+    grid-row: 2 !important;
+    margin-top: 4px !important;
+    justify-self: start !important;
+    width: fit-content !important;
+}
+
+.sigem-quick, .sigem-stat, .fi-ta-ctn, .fi-section {
+    background-color: #ffffff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.08) !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+body:has(.sigem-professional) .fi-header, header.fi-header, .fi-header {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-bottom: none !important;
+}
+
+.fi-main-ctn {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    min-height: 0;
+    margin-left: 0 !important;
+    padding: 0 !important;
+}
+
+.fi-page {
+    max-width: none !important;
+    width: 100% !important;
+    gap: 8px !important;
+}
+
+header.fi-header, .fi-header {
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+header.fi-header h1, header.fi-header h1.fi-header-heading, .fi-header h1, .fi-header h1.fi-header-heading {
+    line-height: 1.25 !important;
+    font-size: 17px !important;
+    margin-bottom: 0 !important;
+}
+
+header.fi-header p, header.fi-header p.fi-header-subheading, .fi-header p, .fi-header p.fi-header-subheading {
+    color: var(--sig-muted, #6b7280) !important;
+    font-size: 12.5px !important;
+    line-height: 1.2 !important;
+    margin-top: 2px !important;
+}
+
+header.fi-header h1.fi-header-heading, .fi-header h1.fi-header-heading {
+    font-size: 22px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+}
+
+header.fi-header p.fi-header-subheading, .fi-header p.fi-header-subheading {
+    font-size: 13.5px !important;
+    font-weight: 400 !important;
+}
+
+.sigem-section-head h2, .fi-section-header-heading {
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+}
+
+.fi-main, main.fi-main, body:has(.sigem-professional) .fi-main {
+    padding: 12px 16px 12px !important;
+}
+
+.fi-page > section {
+    padding-top: 0 !important;
+    padding-bottom: 12px !important;
+    gap: 8px !important;
+    row-gap: 8px !important;
+}
+
+.fi-ta-actions-cell :is(button, a):is([title*=Aprobar], [title*=Autorizar], [x-tooltip*=Aprobar], [x-tooltip*=Autorizar])::before {
+    content: "✅" !important;
+    font-size: 14px !important;
+}
+
+.fi-ta-actions-cell button[title*=Rechazar]::before, .fi-ta-actions-cell button[x-tooltip*=Rechazar]::before, .fi-ta-actions-cell a[title*=Rechazar]::before {
+    content: "❌" !important;
+    font-size: 14px !important;
+}
+
+.fi-ta-actions-cell button[title*=Completar]::before, .fi-ta-actions-cell button[x-tooltip*=Completar]::before, .fi-ta-actions-cell a[title*=Completar]::before {
+    content: "🏁" !important;
+    font-size: 14px !important;
+}
+
+.fi-ta-actions-cell :is(button, a):not(.sigem-pdf-row-btn):is([title*="Ver detalle"], [title*=Detalle], [x-tooltip*=Ver], [x-tooltip*=Detalle])::before {
+    content: "👁" !important;
+    font-size: 14px !important;
+}
+
+.fi-ta-actions-cell button[title*=Editar]::before, .fi-ta-actions-cell button[x-tooltip*=Editar]::before, .fi-ta-actions-cell button[x-tooltip*=Edit]::before, .fi-ta-actions-cell a[title*=Editar]::before {
+    content: "✏️" !important;
+    font-size: 14px !important;
+}
+
+.fi-ta-actions-cell button[title*=Eliminar]::before, .fi-ta-actions-cell button[x-tooltip*=Eliminar]::before, .fi-ta-actions-cell button[wire\:click*=delete]::before, .fi-ta-actions-cell a[title*=Eliminar]::before {
+    content: "🗑️" !important;
+    font-size: 14px !important;
+}
+
+.fi-ta-actions-cell :is(button, a):not(.sigem-pdf-row-btn):is([title*=Aprobar], [x-tooltip*=Aprobar], [title*=Autorizar], [x-tooltip*=Autorizar], [title*=Rechazar], [x-tooltip*=Rechazar], [title*=Completar], [x-tooltip*=Completar], [title*="Ver detalle"], [title*=Detalle], [x-tooltip*=Ver], [x-tooltip*=Detalle], [title*=Editar], [x-tooltip*=Editar], [x-tooltip*=Edit], [title*=Eliminar], [x-tooltip*=Eliminar]) svg {
+    display: none !important;
+}
+
+.fi-ta-header-cell {
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    line-height: 1.2 !important;
+    color: var(--sig-muted) !important;
+    padding: 5px 8px !important;
+    background: var(--sig-bg, #f4f6f8) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.fi-ta-table {
+    table-layout: fixed !important;
+}
+
+.fi-ta-table thead th {
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    line-height: 1.2 !important;
+    padding: 5px 8px !important;
+    background: var(--sig-bg, #f4f6f8) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.fi-ta-table thead th button, .fi-ta-table thead th .fi-ta-header-cell-label {
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 0 !important;
+}
+
+.fi-ta-table thead th:last-child:empty::after, .fi-ta-table thead th.fi-ta-actions-cell:empty::after, .fi-ta-table thead th.fi-ta-actions-header-cell:empty::after {
+    content: "ACCIONES" !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    color: var(--sig-muted) !important;
+    display: block !important;
+    text-align: center !important;
+}
+
+.fi-ta-table tbody td {
+    padding: 4px 8px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    line-height: 1.3 !important;
+    border-bottom: 1px solid var(--sig-border) !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+}
+
+.fi-ta-selection-cell, .fi-ta-table th.fi-ta-selection-cell, .fi-ta-table td.fi-ta-selection-cell {
+    width: 36px !important;
+    min-width: 36px !important;
+    max-width: 36px !important;
+    overflow: hidden !important;
+    padding: 4px 0 !important;
+    text-align: center !important;
+}
+
+.fi-ta-selection-cell > div, .fi-ta-selection-cell label {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    width: 100% !important;
+}
+
+.fi-ta-selection-cell input[type=checkbox] {
+    width: 16px !important;
+    height: 16px !important;
+    accent-color: var(--sig-primary) !important;
+    margin: 0 !important;
+}
+
+.fi-ta-table thead th.fi-ta-selection-cell, .fi-ta-table thead th.fi-ta-selection-cell > div, .fi-ta-table thead th > div, .fi-ta-table tbody td.fi-ta-selection-cell, .fi-ta-table tbody td.fi-ta-selection-cell > div, .fi-ta-table tbody td .fi-ta-text, .fi-ta-table tbody td .fi-ta-col-wrp > div, .fi-ta-table tbody td.fi-ta-actions-cell > div {
+    padding: 1px 0 !important;
+    height: auto !important;
+    min-height: auto !important;
+}
+
+.fi-ta-table tbody td .fi-ta-text {
+    gap: 0 !important;
+    row-gap: 0 !important;
+}
+
+.fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2), .fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2) *, .fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2), .fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2) * {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: var(--sig-text, #0f172a) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.fi-ta-table:has(.fi-ta-selection-cell) thead th:nth-child(2), .fi-ta-table:has(.fi-ta-selection-cell) tbody td:nth-child(2), .fi-ta-table:has(.fi-ta-record-checkbox) thead th:nth-child(2), .fi-ta-table:has(.fi-ta-record-checkbox) tbody td:nth-child(2) {
+    width: 145px !important;
+    min-width: 145px !important;
+}
+
+.fi-ta-table:not(:has(.fi-ta-selection-cell)):not(:has(.fi-ta-record-checkbox)) thead th:nth-child(2), .fi-ta-table:not(:has(.fi-ta-selection-cell)):not(:has(.fi-ta-record-checkbox)) tbody td:nth-child(2) {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
+
+.fi-ta-table tbody td:nth-child(3), .fi-ta-table thead th:nth-child(3) {
+    max-width: 260px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.fi-ta-table tbody td .fi-ta-text-item-label, .fi-ta-table tbody td:nth-child(3) .fi-ta-text-item-label {
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    line-height: 1.2 !important;
+    color: var(--sig-text, #0f172a) !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    display: block !important;
+}
+
+.fi-ta-table tbody td .fi-ta-text p, .fi-ta-table tbody td:nth-child(3) p {
+    font-size: 11.5px !important;
+    color: var(--sig-muted, #64748b) !important;
+    line-height: 1.15 !important;
+    margin-top: 1px !important;
+    margin-bottom: 0 !important;
+    font-weight: 400 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+.fi-ta-table tbody td .fi-badge {
+    font-size: 11px !important;
+    padding: 2px 8px !important;
+    border-radius: 99px !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+}
+
+.fi-ta-table tbody td:nth-child(6), .fi-ta-table tbody td:nth-child(6) * {
+    color: var(--sig-muted, #64748b) !important;
+    font-weight: 400 !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.fi-ta-actions-cell, .fi-ta-table thead th:last-child, .fi-ta-table thead th.fi-ta-actions-cell, .fi-ta-table thead th.fi-ta-actions-header-cell {
+    min-width: 148px !important;
+    width: 148px !important;
+    max-width: 180px !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+}
+
+.fi-ta-actions-cell {
+    padding: 4px 6px !important;
+}
+
+.fi-ta-actions-cell .fi-ta-actions {
+    gap: 3px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+}
+
+.fi-ta-actions-cell .fi-ta-actions button, .fi-ta-actions-cell button {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    min-height: 26px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--sig-border, #e5e7eb) !important;
+    background: #ffffff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+}
+
+.fi-ta-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+    padding-top: 4px !important;
+    padding-bottom: 4px !important;
+    padding: 4px 10px !important;
+    min-height: 36px !important;
+}
+
+.fi-ta-header .fi-ta-actions, .fi-ta-header-toolbar .fi-ta-actions {
+    display: flex !important;
+    gap: 8px !important;
+    width: auto !important;
+}
+
+.fi-ta-header .fi-btn, .fi-ta-header-toolbar .fi-btn, .fi-ta-header button.fi-btn {
+    width: auto !important;
+    min-width: fit-content !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 4px 12px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--sig-border, #e5e7eb) !important;
+    background: #ffffff !important;
+    color: var(--sig-text, #0f172a) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.fi-ta-selection-indicator {
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+}
+
+.fi-ta-header-ctn .fi-dropdown-trigger button.sm\:inline-grid, .fi-ta-header-ctn .fi-dropdown-trigger button.fi-ac-btn-group:not(.sm\:hidden), .fi-ta-header-ctn button.fi-ac-btn-group:not(.sm\:hidden) {
+    width: auto !important;
+    min-width: fit-content !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 4px 12px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    white-space: nowrap !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--sig-border, #e5e7eb) !important;
+    background: #ffffff !important;
+    color: var(--sig-text, #0f172a) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.fi-ta-filters-dropdown .fi-icon-btn-badge-ctn, .fi-ta-filters-dropdown .fi-badge, .fi-ta-header .fi-ta-filters-dropdown .fi-icon-btn-badge-ctn, .fi-ta-header-toolbar .fi-ac-btn-group .fi-badge {
+    display: none !important;
+}
+
+.fi-ta-header-toolbar .fi-icon-btn svg, .fi-ta-header-toolbar button svg, .fi-ta-header-ctn .fi-icon-btn svg, .fi-ta-header-ctn .fi-ta-filters-dropdown svg, .fi-ta-header-ctn .fi-ta-col-toggle svg {
+    display: block !important;
+    visibility: visible !important;
+}
+
+.fi-ta-ctn, .fi-ta-header-ctn, .fi-ta-header, .fi-ta-header-toolbar, .fi-ta-content, .fi-ta-table thead, .fi-ta-table thead tr, .fi-ta-table thead th, .fi-table-individual-search-cell, [class*=fi-table-individual-search-cell] {
+    background: var(--sig-bg, #f4f6f8) !important;
+}
+
+.fi-ta-header-ctn {
+    border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+}
+
+.fi-ta-table tbody tr {
+    background: #ffffff !important;
+}
+
+.fi-ta-table tbody tr:hover {
+    background: #f8fafc !important;
+}
+
+.fi-ta-col-toggle, .fi-ta-header-toolbar button[class*=column-toggle], .fi-ta-header-toolbar .fi-ta-col-toggle, .fi-ta-header-toolbar button:has(svg[class*=view-columns]), .fi-ta-header-toolbar button:has(svg[data-slot=icon][class*=columns]) {
+    display: none !important;
+}
+
+.fi-table-individual-search-cell, .fi-table-individual-search-cell:empty, .fi-ta-table thead th:last-child, .fi-ta-table thead th:last-child *, .fi-ta-table thead tr th, .fi-ta-table thead tr td, [class*=fi-table-individual-search-cell] {
+    background: var(--sig-bg, #f4f6f8) !important;
+}
+
+.fi-ta-table thead, .fi-ta-table thead tr, .fi-ta-table thead th, .fi-ta-table thead td, .fi-ta-table thead th.fi-ta-selection-cell, .fi-ta-table thead td.fi-ta-selection-cell, .fi-ta-table thead th.fi-ta-actions-header-cell, .fi-ta-table thead th > div, .fi-ta-table thead th.fi-ta-selection-cell > div {
+    background: var(--sig-bg, #f4f6f8) !important;
+}
+
+.fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field), .fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field):hover, .fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field) > td {
+    background: var(--sig-bg, #f4f6f8) !important;
+    background-color: var(--sig-bg, #f4f6f8) !important;
+}
+
+.fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field) > td:last-child:empty {
+    text-align: center !important;
+    vertical-align: middle !important;
+    min-width: 52px !important;
+}
+
+.fi-ta-table tbody tr.fi-ta-row:has(.fi-ta-search-field) > td:last-child:empty::after {
+    content: "✕";
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    background: var(--sig-surface, #ffffff) !important;
+    color: var(--sig-muted, #64748b) !important;
+    font-size: 13px !important;
+    opacity: 0.5 !important;
+    pointer-events: none !important;
+}
+
+.fi-ta-table tbody tr.fi-ta-row:not(:has(.fi-ta-search-field)) > td {
+    background: transparent !important;
+}
+
+.fi-ta-loading-indicator, .fi-ta-content-ctn .flex.h-32.items-center.justify-center {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(2px);
+    border-radius: 8px;
+    padding: 24px;
+    gap: 12px;
+    color: var(--sig-primary, #0f172a);
+}
+
+.fi-ta-table thead th, .fi-ta-table thead th *, .fi-ta-table thead th button, .fi-ta-table thead th .fi-ta-header-cell-label, .fi-ta-table thead th::after {
+    color: #475569 !important;
+}
+
+.fi-ta-ctn, .fi-ta-content, .sigem-rep-table-wrap {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+.fi-ta-table:has(th:nth-child(9)) {
+    min-width: 1250px !important;
+    table-layout: auto !important;
+}
+
+body, .fi-body, html, .fi-main, .fi-main-ctn, main.fi-main {
+    background-color: #f3f4f6 !important;
+    background: #f3f4f6 !important;
+}
+
+.fi-ta-ctn, .sigem-stat, .sigem-quick, .sigem-rep-view, .sigem-rep-card, .sigem-inv-side, .fi-section:not(.fi-modal-slide-over-window .fi-section):not(.fi-modal-window .fi-section) {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    border: 1px solid var(--sig-border, #e5e7eb) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+}
+
+.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn, .fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn {
+    border-color: #bfdbfe !important;
+    background: #eff6ff !important;
+    color: #2563eb !important;
+}
+
+.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn::before, .fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn::before {
+    content: none !important;
+    display: none !important;
+}
+
+.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn svg:not(.animate-spin), .fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn svg:not(.animate-spin) {
+    display: inline-block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: 15px !important;
+    height: 15px !important;
+    color: #2563eb !important;
+    stroke: currentColor !important;
+}
+
+.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn:hover, .fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn:hover {
+    background: #2563eb !important;
+    border-color: #2563eb !important;
+    color: #ffffff !important;
+}
+
+.fi-ta-table tbody .fi-ta-actions-cell :is(button, a, .fi-icon-btn).sigem-pdf-row-btn:hover svg:not(.animate-spin), .fi-ta-actions-cell :is(button, a).sigem-pdf-row-btn:hover svg:not(.animate-spin) {
+    color: #ffffff !important;
+    stroke: currentColor !important;
+}
+
+.fi-topbar nav {
+    background: #ffffff !important;
+}
+
+.fi-topbar {
+    background: #ffffff !important;
+}
+
+.sigem-stat-val {
+    line-height: 1.1 !important;
+}

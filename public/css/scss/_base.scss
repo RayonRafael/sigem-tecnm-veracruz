@@ -1,0 +1,30 @@
+// SIGEM Theme — Base, Reset, Typography & Global Canvas
+
+@charset "UTF-8";
+
+body, .fi-body, html {
+    background-image: none !important;
+}
+
+body, .fi-body {
+    color: var(--sig-text);
+    font-family: "DM Sans", sans-serif !important;
+}
+
+.sigem-sw input:focus-visible + .sigem-sw-ui {
+    outline: 2px solid var(--sig-primary);
+    outline-offset: 2px;
+}
+
+.sigem-section-head h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 4px;
+    color: var(--sig-text);
+}
+
+html, body {
+    overflow-x: hidden !important;
+    overflow: hidden !important;
+}

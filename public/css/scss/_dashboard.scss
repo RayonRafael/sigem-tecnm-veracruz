@@ -1,0 +1,433 @@
+// SIGEM Theme — Dashboard, Hero, KPIs, Quick Cards, Filters & Side Panel
+
+body:has(.sigem-professional) .fi-main {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    min-height: calc(100vh - 64px) !important;
+}
+
+body:has(.sigem-professional) .fi-main-ctn {
+    max-width: none !important;
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+body:has(.sigem-professional) .fi-header {
+    padding-top: 1.5rem !important;
+    display: none !important;
+}
+
+.sigem-professional {
+    --brand-50: #eff6ff;
+    --brand-100: #dbeafe;
+    --brand-500: #3b82f6;
+    --brand-600: #2563eb;
+    --brand-700: #1d4ed8;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-600: #475569;
+    --slate-700: #334155;
+    --slate-900: #0f172a;
+    --emerald-50: #ecfdf5;
+    --emerald-500: #10b981;
+    --emerald-600: #059669;
+    --amber-50: #fffbeb;
+    --amber-500: #f59e0b;
+    --amber-600: #d97706;
+    --red-50: #fef2f2;
+    --red-500: #ef4444;
+    --red-600: #dc2626;
+    --cyan-500: #06b6d4;
+    --indigo-500: #6366f1;
+    --violet-500: #8b5cf6;
+    --rose-500: #f43f5e;
+    --purple-500: #a855f7;
+    --fuchsia-500: #d946ef;
+    --teal-500: #14b8a6;
+    font-family: "DM Sans", sans-serif;
+    color: var(--slate-900);
+    background-color: transparent;
+    padding-bottom: 40px;
+}
+
+.sigem-professional * {
+    box-sizing: border-box;
+}
+
+.sigem-professional ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.sigem-professional ::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sigem-professional ::-webkit-scrollbar-thumb {
+    background: var(--slate-200);
+    border-radius: 3px;
+}
+
+.sigem-professional ::-webkit-scrollbar-thumb:hover {
+    background: var(--slate-600);
+}
+
+.sigem-quick:hover .arrow {
+    color: var(--sig-primary);
+    transform: translateX(2px);
+}
+
+.sigem-quick:hover .sigem-quick-desc {
+    max-height: 80px;
+    opacity: 1;
+    margin-top: 4px;
+}
+
+.sigem-quick:focus-visible {
+    outline: 2px solid var(--sig-primary);
+    outline-offset: 2px;
+}
+
+.sigem-quick:focus-within .sigem-quick-desc {
+    max-height: 80px;
+    opacity: 1;
+    margin-top: 4px;
+}
+
+.sigem-quick .arrow {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    color: var(--sig-light);
+    font-size: 16px;
+    transition: all 0.18s;
+}
+
+.sigem-inv-side {
+    position: sticky;
+    top: 72px;
+    max-height: calc(100vh - 90px);
+    overflow: auto;
+    padding: 16px 18px;
+}
+
+.sigem-inv-side-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.sigem-dashboard-layout {
+    display: flex;
+    gap: 0;
+    align-items: flex-start;
+    width: 100%;
+    position: relative;
+    transition: gap 0.3s ease;
+}
+
+.sigem-dashboard-layout.has-panel-open {
+    gap: 20px;
+}
+
+.sigem-dashboard-main {
+    flex: 1 1 0%;
+    min-width: 0;
+    width: 100%;
+    transition: flex 0.3s ease, width 0.3s ease;
+}
+
+.sigem-dash-table .fi-ta-table thead th {
+    background: #fafbfc;
+}
+
+.sigem-dash-table .fi-ta-table tbody td {
+    padding: 8px 12px;
+}
+
+.sigem-inv-layout {
+    display: grid;
+    align-items: start;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 14px;
+    width: 100%;
+}
+
+.sigem-hero, .sigem-quick-grid, .sigem-stats-grid {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.sigem-inv-no-chart {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.sigem-inv-no-chart .sigem-inv-side {
+    display: none;
+}
+
+.sigem-quick-grid, .sigem-stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 10px !important;
+    margin-bottom: 10px !important;
+}
+
+.sigem-stat-ico {
+    border-radius: 10px;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+}
+
+.sigem-quick-ico, .sigem-stat-ico {
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sigem-quick-ico svg, .sigem-stat-ico svg {
+    display: none !important;
+}
+
+.sigem-quick:hover {
+    border-color: var(--sig-primary);
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.07);
+    transform: translateY(-1px);
+    transition: all 0.15s ease;
+}
+
+.sigem-quick {
+    cursor: pointer;
+    position: relative;
+    transition: all 0.18s;
+    text-decoration: none;
+    display: block;
+    color: inherit;
+    padding: 10px 12px !important;
+}
+
+.sigem-quick-ico {
+    border-radius: 10px;
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    min-height: 30px;
+    margin-bottom: 5px;
+}
+
+.sigem-stat {
+    padding: 10px 12px !important;
+}
+
+.sigem-hero {
+    background: linear-gradient(120deg, #1b65d4 0%, #1e40af 100%);
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 18px;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 12px rgba(27, 101, 212, 0.2);
+}
+
+.sigem-quick-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--sig-text);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.sigem-quick-desc {
+    color: var(--sig-muted);
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    margin-top: 0;
+    transition: max-height 0.25s ease, opacity 0.2s ease, margin-top 0.2s ease;
+    font-size: 13px;
+    line-height: 1.3;
+    font-weight: 400;
+}
+
+.sigem-stat-val {
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    color: var(--sig-text);
+}
+
+.sigem-stat-label {
+    color: var(--sig-muted);
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    line-height: 1.3 !important;
+}
+
+.sigem-stat-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 99px;
+    margin-top: 4px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.sigem-hero h1 {
+    color: #fff;
+    line-height: 1.25;
+    font-size: 18px;
+    margin-bottom: 1px;
+    font-weight: 700;
+}
+
+.sigem-hero p {
+    opacity: 0.9;
+    max-width: 520px;
+    color: #fff;
+    margin-bottom: 0;
+    line-height: 1.25;
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.sigem-dash-table .fi-ta-table {
+    table-layout: fixed !important;
+    width: 100% !important;
+}
+
+.sigem-dash-table .fi-ta-table tbody tr {
+    background: var(--sig-surface, #ffffff) !important;
+}
+
+.sigem-dash-table .fi-ta-table tbody tr:hover {
+    background: #f8fafc !important;
+}
+
+.sigem-dash-table .fi-ta-table thead th:first-child, .sigem-dash-table .fi-ta-table tbody td:first-child {
+    width: 130px !important;
+    max-width: 130px !important;
+}
+
+.sigem-dash-table .fi-ta-table thead th:last-child, .sigem-dash-table .fi-ta-table tbody td:last-child {
+    width: 104px !important;
+    min-width: 104px !important;
+    max-width: 104px !important;
+    text-align: center !important;
+    padding: 4px 6px !important;
+}
+
+.sigem-dash-btn {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    min-height: 26px !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--sig-border, #e5e7eb) !important;
+    background: #ffffff !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    line-height: 1 !important;
+}
+
+.sigem-dash-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.sigem-dash-btn::before {
+    font-size: 13px;
+    line-height: 1;
+}
+
+.sigem-dash-filter-row th {
+    background: var(--sig-bg, #f4f6f8) !important;
+    border-bottom: 1px solid var(--sig-border, #e2e8f0) !important;
+}
+
+.sigem-dash-filter-input {
+    width: 100% !important;
+    font-size: 12.5px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 4px 10px !important;
+    border-radius: 6px !important;
+    border: 1px solid var(--sig-border, #e2e8f0) !important;
+    background: var(--sig-surface, #ffffff) !important;
+    color: var(--sig-text, #0f172a) !important;
+}
+
+.sigem-dash-filter-input:focus {
+    border-color: var(--sig-primary, #1b65d4) !important;
+    box-shadow: 0 0 0 2px rgba(27, 101, 212, 0.15) !important;
+    outline: none !important;
+}
+
+.sigem-dash-filter-clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    border: 1px solid var(--sig-border, #e2e8f0);
+    background: #ffffff;
+    color: var(--sig-muted, #64748b);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.sigem-dash-filter-clear:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    border-color: #fca5a5;
+}
+
+.sigem-dash-toolbar {
+    border-bottom: 1px solid var(--sig-border, #e2e8f0);
+}
+
+.sigem-dash-toolbar .sigem-dash-search-input {
+    flex: 1 !important;
+    border: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    font-size: 13px !important;
+    padding: 0 10px 0 6px !important;
+}
+
+.sigem-quick-grid[style*="display: none"], .sigem-quick-grid[style*="display:none"], .sigem-stats-grid[style*="display: none"], .sigem-stats-grid[style*="display:none"] {
+    display: none;
+}
+
+.sigem-sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    transition: opacity 0.25s ease;
+}
+
+.sigem-sidebar-overlay.is-active {
+    display: block;
+}

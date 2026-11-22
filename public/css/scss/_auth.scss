@@ -1,0 +1,50 @@
+// SIGEM Theme — Login, Auth & Profile
+
+.fi-simple-layout {
+    background-color: #0b1d3a !important;
+    background-image: url("../images/fondo.webp") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-attachment: fixed !important;
+    position: relative;
+    z-index: 1;
+}
+
+.fi-simple-layout::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(180deg, rgba(11, 29, 58, 0.55) 0%, rgba(11, 29, 58, 0.72) 100%) !important;
+    z-index: -1;
+}
+
+.fi-simple-layout .fi-simple-header {
+    display: none !important;
+}
+
+.fi-simple-main-ctn > div {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(8px) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.fi-simple-main .fi-fo-component-ctn {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+}
+
+.fi-simple-main .fi-input-wrp .fi-input {
+    border: none !important;
+}
+
+:is(.fi-simple-main, .fi-simple-layout) .sigem-brand {
+    border-bottom: none !important;
+    padding: 0 !important;
+}
