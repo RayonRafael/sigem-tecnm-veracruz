@@ -453,6 +453,12 @@ class NuevosReportes28Test extends TestCase
 
         Livewire::test(ReportesPage::class)
             ->call('cambiarPestanaPrincipal', 'nuevos')
+            ->assertSee('sigem-new-rep-charts-stack', false)
+            ->assertSee('sigem-chart-radial-wrap', false)
+            ->assertSee('sigem-pill ok', false)
+            ->assertSee('sigem-pill info', false)
+            ->assertSee('sigem-col-num', false)
+            ->assertDontSee('filtroAula', false)
             ->assertSee('Mostrando 1–10 de 13 registros')
             ->assertSee('Página 1 de 2')
             ->call('cambiarPaginaNuevoReporte', 'inventario_general', 2)

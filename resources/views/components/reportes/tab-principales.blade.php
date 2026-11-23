@@ -10,6 +10,7 @@
     $porPagina = \App\Filament\Pages\ReportesPage::REPORTES_PRINCIPALES_POR_PAGINA;
     $listaColeccion = collect($listaReportes)->values();
     $primerReporteId = $listaColeccion->first()['id'] ?? null;
+    $esColNum = fn (string $h): bool => (bool) preg_match('/^(cantidad|total|propio|rentado|disponible|en mantto|asignado|cambio|solicitud|pendiente|autorizado|entregado|rechazado)/u', mb_strtolower(trim($h), 'UTF-8'));
 @endphp
 
 <section class="sigem-rep-original-section" style="margin-bottom: 36px;">
@@ -116,15 +117,16 @@
                                 <thead>
                                     <tr>
                                         @foreach ($headers as $header)
-                                            <th>{{ $header }}</th>
+                                            <th class="{{ $esColNum($header) ? 'sigem-col-num' : '' }}">{{ $header }}</th>
                                         @endforeach
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse ($filasPagina as $row)
                                         <tr>
-                                            @foreach ($row as $celda)
-                                                <td>{!! $celda !!}</td>
+                                            @foreach (array_values((array) $row) as $cIdx => $celda)
+                                                @php $hdr = $headers[$cIdx] ?? ''; @endphp
+                                                <td class="{{ $esColNum($hdr) ? 'sigem-col-num' : '' }}">{!! $celda !!}</td>
                                             @endforeach
                                         </tr>
                                     @empty

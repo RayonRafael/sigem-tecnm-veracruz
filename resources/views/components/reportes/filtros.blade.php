@@ -38,17 +38,7 @@
         </select>
     </div>
 
-    <div class="sigem-filter-group">
-        <span class="sigem-filter-label">🏫 Aula:</span>
-        <select wire:model.live="filtroAula" class="sigem-filter-input" style="min-width: 130px; appearance: none; -webkit-appearance: none; -moz-appearance: none;">
-            <option value="">Todas las aulas</option>
-            @foreach ($livewire->aulasParaFiltros as $aulaOpt)
-                <option value="{{ $aulaOpt }}">{{ $aulaOpt }}</option>
-            @endforeach
-        </select>
-    </div>
-
-    @if ($livewire->filtroFechaDesde || $livewire->filtroFechaHasta || $livewire->filtroDepartamentoId || $livewire->filtroAreaId || $livewire->filtroAula)
+    @if ($livewire->filtroFechaDesde || $livewire->filtroFechaHasta || $livewire->filtroDepartamentoId || $livewire->filtroAreaId)
         <button type="button"
                 wire:click="limpiarFiltrosNuevosReportes"
                 class="sigem-btn-export-csv"

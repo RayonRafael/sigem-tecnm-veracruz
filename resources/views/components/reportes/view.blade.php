@@ -142,13 +142,13 @@
         {{-- Barra de Filtros para los 29 reportes --}}
         <x-reportes.filtros :livewire="$livewire" :deptosFiltros="$deptosFiltros" />
 
-        {{-- SECCIÓN 1: GRÁFICAS (grid 2 columnas, gráfica + tabla completa paginada) --}}
+        {{-- SECCIÓN 1: GRÁFICAS (ancho completo, 1 por fila, gráfica + tabla completa paginada) --}}
         @if ($repsConGrafica->isNotEmpty())
             <div class="sigem-new-section-head">
                 <h3>📊 Gráficas</h3>
                 <span class="sigem-new-section-count">{{ $repsConGrafica->count() }} {{ $repsConGrafica->count() === 1 ? 'reporte visual' : 'reportes visuales' }}</span>
             </div>
-            <div class="sigem-new-rep-grid-charts sigem-new-rep-grid" wire:key="sigem-charts-grid-{{ $subpestanaActual }}">
+            <div class="sigem-new-rep-charts-stack" wire:key="sigem-charts-grid-{{ $subpestanaActual }}">
                 @foreach ($repsConGrafica as $rep)
                     <x-reportes.card-grafica :rep="$rep" :livewire="$livewire" :esAdmin="$esAdmin" />
                 @endforeach

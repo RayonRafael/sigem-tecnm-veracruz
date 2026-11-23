@@ -64,7 +64,7 @@ if (!window.sigemChartComponent) {
                 const ctx = this.$refs.canvas.getContext('2d');
                 if (!ctx) return;
 
-                const truncateLabel = (val, maxLen = 25) => {
+                const truncateLabel = (val, maxLen = 38) => {
                     if (typeof val === 'string' && val.length > maxLen) {
                         return val.slice(0, maxLen - 3) + '...';
                     }
@@ -83,36 +83,36 @@ if (!window.sigemChartComponent) {
                             ticks: {
                                 autoSkip: false,
                                 maxRotation: 0,
-                                font: { size: 11 },
+                                font: { size: 12 },
                                 callback: function (val, index) {
                                     const raw = this.getLabelForValue ? this.getLabelForValue(val) : (chartConfig.labels?.[index] ?? val);
-                                    return truncateLabel(raw, 25);
+                                    return truncateLabel(raw, 38);
                                 }
                             }
                         });
                         finalScales.x = Object.assign({}, baseScales.x || {}, {
                             beginAtZero: true,
                             grid: { color: '#f1f5f9' },
-                            ticks: { font: { size: 11 }, precision: 0 }
+                            ticks: { font: { size: 12 }, precision: 0 }
                         });
                     } else {
                         finalScales.x = Object.assign({}, baseScales.x || {}, {
                             grid: { display: false },
                             ticks: {
                                 autoSkip: true,
-                                maxRotation: 45,
+                                maxRotation: 35,
                                 minRotation: 0,
-                                font: { size: 11 },
+                                font: { size: 12 },
                                 callback: function (val, index) {
                                     const raw = this.getLabelForValue ? this.getLabelForValue(val) : (chartConfig.labels?.[index] ?? val);
-                                    return truncateLabel(raw, 25);
+                                    return truncateLabel(raw, 30);
                                 }
                             }
                         });
                         finalScales.y = Object.assign({}, baseScales.y || {}, {
                             beginAtZero: true,
                             grid: { color: '#f1f5f9' },
-                            ticks: { font: { size: 11 }, precision: 0 }
+                            ticks: { font: { size: 12 }, precision: 0 }
                         });
                     }
                 }
@@ -121,6 +121,10 @@ if (!window.sigemChartComponent) {
                     try { this.chartInstance.destroy(); } catch (e) {}
                     this.chartInstance = null;
                 }
+
+                const rawOptions = Object.assign({}, chartConfig.options || {});
+                delete rawOptions.plugins;
+                delete rawOptions.scales;
 
                 try {
                     this.chartInstance = new Chart(ctx, {
@@ -134,13 +138,13 @@ if (!window.sigemChartComponent) {
                             maintainAspectRatio: false,
                             resizeDelay: 150,
                             layout: {
-                                padding: { left: 4, right: 8, top: 4, bottom: 4 }
+                                padding: { left: 10, right: 18, top: 8, bottom: 8 }
                             },
                             plugins: {
                                 legend: {
                                     display: isPieOrDonut,
-                                    position: 'bottom',
-                                    labels: { boxWidth: 10, font: { size: 11 }, padding: 12 }
+                                    position: 'right',
+                                    labels: { boxWidth: 14, font: { size: 12.5 }, padding: 14, usePointStyle: true }
                                 },
                                 tooltip: {
                                     enabled: true,
@@ -154,7 +158,7 @@ if (!window.sigemChartComponent) {
                                 }
                             },
                             scales: finalScales
-                        }, chartConfig.options || {})
+                        }, rawOptions)
                     });
                 } catch (err) {
                     console.warn('Error inicializando gráfica SIGEM:', err);

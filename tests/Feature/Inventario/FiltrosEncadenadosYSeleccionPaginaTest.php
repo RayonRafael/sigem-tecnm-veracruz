@@ -164,27 +164,23 @@ class FiltrosEncadenadosYSeleccionPaginaTest extends TestCase
         $this->assertContains('Redes', $areasRep);
         $this->assertNotContains('Taller', $areasRep);
 
-        // Seleccionar área Desarrollo -> aulas solo D201
-        $component->set('filtroAreaId', (string) $this->areaDesarrollo->id_area);
-        $aulasRep = $component->instance()->aulasParaFiltros;
-        $this->assertContains('D201', $aulasRep);
-        $this->assertNotContains('R301', $aulasRep);
-        $this->assertNotContains('T201', $aulasRep);
+        // El filtro de Aula fue eliminado de Reportes (no aplica a reportes agregados)
+        $component->assertDontSee('filtroAula', false);
 
-        // Validar que el reporte filtra correctamente por área y aula
+        // Seleccionar área Desarrollo y validar filtrado por departamento y área
+        $component->set('filtroAreaId', (string) $this->areaDesarrollo->id_area);
         $datosFiltrados = SigemReportExporter::getReportData('inventario_general', [
             'departamento_id' => (string) $this->deptoSistemas->id_departamento,
             'area_id' => (string) $this->areaDesarrollo->id_area,
-            'aula' => 'D201',
         ]);
         $this->assertCount(1, $datosFiltrados['rows']);
         $this->assertSame('REP-D201', $datosFiltrados['rows'][0][0]);
 
-        // Cambiar departamento limpia área y aula
-        $component->set('filtroAula', 'D201')
+        // Cambiar departamento limpia área seleccionada y reinicia paginación
+        $component->call('cambiarPaginaNuevoReporte', 'inventario_general', 2)
             ->set('filtroDepartamentoId', (string) $this->deptoIndustrial->id_departamento);
         $this->assertSame('', $component->get('filtroAreaId'));
-        $this->assertSame('', $component->get('filtroAula'));
+        $this->assertSame([], $component->get('paginasNuevosReportes'));
     }
 
     public function test_filtros_encadenados_slide_over_cambio_masivo_limpia_area_y_aula(): void

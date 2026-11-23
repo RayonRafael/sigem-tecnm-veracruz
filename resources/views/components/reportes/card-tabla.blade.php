@@ -19,6 +19,11 @@
     $filasPagina = array_slice($todasFilas, $offset, $porPagina);
     $desde = $totalFilas > 0 ? $offset + 1 : 0;
     $hasta = min($totalFilas, $offset + count($filasPagina));
+
+    $esColNum = fn (string $h): bool => (bool) preg_match('/^(cantidad|total|propios|rentados|solicitudes|completadas|pendientes|porcentaje|%|días|dias|mín|min|máx|max|equipos|deptos|áreas|areas|usuarios|acciones|costo|año|frecuencia)/u', mb_strtolower(trim($h), 'UTF-8'))
+        || str_contains(mb_strtolower($h, 'UTF-8'), 'cantidad')
+        || str_contains(mb_strtolower($h, 'UTF-8'), 'porcentaje')
+        || str_contains(mb_strtolower($h, 'UTF-8'), 'días');
 @endphp
 
 <div class="sigem-rep-card sigem-rep-acc-item"
@@ -83,21 +88,21 @@
             </div>
         </div>
 
-        {{-- Tabla completa con TODAS las columnas y scroll horizontal si supera ancho --}}
+        {{-- Tabla completa con TODAS las columnas, zebra, hover y badges --}}
         <div class="sigem-rep-table-wrap sigem-rep-principal-table-wrap">
             <table class="sigem-rep-table sigem-rep-principal-table">
                 <thead>
                     <tr>
                         @foreach ($headers as $header)
-                            <th>{{ $header }}</th>
+                            <th class="{{ $esColNum($header) ? 'sigem-col-num' : '' }}">{{ $header }}</th>
                         @endforeach
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($filasPagina as $row)
                         <tr>
-                            @foreach ((array) $row as $celda)
-                                <td class="{{ preg_match('/^(\d{2}\/\d{2}\/\d{4}|\d{2}:\d{2})$/', trim(strip_tags((string) $celda))) ? 'sigem-td-nowrap' : '' }}">{!! $celda !!}</td>
+                            @foreach (array_values((array) $row) as $cIdx => $celda)
+                                <x-reportes.tabla-celda :header="$headers[$cIdx] ?? ''" :valor="$celda" />
                             @endforeach
                         </tr>
                     @empty

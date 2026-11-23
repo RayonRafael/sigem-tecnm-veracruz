@@ -366,13 +366,13 @@ class PostRefactorFullVerificationTest extends TestCase
 
         $this->assertDatabaseHas('inventario', ['num_serie' => 'SN-NEW-999', 'aula' => 'R102']);
 
-        // #7 Filtros encadenados en Reportes + #8 Pestañas en Reportes
+        // #7 Filtros encadenados en Reportes (Depto -> Área, sin Aula) + #8 Pestañas en Reportes
         $rep = Livewire::test(AdminReportesPage::class)
             ->call('cambiarPestanaPrincipal', 'nuevos')
             ->assertSet('pestanaPrincipal', 'nuevos')
+            ->assertDontSee('filtroAula', false)
             ->set('filtroDepartamentoId', (string) $this->deptoSistemas->id_departamento)
             ->assertSet('filtroAreaId', '')
-            ->assertSet('filtroAula', '')
             ->call('cambiarSubpestanaReportes', 'estadisticas')
             ->assertSet('subpestanaReportes', 'estadisticas')
             ->call('cambiarPestanaPrincipal', 'formatos')
