@@ -608,29 +608,34 @@ select.sigem-filter-input::-ms-expand,
 }
 
 /* ==========================================================================
- * Nuevos Reportes — Vista Híbrida (Gráficas arriba + Acordeón tablas abajo)
+ * Nuevos Reportes — Vista Híbrida (Secciones separadas: Gráficas + Tablas)
  * ========================================================================== */
-.sigem-new-section-head {
+.sigem-rep-section-block {
+    margin-bottom: 32px;
+}
+.sigem-section-divider {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    margin: 6px 0 14px;
+    gap: 12px;
+    margin: 32px 0 24px 0;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e2e8f0;
 }
-.sigem-new-section-head h3 {
+.sigem-section-title {
     font-size: 16px;
     font-weight: 700;
-    color: #1b396a;
+    color: #1e293b;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
     margin: 0;
 }
-.sigem-new-section-count {
-    font-size: 12px;
+.sigem-section-count {
+    font-size: 13px;
     font-weight: 600;
-    color: #475569;
+    color: #64748b;
     background: #f1f5f9;
-    border: 1px solid #e2e8f0;
-    padding: 3px 10px;
-    border-radius: 999px;
+    padding: 2px 10px;
+    border-radius: 12px;
 }
 .sigem-new-card.sigem-hybrid-chart-card {
     padding: 0;

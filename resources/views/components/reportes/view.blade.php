@@ -144,35 +144,39 @@
 
         {{-- SECCIÓN 1: GRÁFICAS (ancho completo, 1 por fila, gráfica + tabla completa paginada) --}}
         @if ($repsConGrafica->isNotEmpty())
-            <div class="sigem-new-section-head">
-                <h3>📊 Gráficas</h3>
-                <span class="sigem-new-section-count">{{ $repsConGrafica->count() }} {{ $repsConGrafica->count() === 1 ? 'reporte visual' : 'reportes visuales' }}</span>
-            </div>
-            <div class="sigem-new-rep-charts-stack" wire:key="sigem-charts-grid-{{ $subpestanaActual }}">
-                @foreach ($repsConGrafica as $rep)
-                    <x-reportes.card-grafica :rep="$rep" :livewire="$livewire" :esAdmin="$esAdmin" />
-                @endforeach
-            </div>
+            <section class="sigem-rep-section-block">
+                <div class="sigem-section-divider">
+                    <h3 class="sigem-section-title">📊&nbsp;&nbsp;GRÁFICAS</h3>
+                    <span class="sigem-section-count">{{ $repsConGrafica->count() }} {{ $repsConGrafica->count() === 1 ? 'reporte' : 'reportes' }}</span>
+                </div>
+                <div class="sigem-new-rep-charts-stack" wire:key="sigem-charts-grid-{{ $subpestanaActual }}">
+                    @foreach ($repsConGrafica as $rep)
+                        <x-reportes.card-grafica :rep="$rep" :livewire="$livewire" :esAdmin="$esAdmin" />
+                    @endforeach
+                </div>
+            </section>
         @endif
 
         {{-- SECCIÓN 2: TABLAS (acordeón colapsable, primero abierto por defecto) --}}
         @if ($repsSoloTabla->isNotEmpty())
-            <div class="sigem-new-section-head">
-                <h3>📋 Tablas</h3>
-                <span class="sigem-new-section-count">{{ $repsSoloTabla->count() }} {{ $repsSoloTabla->count() === 1 ? 'reporte' : 'reportes' }}</span>
-            </div>
-            <div class="sigem-rep-accordion"
-                 wire:key="sigem-tables-accordion-{{ $subpestanaActual }}"
-                 x-data="{ openId: @js($inicialTablaId) }">
-                @foreach ($repsSoloTabla as $rep)
-                    <x-reportes.card-tabla
-                        :rep="$rep"
-                        :livewire="$livewire"
-                        :esAdmin="$esAdmin"
-                        :esInicialmenteAbierto="$rep['id'] === $inicialTablaId"
-                    />
-                @endforeach
-            </div>
+            <section class="sigem-rep-section-block">
+                <div class="sigem-section-divider">
+                    <h3 class="sigem-section-title">📋&nbsp;&nbsp;TABLAS</h3>
+                    <span class="sigem-section-count">{{ $repsSoloTabla->count() }} {{ $repsSoloTabla->count() === 1 ? 'reporte' : 'reportes' }}</span>
+                </div>
+                <div class="sigem-rep-accordion"
+                     wire:key="sigem-tables-accordion-{{ $subpestanaActual }}"
+                     x-data="{ openId: @js($inicialTablaId) }">
+                    @foreach ($repsSoloTabla as $rep)
+                        <x-reportes.card-tabla
+                            :rep="$rep"
+                            :livewire="$livewire"
+                            :esAdmin="$esAdmin"
+                            :esInicialmenteAbierto="$rep['id'] === $inicialTablaId"
+                        />
+                    @endforeach
+                </div>
+            </section>
         @endif
 
         @if ($repsConGrafica->isEmpty() && $repsSoloTabla->isEmpty())
