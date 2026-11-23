@@ -54,10 +54,10 @@
         <button type="button"
                 wire:click="cambiarPestanaPrincipal('nuevos')"
                 class="sigem-nav-tab {{ $esPestanaNuevos ? 'is-active' : '' }}"
-                title="28 Nuevos Reportes con gráficas">
+                title="29 Nuevos Reportes con gráficas">
             <span>📈</span>
             <span>Nuevos Reportes</span>
-            <span class="sigem-nav-tab-badge is-highlight">28 con gráficas</span>
+            <span class="sigem-nav-tab-badge is-highlight">29 con gráficas</span>
         </button>
     </div>
 
@@ -101,7 +101,7 @@
     @endif
 
     {{-- ======================================================== --}}
-    {{-- PESTAÑA 3: NUEVOS REPORTES (12 CON GRÁFICA + 16 TABLA)   --}}
+    {{-- PESTAÑA 3: NUEVOS REPORTES — VISTA HÍBRIDA (12 GRÁFICAS + 17 TABLAS EN ACORDEÓN) --}}
     {{-- ======================================================== --}}
     @if ($esPestanaNuevos)
         @php
@@ -109,16 +109,21 @@
             $subpestanas = \App\Support\SigemReportExporter::getSubpestanas();
             $subpestanaActual = $livewire->subpestanaReportes ?? 'inventario';
             $deptosFiltros = $livewire->departamentosParaFiltros;
-            $reportesSubpestana = $livewire->getReportesSubpestanaActual();
+            $reportesSubpestana = collect($livewire->getReportesSubpestanaActual());
 
-            $repsConGrafica = collect($reportesSubpestana)->filter(fn ($r) => ! empty($r['has_chart']))->values();
-            $repsSoloTabla = collect($reportesSubpestana)->filter(fn ($r) => empty($r['has_chart']))->values();
-
-            $datosPreviaNuevo = null;
-            if ($livewire->nuevoReporteActivo) {
-                $datosPreviaNuevo = collect($reportesSubpestana)->firstWhere('id', $livewire->nuevoReporteActivo)
-                    ?? $livewire->getDatosNuevoReporte($livewire->nuevoReporteActivo);
+            if (! $esAdmin) {
+                $reportesSubpestana = $reportesSubpestana
+                    ->filter(fn ($r) => $livewire->visibilidadServicioSocial[$r['id']] ?? true)
+                    ->values();
             }
+
+            $repsConGrafica = $reportesSubpestana->filter(fn ($r) => ! empty($r['has_chart']))->values();
+            $repsSoloTabla = $reportesSubpestana->filter(fn ($r) => empty($r['has_chart']))->values();
+
+            $primerTablaId = $repsSoloTabla->first()['id'] ?? null;
+            $inicialTablaId = ($livewire->nuevoReporteActivo && $repsSoloTabla->contains('id', $livewire->nuevoReporteActivo))
+                ? $livewire->nuevoReporteActivo
+                : $primerTablaId;
         @endphp
 
         {{-- Barra de 5 Sub-pestañas --}}
@@ -134,88 +139,45 @@
             @endforeach
         </div>
 
-        {{-- Barra de Filtros para los 28 reportes --}}
+        {{-- Barra de Filtros para los 29 reportes --}}
         <x-reportes.filtros :livewire="$livewire" :deptosFiltros="$deptosFiltros" />
 
-        {{-- SECCIÓN 1: Tarjetas CON Gráfica (2 por fila, 50% cada una) --}}
+        {{-- SECCIÓN 1: GRÁFICAS (grid 2 columnas, gráfica + tabla completa paginada) --}}
         @if ($repsConGrafica->isNotEmpty())
+            <div class="sigem-new-section-head">
+                <h3>📊 Gráficas</h3>
+                <span class="sigem-new-section-count">{{ $repsConGrafica->count() }} {{ $repsConGrafica->count() === 1 ? 'reporte visual' : 'reportes visuales' }}</span>
+            </div>
             <div class="sigem-new-rep-grid-charts sigem-new-rep-grid" wire:key="sigem-charts-grid-{{ $subpestanaActual }}">
                 @foreach ($repsConGrafica as $rep)
-                    <x-reportes.card-grafica :rep="$rep" />
+                    <x-reportes.card-grafica :rep="$rep" :livewire="$livewire" :esAdmin="$esAdmin" />
                 @endforeach
             </div>
         @endif
 
-        {{-- SECCIÓN 2: Tarjetas SOLO Tabla (3 por fila, 33% cada una) --}}
+        {{-- SECCIÓN 2: TABLAS (acordeón colapsable, primero abierto por defecto) --}}
         @if ($repsSoloTabla->isNotEmpty())
-            <div class="sigem-new-rep-grid-tables sigem-new-rep-grid" wire:key="sigem-tables-grid-{{ $subpestanaActual }}">
+            <div class="sigem-new-section-head">
+                <h3>📋 Tablas</h3>
+                <span class="sigem-new-section-count">{{ $repsSoloTabla->count() }} {{ $repsSoloTabla->count() === 1 ? 'reporte' : 'reportes' }}</span>
+            </div>
+            <div class="sigem-rep-accordion"
+                 wire:key="sigem-tables-accordion-{{ $subpestanaActual }}"
+                 x-data="{ openId: @js($inicialTablaId) }">
                 @foreach ($repsSoloTabla as $rep)
-                    <x-reportes.card-tabla :rep="$rep" />
+                    <x-reportes.card-tabla
+                        :rep="$rep"
+                        :livewire="$livewire"
+                        :esAdmin="$esAdmin"
+                        :esInicialmenteAbierto="$rep['id'] === $inicialTablaId"
+                    />
                 @endforeach
             </div>
         @endif
 
         @if ($repsConGrafica->isEmpty() && $repsSoloTabla->isEmpty())
             <div style="padding: 24px; text-align: center; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; color: #64748b; margin-bottom: 32px;">
-                No hay reportes configurados para esta sección.
-            </div>
-        @endif
-
-        {{-- Vista previa del nuevo reporte seleccionado (abajo del grid) --}}
-        @if ($datosPreviaNuevo)
-            <div class="sigem-rep-view" id="sigem-reporte-visor" wire:key="sigem-reporte-visor-detalle" x-on:scroll-to-report.window="$el.scrollIntoView({behavior:'smooth'})" style="margin-top: 28px;">
-                <div class="sigem-rep-vh">
-                    <div>
-                        <h3>📊 {{ $datosPreviaNuevo['titulo'] }}</h3>
-                        <div class="sigem-rep-meta">
-                            Vista previa (primeros 5 registros de {{ $datosPreviaNuevo['total'] ?? $datosPreviaNuevo['total_registros'] ?? count($datosPreviaNuevo['rows']) }} totales)
-                        </div>
-                    </div>
-                    <div style="display: inline-flex; align-items: center; gap: 8px;">
-                        <button type="button"
-                                wire:click="exportarNuevoReporte('{{ $livewire->nuevoReporteActivo }}', 'xlsx')"
-                                class="sigem-btn-primary">
-                            ↓ Exportar Excel (.xlsx)
-                        </button>
-                        <button type="button"
-                                wire:click="exportarNuevoReporte('{{ $livewire->nuevoReporteActivo }}', 'csv')"
-                                class="sigem-rep-btn-sec">
-                            ↓ Exportar CSV
-                        </button>
-                        <button type="button"
-                                wire:click="cerrarNuevoReporte"
-                                class="sigem-rep-btn-sec">
-                            ✕ Cerrar
-                        </button>
-                    </div>
-                </div>
-
-                @if (count($datosPreviaNuevo['rows']) > 0)
-                    <div class="sigem-rep-table-wrap sigem-scroll-top">
-                        <table class="sigem-rep-table">
-                            <thead>
-                                <tr>
-                                    @foreach ($datosPreviaNuevo['headers'] as $header)
-                                        <th>{{ $header }}</th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (array_slice($datosPreviaNuevo['rows'], 0, 5) as $row)
-                                    <tr>
-                                        @foreach ((array) $row as $celda)
-                                            <td>{!! $celda !!}</td>
-                                        @endforeach
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="sigem-rep-empty">
-                        Sin registros disponibles para los filtros actuales de este reporte.
-                    </div>
-                @endif
+                No hay reportes disponibles para esta sección.
             </div>
         @endif
     @endif

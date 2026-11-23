@@ -343,11 +343,21 @@ class NuevosReportes28Test extends TestCase
             ->call('cambiarPestanaPrincipal', 'formatos')
             ->assertSet('pestanaPrincipal', 'formatos')
             ->assertSee('Formatos PDF')
-            // Cambiar a pestaña Nuevos Reportes
+            // Cambiar a pestaña Nuevos Reportes (vista híbrida: gráficas arriba + acordeón abajo)
             ->call('cambiarPestanaPrincipal', 'nuevos')
             ->assertSet('pestanaPrincipal', 'nuevos')
+            ->assertSee('29 con gráficas')
+            ->assertSee('📊 Gráficas')
+            ->assertSee('📋 Tablas')
             ->assertSee('Inventario General')
             ->assertSee('Por Departamento')
+            ->assertSee("openId: 'inventario_general'", false)
+            ->assertSee('Marca')
+            ->assertSee('Modelo')
+            ->assertSee('Serie')
+            ->assertDontSee('wire:click="verNuevoReporte(', false)
+            ->assertDontSee('sigem-reporte-visor', false)
+            ->assertDontSee('Vista previa (top 5):')
             // Cambiar sub-pestaña a Mantenimiento
             ->call('cambiarSubpestanaReportes', 'mantenimiento')
             ->assertSet('subpestanaReportes', 'mantenimiento')
@@ -363,13 +373,7 @@ class NuevosReportes28Test extends TestCase
             ->assertSet('subpestanaReportes', 'historico')
             ->assertSee('Cambios de área')
             ->assertSee('Bajas')
-            // Abrir vista previa
-            ->call('verNuevoReporte', 'historico_bajas')
-            ->assertSet('nuevoReporteActivo', 'historico_bajas')
-            ->assertSee('Vista previa')
-            // Cerrar vista previa
-            ->call('cerrarNuevoReporte')
-            ->assertSet('nuevoReporteActivo', null);
+            ->assertSee("openId: 'historico_bajas'", false);
 
         // Volver a formatos y descargar Cambio de Área
         $livewire->call('cambiarPestanaPrincipal', 'formatos')
@@ -424,6 +428,39 @@ class NuevosReportes28Test extends TestCase
             ->call('cambiarPaginaReportePrincipal', 'movimientos_recientes', 2)
             ->assertSet('paginasReportesPrincipales.movimientos_recientes', 2)
             ->assertSee('Página 2 de');
+    }
+
+    public function test_nuevos_reportes_paginan_todos_los_registros_de_10_en_10_y_toggle_ss(): void
+    {
+        $this->actingAs($this->adminUser);
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        for ($i = 1; $i <= 13; $i++) {
+            Inventario::create([
+                'codigo' => sprintf('PAG-NR-%02d', $i),
+                'num_serie' => sprintf('SN-NR-%02d', $i),
+                'id_producto' => $this->material->id_producto,
+                'departamento_id' => $this->depto->id_departamento,
+                'area_id' => $this->area->id_area,
+                'estado' => 'Disponible',
+                'tipo_propiedad' => 'Propio',
+                'fecha_registro' => now()->subDays($i),
+                'id_usuario' => $this->adminUser->id,
+            ]);
+        }
+
+        SigemReportExporter::clearCache();
+
+        Livewire::test(ReportesPage::class)
+            ->call('cambiarPestanaPrincipal', 'nuevos')
+            ->assertSee('Mostrando 1–10 de 13 registros')
+            ->assertSee('Página 1 de 2')
+            ->call('cambiarPaginaNuevoReporte', 'inventario_general', 2)
+            ->assertSet('paginasNuevosReportes.inventario_general', 2)
+            ->assertSee('Mostrando 11–13 de 13 registros')
+            ->assertSee('Página 2 de 2')
+            ->call('toggleVisibilidad', 'inventario_general')
+            ->assertSet('visibilidadServicioSocial.inventario_general', false);
     }
 
     public function test_exactamente_12_reportes_tienen_grafica_y_16_son_solo_tabla(): void

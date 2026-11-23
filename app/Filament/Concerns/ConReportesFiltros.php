@@ -26,13 +26,13 @@ trait ConReportesFiltros
     {
         $this->filtroAreaId = '';
         $this->filtroAula = '';
-        $this->cerrarNuevoReporte();
+        $this->reiniciarPaginacionNuevosReportes();
     }
 
     public function updatedFiltroAreaId(): void
     {
         $this->filtroAula = '';
-        $this->cerrarNuevoReporte();
+        $this->reiniciarPaginacionNuevosReportes();
     }
 
     public function limpiarFiltrosNuevosReportes(): void
@@ -42,7 +42,7 @@ trait ConReportesFiltros
         $this->filtroDepartamentoId = '';
         $this->filtroAreaId = '';
         $this->filtroAula = '';
-        $this->cerrarNuevoReporte();
+        $this->reiniciarPaginacionNuevosReportes();
     }
 
     #[Computed]

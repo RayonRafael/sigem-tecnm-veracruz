@@ -34,16 +34,22 @@ class ReportesPage extends Page
 
     public const REPORTES_PRINCIPALES_POR_PAGINA = 10;
 
+    public const NUEVOS_REPORTES_POR_PAGINA = 10;
+
     public string $pestanaPrincipal = 'principales';
 
     public string $subpestanaReportes = 'inventario';
 
+    /** Opcional: reporte inicial a abrir por deep-link (ej. ?reporte=rent_seguimiento). */
     public ?string $nuevoReporteActivo = null;
 
     public array $visibilidadServicioSocial = [];
 
     /** @var array<string, int> */
     public array $paginasReportesPrincipales = [];
+
+    /** @var array<string, int> */
+    public array $paginasNuevosReportes = [];
 
     public function getTitle(): string
     {
@@ -70,6 +76,12 @@ class ReportesPage extends Page
             'solicitudes_tipo_estado' => true,
             'movimientos_recientes' => true,
         ];
+
+        foreach (SigemReportExporter::getCatalogo() as $subReportes) {
+            foreach (array_keys($subReportes) as $repId) {
+                $defaults[$repId] = true;
+            }
+        }
 
         $cached = Cache::get('sigem_reportes_visibilidad_ss', []);
         $this->visibilidadServicioSocial = array_merge($defaults, is_array($cached) ? $cached : []);
@@ -222,7 +234,6 @@ class ReportesPage extends Page
 
         if (in_array($pestana, ['principales', 'formatos', 'nuevos'], true)) {
             $this->pestanaPrincipal = $pestana;
-            $this->cerrarNuevoReporte();
         }
     }
 
@@ -231,19 +242,24 @@ class ReportesPage extends Page
         $validas = array_keys(SigemReportExporter::getSubpestanas());
         if (in_array($subpestana, $validas, true)) {
             $this->subpestanaReportes = $subpestana;
-            $this->cerrarNuevoReporte();
+            $this->nuevoReporteActivo = null;
+            $this->reiniciarPaginacionNuevosReportes();
         }
     }
 
-    public function verNuevoReporte(string $reportId): void
+    public function cambiarPaginaNuevoReporte(string $reportId, int $pagina): void
     {
-        $this->nuevoReporteActivo = $reportId;
-        $this->dispatch('scroll-to-report');
+        $this->paginasNuevosReportes[$reportId] = max(1, $pagina);
     }
 
-    public function cerrarNuevoReporte(): void
+    public function getPaginaNuevoReporte(string $reportId): int
     {
-        $this->nuevoReporteActivo = null;
+        return max(1, (int) ($this->paginasNuevosReportes[$reportId] ?? 1));
+    }
+
+    public function reiniciarPaginacionNuevosReportes(): void
+    {
+        $this->paginasNuevosReportes = [];
     }
 
     public function exportarNuevoReporte(string $reportId, string $formato = 'xlsx')
