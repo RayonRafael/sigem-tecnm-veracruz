@@ -101,13 +101,13 @@
     @endif
 
     {{-- ======================================================== --}}
-    {{-- PESTAÑA 3: NUEVOS REPORTES — VISTA HÍBRIDA (12 GRÁFICAS + 17 TABLAS EN ACORDEÓN) --}}
+    {{-- PESTAÑA 3: NUEVOS REPORTES — 6 SUB-PESTAÑAS EN ACORDEÓN  --}}
     {{-- ======================================================== --}}
     @if ($esPestanaNuevos)
         @php
-            $catalogoNuevos = \App\Support\SigemReportExporter::getCatalogo();
-            $subpestanas = \App\Support\SigemReportExporter::getSubpestanas();
-            $subpestanaActual = $livewire->subpestanaReportes ?? 'inventario';
+            $subpestanasUi = $livewire->getSubpestanasUi();
+            $subpestanaActual = $livewire->subpestanaReportes ?? 'graficas';
+            $esSubpestanaGraficas = $subpestanaActual === 'graficas';
             $deptosFiltros = $livewire->departamentosParaFiltros;
             $reportesSubpestana = collect($livewire->getReportesSubpestanaActual());
 
@@ -117,24 +117,21 @@
                     ->values();
             }
 
-            $repsConGrafica = $reportesSubpestana->filter(fn ($r) => ! empty($r['has_chart']))->values();
-            $repsSoloTabla = $reportesSubpestana->filter(fn ($r) => empty($r['has_chart']))->values();
-
-            $primerTablaId = $repsSoloTabla->first()['id'] ?? null;
-            $inicialTablaId = ($livewire->nuevoReporteActivo && $repsSoloTabla->contains('id', $livewire->nuevoReporteActivo))
+            $primerReporteId = $reportesSubpestana->first()['id'] ?? null;
+            $inicialAbiertoId = ($livewire->nuevoReporteActivo && $reportesSubpestana->contains('id', $livewire->nuevoReporteActivo))
                 ? $livewire->nuevoReporteActivo
-                : $primerTablaId;
+                : $primerReporteId;
         @endphp
 
-        {{-- Barra de 5 Sub-pestañas --}}
+        {{-- Barra de 6 Sub-pestañas: Gráficas (12) + 5 pestañas de tablas --}}
         <div class="sigem-subtabs-bar">
-            @foreach ($subpestanas as $claveSub => $nombreSub)
+            @foreach ($subpestanasUi as $claveSub => $tabInfo)
                 <button type="button"
                         wire:key="sigem-subtab-{{ $claveSub }}"
                         wire:click="cambiarSubpestanaReportes('{{ $claveSub }}')"
-                        class="sigem-subtab-btn {{ $subpestanaActual === $claveSub ? 'is-active' : '' }}">
-                    <span>{{ $nombreSub }}</span>
-                    <span style="font-size: 11px; opacity: 0.85;">({{ count($catalogoNuevos[$claveSub] ?? []) }})</span>
+                        class="sigem-subtab-btn {{ $claveSub === 'graficas' ? 'is-graficas' : '' }} {{ $subpestanaActual === $claveSub ? 'is-active' : '' }}">
+                    <span>{{ $tabInfo['label'] }}</span>
+                    <span class="sigem-subtab-count">({{ $tabInfo['count'] }})</span>
                 </button>
             @endforeach
         </div>
@@ -142,44 +139,30 @@
         {{-- Barra de Filtros para los 29 reportes --}}
         <x-reportes.filtros :livewire="$livewire" :deptosFiltros="$deptosFiltros" />
 
-        {{-- SECCIÓN 1: GRÁFICAS (ancho completo, 1 por fila, gráfica + tabla completa paginada) --}}
-        @if ($repsConGrafica->isNotEmpty())
-            <section class="sigem-rep-section-block">
-                <div class="sigem-section-divider">
-                    <h3 class="sigem-section-title">📊&nbsp;&nbsp;GRÁFICAS</h3>
-                    <span class="sigem-section-count">{{ $repsConGrafica->count() }} {{ $repsConGrafica->count() === 1 ? 'reporte' : 'reportes' }}</span>
-                </div>
-                <div class="sigem-new-rep-charts-stack" wire:key="sigem-charts-grid-{{ $subpestanaActual }}">
-                    @foreach ($repsConGrafica as $rep)
-                        <x-reportes.card-grafica :rep="$rep" :livewire="$livewire" :esAdmin="$esAdmin" />
-                    @endforeach
-                </div>
-            </section>
-        @endif
-
-        {{-- SECCIÓN 2: TABLAS (acordeón colapsable, primero abierto por defecto) --}}
-        @if ($repsSoloTabla->isNotEmpty())
-            <section class="sigem-rep-section-block">
-                <div class="sigem-section-divider">
-                    <h3 class="sigem-section-title">📋&nbsp;&nbsp;TABLAS</h3>
-                    <span class="sigem-section-count">{{ $repsSoloTabla->count() }} {{ $repsSoloTabla->count() === 1 ? 'reporte' : 'reportes' }}</span>
-                </div>
-                <div class="sigem-rep-accordion"
-                     wire:key="sigem-tables-accordion-{{ $subpestanaActual }}"
-                     x-data="{ openId: @js($inicialTablaId) }">
-                    @foreach ($repsSoloTabla as $rep)
+        {{-- Acordeón de reportes de la sub-pestaña activa (1 abierto a la vez) --}}
+        @if ($reportesSubpestana->isNotEmpty())
+            <div class="sigem-rep-accordion"
+                 wire:key="sigem-nuevos-accordion-{{ $subpestanaActual }}"
+                 x-data="{ openId: @js($inicialAbiertoId) }">
+                @foreach ($reportesSubpestana as $rep)
+                    @if ($esSubpestanaGraficas || ! empty($rep['has_chart']))
+                        <x-reportes.card-grafica
+                            :rep="$rep"
+                            :livewire="$livewire"
+                            :esAdmin="$esAdmin"
+                            :esInicialmenteAbierto="$rep['id'] === $inicialAbiertoId"
+                        />
+                    @else
                         <x-reportes.card-tabla
                             :rep="$rep"
                             :livewire="$livewire"
                             :esAdmin="$esAdmin"
-                            :esInicialmenteAbierto="$rep['id'] === $inicialTablaId"
+                            :esInicialmenteAbierto="$rep['id'] === $inicialAbiertoId"
                         />
-                    @endforeach
-                </div>
-            </section>
-        @endif
-
-        @if ($repsConGrafica->isEmpty() && $repsSoloTabla->isEmpty())
+                    @endif
+                @endforeach
+            </div>
+        @else
             <div style="padding: 24px; text-align: center; background: #ffffff; border-radius: 12px; border: 1px solid #e2e8f0; color: #64748b; margin-bottom: 32px;">
                 No hay reportes disponibles para esta sección.
             </div>

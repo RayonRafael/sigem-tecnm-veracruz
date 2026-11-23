@@ -53,8 +53,28 @@ if (!window.sigemChartComponent) {
                 }
             },
 
+            ensureRendered() {
+                if (!chartConfig || !this.$refs.canvas) return;
+                if (this.chartInstance) {
+                    try { this.chartInstance.resize(); } catch (e) {}
+                    return;
+                }
+                if (this.$refs.canvas.offsetWidth === 0) {
+                    setTimeout(() => this.ensureRendered(), 60);
+                    return;
+                }
+                this.initialized = true;
+                this.renderChart();
+            },
+
             renderChart() {
                 if (!chartConfig || !this.$refs.canvas) return;
+
+                if (this.$refs.canvas.offsetWidth === 0) {
+                    this.initialized = false;
+                    setTimeout(() => this.ensureRendered(), 80);
+                    return;
+                }
 
                 if (typeof Chart === 'undefined') {
                     setTimeout(() => this.renderChart(), 120);

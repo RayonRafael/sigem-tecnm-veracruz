@@ -38,7 +38,7 @@ class ReportesPage extends Page
 
     public string $pestanaPrincipal = 'principales';
 
-    public string $subpestanaReportes = 'inventario';
+    public string $subpestanaReportes = 'graficas';
 
     /** Opcional: reporte inicial a abrir por deep-link (ej. ?reporte=rent_seguimiento). */
     public ?string $nuevoReporteActivo = null;
@@ -93,7 +93,7 @@ class ReportesPage extends Page
         }
 
         $subpestana = request()->query('subpestana');
-        if (is_string($subpestana) && array_key_exists($subpestana, SigemReportExporter::getSubpestanas())) {
+        if (is_string($subpestana) && array_key_exists($subpestana, $this->getSubpestanasUi())) {
             $this->subpestanaReportes = $subpestana;
         }
 
@@ -239,12 +239,55 @@ class ReportesPage extends Page
 
     public function cambiarSubpestanaReportes(string $subpestana): void
     {
-        $validas = array_keys(SigemReportExporter::getSubpestanas());
+        $validas = array_keys($this->getSubpestanasUi());
         if (in_array($subpestana, $validas, true)) {
             $this->subpestanaReportes = $subpestana;
             $this->nuevoReporteActivo = null;
             $this->reiniciarPaginacionNuevosReportes();
         }
+    }
+
+    /**
+     * Retorna las 6 sub-pestañas de UI para Nuevos Reportes:
+     * Gráficas (12) + 5 sub-pestañas de solo tablas (3, 3, 4, 4, 3 = 17). Total: 29.
+     *
+     * @return array<string, array{label: string, count: int}>
+     */
+    public function getSubpestanasUi(): array
+    {
+        $catalogo = SigemReportExporter::getCatalogo();
+        $labelsBase = SigemReportExporter::getSubpestanas();
+
+        $totalGraficas = 0;
+        $conteosTablas = [];
+
+        foreach ($catalogo as $claveSub => $reportes) {
+            $soloTablas = 0;
+            foreach ($reportes as $meta) {
+                if (! empty($meta['has_chart'])) {
+                    $totalGraficas++;
+                } else {
+                    $soloTablas++;
+                }
+            }
+            $conteosTablas[$claveSub] = $soloTablas;
+        }
+
+        $tabs = [
+            'graficas' => [
+                'label' => '📊 Gráficas',
+                'count' => $totalGraficas,
+            ],
+        ];
+
+        foreach ($labelsBase as $claveSub => $nombreSub) {
+            $tabs[$claveSub] = [
+                'label' => $nombreSub,
+                'count' => $conteosTablas[$claveSub] ?? 0,
+            ];
+        }
+
+        return $tabs;
     }
 
     public function cambiarPaginaNuevoReporte(string $reportId, int $pagina): void
@@ -274,7 +317,29 @@ class ReportesPage extends Page
 
     public function getReportesSubpestanaActual(): array
     {
-        return SigemReportExporter::getReportesSubpestana($this->subpestanaReportes, $this->obtenerFiltrosNuevosReportes());
+        $filtros = $this->obtenerFiltrosNuevosReportes();
+        $catalogo = SigemReportExporter::getCatalogo();
+        $resultado = [];
+
+        if ($this->subpestanaReportes === 'graficas') {
+            foreach ($catalogo as $reportes) {
+                foreach ($reportes as $key => $meta) {
+                    if (! empty($meta['has_chart'])) {
+                        $resultado[] = SigemReportExporter::getReportData($key, $filtros);
+                    }
+                }
+            }
+
+            return $resultado;
+        }
+
+        foreach ($catalogo[$this->subpestanaReportes] ?? [] as $key => $meta) {
+            if (empty($meta['has_chart'])) {
+                $resultado[] = SigemReportExporter::getReportData($key, $filtros);
+            }
+        }
+
+        return $resultado;
     }
 
     protected function esUsuarioAdminReportes(): bool
