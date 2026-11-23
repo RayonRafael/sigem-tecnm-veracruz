@@ -383,6 +383,11 @@ class NuevosReportes28Test extends TestCase
 
         $livewire = Livewire::test(ReportesPage::class)
             ->assertSee('Reportes Principales del Inventario')
+            ->assertSee('sigem-rep-accordion', false)
+            ->assertSee("openId: 'inventario_categoria'", false)
+            ->assertSee('sigem-rep-acc-badge', false)
+            ->assertSee('▼')
+            ->assertSee('▶')
             ->assertSee('Inventario por categoría')
             ->assertSee('Equipos por área')
             ->assertSee('Equipos en mantenimiento')
@@ -401,12 +406,12 @@ class NuevosReportes28Test extends TestCase
         $this->assertEquals(! $estadoInicial, $livewire->get('visibilidadServicioSocial')['inventario_categoria']);
     }
 
-    public function test_reportes_principales_paginan_cuando_hay_mas_de_15_filas(): void
+    public function test_reportes_principales_paginan_cuando_hay_mas_de_10_filas(): void
     {
         $this->actingAs($this->adminUser);
         Filament::setCurrentPanel(Filament::getPanel('admin'));
 
-        for ($i = 1; $i <= 18; $i++) {
+        for ($i = 1; $i <= 14; $i++) {
             activity()
                 ->causedBy($this->adminUser)
                 ->event('updated')
@@ -414,7 +419,7 @@ class NuevosReportes28Test extends TestCase
         }
 
         Livewire::test(ReportesPage::class)
-            ->assertSee('Mostrando 1–15 de')
+            ->assertSee('Mostrando 1–10 de')
             ->assertSee('Página 1 de')
             ->call('cambiarPaginaReportePrincipal', 'movimientos_recientes', 2)
             ->assertSet('paginasReportesPrincipales.movimientos_recientes', 2)

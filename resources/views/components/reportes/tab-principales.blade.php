@@ -8,6 +8,8 @@
 
 @php
     $porPagina = \App\Filament\Pages\ReportesPage::REPORTES_PRINCIPALES_POR_PAGINA;
+    $listaColeccion = collect($listaReportes)->values();
+    $primerReporteId = $listaColeccion->first()['id'] ?? null;
 @endphp
 
 <section class="sigem-rep-original-section" style="margin-bottom: 36px;">
@@ -27,130 +29,154 @@
         </div>
     </div>
 
-    {{-- Lista vertical de las 6 cards con su tabla integrada directamente --}}
-    <div class="sigem-rep-principal-list">
-        @forelse ($listaReportes as $rep)
-            @php
-                $repId = $rep['id'];
-                $esVisible = $livewire->visibilidadServicioSocial[$repId] ?? false;
-                $datos = $datosReportes[$repId] ?? ['headers' => [], 'rows' => []];
-                $headers = $datos['headers'] ?? [];
-                $todasFilas = $datos['rows'] ?? [];
-                $totalFilas = count($todasFilas);
-                $totalPaginas = max(1, (int) ceil($totalFilas / $porPagina));
-                $paginaActual = min($totalPaginas, max(1, $livewire->getPaginaReportePrincipal($repId)));
-                $offset = ($paginaActual - 1) * $porPagina;
-                $filasPagina = array_slice($todasFilas, $offset, $porPagina);
-                $desde = $totalFilas > 0 ? $offset + 1 : 0;
-                $hasta = min($totalFilas, $offset + count($filasPagina));
-            @endphp
+    {{-- Acordeón de Reportes Principales (1 abierto a la vez, primero abierto inicialmente) --}}
+    @if ($listaColeccion->isNotEmpty())
+        <div class="sigem-rep-accordion"
+             x-data="{ openId: @js($primerReporteId) }">
+            @foreach ($listaColeccion as $idx => $rep)
+                @php
+                    $repId = $rep['id'];
+                    $esPrimero = $idx === 0;
+                    $esVisible = $livewire->visibilidadServicioSocial[$repId] ?? false;
+                    $datos = $datosReportes[$repId] ?? ['headers' => [], 'rows' => []];
+                    $headers = $datos['headers'] ?? [];
+                    $todasFilas = $datos['rows'] ?? [];
+                    $totalFilas = count($todasFilas);
+                    $totalPaginas = max(1, (int) ceil($totalFilas / $porPagina));
+                    $paginaActual = min($totalPaginas, max(1, $livewire->getPaginaReportePrincipal($repId)));
+                    $offset = ($paginaActual - 1) * $porPagina;
+                    $filasPagina = array_slice($todasFilas, $offset, $porPagina);
+                    $desde = $totalFilas > 0 ? $offset + 1 : 0;
+                    $hasta = min($totalFilas, $offset + count($filasPagina));
+                @endphp
 
-            <div class="sigem-rep-card sigem-rep-principal-card" wire:key="sigem-rep-card-{{ $repId }}">
-                {{-- Cabecera de la card: icono, título, descripción y acciones --}}
-                <div class="sigem-rep-principal-head">
-                    <div class="sigem-rep-principal-info">
-                        <div class="sigem-rep-ico" style="margin-bottom: 0; flex-shrink: 0;">{{ $rep['emoji'] }}</div>
-                        <div style="min-width: 0;">
-                            <div class="sigem-rep-t">{{ $rep['titulo'] }}</div>
-                            <div class="sigem-rep-d">{{ $rep['descripcion'] }}</div>
+                <div class="sigem-rep-card sigem-rep-acc-item"
+                     :class="{ 'is-open': openId === '{{ $repId }}' }"
+                     wire:key="sigem-rep-card-{{ $repId }}">
+                    {{-- Fila clickeable del acordeón --}}
+                    <button type="button"
+                            class="sigem-rep-acc-trigger"
+                            :class="{ 'is-open': openId === '{{ $repId }}' }"
+                            :aria-expanded="(openId === '{{ $repId }}').toString()"
+                            @click="openId = (openId === '{{ $repId }}' ? null : '{{ $repId }}')">
+                        <span class="sigem-rep-acc-arrow"
+                              :class="{ 'is-open': openId === '{{ $repId }}' }"
+                              x-text="openId === '{{ $repId }}' ? '▼' : '▶'">{{ $esPrimero ? '▼' : '▶' }}</span>
+                        <span class="sigem-rep-ico sigem-rep-acc-ico">{{ $rep['emoji'] }}</span>
+                        <span class="sigem-rep-t sigem-rep-acc-title">{{ $rep['titulo'] }}</span>
+                        <span class="sigem-rep-acc-badge" title="{{ $totalFilas }} registros">{{ $totalFilas }}</span>
+                    </button>
+
+                    {{-- Contenido colapsable: descripción + toggle SS + Excel/CSV + tabla + paginación --}}
+                    <div class="sigem-rep-acc-panel accordion-content"
+                         x-show="openId === '{{ $repId }}'"
+                         @if (! $esPrimero) x-cloak @endif
+                         x-transition:enter="sigem-acc-enter"
+                         x-transition:enter-start="sigem-acc-enter-start"
+                         x-transition:enter-end="sigem-acc-enter-end"
+                         x-transition:leave="sigem-acc-leave"
+                         x-transition:leave-start="sigem-acc-leave-start"
+                         x-transition:leave-end="sigem-acc-leave-end">
+                        <div class="sigem-rep-acc-toolbar">
+                            <div class="sigem-rep-d" style="margin-bottom: 10px;">{{ $rep['descripcion'] }}</div>
+
+                            <div class="sigem-rep-foot sigem-rep-principal-controls">
+                                @if($esAdmin)
+                                    <label class="sigem-sw" title="Activar o desactivar visibilidad para Servicio Social">
+                                        <input type="checkbox"
+                                               wire:click="toggleVisibilidad('{{ $repId }}')"
+                                               @checked($esVisible)>
+                                        <span class="sigem-sw-ui"></span>
+                                        <span class="sigem-sw-l">Visible para Servicio Social</span>
+                                    </label>
+                                @else
+                                    <span class="sigem-pill ok" style="font-size: 13px;">✓ Autorizado</span>
+                                @endif
+
+                                <div style="display: inline-flex; align-items: center; gap: 8px;">
+                                    <button type="button"
+                                            wire:click="exportarReporte('{{ $repId }}', 'xlsx')"
+                                            class="sigem-btn-primary"
+                                            title="Descargar como archivo XLSX de Excel">
+                                        ↓ Excel
+                                    </button>
+                                    <button type="button"
+                                            wire:click="exportarReporte('{{ $repId }}', 'csv')"
+                                            class="sigem-rep-btn-sec"
+                                            title="Descargar como archivo CSV">
+                                        ↓ CSV
+                                    </button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="sigem-rep-foot sigem-rep-principal-controls">
-                        @if($esAdmin)
-                            <label class="sigem-sw" title="Activar o desactivar visibilidad para Servicio Social">
-                                <input type="checkbox"
-                                       wire:click="toggleVisibilidad('{{ $repId }}')"
-                                       @checked($esVisible)>
-                                <span class="sigem-sw-ui"></span>
-                                <span class="sigem-sw-l">Visible para Servicio Social</span>
-                            </label>
-                        @else
-                            <span class="sigem-pill ok" style="font-size: 13px;">✓ Autorizado</span>
-                        @endif
+                        {{-- Tabla del reporte --}}
+                        <div class="sigem-rep-table-wrap sigem-rep-principal-table-wrap">
+                            <table class="sigem-rep-table sigem-rep-principal-table">
+                                <thead>
+                                    <tr>
+                                        @foreach ($headers as $header)
+                                            <th>{{ $header }}</th>
+                                        @endforeach
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($filasPagina as $row)
+                                        <tr>
+                                            @foreach ($row as $celda)
+                                                <td>{!! $celda !!}</td>
+                                            @endforeach
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="{{ max(1, count($headers)) }}" style="text-align: center; color: #94a3b8; padding: 20px;">
+                                                Sin registros disponibles para este reporte
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
 
-                        <div style="display: inline-flex; align-items: center; gap: 8px;">
-                            <button type="button"
-                                    wire:click="exportarReporte('{{ $repId }}', 'xlsx')"
-                                    class="sigem-btn-primary"
-                                    title="Descargar como archivo XLSX de Excel">
-                                ↓ Excel
-                            </button>
-                            <button type="button"
-                                    wire:click="exportarReporte('{{ $repId }}', 'csv')"
-                                    class="sigem-rep-btn-sec"
-                                    title="Descargar como archivo CSV">
-                                ↓ CSV
-                            </button>
+                        {{-- Pie del reporte: conteo y paginación (10 por tabla) --}}
+                        <div class="sigem-rep-principal-footer">
+                            <div class="sigem-rep-meta">
+                                @if ($totalFilas === 0)
+                                    Mostrando 0 de 0 registros
+                                @elseif ($totalFilas <= $porPagina)
+                                    Mostrando {{ $totalFilas }} de {{ $totalFilas }} {{ $totalFilas === 1 ? 'registro' : 'registros' }}
+                                @else
+                                    Mostrando {{ $desde }}–{{ $hasta }} de {{ $totalFilas }} registros
+                                @endif
+                            </div>
+
+                            @if ($totalPaginas > 1)
+                                <div class="sigem-rep-principal-pagination">
+                                    <button type="button"
+                                            wire:click="cambiarPaginaReportePrincipal('{{ $repId }}', {{ $paginaActual - 1 }})"
+                                            @disabled($paginaActual <= 1)
+                                            class="sigem-rep-page-btn">
+                                        ← Anterior
+                                    </button>
+                                    <span class="sigem-rep-page-indicator">
+                                        Página {{ $paginaActual }} de {{ $totalPaginas }}
+                                    </span>
+                                    <button type="button"
+                                            wire:click="cambiarPaginaReportePrincipal('{{ $repId }}', {{ $paginaActual + 1 }})"
+                                            @disabled($paginaActual >= $totalPaginas)
+                                            class="sigem-rep-page-btn">
+                                        Siguiente →
+                                    </button>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
-
-                {{-- Tabla directa integrada dentro de la card --}}
-                <div class="sigem-rep-table-wrap sigem-rep-principal-table-wrap">
-                    <table class="sigem-rep-table sigem-rep-principal-table">
-                        <thead>
-                            <tr>
-                                @foreach ($headers as $header)
-                                    <th>{{ $header }}</th>
-                                @endforeach
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($filasPagina as $row)
-                                <tr>
-                                    @foreach ($row as $celda)
-                                        <td>{!! $celda !!}</td>
-                                    @endforeach
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="{{ max(1, count($headers)) }}" style="text-align: center; color: #94a3b8; padding: 20px;">
-                                        Sin registros disponibles para este reporte
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                {{-- Pie de la card: conteo y paginación cuando supera 15 filas --}}
-                <div class="sigem-rep-principal-footer">
-                    <div class="sigem-rep-meta">
-                        @if ($totalFilas === 0)
-                            Mostrando 0 de 0 registros
-                        @elseif ($totalFilas <= $porPagina)
-                            Mostrando {{ $totalFilas }} de {{ $totalFilas }} {{ $totalFilas === 1 ? 'registro' : 'registros' }}
-                        @else
-                            Mostrando {{ $desde }}–{{ $hasta }} de {{ $totalFilas }} registros
-                        @endif
-                    </div>
-
-                    @if ($totalPaginas > 1)
-                        <div class="sigem-rep-principal-pagination">
-                            <button type="button"
-                                    wire:click="cambiarPaginaReportePrincipal('{{ $repId }}', {{ $paginaActual - 1 }})"
-                                    @disabled($paginaActual <= 1)
-                                    class="sigem-rep-page-btn">
-                                ← Anterior
-                            </button>
-                            <span class="sigem-rep-page-indicator">
-                                Página {{ $paginaActual }} de {{ $totalPaginas }}
-                            </span>
-                            <button type="button"
-                                    wire:click="cambiarPaginaReportePrincipal('{{ $repId }}', {{ $paginaActual + 1 }})"
-                                    @disabled($paginaActual >= $totalPaginas)
-                                    class="sigem-rep-page-btn">
-                                Siguiente →
-                            </button>
-                        </div>
-                    @endif
-                </div>
-            </div>
-        @empty
-            <div class="sigem-rep-empty" style="padding: 32px; text-align: center; background: white; border-radius: 12px; border: 1px solid var(--sig-border);">
-                No hay reportes autorizados actualmente por el Administrador.
-            </div>
-        @endforelse
-    </div>
+            @endforeach
+        </div>
+    @else
+        <div class="sigem-rep-empty" style="padding: 32px; text-align: center; background: white; border-radius: 12px; border: 1px solid var(--sig-border);">
+            No hay reportes autorizados actualmente por el Administrador.
+        </div>
+    @endif
 </section>

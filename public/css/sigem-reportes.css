@@ -489,34 +489,129 @@ select.sigem-filter-input::-ms-expand,
 }
 
 /* ==========================================================================
- * Reportes Principales — Cards con tabla integrada directamente
+ * Reportes Principales — Vista Acordeón Colapsable
  * ========================================================================== */
-.sigem-rep-principal-list {
+.sigem-rep-accordion {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
 }
-.sigem-rep-card.sigem-rep-principal-card {
+.sigem-rep-card.sigem-rep-acc-item {
     padding: 0;
     gap: 0;
-    overflow: hidden;
+    border: none;
+    border-bottom: 1px solid #e2e8f0;
+    border-radius: 0;
+    box-shadow: none;
+    background: #ffffff;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
 }
-.sigem-rep-card.sigem-rep-principal-card:hover {
+.sigem-rep-card.sigem-rep-acc-item:last-child {
+    border-bottom: none;
+}
+.sigem-rep-card.sigem-rep-acc-item:hover {
     transform: none;
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+    box-shadow: none;
 }
-.sigem-rep-principal-head {
-    padding: 16px 20px 14px;
+.sigem-rep-card.sigem-rep-acc-item.is-open {
+    border-left: 3px solid #1b396a;
+}
+.sigem-rep-acc-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: #ffffff;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+.sigem-rep-acc-trigger:hover {
+    background: #f8fafc;
+}
+.sigem-rep-acc-trigger.is-open {
+    background: #eff6ff;
+    border-bottom: 1px solid #dbeafe;
+}
+.sigem-rep-acc-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    font-size: 12px;
+    color: #64748b;
+    flex-shrink: 0;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+.sigem-rep-acc-arrow.is-open {
+    color: #1b396a;
+}
+.sigem-rep-ico.sigem-rep-acc-ico {
+    width: 30px;
+    height: 30px;
+    font-size: 16px;
+    margin-bottom: 0;
+    flex-shrink: 0;
+}
+.sigem-rep-acc-title {
+    flex: 1;
+    min-width: 0;
+}
+.sigem-rep-acc-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    background: #f1f5f9;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+}
+.sigem-rep-acc-trigger.is-open .sigem-rep-acc-badge {
+    background: #1b396a;
+    color: #ffffff;
+    border-color: #1b396a;
+}
+.accordion-content,
+.sigem-rep-acc-panel {
+    overflow: hidden;
+    background: #ffffff;
+}
+.sigem-acc-enter {
+    transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+.sigem-acc-enter-start {
+    opacity: 0;
+    transform: translateY(-4px);
+}
+.sigem-acc-enter-end {
+    opacity: 1;
+    transform: translateY(0);
+}
+.sigem-acc-leave {
+    transition: opacity 0.15s ease-in;
+}
+.sigem-acc-leave-start {
+    opacity: 1;
+}
+.sigem-acc-leave-end {
+    opacity: 0;
+}
+.sigem-rep-acc-toolbar {
+    padding: 14px 20px 12px;
     border-bottom: 1px solid #e2e8f0;
     background: #ffffff;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-.sigem-rep-principal-info {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
 }
 .sigem-rep-principal-controls {
     margin-top: 0;
@@ -524,7 +619,7 @@ select.sigem-filter-input::-ms-expand,
     border-top: 1px solid #f1f5f9;
 }
 .sigem-rep-principal-table-wrap {
-    max-height: 480px;
+    max-height: 440px;
     overflow-y: auto;
     overflow-x: auto;
     background: #ffffff;

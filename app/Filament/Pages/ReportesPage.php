@@ -32,7 +32,7 @@ class ReportesPage extends Page
 
     protected static string $view = 'filament.pages.reportes';
 
-    public const REPORTES_PRINCIPALES_POR_PAGINA = 15;
+    public const REPORTES_PRINCIPALES_POR_PAGINA = 10;
 
     public string $pestanaPrincipal = 'principales';
 
