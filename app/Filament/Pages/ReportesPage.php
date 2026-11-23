@@ -32,7 +32,7 @@ class ReportesPage extends Page
 
     protected static string $view = 'filament.pages.reportes';
 
-    public ?string $reporteActivo = null;
+    public const REPORTES_PRINCIPALES_POR_PAGINA = 15;
 
     public string $pestanaPrincipal = 'principales';
 
@@ -41,6 +41,9 @@ class ReportesPage extends Page
     public ?string $nuevoReporteActivo = null;
 
     public array $visibilidadServicioSocial = [];
+
+    /** @var array<string, int> */
+    public array $paginasReportesPrincipales = [];
 
     public function getTitle(): string
     {
@@ -102,15 +105,14 @@ class ReportesPage extends Page
             ->send();
     }
 
-    public function verReporte(string $reportId): void
+    public function cambiarPaginaReportePrincipal(string $reportId, int $pagina): void
     {
-        $this->reporteActivo = $reportId;
-        $this->dispatch('scrollToReport');
+        $this->paginasReportesPrincipales[$reportId] = max(1, $pagina);
     }
 
-    public function cerrarReporte(): void
+    public function getPaginaReportePrincipal(string $reportId): int
     {
-        $this->reporteActivo = null;
+        return max(1, (int) ($this->paginasReportesPrincipales[$reportId] ?? 1));
     }
 
     public function exportarExcel(string $reportId): ?BinaryFileResponse
@@ -220,7 +222,6 @@ class ReportesPage extends Page
 
         if (in_array($pestana, ['principales', 'formatos', 'nuevos'], true)) {
             $this->pestanaPrincipal = $pestana;
-            $this->cerrarReporte();
             $this->cerrarNuevoReporte();
         }
     }

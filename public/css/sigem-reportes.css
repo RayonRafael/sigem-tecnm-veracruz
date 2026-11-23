@@ -487,3 +487,110 @@ select.sigem-filter-input::-ms-expand,
 .sigem-btn-preview:hover {
     background: #eff6ff;
 }
+
+/* ==========================================================================
+ * Reportes Principales — Cards con tabla integrada directamente
+ * ========================================================================== */
+.sigem-rep-principal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.sigem-rep-card.sigem-rep-principal-card {
+    padding: 0;
+    gap: 0;
+    overflow: hidden;
+}
+.sigem-rep-card.sigem-rep-principal-card:hover {
+    transform: none;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+.sigem-rep-principal-head {
+    padding: 16px 20px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.sigem-rep-principal-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+.sigem-rep-principal-controls {
+    margin-top: 0;
+    padding-top: 10px;
+    border-top: 1px solid #f1f5f9;
+}
+.sigem-rep-principal-table-wrap {
+    max-height: 480px;
+    overflow-y: auto;
+    overflow-x: auto;
+    background: #ffffff;
+}
+.sigem-rep-principal-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.sigem-rep-principal-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+    white-space: nowrap;
+}
+.sigem-rep-principal-table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background 0.12s ease;
+}
+.sigem-rep-principal-table tbody tr:last-child {
+    border-bottom: none;
+}
+.sigem-rep-principal-table tbody tr:hover {
+    background: #f8fafc;
+}
+.sigem-rep-principal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px 20px;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    font-size: 12.5px;
+    color: #64748b;
+}
+.sigem-rep-principal-pagination {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.sigem-rep-page-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.sigem-rep-page-btn:hover:not(:disabled) {
+    background: #eff6ff;
+    border-color: #93c5fd;
+    color: #1b396a;
+}
+.sigem-rep-page-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+.sigem-rep-page-indicator {
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+}

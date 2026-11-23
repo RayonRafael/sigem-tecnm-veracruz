@@ -135,13 +135,12 @@ class AdminResourceTest extends TestCase
             ->test(ReportesPage::class)
             ->assertSee('Reportes')
             ->assertSee('Genera reportes del inventario')
-            ->call('toggleVisibilidad', 'inventario_categoria')
-            ->assertSet('visibilidadServicioSocial.inventario_categoria', false)
-            ->call('verReporte', 'inventario_categoria')
-            ->assertSet('reporteActivo', 'inventario_categoria')
             ->assertSee('Inventario por categoría')
-            ->call('cerrarReporte')
-            ->assertSet('reporteActivo', null);
+            ->assertSee('↓ Excel')
+            ->assertSee('↓ CSV')
+            ->assertDontSee('wire:click="verReporte(', false)
+            ->call('toggleVisibilidad', 'inventario_categoria')
+            ->assertSet('visibilidadServicioSocial.inventario_categoria', false);
     }
 
     public function test_admin_can_access_configuracion_page()
@@ -399,8 +398,6 @@ class AdminResourceTest extends TestCase
 
         \Livewire\Livewire::actingAs($user)
             ->test(ReportesPage::class)
-            ->call('verReporte', 'inventario_categoria')
-            ->assertSet('reporteActivo', 'inventario_categoria')
             ->assertSee('Inventario por categoría')
             ->assertSee('Laptops Test')
             ->assertSee('Total');
@@ -442,8 +439,6 @@ class AdminResourceTest extends TestCase
 
         \Livewire\Livewire::actingAs($user)
             ->test(ReportesPage::class)
-            ->call('verReporte', 'equipos_area')
-            ->assertSet('reporteActivo', 'equipos_area')
             ->assertSee('Equipos por área')
             ->assertSee('Laboratorio Redes Test')
             ->assertSee('Depto Sistemas Test');

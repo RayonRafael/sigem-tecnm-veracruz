@@ -390,17 +390,35 @@ class NuevosReportes28Test extends TestCase
             ->assertSee('Solicitudes de material')
             ->assertSee('Movimientos SS')
             ->assertSee('Visible para Servicio Social')
-            ->call('verReporte', 'inventario_categoria')
-            ->assertSet('reporteActivo', 'inventario_categoria')
             ->assertSee('Categoría')
-            ->assertSee('Cerrar')
-            ->call('cerrarReporte')
-            ->assertSet('reporteActivo', null);
+            ->assertSee('↓ Excel')
+            ->assertSee('↓ CSV')
+            ->assertDontSee('wire:click="verReporte(', false);
 
         // Toggle visibilidad SS funciona
         $estadoInicial = $livewire->get('visibilidadServicioSocial')['inventario_categoria'] ?? true;
         $livewire->call('toggleVisibilidad', 'inventario_categoria');
         $this->assertEquals(! $estadoInicial, $livewire->get('visibilidadServicioSocial')['inventario_categoria']);
+    }
+
+    public function test_reportes_principales_paginan_cuando_hay_mas_de_15_filas(): void
+    {
+        $this->actingAs($this->adminUser);
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        for ($i = 1; $i <= 18; $i++) {
+            activity()
+                ->causedBy($this->adminUser)
+                ->event('updated')
+                ->log(sprintf('Evento paginación #%02d', $i));
+        }
+
+        Livewire::test(ReportesPage::class)
+            ->assertSee('Mostrando 1–15 de')
+            ->assertSee('Página 1 de')
+            ->call('cambiarPaginaReportePrincipal', 'movimientos_recientes', 2)
+            ->assertSet('paginasReportesPrincipales.movimientos_recientes', 2)
+            ->assertSee('Página 2 de');
     }
 
     public function test_exactamente_12_reportes_tienen_grafica_y_16_son_solo_tabla(): void

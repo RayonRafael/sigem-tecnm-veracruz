@@ -75,7 +75,10 @@
                 $listaReportes = collect($reportes)->filter(fn ($r) => $livewire->visibilidadServicioSocial[$r['id']] ?? false)->values();
                 $notaVisibilidad = $listaReportes->count() . " de " . count($reportes) . " reportes autorizados para Servicio Social";
             }
-            $reporteActual = $livewire->reporteActivo ? $livewire->getDatosReporte($livewire->reporteActivo) : null;
+            $datosReportes = [];
+            foreach ($listaReportes as $repItem) {
+                $datosReportes[$repItem['id']] = $livewire->getDatosReporte($repItem['id']);
+            }
         @endphp
 
         <x-reportes.tab-principales
@@ -83,7 +86,7 @@
             :esAdmin="$esAdmin"
             :listaReportes="$listaReportes"
             :notaVisibilidad="$notaVisibilidad"
-            :reporteActual="$reporteActual"
+            :datosReportes="$datosReportes"
         />
     @endif
 
