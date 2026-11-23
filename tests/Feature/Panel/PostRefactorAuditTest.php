@@ -365,7 +365,7 @@ class PostRefactorAuditTest extends TestCase
             ->assertOk()
             ->assertSee('EQ-AUDIT-001');
 
-        // #45 Compiled CSS theme exists, includes Mi Perfil styles and 11-column table rules
+        // #45 Compiled CSS theme exists, includes Mi Perfil styles, 11-column table rules and No tiene toggle
         $cssPath = public_path('css/sigem-theme.css');
         $this->assertFileExists($cssPath);
         $this->assertGreaterThan(100_000, filesize($cssPath));
@@ -373,5 +373,16 @@ class PostRefactorAuditTest extends TestCase
         $this->assertStringContainsString('.sigem-profile-card', $cssContent);
         $this->assertStringContainsString('.sigem-profile-avatar', $cssContent);
         $this->assertStringContainsString('.fi-ta-table:has(th:nth-child(9))', $cssContent);
+        $this->assertStringContainsString('.sigem-no-tiene-toggle', $cssContent);
+
+        // Favicon SVG con type explícito y ruta relativa segura para Render HTTPS
+        $solicitudesHtml = $this->actingAs($this->admin)->get('/admin/solicituds')->assertOk()->getContent();
+        $this->assertStringContainsString('type="image/svg+xml" href="/images/sigem-icon.svg?v=2"', $solicitudesHtml);
+
+        // Slide-over Registrar equipo renderiza el selector visible "No tiene" con clase sigem-no-tiene-toggle
+        Livewire::test(AdminDashboard::class)
+            ->mountAction('registrarEquipo')
+            ->assertSee('sigem-no-tiene-toggle', false)
+            ->assertSee('No tiene');
     }
 }

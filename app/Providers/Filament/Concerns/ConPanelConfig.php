@@ -31,9 +31,9 @@ trait ConPanelConfig
             ->profile(EditProfile::class, isSimple: false)
             ->passwordReset()
             ->brandName($config['brandName'])
-            ->brandLogo(new HtmlString('<div class="sigem-brand"><img src="' . asset('images/sigem-icon.svg') . '" alt="SIGEM" class="sigem-brand-logo"></div>'))
+            ->brandLogo(new HtmlString('<div class="sigem-brand"><img src="/images/sigem-icon.svg" alt="SIGEM" class="sigem-brand-logo"></div>'))
             ->brandLogoHeight('auto')
-            ->favicon(asset('images/sigem-icon.svg'))
+            ->favicon('/images/sigem-icon.svg?v=2')
             ->font('DM Sans')
             ->globalSearch(false)
             ->darkMode(false)
@@ -80,6 +80,8 @@ trait ConPanelConfig
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+<link rel="icon" type="image/svg+xml" href="/images/sigem-icon.svg?v=2">
+<link rel="shortcut icon" type="image/svg+xml" href="/images/sigem-icon.svg?v=2">
 <link rel="stylesheet" href="{{ asset('css/sigem-theme.css') }}?v={{ file_exists(public_path('css/sigem-theme.css')) ? filemtime(public_path('css/sigem-theme.css')) : 1 }}">
 <script src="{{ asset('js/sigem-network.js') }}" defer></script>
 <script src="{{ asset('js/sigem-titles.js') }}" defer></script>

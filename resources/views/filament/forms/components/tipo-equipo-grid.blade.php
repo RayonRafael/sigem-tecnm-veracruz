@@ -5,7 +5,7 @@
         ['id' => 'aio', 'nombre' => 'All in One', 'icono' => '🖥️', 'desc' => 'Equipo + teclado y mouse'],
         ['id' => 'lap', 'nombre' => 'Laptop', 'icono' => '💻', 'desc' => 'Laptop / Notebook'],
         ['id' => 'cpu', 'nombre' => 'CPU', 'icono' => '🗄️', 'desc' => 'Computadora de Escritorio / CPU'],
-        ['id' => 'mon', 'nombre' => 'Monitor', 'icono' => '🖵', 'desc' => 'Monitor / Pantalla'],
+        ['id' => 'mon', 'nombre' => 'Monitor', 'icono' => '🖥️', 'desc' => 'Monitor / Pantalla'],
         ['id' => 'tec', 'nombre' => 'Teclado', 'icono' => '⌨️', 'desc' => 'Teclado'],
         ['id' => 'mou', 'nombre' => 'Mouse', 'icono' => '🖱️', 'desc' => 'Mouse (Ratón)'],
         ['id' => 'imp', 'nombre' => 'Impresora', 'icono' => '🖨️', 'desc' => 'Impresora Láser o Inyección'],

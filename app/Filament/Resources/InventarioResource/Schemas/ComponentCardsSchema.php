@@ -57,8 +57,8 @@ class ComponentCardsSchema
                     Forms\Components\Checkbox::make('especificaciones.no_tiene_monitor')
                         ->label('No tiene')
                         ->live()
-                        ->extraAttributes([
-                            'style' => 'position: absolute; top: 14px; right: 20px; width: auto; z-index: 20; pointer-events: auto !important; cursor: pointer;',
+                        ->extraFieldWrapperAttributes([
+                            'class' => 'sigem-no-tiene-toggle',
                         ]),
 
                     Forms\Components\Grid::make(['default' => 1, 'sm' => 2, 'lg' => 3])
@@ -148,8 +148,8 @@ class ComponentCardsSchema
                     Forms\Components\Checkbox::make('especificaciones.no_tiene_teclado')
                         ->label('No tiene')
                         ->live()
-                        ->extraAttributes([
-                            'style' => 'position: absolute; top: 14px; right: 20px; width: auto; z-index: 20; pointer-events: auto !important; cursor: pointer;',
+                        ->extraFieldWrapperAttributes([
+                            'class' => 'sigem-no-tiene-toggle',
                         ]),
 
                     Forms\Components\Grid::make(['default' => 1, 'sm' => 2, 'lg' => 3])
@@ -204,8 +204,8 @@ class ComponentCardsSchema
                     Forms\Components\Checkbox::make('especificaciones.no_tiene_mouse')
                         ->label('No tiene')
                         ->live()
-                        ->extraAttributes([
-                            'style' => 'position: absolute; top: 14px; right: 20px; width: auto; z-index: 20; pointer-events: auto !important; cursor: pointer;',
+                        ->extraFieldWrapperAttributes([
+                            'class' => 'sigem-no-tiene-toggle',
                         ]),
 
                     Forms\Components\Grid::make(['default' => 1, 'sm' => 2, 'lg' => 3])
