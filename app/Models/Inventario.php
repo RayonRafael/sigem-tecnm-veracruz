@@ -43,6 +43,15 @@ class Inventario extends Model
             });
     }
 
+    public function tapActivity(\Spatie\Activitylog\Contracts\Activity $activity, string $eventName): void
+    {
+        $props = $activity->properties ?? collect();
+        $activity->properties = $props->merge([
+            'equipo_codigo' => filled($this->codigo) ? (string) $this->codigo : null,
+            'equipo_num_serie' => filled($this->num_serie) ? (string) $this->num_serie : null,
+        ]);
+    }
+
     protected $table = 'inventario';
 
     protected $primaryKey = 'id_inventario';

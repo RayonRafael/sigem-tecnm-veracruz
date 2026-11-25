@@ -83,26 +83,45 @@ class EstadisticasReportsBuilder
 
     protected function estadisticasDeptoMasEquipos(array $filtros): array
     {
+        $deptoFiltro = ! empty($filtros['departamento_id']) ? (int) $filtros['departamento_id'] : null;
+
         $statsQ = Inventario::query()
             ->leftJoin('area', 'inventario.area_id', '=', 'area.id_area')
             ->selectRaw('COALESCE(inventario.departamento_id, area.id_departamento) as depto_id, COUNT(*) as cant')
             ->groupByRaw('COALESCE(inventario.departamento_id, area.id_departamento)');
         SigemReportExporter::aplicarFiltroFechas($statsQ, $filtros);
+        if ($deptoFiltro) {
+            $statsQ->whereRaw('COALESCE(inventario.departamento_id, area.id_departamento) = ?', [$deptoFiltro]);
+        }
 
         $countsByDepto = $statsQ->get();
         $totalGeneral = (int) $countsByDepto->sum('cant');
-        $deptosMap = Departamento::pluck('nombre', 'id_departamento');
+        $countsMap = $countsByDepto
+            ->filter(fn ($r) => $r->depto_id !== null)
+            ->keyBy(fn ($r) => (int) $r->depto_id);
 
-        $ranking = [];
-        foreach ($countsByDepto as $row) {
-            if ($row->depto_id !== null && isset($deptosMap[$row->depto_id]) && (int) $row->cant > 0) {
-                $cant = (int) $row->cant;
-                $pct = $totalGeneral > 0 ? round(($cant / $totalGeneral) * 100, 1) . '%' : '0%';
-                $ranking[] = [$deptosMap[$row->depto_id], $cant, $pct];
-            }
+        $deptosMap = Departamento::orderBy('nombre')->pluck('nombre', 'id_departamento');
+        if ($deptoFiltro) {
+            $deptosMap = $deptosMap->has($deptoFiltro)
+                ? collect([$deptoFiltro => $deptosMap->get($deptoFiltro)])
+                : collect();
         }
 
-        usort($ranking, fn ($a, $b) => $b[1] <=> $a[1]);
+        // Incluir TODOS los departamentos (también los de 0 equipos) para visibilidad completa
+        $ranking = [];
+        foreach ($deptosMap as $idDepto => $nombreDepto) {
+            $cant = (int) ($countsMap->get((int) $idDepto)->cant ?? 0);
+            $pct = $totalGeneral > 0 ? round(($cant / $totalGeneral) * 100, 1) . '%' : '0%';
+            $ranking[] = [$nombreDepto, $cant, $pct];
+        }
+
+        usort($ranking, function (array $a, array $b): int {
+            if ($b[1] !== $a[1]) {
+                return $b[1] <=> $a[1];
+            }
+
+            return strcasecmp((string) $a[0], (string) $b[0]);
+        });
 
         return $ranking;
     }

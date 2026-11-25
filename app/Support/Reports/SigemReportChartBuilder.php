@@ -36,8 +36,15 @@ class SigemReportChartBuilder
 
             case 'inventario_por_departamento':
             case 'estadisticas_depto_mas_equipos':
+                // Incluir TODOS los departamentos (incluso los de 0 equipos) sin recortar en 8
+                foreach ($rows as $r) {
+                    $labels[] = (string) ($r[0] ?? '');
+                    $data[] = (int) ($r[1] ?? 0);
+                }
+                break;
+
             case 'mantenimiento_depto_pide_mas':
-                foreach (array_slice($rows, 0, 8) as $r) {
+                foreach (array_slice($rows, 0, 12) as $r) {
                     $labels[] = (string) ($r[0] ?? '');
                     $data[] = (int) ($r[1] ?? 0);
                 }
@@ -130,12 +137,17 @@ class SigemReportChartBuilder
             $bgColors = $meta['chart_color'] ?? '#1b65d4';
         }
 
+        $chartTitle = $meta['chart_title'] ?? ($meta['titulo'] ?? 'Reporte');
+        $chartUnit = $meta['chart_unit'] ?? 'registros';
+
         return [
             'type' => $type,
+            'chart_title' => $chartTitle,
+            'chart_unit' => $chartUnit,
             'labels' => $labels,
             'datasets' => [
                 [
-                    'label' => $meta['titulo'] ?? 'Reporte',
+                    'label' => $chartTitle,
                     'data' => $data,
                     'backgroundColor' => $bgColors,
                     'borderColor' => $isPieOrDonut ? '#ffffff' : ($meta['chart_color'] ?? '#1b65d4'),
@@ -149,6 +161,20 @@ class SigemReportChartBuilder
                 'responsive' => true,
                 'maintainAspectRatio' => false,
                 'plugins' => [
+                    'title' => [
+                        'display' => true,
+                        'text' => $chartTitle,
+                        'align' => 'start',
+                        'color' => '#0f172a',
+                        'font' => [
+                            'size' => 15,
+                            'weight' => '600',
+                        ],
+                        'padding' => [
+                            'top' => 4,
+                            'bottom' => 14,
+                        ],
+                    ],
                     'legend' => [
                         'display' => $isPieOrDonut,
                         'position' => 'bottom',

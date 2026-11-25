@@ -16,7 +16,7 @@
 <div class="sigem-bitacora-filters">
     <input type="text"
            wire:model.live.debounce.300ms="bitacoraSearch"
-           placeholder="🔍 Buscar usuario, evento o detalle..."
+           placeholder="🔍 Buscar usuario, equipo, evento o detalle..."
            style="min-width: 220px; flex: 1;">
 
     <select wire:model.live="bitacoraUsuario" style="min-width: 170px;">
@@ -64,16 +64,25 @@
                         <th>Usuario</th>
                         <th>Rol</th>
                         <th>Acción</th>
+                        <th>Equipo</th>
                         <th>Detalle</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($bitacoraRows as $brow)
-                        <tr>
+                    @foreach ($bitacoraRows as $bIdx => $brow)
+                        @php $equipoTxt = $brow['equipo'] ?? '—'; @endphp
+                        <tr wire:key="bitacora-row-{{ $brow['id'] ?? $bIdx }}">
                             <td><span class="sigem-td-folio">{{ $brow['fecha'] }}</span></td>
                             <td>{!! $brow['usuario'] !!}</td>
                             <td>{!! $brow['rol'] !!}</td>
                             <td>{!! $brow['accion'] !!}</td>
+                            <td>
+                                @if ($equipoTxt !== '—')
+                                    <span class="sigem-td-folio">{{ $equipoTxt }}</span>
+                                @else
+                                    <span style="color: var(--sig-muted);">—</span>
+                                @endif
+                            </td>
                             <td>{{ $brow['detalle'] }}</td>
                         </tr>
                     @endforeach

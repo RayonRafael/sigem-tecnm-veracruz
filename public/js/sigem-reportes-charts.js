@@ -143,8 +143,80 @@ if (!window.sigemChartComponent) {
                 }
 
                 const rawOptions = Object.assign({}, chartConfig.options || {});
+                const incomingTitle = chartConfig.options?.plugins?.title || null;
+                const chartTitleText = incomingTitle?.text || chartConfig.chart_title || chartConfig.datasets?.[0]?.label || '';
+                const chartUnit = chartConfig.chart_unit || 'registros';
                 delete rawOptions.plugins;
                 delete rawOptions.scales;
+
+                const formatValueWithUnit = (val) => {
+                    const num = Number(val ?? 0);
+                    if (chartUnit === 'MXN') {
+                        return '$' + num.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' MXN';
+                    }
+                    const singularMap = {
+                        equipos: 'equipo',
+                        mantenimientos: 'mantenimiento',
+                        movimientos: 'movimiento',
+                        cambios: 'cambio',
+                        acciones: 'acción',
+                        registros: 'registro'
+                    };
+                    const unitLabel = num === 1 ? (singularMap[chartUnit] || chartUnit) : chartUnit;
+                    return `${num} ${unitLabel}`;
+                };
+
+                // Opción C: en gráficas de barras, mostrar indicador mínimo visible y etiqueta "0"
+                // para departamentos/elementos con 0 registros + valores legibles al lado de cada barra.
+                const sigemZeroBarPlugin = {
+                    id: 'sigemZeroBarAndValueLabels',
+                    afterDatasetsDraw(chart) {
+                        if (chart.config.type !== 'bar') return;
+                        const { ctx: c, data, scales } = chart;
+                        const dataset = data.datasets?.[0];
+                        const meta = chart.getDatasetMeta(0);
+                        if (!dataset || !meta || !meta.data) return;
+
+                        const horizontal = chart.options?.indexAxis === 'y';
+                        c.save();
+                        c.font = '600 11.5px Inter, system-ui, -apple-system, sans-serif';
+                        c.textBaseline = 'middle';
+
+                        meta.data.forEach((barEl, idx) => {
+                            const val = Number(dataset.data?.[idx] ?? 0);
+                            if (horizontal) {
+                                const xBase = scales.x ? scales.x.getPixelForValue(0) : barEl.base;
+                                if (val === 0) {
+                                    const barH = Math.max(8, Math.min(18, (barEl.height || 14)));
+                                    c.fillStyle = '#cbd5e1';
+                                    c.fillRect(xBase, barEl.y - barH / 2, 4, barH);
+                                    c.fillStyle = '#64748b';
+                                    c.textAlign = 'left';
+                                    c.fillText('0', xBase + 9, barEl.y);
+                                } else {
+                                    c.fillStyle = '#334155';
+                                    c.textAlign = 'left';
+                                    c.fillText(String(val), barEl.x + 6, barEl.y);
+                                }
+                            } else {
+                                const yBase = scales.y ? scales.y.getPixelForValue(0) : barEl.base;
+                                c.textAlign = 'center';
+                                if (val === 0) {
+                                    const barW = Math.max(10, Math.min(28, (barEl.width || 18)));
+                                    c.fillStyle = '#cbd5e1';
+                                    c.fillRect(barEl.x - barW / 2, yBase - 4, barW, 4);
+                                    c.fillStyle = '#64748b';
+                                    c.fillText('0', barEl.x, yBase - 12);
+                                } else {
+                                    c.fillStyle = '#334155';
+                                    c.fillText(String(val), barEl.x, barEl.y - 10);
+                                }
+                            }
+                        });
+
+                        c.restore();
+                    }
+                };
 
                 try {
                     this.chartInstance = new Chart(ctx, {
@@ -153,14 +225,23 @@ if (!window.sigemChartComponent) {
                             labels: chartConfig.labels,
                             datasets: chartConfig.datasets
                         },
+                        plugins: [sigemZeroBarPlugin],
                         options: Object.assign({
                             responsive: true,
                             maintainAspectRatio: false,
                             resizeDelay: 150,
                             layout: {
-                                padding: { left: 10, right: 18, top: 8, bottom: 8 }
+                                padding: { left: 10, right: isHorizontal ? 34 : 18, top: 8, bottom: 8 }
                             },
                             plugins: {
+                                title: Object.assign({
+                                    display: Boolean(chartTitleText),
+                                    text: chartTitleText,
+                                    align: 'start',
+                                    color: '#0f172a',
+                                    font: { size: 15, weight: '600' },
+                                    padding: { top: 4, bottom: 14 }
+                                }, incomingTitle || {}),
                                 legend: {
                                     display: isPieOrDonut,
                                     position: 'right',
@@ -173,6 +254,12 @@ if (!window.sigemChartComponent) {
                                             if (!items.length) return '';
                                             const idx = items[0].dataIndex;
                                             return chartConfig.labels?.[idx] ?? items[0].label ?? '';
+                                        },
+                                        label: function (context) {
+                                            const rawVal = isHorizontal
+                                                ? (context.parsed?.x ?? context.raw)
+                                                : (isPieOrDonut ? context.raw : (context.parsed?.y ?? context.raw));
+                                            return ' ' + formatValueWithUnit(rawVal);
                                         }
                                     }
                                 }

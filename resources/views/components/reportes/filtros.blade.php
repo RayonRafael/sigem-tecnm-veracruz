@@ -1,22 +1,32 @@
 @props([
     'livewire',
     'deptosFiltros' => [],
+    'mostrarControlesFecha' => true,
+    'usaFechasInicial' => true,
 ])
 
 <div class="sigem-filter-toolbar">
-    <div class="sigem-filter-group">
-        <span class="sigem-filter-label">📅 Desde:</span>
-        <input type="date"
-               wire:model.live="filtroFechaDesde"
-               class="sigem-filter-input">
-    </div>
+    @if ($mostrarControlesFecha)
+        <div class="sigem-filter-group sigem-filter-fecha"
+             x-show="openId && reportesConFechas.includes(openId)"
+             @if (! $usaFechasInicial) style="display: none;" @endif
+             title="Los filtros de fecha aplican solo a reportes históricos y cronológicos">
+            <span class="sigem-filter-label">📅 Desde:</span>
+            <input type="date"
+                   wire:model.live="filtroFechaDesde"
+                   class="sigem-filter-input">
+        </div>
 
-    <div class="sigem-filter-group">
-        <span class="sigem-filter-label">📅 Hasta:</span>
-        <input type="date"
-               wire:model.live="filtroFechaHasta"
-               class="sigem-filter-input">
-    </div>
+        <div class="sigem-filter-group sigem-filter-fecha"
+             x-show="openId && reportesConFechas.includes(openId)"
+             @if (! $usaFechasInicial) style="display: none;" @endif
+             title="Los filtros de fecha aplican solo a reportes históricos y cronológicos">
+            <span class="sigem-filter-label">📅 Hasta:</span>
+            <input type="date"
+                   wire:model.live="filtroFechaHasta"
+                   class="sigem-filter-input">
+        </div>
+    @endif
 
     <div class="sigem-filter-group">
         <span class="sigem-filter-label">🏢 Depto:</span>
@@ -38,7 +48,7 @@
         </select>
     </div>
 
-    @if ($livewire->filtroFechaDesde || $livewire->filtroFechaHasta || $livewire->filtroDepartamentoId || $livewire->filtroAreaId)
+    @if (($mostrarControlesFecha && ($livewire->filtroFechaDesde || $livewire->filtroFechaHasta)) || $livewire->filtroDepartamentoId || $livewire->filtroAreaId)
         <button type="button"
                 wire:click="limpiarFiltrosNuevosReportes"
                 class="sigem-btn-export-csv"

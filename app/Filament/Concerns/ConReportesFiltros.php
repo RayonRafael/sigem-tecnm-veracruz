@@ -85,4 +85,37 @@ trait ConReportesFiltros
             'area_id' => $this->filtroAreaId,
         ];
     }
+
+    /**
+     * Indica si un reporte específico admite filtros de rango de fechas (Desde / Hasta).
+     */
+    public function reporteUsaFechas(?string $reportId): bool
+    {
+        if (blank($reportId)) {
+            return false;
+        }
+
+        $meta = SigemReportExporter::findReporte($reportId);
+
+        return (bool) ($meta['usa_fechas'] ?? false);
+    }
+
+    /**
+     * Retorna los IDs de reportes visibles que admiten filtros de fecha (Desde / Hasta).
+     *
+     * @param  iterable<int, array<string, mixed>>  $reportes
+     * @return array<int, string>
+     */
+    public function getReportesIdsConFechas(iterable $reportes): array
+    {
+        $ids = [];
+        foreach ($reportes as $rep) {
+            $id = $rep['id'] ?? null;
+            if (is_string($id) && ($rep['usa_fechas'] ?? $this->reporteUsaFechas($id))) {
+                $ids[] = $id;
+            }
+        }
+
+        return $ids;
+    }
 }

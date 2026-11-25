@@ -33,10 +33,12 @@
     if ($isPieOrDonut) {
         $canvasHeight = 400;
     } elseif ($isHorizontalBar) {
-        $canvasHeight = max(350, min(560, $numPuntos * 44 + 60));
+        $canvasHeight = max(350, $numPuntos * 40 + 80);
     } else {
-        $canvasHeight = 350;
+        $canvasHeight = 360;
     }
+
+    $chartTitleDisplay = $rep['chart_title'] ?? ($rep['chart']['chart_title'] ?? $rep['titulo']);
 
     $esColNum = fn (string $h): bool => (bool) preg_match('/^(cantidad|total|propios|rentados|solicitudes|completadas|pendientes|porcentaje|%|días|dias|mín|min|máx|max|equipos|deptos|áreas|areas|usuarios|acciones|costo|año|frecuencia)/u', mb_strtolower(trim($h), 'UTF-8'))
         || str_contains(mb_strtolower($h, 'UTF-8'), 'cantidad')
@@ -71,9 +73,16 @@
          x-transition:leave="sigem-acc-leave"
          x-transition:leave-start="sigem-acc-leave-start"
          x-transition:leave-end="sigem-acc-leave-end">
-        @if (! empty($rep['descripcion']))
+        @if (! empty($rep['descripcion']) || ! empty($chartTitleDisplay))
             <div class="sigem-rep-acc-desc-bar">
-                <div class="sigem-rep-d">{{ $rep['descripcion'] }}</div>
+                @if (! empty($chartTitleDisplay) && $chartTitleDisplay !== ($rep['titulo'] ?? ''))
+                    <div class="sigem-chart-subtitle" style="font-size: 14.5px; font-weight: 700; color: #0f172a; margin-bottom: 3px;">
+                        {{ $chartTitleDisplay }}
+                    </div>
+                @endif
+                @if (! empty($rep['descripcion']))
+                    <div class="sigem-rep-d">{{ $rep['descripcion'] }}</div>
+                @endif
             </div>
         @endif
 
@@ -85,9 +94,11 @@
              x-init="initChart()"
              x-effect="if (openId === '{{ $repId }}') { $nextTick(() => ensureRendered()); }">
             @if ($numPuntos > 0)
-                <div class="sigem-chart-canvas-wrap {{ $isPieOrDonut ? 'sigem-chart-radial-wrap' : 'sigem-chart-wide-wrap' }}"
-                     style="min-height: {{ $canvasHeight }}px; height: {{ $canvasHeight }}px; position: relative;">
-                    <canvas x-ref="canvas"></canvas>
+                <div class="sigem-chart-scroll-box" style="{{ $isHorizontalBar && $canvasHeight > 560 ? 'max-height: 560px; overflow-y: auto; padding-right: 4px;' : '' }}">
+                    <div class="sigem-chart-canvas-wrap {{ $isPieOrDonut ? 'sigem-chart-radial-wrap' : 'sigem-chart-wide-wrap' }}"
+                         style="min-height: {{ $canvasHeight }}px; height: {{ $canvasHeight }}px; position: relative;">
+                        <canvas x-ref="canvas"></canvas>
+                    </div>
                 </div>
             @else
                 <div class="sin-grafica" style="padding: 24px; text-align: center; color: #94a3b8; background: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1; font-size: 13.5px;">
