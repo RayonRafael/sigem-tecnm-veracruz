@@ -30,6 +30,7 @@ class AreaResource extends Resource
     {
         return [CatalogoBaseFormSchema::section('📍 Datos del área', 'heroicon-m-map-pin', [
             CatalogoBaseFormSchema::campoNombre('Nombre del área', 'Ej. Laboratorio de Redes', uniqueModel: Area::class, uniqueLabel: 'un área'),
+            CatalogoBaseFormSchema::alertaSimilitudCatalogo('nombre', Area::class, 'un área'),
             CatalogoBaseFormSchema::selectRelacionConCreacion('id_departamento', 'Departamento', 'departamento', 'heroicon-m-building-office-2', '✏️ Agregar departamento como nueva opción', 'Nombre del departamento', 'Ej. Sistemas y Computación', 'El departamento estará disponible inmediatamente en el catálogo.', 'Departamento creado correctamente', true),
         ], 2)];
     }

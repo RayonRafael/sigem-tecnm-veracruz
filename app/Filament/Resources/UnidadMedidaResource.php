@@ -29,6 +29,7 @@ class UnidadMedidaResource extends Resource
         return [
             CatalogoBaseFormSchema::section('📏 Datos de la unidad de medida', 'heroicon-m-bars-3-bottom-left', [
                 CatalogoBaseFormSchema::campoNombre('Nombre de la unidad', 'Ej. Pieza, Caja, Metro', 'heroicon-m-bars-3-bottom-left', 50, UnidadMedida::class, 'una unidad de medida'),
+                CatalogoBaseFormSchema::alertaSimilitudCatalogo('nombre', UnidadMedida::class, 'una unidad de medida'),
             ]),
         ];
     }

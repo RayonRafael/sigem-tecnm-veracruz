@@ -74,10 +74,51 @@ class CatalogoBaseFormSchema
             ->maxLength($maxLength);
 
         if ($uniqueModel !== null && $uniqueLabel !== null) {
-            $field->rule(static::reglaNombreUnico($uniqueModel, $uniqueLabel));
+            $field
+                ->live(onBlur: true)
+                ->rule(static::reglaNombreUnico($uniqueModel, $uniqueLabel));
         }
 
         return $field;
+    }
+
+    /**
+     * Banner reactivo no-bloqueante de advertencia (Nivel 2) o sugerencia (Nivel 3)
+     * cuando el texto ingresado es similar o una abreviación de un registro existente.
+     *
+     * @param  class-string<\Illuminate\Database\Eloquent\Model>  $modelClass
+     */
+    public static function alertaSimilitudCatalogo(
+        string $fieldName,
+        string $modelClass,
+        string $etiquetaArticulo,
+        string $column = 'nombre',
+        bool $ignorarRecord = true,
+    ): Forms\Components\Placeholder {
+        $resolver = function (Forms\Get $get, ?\Illuminate\Database\Eloquent\Model $record = null) use ($fieldName, $modelClass, $etiquetaArticulo, $column, $ignorarRecord): array {
+            $val = $get($fieldName);
+            if (! is_scalar($val) || trim((string) $val) === '') {
+                return ['accion' => SigemUniqueValidator::ACCION_PERMITIR];
+            }
+
+            $ignoreId = ($ignorarRecord && $record instanceof $modelClass) ? $record->getKey() : null;
+
+            return SigemUniqueValidator::analizarCatalogo($modelClass, $column, (string) $val, $etiquetaArticulo, $ignoreId);
+        };
+
+        return Forms\Components\Placeholder::make('alerta_similitud_' . str_replace('.', '_', $fieldName))
+            ->label('')
+            ->hiddenLabel()
+            ->visible(function (Forms\Get $get, ?\Illuminate\Database\Eloquent\Model $record = null) use ($resolver): bool {
+                $analisis = $resolver($get, $record);
+
+                return in_array($analisis['accion'] ?? '', [
+                    SigemUniqueValidator::ACCION_ADVERTIR,
+                    SigemUniqueValidator::ACCION_SUGERIR,
+                ], true);
+            })
+            ->content(fn (Forms\Get $get, ?\Illuminate\Database\Eloquent\Model $record = null) => SigemUniqueValidator::renderAlertaHtml($resolver($get, $record)))
+            ->columnSpanFull();
     }
 
     public static function selectRelacionConCreacion(
@@ -107,10 +148,23 @@ class CatalogoBaseFormSchema
             'unidad' => [UnidadMedida::class, 'una unidad de medida'],
         ];
 
+        $alertaRelacion = null;
         if (isset($relacionUniqueMap[$relationship])) {
             [$relModel, $relLabel] = $relacionUniqueMap[$relationship];
-            $createNombreField->rule(static::reglaNombreUnico($relModel, $relLabel, 'nombre', false));
+            $createNombreField
+                ->live(onBlur: true)
+                ->rule(static::reglaNombreUnico($relModel, $relLabel, 'nombre', false));
+            $alertaRelacion = static::alertaSimilitudCatalogo('nombre', $relModel, $relLabel, 'nombre', false);
         }
+
+        $createOptionSchema = [
+            SubformSlideOverHelper::headerNav(),
+            $createNombreField,
+        ];
+        if ($alertaRelacion !== null) {
+            $createOptionSchema[] = $alertaRelacion;
+        }
+        $createOptionSchema[] = SubformSlideOverHelper::catalogTip($tip);
 
         $select = Forms\Components\Select::make($name)
             ->placeholder('Selecciona...')
@@ -120,11 +174,7 @@ class CatalogoBaseFormSchema
             ->searchable()
             ->preload()
             ->prefixIcon($icon)
-            ->createOptionForm([
-                SubformSlideOverHelper::headerNav(),
-                $createNombreField,
-                SubformSlideOverHelper::catalogTip($tip),
-            ])
+            ->createOptionForm($createOptionSchema)
             ->createOptionAction(fn (Action $action) => SubformSlideOverHelper::configureAction(
                 $action,
                 $modalHeading,

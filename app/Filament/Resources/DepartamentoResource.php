@@ -29,6 +29,7 @@ class DepartamentoResource extends Resource
     {
         return [CatalogoBaseFormSchema::section('📁 Datos del departamento', 'heroicon-m-building-office-2', [
             CatalogoBaseFormSchema::campoNombre('Nombre', 'Ej. Departamento de Ciencias Básicas', uniqueModel: Departamento::class, uniqueLabel: 'un departamento'),
+            CatalogoBaseFormSchema::alertaSimilitudCatalogo('nombre', Departamento::class, 'un departamento'),
             Forms\Components\TextInput::make('encargado')->label('Jefe del Departamento')->placeholder('Ej. Dr. Juan Pérez')->helperText('Jefe o responsable del departamento')->nullable()->prefixIcon('heroicon-m-user')->maxLength(100),
         ])];
     }

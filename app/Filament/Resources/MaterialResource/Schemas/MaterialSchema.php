@@ -30,8 +30,10 @@ class MaterialSchema
                                     ->required()
                                     ->prefixIcon('heroicon-m-tag')
                                     ->maxLength(150)
+                                    ->live(onBlur: true)
                                     ->rule(CatalogoBaseFormSchema::reglaNombreUnico(Material::class, 'un material'))
                                     ->columnSpanFull(),
+                                CatalogoBaseFormSchema::alertaSimilitudCatalogo('nombre', Material::class, 'un material'),
                                 Forms\Components\TextInput::make('modelo')
                                     ->placeholder('Ej. OptiPlex 7090')
                                     ->prefixIcon('heroicon-m-qr-code')

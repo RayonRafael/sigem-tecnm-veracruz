@@ -23,7 +23,9 @@ class ProveedorSchema
                     ->required()
                     ->prefixIcon('heroicon-m-building-storefront')
                     ->maxLength(150)
+                    ->live(onBlur: true)
                     ->rule(CatalogoBaseFormSchema::reglaNombreUnico(Proveedor::class, 'un proveedor', 'nombre_empresa')),
+                CatalogoBaseFormSchema::alertaSimilitudCatalogo('nombre_empresa', Proveedor::class, 'un proveedor', 'nombre_empresa'),
                 Forms\Components\TextInput::make('rfc')
                     ->label('RFC')
                     ->placeholder('Ej. STE200101AAA')

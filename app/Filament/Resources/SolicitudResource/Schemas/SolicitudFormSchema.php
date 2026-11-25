@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SolicitudResource\Schemas;
 
+use App\Filament\Schemas\CatalogoBaseFormSchema;
 use App\Models\Material;
 use App\Models\MarcaMaterial;
 use App\Models\Receptor;
@@ -53,7 +54,9 @@ class SolicitudFormSchema
                                             ->placeholder('Ej. Bobina cable UTP, Pasta térmica...')
                                             ->required()
                                             ->maxLength(100)
+                                            ->live(onBlur: true)
                                             ->rule(SigemUniqueValidator::reglaCatalogoUnico(Material::class, 'un material', 'nombre', false)),
+                                        CatalogoBaseFormSchema::alertaSimilitudCatalogo('nombre', Material::class, 'un material', 'nombre', false),
                                         SubformSlideOverHelper::catalogTip('El material estará disponible inmediatamente en el catálogo.'),
                                     ])
                                     ->createOptionUsing(function (array $data): int {

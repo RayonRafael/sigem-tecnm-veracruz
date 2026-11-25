@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\InventarioResource\Schemas;
 
+use App\Filament\Schemas\CatalogoBaseFormSchema;
 use App\Models\Inventario;
 use App\Models\MarcaMaterial;
 use App\Models\Receptor;
@@ -14,13 +15,44 @@ use Illuminate\Support\Carbon;
 trait InventarioFormFields
 {
     /**
-     * Regla de unicidad para No. de serie (case-insensitive, incluye soft-deleted, permite vacío).
+     * Regla de unicidad para No. de serie (Nivel 1: normalizado, incluye soft-deleted, permite vacío).
      *
      * @param  array<int, array{field: string, skipIf?: string, onlyTypes?: array<int, string>}>  $camposHermanos
      */
     protected static function getNumSerieUniqueRule(array $camposHermanos = []): \Closure
     {
         return SigemUniqueValidator::reglaSerieUnica($camposHermanos);
+    }
+
+    /**
+     * Banner reactivo no-bloqueante de advertencia (Nivel 2: Levenshtein <= 2)
+     * cuando el No. de serie capturado es muy similar a uno ya existente.
+     */
+    protected static function getNumSerieSimilarAlert(string $fieldName, ?\Closure $extraVisible = null): Forms\Components\Placeholder
+    {
+        $resolver = function (Forms\Get $get, ?Inventario $record = null) use ($fieldName): array {
+            $val = $get($fieldName);
+            if (! is_scalar($val) || trim((string) $val) === '') {
+                return ['accion' => SigemUniqueValidator::ACCION_PERMITIR];
+            }
+
+            return SigemUniqueValidator::analizarSerieInventario((string) $val, $record?->getKey());
+        };
+
+        return Forms\Components\Placeholder::make('alerta_sn_similar_' . str_replace('.', '_', $fieldName))
+            ->label('')
+            ->hiddenLabel()
+            ->visible(function (Forms\Get $get, ?Inventario $record = null) use ($resolver, $extraVisible): bool {
+                if ($extraVisible !== null && ! $extraVisible($get)) {
+                    return false;
+                }
+
+                $analisis = $resolver($get, $record);
+
+                return ($analisis['accion'] ?? '') === SigemUniqueValidator::ACCION_ADVERTIR;
+            })
+            ->content(fn (Forms\Get $get, ?Inventario $record = null) => SigemUniqueValidator::renderAlertaHtml($resolver($get, $record)))
+            ->columnSpanFull();
     }
 
     public static function getRentaFechaFinField(): Forms\Components\DatePicker
@@ -306,7 +338,9 @@ trait InventarioFormFields
                     ->placeholder('Ej. Dell, HP, Lenovo...')
                     ->required()
                     ->maxLength(100)
+                    ->live(onBlur: true)
                     ->rule(SigemUniqueValidator::reglaCatalogoUnico(MarcaMaterial::class, 'una marca', 'nombre', false)),
+                CatalogoBaseFormSchema::alertaSimilitudCatalogo('nombre', MarcaMaterial::class, 'una marca', 'nombre', false),
                 SubformSlideOverHelper::catalogTip('La marca estará disponible inmediatamente en el catálogo.'),
             ])
             ->createOptionUsing(function (array $data) {

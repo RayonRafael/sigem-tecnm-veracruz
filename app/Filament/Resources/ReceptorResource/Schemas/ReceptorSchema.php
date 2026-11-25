@@ -29,19 +29,46 @@ class ReceptorSchema
                     ->required()
                     ->prefixIcon('heroicon-m-user')
                     ->maxLength(100)
+                    ->live(onBlur: true)
                     ->rule(SigemUniqueValidator::reglaReceptorUnico()),
                 Forms\Components\TextInput::make('apellido_paterno')
                     ->label('Apellido paterno')
                     ->placeholder('Ej. Hernández')
                     ->required()
                     ->prefixIcon('heroicon-m-user')
-                    ->maxLength(100),
+                    ->maxLength(100)
+                    ->live(onBlur: true),
                 Forms\Components\TextInput::make('apellido_materno')
                     ->label('Apellido materno')
                     ->placeholder('Ej. García')
                     ->required()
                     ->prefixIcon('heroicon-m-user')
-                    ->maxLength(100),
+                    ->maxLength(100)
+                    ->live(onBlur: true),
+                Forms\Components\Placeholder::make('alerta_similitud_receptor')
+                    ->label('')
+                    ->hiddenLabel()
+                    ->visible(function (Forms\Get $get, ?Receptor $record = null): bool {
+                        $analisis = SigemUniqueValidator::analizarReceptor(
+                            is_scalar($get('nombre')) ? (string) $get('nombre') : null,
+                            is_scalar($get('apellido_paterno')) ? (string) $get('apellido_paterno') : null,
+                            is_scalar($get('apellido_materno')) ? (string) $get('apellido_materno') : null,
+                            $record?->getKey(),
+                        );
+
+                        return $analisis['accion'] === SigemUniqueValidator::ACCION_ADVERTIR;
+                    })
+                    ->content(function (Forms\Get $get, ?Receptor $record = null) {
+                        $analisis = SigemUniqueValidator::analizarReceptor(
+                            is_scalar($get('nombre')) ? (string) $get('nombre') : null,
+                            is_scalar($get('apellido_paterno')) ? (string) $get('apellido_paterno') : null,
+                            is_scalar($get('apellido_materno')) ? (string) $get('apellido_materno') : null,
+                            $record?->getKey(),
+                        );
+
+                        return SigemUniqueValidator::renderAlertaHtml($analisis);
+                    })
+                    ->columnSpanFull(),
                 Forms\Components\Select::make('tipo')
                     ->label('Tipo')
                     ->placeholder('Selecciona el tipo...')
@@ -119,7 +146,9 @@ class ReceptorSchema
                             ->placeholder('Ej. Laboratorio de Cómputo')
                             ->required()
                             ->maxLength(100)
+                            ->live(onBlur: true)
                             ->rule(CatalogoBaseFormSchema::reglaNombreUnico(Area::class, 'un área', 'nombre', false)),
+                        CatalogoBaseFormSchema::alertaSimilitudCatalogo('nombre', Area::class, 'un área', 'nombre', false),
                         Forms\Components\Select::make('id_departamento')
                             ->placeholder('Selecciona...')
                             ->label('Departamento')
