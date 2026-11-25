@@ -508,10 +508,15 @@ button[role="switch"][aria-checked="true"] {
       overflow-x: hidden !important;
     }
 
-    .choices__item {
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
-      white-space: nowrap !important;
+    .choices__item,
+    .choices__item--choice {
+      white-space: normal !important;
+      overflow: visible !important;
+      text-overflow: clip !important;
+      overflow-wrap: anywhere !important;
+      word-break: break-word !important;
+      line-height: 1.4 !important;
+      padding: 8px 12px !important;
       max-width: 100% !important;
     }
   }

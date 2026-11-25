@@ -299,3 +299,18 @@ body:has(.fi-modal-open .fi-modal-slide-over-window) .fi-topbar nav {
     margin-right: 0 !important;
   }
 }
+
+/* ==========================================================================
+   Choices.js: Texto completo en dropdowns (sin truncado "...")
+   ========================================================================== */
+.choices__list--dropdown .choices__item,
+.choices__list[aria-expanded] .choices__item,
+.choices__item--choice {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  line-height: 1.4 !important;
+  padding: 8px 12px !important;
+}

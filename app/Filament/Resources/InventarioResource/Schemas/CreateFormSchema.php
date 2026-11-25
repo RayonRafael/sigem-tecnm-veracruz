@@ -103,7 +103,7 @@ class CreateFormSchema
                 ->description('Ubicación física estructurada y receptor asignado al equipo')
                 ->icon('heroicon-m-map-pin')
                 ->schema([
-                    Forms\Components\Grid::make(['default' => 1, 'sm' => 2, 'lg' => 4])
+                    Forms\Components\Grid::make(['default' => 1, 'sm' => 2])
                         ->schema([
                             Forms\Components\Select::make('departamento_id')
                                 ->label('Departamento')
