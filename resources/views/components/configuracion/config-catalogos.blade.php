@@ -116,9 +116,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($catActivo['rows'] as $row)
+                    @foreach ($catActivo['rows'] as $rowIdx => $row)
                         @php $cellsCount = count($row); @endphp
-                        <tr>
+                        <tr wire:key="cat-{{ $catActivo['id'] }}-{{ $rowIdx }}-{{ md5((string) ($row[0] ?? $rowIdx)) }}">
                             @foreach ($row as $idx => $cell)
                                 <td class="{{ $idx === 0 ? 'sigem-col-id' : ($idx === $cellsCount - 1 ? 'sigem-col-actions fi-ta-actions-cell' : 'sigem-col-content') }}">{!! $cell !!}</td>
                             @endforeach

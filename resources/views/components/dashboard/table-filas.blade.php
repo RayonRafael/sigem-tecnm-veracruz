@@ -78,7 +78,7 @@
                     default => 'neutral',
                 };
             @endphp
-            <tr>
+            <tr wire:key="inv-row-{{ $inv->id_inventario ?? $inv->id }}">
                 {{-- 0. CHECKBOX SELECCIÓN --}}
                 <td style="width: 44px; min-width: 44px; text-align: center; padding: 6px;">
                     <input

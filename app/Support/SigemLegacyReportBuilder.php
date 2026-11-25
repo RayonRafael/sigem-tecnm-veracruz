@@ -143,31 +143,60 @@ class SigemLegacyReportBuilder
         $areas = Area::with('departamento')->orderBy('nombre')->get();
         $inventarios = Inventario::select(['id_inventario', 'area_id', 'ubicacion_fisica', 'especificaciones', 'tipo_propiedad', 'estado', 'estado_registro'])->get();
 
-        // Pre-decodificar especificaciones una sola vez (O(E) en lugar de O(A * E))
-        $invMeta = $inventarios->map(function ($inv) {
-            $espec = is_array($inv->especificaciones) ? $inv->especificaciones : json_decode($inv->especificaciones ?? '[]', true);
+        $areasById = $areas->keyBy(fn ($a) => (string) $a->id_area);
+        $asignadosPorArea = [];
+        $sinAreaDirecta = [];
 
-            return [
-                'inv' => $inv,
-                'area_id' => (string) ($inv->area_id ?? ''),
-                'espec_area_id' => isset($espec['area_id']) ? (string) $espec['area_id'] : '',
-                'ubicacion' => (string) ($inv->ubicacion_fisica ?? ''),
-            ];
-        });
+        // Pasada 1: asignación exclusiva 1-a-1 por area_id o especificaciones.area_id.
+        // Evita contar un mismo equipo en múltiples áreas si varias comparten nombre
+        // o si su ubicacion_fisica contiene como subcadena el nombre de otra área.
+        foreach ($inventarios as $inv) {
+            $areaIdStr = (string) ($inv->area_id ?? '');
+            if ($areaIdStr !== '' && $areasById->has($areaIdStr)) {
+                $asignadosPorArea[$areaIdStr][] = $inv;
+                continue;
+            }
+
+            $espec = is_array($inv->especificaciones) ? $inv->especificaciones : json_decode($inv->especificaciones ?? '[]', true);
+            $especAreaIdStr = isset($espec['area_id']) ? (string) $espec['area_id'] : '';
+            if ($especAreaIdStr !== '' && $areasById->has($especAreaIdStr)) {
+                $asignadosPorArea[$especAreaIdStr][] = $inv;
+                continue;
+            }
+
+            // Solo equipos sin area_id válido pasan al fallback por texto de ubicacion_fisica
+            if ($areaIdStr === '' && $especAreaIdStr === '') {
+                $ubicacion = trim((string) ($inv->ubicacion_fisica ?? ''));
+                if ($ubicacion !== '') {
+                    $sinAreaDirecta[] = ['inv' => $inv, 'ubicacion' => $ubicacion];
+                }
+            }
+        }
+
+        // Pasada 2: fallback por ubicacion_fisica exclusivamente para equipos sin área asignada,
+        // priorizando nombres más largos (más específicos) y asignando cada equipo a lo sumo a 1 área.
+        if (! empty($sinAreaDirecta)) {
+            $areasPorEspecificidad = $areas
+                ->filter(fn ($a) => trim((string) $a->nombre) !== '')
+                ->sortByDesc(fn ($a) => mb_strlen(trim((string) $a->nombre)))
+                ->values();
+
+            foreach ($sinAreaDirecta as $item) {
+                foreach ($areasPorEspecificidad as $area) {
+                    $areaNombre = trim((string) $area->nombre);
+                    if (mb_stripos($item['ubicacion'], $areaNombre) !== false) {
+                        $asignadosPorArea[(string) $area->id_area][] = $item['inv'];
+                        break;
+                    }
+                }
+            }
+        }
 
         $rows = [];
 
         foreach ($areas as $area) {
-            $areaNombre = $area->nombre;
             $areaIdStr = (string) $area->id_area;
-
-            $areaInventarios = $invMeta->filter(function ($item) use ($areaNombre, $areaIdStr) {
-                if ($item['area_id'] === $areaIdStr || $item['espec_area_id'] === $areaIdStr) {
-                    return true;
-                }
-
-                return $item['ubicacion'] !== '' && stripos($item['ubicacion'], $areaNombre) !== false;
-            })->pluck('inv');
+            $areaInventarios = collect($asignadosPorArea[$areaIdStr] ?? []);
 
             $total = $areaInventarios->count();
             if ($total === 0) {
