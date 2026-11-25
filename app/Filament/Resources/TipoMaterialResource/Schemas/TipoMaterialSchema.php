@@ -17,7 +17,7 @@ class TipoMaterialSchema
     {
         return [
             CatalogoBaseFormSchema::section('📦 Datos del tipo de material', 'heroicon-m-rectangle-stack', [
-                CatalogoBaseFormSchema::campoNombre('Nombre del tipo', 'Ej. Equipo de Cómputo', 'heroicon-m-rectangle-stack'),
+                CatalogoBaseFormSchema::campoNombre('Nombre del tipo', 'Ej. Equipo de Cómputo', 'heroicon-m-rectangle-stack', uniqueModel: TipoMaterial::class, uniqueLabel: 'un tipo de material'),
                 Forms\Components\Select::make('familia')
                     ->label('Familia')
                     ->placeholder('Selecciona la familia...')

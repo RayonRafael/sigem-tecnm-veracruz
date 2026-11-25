@@ -7,6 +7,7 @@ use App\Models\MarcaMaterial;
 use App\Models\Receptor;
 use App\Models\TipoMaterial;
 use App\Models\UnidadMedida;
+use App\Support\SigemUniqueValidator;
 use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
@@ -51,7 +52,8 @@ class SolicitudFormSchema
                                             ->label('Nombre del material')
                                             ->placeholder('Ej. Bobina cable UTP, Pasta térmica...')
                                             ->required()
-                                            ->maxLength(100),
+                                            ->maxLength(100)
+                                            ->rule(SigemUniqueValidator::reglaCatalogoUnico(Material::class, 'un material', 'nombre', false)),
                                         SubformSlideOverHelper::catalogTip('El material estará disponible inmediatamente en el catálogo.'),
                                     ])
                                     ->createOptionUsing(function (array $data): int {

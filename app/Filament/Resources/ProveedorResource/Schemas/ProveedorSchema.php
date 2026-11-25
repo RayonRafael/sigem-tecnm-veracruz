@@ -22,7 +22,8 @@ class ProveedorSchema
                     ->placeholder('Ej. Soluciones Tecnológicas S.A. de C.V.')
                     ->required()
                     ->prefixIcon('heroicon-m-building-storefront')
-                    ->maxLength(150),
+                    ->maxLength(150)
+                    ->rule(CatalogoBaseFormSchema::reglaNombreUnico(Proveedor::class, 'un proveedor', 'nombre_empresa')),
                 Forms\Components\TextInput::make('rfc')
                     ->label('RFC')
                     ->placeholder('Ej. STE200101AAA')

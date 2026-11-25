@@ -30,6 +30,7 @@ class MaterialSchema
                                     ->required()
                                     ->prefixIcon('heroicon-m-tag')
                                     ->maxLength(150)
+                                    ->rule(CatalogoBaseFormSchema::reglaNombreUnico(Material::class, 'un material'))
                                     ->columnSpanFull(),
                                 Forms\Components\TextInput::make('modelo')
                                     ->placeholder('Ej. OptiPlex 7090')

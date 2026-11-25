@@ -8,6 +8,7 @@ use App\Models\Departamento;
 use App\Models\Inventario;
 use App\Models\MarcaMaterial;
 use App\Models\Proveedor;
+use App\Support\SigemUniqueValidator;
 use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
@@ -65,12 +66,21 @@ class EditFormTabs
                                         ->label('Nombre de la marca')
                                         ->placeholder('Ej. Dell, HP, Lenovo...')
                                         ->required()
-                                        ->maxLength(100),
+                                        ->maxLength(100)
+                                        ->rule(SigemUniqueValidator::reglaCatalogoUnico(MarcaMaterial::class, 'una marca', 'nombre', false)),
                                     SubformSlideOverHelper::catalogTip('La marca estará disponible inmediatamente en el catálogo.'),
                                 ])
                                 ->createOptionUsing(function (array $data) {
                                     $clean = trim($data['nombre']);
-                                    $marca = MarcaMaterial::firstOrCreate(['nombre' => $clean]);
+                                    $existente = SigemUniqueValidator::buscarPorValorNormalizado(MarcaMaterial::class, 'nombre', $clean);
+                                    if ($existente instanceof MarcaMaterial) {
+                                        if ($existente->trashed()) {
+                                            $existente->restore();
+                                        }
+
+                                        return $existente->nombre;
+                                    }
+                                    $marca = MarcaMaterial::create(['nombre' => $clean]);
 
                                     return $marca->nombre;
                                 })
@@ -92,6 +102,7 @@ class EditFormTabs
                             Forms\Components\TextInput::make('num_serie')
                                 ->label('Número de serie (S/N)')
                                 ->maxLength(100)
+                                ->rule(static::getNumSerieUniqueRule())
                                 ->afterStateHydrated(fn (Forms\Components\Component $component, ?Inventario $record) => $component->state($record?->num_serie ?? '')),
 
                             Forms\Components\TextInput::make('subtipo')

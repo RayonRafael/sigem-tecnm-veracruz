@@ -9,11 +9,13 @@ use App\Models\MarcaMaterial;
 use App\Models\Material;
 use App\Models\Receptor;
 use App\Models\Salon;
+use App\Support\SigemUniqueValidator;
 use Filament\Forms;
 use Filament\Tables;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\HtmlString;
+use Illuminate\Validation\ValidationException;
 
 class EditarEquipoAction
 {
@@ -139,6 +141,13 @@ class EditarEquipoAction
 
     public static function guardarCambiosEquipo(Inventario $record, array $data): Inventario
     {
+        if (array_key_exists('num_serie', $data) && filled($data['num_serie'])) {
+            $errorSn = SigemUniqueValidator::validarSerieInventario((string) $data['num_serie'], $record->getKey());
+            if ($errorSn !== null) {
+                throw ValidationException::withMessages(['num_serie' => $errorSn]);
+            }
+        }
+
         return DB::transaction(function () use ($record, $data) {
             // 1. Nombre y Marca en el registro de inventario
             $nuevoNombre = null;
@@ -154,10 +163,14 @@ class EditarEquipoAction
                 $specs['marca'] = $nuevaMarca;
                 $record->especificaciones = $specs;
 
-                $marcaModel = MarcaMaterial::withTrashed()->where('nombre', $nuevaMarca)->first();
-                if ($marcaModel && $marcaModel->trashed()) {
-                    $marcaModel->restore();
-                } elseif (! $marcaModel) {
+                $marcaModel = SigemUniqueValidator::buscarPorValorNormalizado(MarcaMaterial::class, 'nombre', $nuevaMarca);
+                if ($marcaModel instanceof MarcaMaterial) {
+                    if ($marcaModel->trashed()) {
+                        $marcaModel->restore();
+                    }
+                    $specs['marca'] = $marcaModel->nombre;
+                    $record->especificaciones = $specs;
+                } else {
                     $marcaModel = MarcaMaterial::create(['nombre' => $nuevaMarca]);
                 }
             }

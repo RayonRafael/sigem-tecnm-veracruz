@@ -8,6 +8,7 @@ use App\Filament\Schemas\CatalogoBaseTableSchema;
 use App\Models\Area;
 use App\Models\Departamento;
 use App\Models\Receptor;
+use App\Support\SigemUniqueValidator;
 use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
@@ -27,7 +28,8 @@ class ReceptorSchema
                     ->placeholder('Ej. Roberto')
                     ->required()
                     ->prefixIcon('heroicon-m-user')
-                    ->maxLength(100),
+                    ->maxLength(100)
+                    ->rule(SigemUniqueValidator::reglaReceptorUnico()),
                 Forms\Components\TextInput::make('apellido_paterno')
                     ->label('Apellido paterno')
                     ->placeholder('Ej. Hernández')
@@ -116,7 +118,8 @@ class ReceptorSchema
                             ->label('Nombre del área')
                             ->placeholder('Ej. Laboratorio de Cómputo')
                             ->required()
-                            ->maxLength(100),
+                            ->maxLength(100)
+                            ->rule(CatalogoBaseFormSchema::reglaNombreUnico(Area::class, 'un área', 'nombre', false)),
                         Forms\Components\Select::make('id_departamento')
                             ->placeholder('Selecciona...')
                             ->label('Departamento')

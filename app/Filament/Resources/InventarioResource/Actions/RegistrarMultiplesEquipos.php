@@ -10,13 +10,46 @@ use App\Models\Inventario;
 use App\Models\MarcaMaterial;
 use App\Models\Receptor;
 use App\Models\Salon;
+use App\Support\SigemUniqueValidator;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class RegistrarMultiplesEquipos
 {
     public static function ejecutar(array $data): Inventario
     {
+        $tipoValidar = $data['tipo_equipo'] ?? 'pc';
+        $seriesAValidar = [];
+
+        if ($tipoValidar === 'pc') {
+            if (! (bool) ($data['especificaciones']['no_tiene_monitor'] ?? false)) {
+                $seriesAValidar['especificaciones.monitor_sn'] = $data['especificaciones']['monitor_sn'] ?? null;
+            }
+            if (! (bool) ($data['especificaciones']['no_tiene_teclado'] ?? false)) {
+                $seriesAValidar['especificaciones.teclado_sn'] = $data['especificaciones']['teclado_sn'] ?? null;
+            }
+            if (! (bool) ($data['especificaciones']['no_tiene_mouse'] ?? false)) {
+                $seriesAValidar['especificaciones.mouse_sn'] = $data['especificaciones']['mouse_sn'] ?? null;
+            }
+            $seriesAValidar['num_serie'] = $data['num_serie'] ?? null;
+        } elseif ($tipoValidar === 'aio') {
+            if (! (bool) ($data['especificaciones']['no_tiene_teclado'] ?? false)) {
+                $seriesAValidar['especificaciones.teclado_sn'] = $data['especificaciones']['teclado_sn'] ?? null;
+            }
+            if (! (bool) ($data['especificaciones']['no_tiene_mouse'] ?? false)) {
+                $seriesAValidar['especificaciones.mouse_sn'] = $data['especificaciones']['mouse_sn'] ?? null;
+            }
+            $seriesAValidar['num_serie'] = $data['num_serie'] ?? null;
+        } else {
+            $seriesAValidar['num_serie'] = $data['num_serie'] ?? null;
+        }
+
+        $erroresSeries = SigemUniqueValidator::validarSeriesLote($seriesAValidar);
+        if (! empty($erroresSeries)) {
+            throw ValidationException::withMessages($erroresSeries);
+        }
+
         return DB::transaction(function () use ($data) {
             $tipo = $data['tipo_equipo'] ?? 'pc';
             $estacion = $data['estacion'] ?? null;
@@ -74,10 +107,13 @@ class RegistrarMultiplesEquipos
                 if (str_starts_with($clean, '__NEW__:')) {
                     $clean = trim(substr($clean, 8));
                 }
-                $marcaObj = MarcaMaterial::withTrashed()->where('nombre', $clean)->first();
-                if ($marcaObj && $marcaObj->trashed()) {
-                    $marcaObj->restore();
-                } elseif (! $marcaObj) {
+                $marcaObj = SigemUniqueValidator::buscarPorValorNormalizado(MarcaMaterial::class, 'nombre', $clean);
+                if ($marcaObj instanceof MarcaMaterial) {
+                    if ($marcaObj->trashed()) {
+                        $marcaObj->restore();
+                    }
+                    $clean = $marcaObj->nombre;
+                } else {
                     MarcaMaterial::create(['nombre' => $clean]);
                 }
                 return $clean;

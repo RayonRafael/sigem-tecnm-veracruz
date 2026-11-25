@@ -23,7 +23,12 @@ class ComponentCardsSchema
                                 ->prefixIcon('heroicon-m-qr-code')
                                 ->required(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'pc')
                                 ->dehydrated(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'pc')
-                                ->maxLength(100),
+                                ->maxLength(100)
+                                ->rule(static::getNumSerieUniqueRule([
+                                    ['field' => 'especificaciones.monitor_sn', 'skipIf' => 'especificaciones.no_tiene_monitor', 'onlyTypes' => ['pc']],
+                                    ['field' => 'especificaciones.teclado_sn', 'skipIf' => 'especificaciones.no_tiene_teclado', 'onlyTypes' => ['pc']],
+                                    ['field' => 'especificaciones.mouse_sn', 'skipIf' => 'especificaciones.no_tiene_mouse', 'onlyTypes' => ['pc']],
+                                ])),
 
                             static::getMarcaSelectField('especificaciones.cpu_marca', fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'pc'),
 
@@ -72,7 +77,12 @@ class ComponentCardsSchema
                                 ->prefixIcon('heroicon-m-qr-code')
                                 ->required(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'pc' && ! $get('especificaciones.no_tiene_monitor'))
                                 ->disabled(fn (Forms\Get $get) => (bool) $get('especificaciones.no_tiene_monitor'))
-                                ->maxLength(100),
+                                ->maxLength(100)
+                                ->rule(static::getNumSerieUniqueRule([
+                                    ['field' => 'num_serie', 'onlyTypes' => ['pc']],
+                                    ['field' => 'especificaciones.teclado_sn', 'skipIf' => 'especificaciones.no_tiene_teclado', 'onlyTypes' => ['pc']],
+                                    ['field' => 'especificaciones.mouse_sn', 'skipIf' => 'especificaciones.no_tiene_mouse', 'onlyTypes' => ['pc']],
+                                ])),
 
                             static::getMarcaSelectField(
                                 'especificaciones.monitor_marca',
@@ -114,7 +124,11 @@ class ComponentCardsSchema
                                 ->prefixIcon('heroicon-m-qr-code')
                                 ->required(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'aio')
                                 ->dehydrated(fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'aio')
-                                ->maxLength(100),
+                                ->maxLength(100)
+                                ->rule(static::getNumSerieUniqueRule([
+                                    ['field' => 'especificaciones.teclado_sn', 'skipIf' => 'especificaciones.no_tiene_teclado', 'onlyTypes' => ['aio']],
+                                    ['field' => 'especificaciones.mouse_sn', 'skipIf' => 'especificaciones.no_tiene_mouse', 'onlyTypes' => ['aio']],
+                                ])),
 
                             static::getMarcaSelectField('especificaciones.marca', fn (Forms\Get $get) => ($get('tipo_equipo') ?? 'pc') === 'aio'),
 
@@ -163,7 +177,12 @@ class ComponentCardsSchema
                                 ->prefixIcon('heroicon-m-qr-code')
                                 ->required(fn (Forms\Get $get) => in_array($get('tipo_equipo') ?? 'pc', ['pc', 'aio']) && ! $get('especificaciones.no_tiene_teclado'))
                                 ->disabled(fn (Forms\Get $get) => (bool) $get('especificaciones.no_tiene_teclado'))
-                                ->maxLength(100),
+                                ->maxLength(100)
+                                ->rule(static::getNumSerieUniqueRule([
+                                    ['field' => 'num_serie', 'onlyTypes' => ['pc', 'aio']],
+                                    ['field' => 'especificaciones.monitor_sn', 'skipIf' => 'especificaciones.no_tiene_monitor', 'onlyTypes' => ['pc']],
+                                    ['field' => 'especificaciones.mouse_sn', 'skipIf' => 'especificaciones.no_tiene_mouse', 'onlyTypes' => ['pc', 'aio']],
+                                ])),
 
                             static::getMarcaSelectField(
                                 'especificaciones.teclado_marca',
@@ -219,7 +238,12 @@ class ComponentCardsSchema
                                 ->prefixIcon('heroicon-m-qr-code')
                                 ->required(fn (Forms\Get $get) => in_array($get('tipo_equipo') ?? 'pc', ['pc', 'aio']) && ! $get('especificaciones.no_tiene_mouse'))
                                 ->disabled(fn (Forms\Get $get) => (bool) $get('especificaciones.no_tiene_mouse'))
-                                ->maxLength(100),
+                                ->maxLength(100)
+                                ->rule(static::getNumSerieUniqueRule([
+                                    ['field' => 'num_serie', 'onlyTypes' => ['pc', 'aio']],
+                                    ['field' => 'especificaciones.monitor_sn', 'skipIf' => 'especificaciones.no_tiene_monitor', 'onlyTypes' => ['pc']],
+                                    ['field' => 'especificaciones.teclado_sn', 'skipIf' => 'especificaciones.no_tiene_teclado', 'onlyTypes' => ['pc', 'aio']],
+                                ])),
 
                             static::getMarcaSelectField(
                                 'especificaciones.mouse_marca',
@@ -284,7 +308,8 @@ class ComponentCardsSchema
                                 ->prefixIcon('heroicon-m-qr-code')
                                 ->required(fn (Forms\Get $get) => ! in_array($get('tipo_equipo') ?? 'pc', ['pc', 'aio']))
                                 ->dehydrated(fn (Forms\Get $get) => ! in_array($get('tipo_equipo') ?? 'pc', ['pc', 'aio']))
-                                ->maxLength(100),
+                                ->maxLength(100)
+                                ->rule(static::getNumSerieUniqueRule()),
 
                             static::getMarcaSelectField('especificaciones.marca', fn (Forms\Get $get) => ! in_array($get('tipo_equipo') ?? 'pc', ['pc', 'aio'])),
 

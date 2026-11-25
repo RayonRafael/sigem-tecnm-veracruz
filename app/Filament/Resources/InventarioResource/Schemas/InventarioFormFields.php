@@ -5,6 +5,7 @@ namespace App\Filament\Resources\InventarioResource\Schemas;
 use App\Models\Inventario;
 use App\Models\MarcaMaterial;
 use App\Models\Receptor;
+use App\Support\SigemUniqueValidator;
 use App\Support\SubformSlideOverHelper;
 use Filament\Forms;
 use Filament\Forms\Components\Actions\Action;
@@ -12,6 +13,16 @@ use Illuminate\Support\Carbon;
 
 trait InventarioFormFields
 {
+    /**
+     * Regla de unicidad para No. de serie (case-insensitive, incluye soft-deleted, permite vacío).
+     *
+     * @param  array<int, array{field: string, skipIf?: string, onlyTypes?: array<int, string>}>  $camposHermanos
+     */
+    protected static function getNumSerieUniqueRule(array $camposHermanos = []): \Closure
+    {
+        return SigemUniqueValidator::reglaSerieUnica($camposHermanos);
+    }
+
     public static function getRentaFechaFinField(): Forms\Components\DatePicker
     {
         return Forms\Components\DatePicker::make('renta_fecha_fin')
@@ -274,7 +285,15 @@ trait InventarioFormFields
                     if (str_starts_with($clean, '__NEW__:')) {
                         $clean = trim(substr($clean, 8));
                     }
-                    MarcaMaterial::firstOrCreate(['nombre' => $clean]);
+                    $existente = SigemUniqueValidator::buscarPorValorNormalizado(MarcaMaterial::class, 'nombre', $clean);
+                    if ($existente instanceof MarcaMaterial) {
+                        if ($existente->trashed()) {
+                            $existente->restore();
+                        }
+                        $clean = $existente->nombre;
+                    } else {
+                        MarcaMaterial::create(['nombre' => $clean]);
+                    }
                     if ($clean !== $state) {
                         $set($fieldName, $clean);
                     }
@@ -286,12 +305,22 @@ trait InventarioFormFields
                     ->label('Nombre de la marca')
                     ->placeholder('Ej. Dell, HP, Lenovo...')
                     ->required()
-                    ->maxLength(100),
+                    ->maxLength(100)
+                    ->rule(SigemUniqueValidator::reglaCatalogoUnico(MarcaMaterial::class, 'una marca', 'nombre', false)),
                 SubformSlideOverHelper::catalogTip('La marca estará disponible inmediatamente en el catálogo.'),
             ])
             ->createOptionUsing(function (array $data) {
                 $clean = trim($data['nombre']);
-                $marca = MarcaMaterial::firstOrCreate(['nombre' => $clean]);
+                $existente = SigemUniqueValidator::buscarPorValorNormalizado(MarcaMaterial::class, 'nombre', $clean);
+                if ($existente instanceof MarcaMaterial) {
+                    if ($existente->trashed()) {
+                        $existente->restore();
+                    }
+
+                    return $existente->nombre;
+                }
+                $marca = MarcaMaterial::create(['nombre' => $clean]);
+
                 return $marca->nombre;
             })
             ->createOptionAction(function (Action $action) {

@@ -28,7 +28,7 @@ class MarcaMaterialResource extends Resource
     {
         return [
             CatalogoBaseFormSchema::section('🏷 Datos de la marca', 'heroicon-m-tag', [
-                CatalogoBaseFormSchema::campoNombre('Nombre de la marca', 'Ej. Dell, HP, Cisco'),
+                CatalogoBaseFormSchema::campoNombre('Nombre de la marca', 'Ej. Dell, HP, Cisco', uniqueModel: MarcaMaterial::class, uniqueLabel: 'una marca'),
             ]),
         ];
     }
