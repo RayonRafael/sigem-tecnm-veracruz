@@ -60,6 +60,7 @@ html {
 }
 
 .fi-panel-servicio-social {
+
   .fi-ta-ctn,
   .fi-ta-content,
   .fi-ta-table tbody tr {
@@ -222,6 +223,7 @@ button[role="switch"][aria-checked="true"] {
 
 /* ===== 6. LABELS DE CAMPOS ===== */
 .fi-fo-field-wrp-label {
+
   &,
   * {
     color: #334155 !important;
@@ -424,7 +426,7 @@ button[role="switch"][aria-checked="true"] {
   overflow: visible !important;
   min-width: 0 !important;
 
-  > .min-w-0.flex-1 {
+  >.min-w-0.flex-1 {
     min-width: 0 !important;
     max-width: 100% !important;
     overflow: visible !important;
