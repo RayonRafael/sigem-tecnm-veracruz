@@ -186,7 +186,9 @@ class SigemReportExporter
 
         $hasChart = ! empty($meta['has_chart']);
         $chartConfig = $hasChart ? self::buildChartConfig($meta, $headers, $rows) : null;
-        $totalesLabel = self::computeTotalesLabel($meta['id'] ?? $canonical, $rows);
+        $reportId = $meta['id'] ?? $canonical;
+        $totalesLabel = self::computeTotalesLabel($reportId, $rows);
+        $resumenInline = self::computeResumenInline($reportId, $headers, $rows);
 
         $top5Headers = array_slice($headers, 0, min(3, count($headers)));
         $top5Rows = [];
@@ -195,15 +197,19 @@ class SigemReportExporter
         }
 
         return [
-            'id' => $meta['id'] ?? $canonical,
-            'alias' => $meta['alias'] ?? ($meta['id'] ?? $canonical),
+            'id' => $reportId,
+            'alias' => $meta['alias'] ?? $reportId,
             'subpestana' => $meta['categoria'] ?? 'inventario',
             'titulo' => $meta['titulo'] ?? 'Reporte',
-            'chart_title' => $meta['chart_title'] ?? ($meta['titulo'] ?? 'Reporte'),
+            'titulo_ui' => $meta['titulo_ui'] ?? ($meta['titulo'] ?? 'Reporte'),
+            'chart_title' => $meta['chart_title'] ?? ($meta['titulo_ui'] ?? ($meta['titulo'] ?? 'Reporte')),
             'chart_unit' => $meta['chart_unit'] ?? 'registros',
             'emoji' => $meta['icono'] ?? '📊',
+            'descripcion_corta' => $meta['descripcion_corta'] ?? ($meta['descripcion'] ?? ''),
             'descripcion' => $meta['descripcion'] ?? '',
+            'nota_grafica' => $meta['nota_grafica'] ?? null,
             'usa_fechas' => (bool) ($meta['usa_fechas'] ?? false),
+            'resumen_inline' => $resumenInline,
             'headers' => $headers,
             'rows' => $rows,
             'total' => count($rows),
@@ -222,6 +228,58 @@ class SigemReportExporter
     public static function buildChartConfig(array $meta, array $headers, array $rows): ?array
     {
         return SigemReportChartBuilder::build($meta, $headers, $rows);
+    }
+
+    /**
+     * Genera el resumen inline conciso para el encabezado del acordeón (ej. "· 14 deptos · 472 equipos").
+     */
+    public static function computeResumenInline(string $id, array $headers, array $rows): string
+    {
+        $count = count($rows);
+
+        return match ($id) {
+            'inventario_por_departamento', 'inv_depto' => '· ' . $count . ' deptos · ' . array_sum(array_map('intval', array_column($rows, 1))) . ' equipos',
+            'inventario_por_tipo', 'inv_tipo' => "· {$count} tipos",
+            'inventario_por_estado', 'inv_estado' => "· {$count} estados",
+            'estadisticas_depto_mas_equipos', 'est_top_deptos' => "· {$count} deptos",
+            'estadisticas_mas_movidos', 'est_movidos' => "· {$count} equipos",
+            'estadisticas_propio_vs_rentado', 'est_propiedad' => '· ' . array_sum(array_map('intval', array_column($rows, 1))) . ' equipos',
+            'mantenimiento_depto_pide_mas', 'mant_top_deptos' => "· {$count} deptos",
+            'mantenimiento_por_mes', 'mant_por_mes' => "· {$count} meses",
+            'rentas_proximas_vencer', 'rent_por_vencer' => "· {$count} equipos",
+            'rentas_gasto_mensual', 'rent_gasto_mensual' => '· $' . number_format(array_sum(array_map(
+                fn ($r) => (float) preg_replace('/[^0-9.]/', '', (string) ($r[2] ?? '0')),
+                $rows
+            )), 2) . ' MXN total',
+            'historico_cambios_area', 'hist_cambios_area' => "· {$count} cambios",
+            'historico_actividad_usuario', 'hist_actividad_usuario' => "· {$count} usuarios",
+            'inventario_general', 'inv_general' => "· {$count} registros · " . count($headers) . ' columnas',
+            'inventario_por_area', 'inv_area' => "· {$count} áreas",
+            'inventario_por_aula', 'inv_aula' => "· {$count} aulas",
+            'estadisticas_antiguos', 'est_antiguos' => '· Top 20',
+            'estadisticas_sin_asignar', 'est_sin_asignar' => "· {$count} equipos",
+            'estadisticas_resumen_general', 'est_resumen' => '· ' . count($headers) . ' métricas',
+            'mantenimiento_tipo_mas_frecuente', 'mant_top_tipos' => "· {$count} tipos",
+            'mantenimiento_en_curso', 'mant_activos' => "· {$count} equipos",
+            'mantenimiento_tiempo_promedio', 'mant_tiempos' => (function () use ($rows): string {
+                $vals = array_values(array_filter(array_map(
+                    fn ($r) => (float) preg_replace('/[^0-9.]/', '', (string) ($r[1] ?? '0')),
+                    $rows
+                ), fn ($v) => $v >= 0));
+                $prom = count($vals) > 0 ? round(array_sum($vals) / count($vals), 1) : 0;
+
+                return "· {$prom} días prom";
+            })(),
+            'mantenimiento_historial_equipo', 'mant_historial' => "· {$count} registros",
+            'rentas_equipos', 'rent_activas' => "· {$count} equipos",
+            'rentas_vencidas', 'rent_vencidas' => "· {$count} equipos",
+            'rentas_por_proveedor', 'rent_proveedores' => "· {$count} proveedores",
+            'rent_seguimiento' => "· {$count} registros",
+            'historico_bajas', 'hist_bajas' => "· {$count} registros",
+            'historico_entregas', 'hist_entregas' => "· {$count} registros",
+            'historico_general', 'hist_general' => "· {$count} registros",
+            default => "· {$count} registros",
+        };
     }
 
     /**

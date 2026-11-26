@@ -24,14 +24,19 @@
         || str_contains(mb_strtolower($h, 'UTF-8'), 'cantidad')
         || str_contains(mb_strtolower($h, 'UTF-8'), 'porcentaje')
         || str_contains(mb_strtolower($h, 'UTF-8'), 'días');
+
+    $tituloUi = $rep['titulo_ui'] ?? $rep['titulo'];
+    $tituloLegacy = $rep['titulo'] ?? $tituloUi;
+    $resumenInline = $rep['resumen_inline'] ?? ("· {$totalFilas} registros");
+    $descCorta = $rep['descripcion_corta'] ?? ($rep['descripcion'] ?? '');
 @endphp
 
 <div class="sigem-rep-card sigem-rep-acc-item"
      :class="{ 'is-open': openId === '{{ $repId }}' }"
      wire:key="sigem-new-table-{{ $repId }}">
-    {{-- Fila clickeable del acordeón --}}
+    {{-- Fila clickeable del acordeón (descriptiva en 2 líneas: título + resumen inline + descripción visible) --}}
     <button type="button"
-            class="sigem-rep-acc-trigger"
+            class="sigem-rep-acc-trigger sigem-rep-acc-trigger-rich"
             :class="{ 'is-open': openId === '{{ $repId }}' }"
             :aria-expanded="(openId === '{{ $repId }}').toString()"
             @click="openId = (openId === '{{ $repId }}' ? null : '{{ $repId }}')">
@@ -39,11 +44,24 @@
               :class="{ 'is-open': openId === '{{ $repId }}' }"
               x-text="openId === '{{ $repId }}' ? '▼' : '▶'">{{ $esInicialmenteAbierto ? '▼' : '▶' }}</span>
         <span class="sigem-rep-ico sigem-rep-acc-ico">{{ $rep['emoji'] }}</span>
-        <span class="sigem-rep-t sigem-rep-acc-title">{{ $rep['titulo'] }}</span>
+        <span class="sigem-rep-acc-meta-col">
+            <span class="sigem-rep-acc-line1">
+                <span class="sigem-rep-t sigem-rep-acc-title-text">{{ $tituloUi }}</span>
+                @if ($tituloLegacy !== $tituloUi)
+                    <span class="sr-only">{{ $tituloLegacy }}</span>
+                @endif
+                @if (! empty($resumenInline))
+                    <span class="sigem-rep-acc-summary">{{ $resumenInline }}</span>
+                @endif
+            </span>
+            @if (! empty($descCorta))
+                <span class="sigem-rep-acc-subdesc">{{ $descCorta }}</span>
+            @endif
+        </span>
         <span class="sigem-rep-acc-badge" title="{{ $totalFilas }} registros">{{ $totalFilas }}</span>
     </button>
 
-    {{-- Panel colapsable: descripción + toggle SS + Excel/CSV + tabla completa + paginación --}}
+    {{-- Panel colapsable: toggle SS + Excel/CSV + tabla completa + paginación --}}
     <div class="sigem-rep-acc-panel accordion-content"
          x-show="openId === '{{ $repId }}'"
          @if (! $esInicialmenteAbierto) x-cloak @endif
@@ -54,11 +72,7 @@
          x-transition:leave-start="sigem-acc-leave-start"
          x-transition:leave-end="sigem-acc-leave-end">
         <div class="sigem-rep-acc-toolbar">
-            @if (! empty($rep['descripcion']))
-                <div class="sigem-rep-d" style="margin-bottom: 10px;">{{ $rep['descripcion'] }}</div>
-            @endif
-
-            <div class="sigem-rep-foot sigem-rep-principal-controls">
+            <div class="sigem-rep-foot sigem-rep-principal-controls" style="border-top: none; padding-top: 0;">
                 @if ($esAdmin)
                     <label class="sigem-sw" title="Activar o desactivar visibilidad para Servicio Social">
                         <input type="checkbox"

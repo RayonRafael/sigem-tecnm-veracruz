@@ -93,6 +93,19 @@ if (!window.sigemChartComponent) {
 
                 const isHorizontal = chartConfig.options?.indexAxis === 'y';
                 const isPieOrDonut = ['pie', 'doughnut'].includes(chartConfig.type);
+                const labelsCount = Array.isArray(chartConfig.labels) ? chartConfig.labels.length : 0;
+
+                // Altura dinámica sin scroll interno: max(350, cantidad_items × 40 + 120) en barras horizontales
+                const wrap = this.$refs.canvas.parentElement;
+                if (wrap) {
+                    wrap.style.overflow = 'visible';
+                    if (isHorizontal && labelsCount > 0) {
+                        const dynamicHeight = Math.max(350, labelsCount * 40 + 120);
+                        wrap.style.minHeight = dynamicHeight + 'px';
+                        wrap.style.height = dynamicHeight + 'px';
+                    }
+                }
+
                 const baseScales = chartConfig.options?.scales ? JSON.parse(JSON.stringify(chartConfig.options.scales)) : {};
                 const finalScales = {};
 

@@ -33,12 +33,18 @@
     if ($isPieOrDonut) {
         $canvasHeight = 400;
     } elseif ($isHorizontalBar) {
-        $canvasHeight = max(350, $numPuntos * 40 + 80);
+        // Altura dinámica sin scroll interno: max(350, cantidad_items × 40 + 120)
+        $canvasHeight = max(350, $numPuntos * 40 + 120);
     } else {
         $canvasHeight = 360;
     }
 
-    $chartTitleDisplay = $rep['chart_title'] ?? ($rep['chart']['chart_title'] ?? $rep['titulo']);
+    $tituloUi = $rep['titulo_ui'] ?? $rep['titulo'];
+    $tituloLegacy = $rep['titulo'] ?? $tituloUi;
+    $resumenInline = $rep['resumen_inline'] ?? ("· {$totalFilas} registros");
+    $descCorta = $rep['descripcion_corta'] ?? ($rep['descripcion'] ?? '');
+    $notaGrafica = $rep['nota_grafica'] ?? null;
+    $chartTitleDisplay = $rep['chart_title'] ?? ($rep['chart']['chart_title'] ?? $tituloUi);
 
     $esColNum = fn (string $h): bool => (bool) preg_match('/^(cantidad|total|propios|rentados|solicitudes|completadas|pendientes|porcentaje|%|días|dias|mín|min|máx|max|equipos|deptos|áreas|areas|usuarios|acciones|costo|año|frecuencia)/u', mb_strtolower(trim($h), 'UTF-8'))
         || str_contains(mb_strtolower($h, 'UTF-8'), 'cantidad')
@@ -49,9 +55,9 @@
 <div class="sigem-rep-card sigem-rep-acc-item sigem-chart-card"
      :class="{ 'is-open': openId === '{{ $repId }}' }"
      wire:key="sigem-new-chart-{{ $repId }}">
-    {{-- Fila clickeable del acordeón --}}
+    {{-- Fila clickeable del acordeón (descriptiva en 2 líneas: título + resumen inline + descripción visible) --}}
     <button type="button"
-            class="sigem-rep-acc-trigger"
+            class="sigem-rep-acc-trigger sigem-rep-acc-trigger-rich"
             :class="{ 'is-open': openId === '{{ $repId }}' }"
             :aria-expanded="(openId === '{{ $repId }}').toString()"
             @click="openId = (openId === '{{ $repId }}' ? null : '{{ $repId }}')">
@@ -59,11 +65,24 @@
               :class="{ 'is-open': openId === '{{ $repId }}' }"
               x-text="openId === '{{ $repId }}' ? '▼' : '▶'">{{ $esInicialmenteAbierto ? '▼' : '▶' }}</span>
         <span class="sigem-rep-ico sigem-rep-acc-ico">{{ $rep['emoji'] }}</span>
-        <span class="sigem-rep-t sigem-rep-acc-title">{{ $rep['titulo'] }}</span>
+        <span class="sigem-rep-acc-meta-col">
+            <span class="sigem-rep-acc-line1">
+                <span class="sigem-rep-t sigem-rep-acc-title-text">{{ $tituloUi }}</span>
+                @if ($tituloLegacy !== $tituloUi)
+                    <span class="sr-only">{{ $tituloLegacy }}</span>
+                @endif
+                @if (! empty($resumenInline))
+                    <span class="sigem-rep-acc-summary">{{ $resumenInline }}</span>
+                @endif
+            </span>
+            @if (! empty($descCorta))
+                <span class="sigem-rep-acc-subdesc">{{ $descCorta }}</span>
+            @endif
+        </span>
         <span class="sigem-rep-acc-badge" title="{{ $totalFilas }} registros">{{ $totalFilas }}</span>
     </button>
 
-    {{-- Panel colapsable: descripción + Chart.js ancho completo + controles + tabla paginada --}}
+    {{-- Panel colapsable: Chart.js ancho completo sin scroll interno + nota + controles + tabla paginada --}}
     <div class="sigem-rep-acc-panel accordion-content"
          x-show="openId === '{{ $repId }}'"
          @if (! $esInicialmenteAbierto) x-cloak @endif
@@ -73,20 +92,7 @@
          x-transition:leave="sigem-acc-leave"
          x-transition:leave-start="sigem-acc-leave-start"
          x-transition:leave-end="sigem-acc-leave-end">
-        @if (! empty($rep['descripcion']) || ! empty($chartTitleDisplay))
-            <div class="sigem-rep-acc-desc-bar">
-                @if (! empty($chartTitleDisplay) && $chartTitleDisplay !== ($rep['titulo'] ?? ''))
-                    <div class="sigem-chart-subtitle" style="font-size: 14.5px; font-weight: 700; color: #0f172a; margin-bottom: 3px;">
-                        {{ $chartTitleDisplay }}
-                    </div>
-                @endif
-                @if (! empty($rep['descripcion']))
-                    <div class="sigem-rep-d">{{ $rep['descripcion'] }}</div>
-                @endif
-            </div>
-        @endif
-
-        {{-- CONTENEDOR CANVAS DE ANCHO COMPLETO (wire:ignore evita parpadeo al paginar) --}}
+        {{-- CONTENEDOR CANVAS DE ANCHO COMPLETO SIN SCROLL INTERNO (crece según los datos) --}}
         <div class="sigem-hybrid-chart-body"
              wire:ignore
              wire:key="sigem-chart-box-{{ $repId }}-{{ $chartHash }}"
@@ -94,15 +100,20 @@
              x-init="initChart()"
              x-effect="if (openId === '{{ $repId }}') { $nextTick(() => ensureRendered()); }">
             @if ($numPuntos > 0)
-                <div class="sigem-chart-scroll-box" style="{{ $isHorizontalBar && $canvasHeight > 560 ? 'max-height: 560px; overflow-y: auto; padding-right: 4px;' : '' }}">
-                    <div class="sigem-chart-canvas-wrap {{ $isPieOrDonut ? 'sigem-chart-radial-wrap' : 'sigem-chart-wide-wrap' }}"
-                         style="min-height: {{ $canvasHeight }}px; height: {{ $canvasHeight }}px; position: relative;">
-                        <canvas x-ref="canvas"></canvas>
-                    </div>
+                <div class="sigem-chart-canvas-wrap {{ $isPieOrDonut ? 'sigem-chart-radial-wrap' : 'sigem-chart-wide-wrap' }}"
+                     style="min-height: {{ $canvasHeight }}px; height: {{ $canvasHeight }}px; position: relative; overflow: visible;">
+                    <canvas x-ref="canvas"></canvas>
                 </div>
             @else
                 <div class="sin-grafica" style="padding: 24px; text-align: center; color: #94a3b8; background: #f8fafc; border-radius: 8px; border: 1px dashed #cbd5e1; font-size: 13.5px;">
                     📊 Datos insuficientes para gráfica
+                </div>
+            @endif
+
+            @if (! empty($notaGrafica))
+                <div class="sigem-chart-note">
+                    <span>📌</span>
+                    <span><strong>Nota:</strong> {{ $notaGrafica }}</span>
                 </div>
             @endif
         </div>

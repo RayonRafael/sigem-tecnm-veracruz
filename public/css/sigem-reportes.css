@@ -322,17 +322,32 @@ select.sigem-filter-input::-ms-expand,
     border-radius: 10px;
     padding: 14px 16px;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow: visible;
 }
 .sigem-chart-wide-wrap {
     width: 100%;
     min-height: 350px;
+    overflow: visible;
 }
 .sigem-chart-radial-wrap {
     width: 100%;
     max-width: 720px;
     min-height: 400px;
     margin: 0 auto;
+    overflow: visible;
+}
+.sigem-chart-note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    font-size: 12.5px;
+    color: #475569;
+    line-height: 1.4;
 }
 .sigem-btn-export-excel {
     background: #1b396a;
@@ -439,6 +454,49 @@ select.sigem-filter-input::-ms-expand,
     flex: 1;
     min-width: 0;
 }
+.sigem-rep-acc-trigger-rich {
+    align-items: flex-start;
+    padding: 14px 20px;
+}
+.sigem-rep-acc-trigger-rich .sigem-rep-acc-arrow,
+.sigem-rep-acc-trigger-rich .sigem-rep-acc-ico {
+    margin-top: 2px;
+}
+.sigem-rep-acc-meta-col {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.sigem-rep-acc-line1 {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+    line-height: 1.35;
+}
+.sigem-rep-acc-title-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0f172a;
+}
+.sigem-rep-acc-summary {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #1d4ed8;
+    font-variant-numeric: tabular-nums;
+}
+.sigem-rep-acc-trigger.is-open .sigem-rep-acc-summary {
+    color: #1b396a;
+}
+.sigem-rep-acc-subdesc {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 400;
+    color: #64748b;
+    line-height: 1.4;
+}
 .sigem-rep-acc-badge {
     display: inline-flex;
     align-items: center;
@@ -461,7 +519,7 @@ select.sigem-filter-input::-ms-expand,
 }
 .accordion-content,
 .sigem-rep-acc-panel {
-    overflow: hidden;
+    overflow: visible;
     background: #ffffff;
 }
 .sigem-acc-enter {
@@ -628,6 +686,7 @@ select.sigem-filter-input::-ms-expand,
     padding: 16px 22px 18px;
     border-bottom: 1px solid #f1f5f9;
     background: #ffffff;
+    overflow: visible;
 }
 .sigem-hybrid-chart-controls {
     display: flex;
